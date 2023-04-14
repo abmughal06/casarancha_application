@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "956181357951",
+    "project_id": "casarancha-81b7c",
+    "storage_bucket": "casarancha-81b7c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956181357951:android:a881490c77add423b1a64a",
+        "android_client_info": {
+          "package_name": "com.zb.casarancha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956181357951-5pqo21b5kf282gmbbrck4n874csm8aic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2NOqeUHxFWT9bTWvC3CHgrzEJhTziiHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956181357951-5pqo21b5kf282gmbbrck4n874csm8aic.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

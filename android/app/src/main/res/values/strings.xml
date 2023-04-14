@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Casarancha</string>
+    <string name="facebook_app_id">5791300140991335</string>
+    <string name="fb_login_protocol_scheme">fb5791300140991335</string>
+    <string name="facebook_client_token">fdd96669931dd4fcf601f0d0b61d72d8</string>
+</resources>
