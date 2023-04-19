@@ -6,7 +6,7 @@ import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_helper.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
 import 'package:casarancha/utils/snackbar.dart';
-import 'package:casarancha/widgets/PostCard/PostCard.dart';
+import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

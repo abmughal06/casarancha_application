@@ -170,12 +170,12 @@ print(decodedImage.height);
           await ImagePicker().pickImage(source: ImageSource.gallery);
 
       if (pickedPhoto != null) {
-        File? cropedImage = await cropImage(pickedPhoto.path);
-        if (cropedImage != null) {
-          photosList.add(cropedImage);
-        } /* else {
-          photosList.add(File(pickedPhoto.path));
-        } */
+        CroppedFile? croppedImage = await ImageCropper().cropImage(
+            sourcePath: pickedPhoto.path,
+            aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
+        var image = File(croppedImage!.path);
+
+        photosList.add(image);
       }
     } catch (e) {
       GlobalSnackBar.show(message: 'Operation Cancelled');

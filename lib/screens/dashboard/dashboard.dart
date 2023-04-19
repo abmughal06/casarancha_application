@@ -1,4 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_helper.dart';
@@ -9,7 +10,6 @@ import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
-import 'package:casarancha/utils/app_constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ import '../../resources/color_resources.dart';
 import '../home/HomeScreen/home_screen_controller.dart';
 
 class DashBoard extends StatefulWidget {
-  DashBoard({Key? key}) : super(key: key);
+  const DashBoard({Key? key}) : super(key: key);
 
   @override
   State<DashBoard> createState() => _DashBoardState();
@@ -49,8 +49,9 @@ class _DashBoardState extends State<DashBoard>
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return SafeArea(
+    super.build(context);
+    return Obx(
+      () => SafeArea(
         top: profileScreenController.isGhostModeOn.value,
         bottom: profileScreenController.isGhostModeOn.value,
         child: Scaffold(
@@ -67,9 +68,9 @@ class _DashBoardState extends State<DashBoard>
               controller: dashboardController.pageController,
               onPageChanged: (value) {},
               children: [
-                HomeScreen(),
-                SearchScreen(),
-                MyGroupsScreen(),
+                const HomeScreen(),
+                const SearchScreen(),
+                const MyGroupsScreen(),
                 ChatListScreen(),
                 ProfileScreen(),
               ],
@@ -80,7 +81,10 @@ class _DashBoardState extends State<DashBoard>
           floatingActionButton: Card(
             margin: EdgeInsets.symmetric(
               horizontal: 20.w,
-              vertical: profileScreenController.isGhostModeOn.value ? 10.w : 0,
+              vertical: Platform.isAndroid ||
+                      profileScreenController.isGhostModeOn.value
+                  ? 10.w
+                  : 0.w,
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(
@@ -155,8 +159,8 @@ class _DashBoardState extends State<DashBoard>
             ),
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   @override

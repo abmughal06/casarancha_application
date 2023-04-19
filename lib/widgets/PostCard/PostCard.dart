@@ -1,17 +1,6 @@
-// ignore_for_file: unnecessary_null_comparison
-
-import 'dart:math';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/post_model.dart';
-import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 import 'package:readmore/readmore.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -288,7 +277,7 @@ class PostRowButtons extends StatelessWidget {
       children: [
         IconButton(
           visualDensity: VisualDensity.compact,
-          onPressed: postCardController.likeDisLikePost,
+          onPressed: () {},
           icon: Obx(
             () => Icon(
               Icons.thumb_up_alt_rounded,
@@ -386,19 +375,12 @@ class _NewPostCardState extends State<NewPostCard>
     return Container(
       margin: EdgeInsets.symmetric(
         vertical: 10.w,
-        horizontal: 20.w,
+        // horizontal: 20.w,
       ),
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.8),
-            blurRadius: 2.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,7 +394,7 @@ class _NewPostCardState extends State<NewPostCard>
                 return Container(
                   color: Colors.grey.shade100,
                   child: AspectRatio(
-                      aspectRatio: isOnlyQoute ? 1.6 : 1.2,
+                      aspectRatio: 2 / 3,
                       child: PageView(
                         controller: _pageController,
                         children: setContainer(
@@ -429,7 +411,7 @@ class _NewPostCardState extends State<NewPostCard>
             postCardController: widget.postCardController,
           ),
           Visibility(
-            visible: widget.postCardController.post.value.description != null &&
+            visible:
                 widget.postCardController.post.value.description.isNotEmpty,
             child: Padding(
               padding: EdgeInsets.only(

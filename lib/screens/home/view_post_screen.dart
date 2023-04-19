@@ -4,7 +4,7 @@ import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
-import 'package:casarancha/widgets/PostCard/PostCard.dart';
+import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/menu_post_button.dart';
 

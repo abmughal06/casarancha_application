@@ -104,3 +104,8 @@ const icBottomDeSelSearch =
     "assets/images/img_home_page/ic_btm_de_sel_search.svg";
 const icBottomDeSelGrp = "assets/images/img_home_page/ic_btm_de_sel_grp.svg";
 const icBottomDeSelChat = "assets/images/img_home_page/ic_btm_de_sel_chat.svg";
+const postLike = "assets/images/post_like_white.png";
+const postLikeRed = "assets/images/like_red.png";
+const postComment = "assets/images/post_cmnt.png";
+const postSave = "assets/images/post_save.png";
+const postSend = "assets/images/post_share.png";

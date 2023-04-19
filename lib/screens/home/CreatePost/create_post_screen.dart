@@ -68,6 +68,7 @@ class CreatePostScreen extends StatelessWidget {
       length: _createPostTabs.length,
       child: Scaffold(
         appBar: primaryAppbar(
+          elevation: 1,
           title: 'Create Post',
           bottom: primaryTabBar(
             tabs: _createPostTabs,
@@ -88,7 +89,7 @@ class CreatePostScreen extends StatelessWidget {
                     child: TextField(
                       controller: createPostController.quoteTextController,
                       style: const TextStyle(
-                        backgroundColor: colorFF4,
+                        backgroundColor: Colors.transparent,
                         fontSize: 25,
                         height: 1.6,
                       ),
@@ -130,57 +131,53 @@ class CreatePostScreen extends StatelessWidget {
                                 final photoFile =
                                     createPostController.photosList[index];
                                 return Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: 10.w,
-                                  ),
-                                  child: Container(
-                                    constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width /
-                                                1.2),
-                                    child: Center(
-                                      child: Card(
-                                        elevation: 5,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                              10.r,
+                                    padding: EdgeInsets.only(
+                                      bottom: 10.w,
+                                    ),
+                                    child: AspectRatio(
+                                      aspectRatio: 2 / 3,
+                                      child: Center(
+                                        child: Card(
+                                          elevation: 5,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(
+                                                10.r,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(
-                                                  10.r,
+                                          child: Stack(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(
+                                                    10.r,
+                                                  ),
+                                                ),
+                                                child: Image.file(
+                                                  photoFile,
+                                                  fit: BoxFit.contain,
                                                 ),
                                               ),
-                                              child: Image.file(
-                                                photoFile,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 2,
-                                              left: 2,
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  createPostController
-                                                      .removePhotoFile(
-                                                          photoFile);
-                                                },
-                                                icon: SvgPicture.asset(
-                                                  icRemovePost,
+                                              Positioned(
+                                                top: 2,
+                                                left: 2,
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    createPostController
+                                                        .removePhotoFile(
+                                                            photoFile);
+                                                  },
+                                                  icon: SvgPicture.asset(
+                                                    icRemovePost,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                );
+                                    ));
                               },
                             ),
                           ),
@@ -348,8 +345,8 @@ class CreatePostScreen extends StatelessWidget {
             CommonButton(
               text: 'Continue',
               height: 58.w,
-              verticalOutMargin: 10.w,
-              horizontalOutMargin: 10.w,
+              verticalOutMargin: 25.h,
+              horizontalOutMargin: 30.w,
               onTap: () {
                 Get.to(
                   () => NewPostShareScreen(

@@ -1,12 +1,6 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:casarancha/models/comment_model.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
-import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
@@ -47,21 +41,16 @@ class PostCardController extends GetxController {
 
   //Methods
 
-  Future<void> likeDisLikePost() async {
+  Future<void> likeDisLikePost(currentUser, postId) async {
     try {
+      var ref = FirebaseFirestore.instance.collection("posts").doc(postId);
       if (isLiked.value) {
-        postRef.update({
-          'likesIds': FieldValue.arrayRemove([currentUserId])
-        });
-        post.update((val) {
-          val!.likesIds.remove(currentUserId);
+        ref.update({
+          'likesIds': FieldValue.arrayUnion([currentUser])
         });
       } else {
-        postRef.update({
-          'likesIds': FieldValue.arrayUnion([currentUserId])
-        });
-        post.update((val) {
-          val!.likesIds.add(currentUserId);
+        ref.update({
+          'likesIds': FieldValue.arrayRemove([currentUser])
         });
       }
       isLiked.value = !isLiked.value;

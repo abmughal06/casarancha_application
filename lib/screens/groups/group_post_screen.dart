@@ -21,7 +21,7 @@ import 'package:get/get.dart';
 
 import '../../models/post_model.dart';
 import '../../resources/image_resources.dart';
-import '../../widgets/PostCard/PostCard.dart';
+import '../../widgets/PostCard/postCard.dart';
 import '../../widgets/PostCard/PostCardController.dart';
 
 class GroupPostScreen extends StatefulWidget {

@@ -10,7 +10,7 @@ import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 
-import 'PostCard/PostCard.dart';
+import 'PostCard/postCard.dart';
 
 class ListViewGroupsWithWhereInQuerry extends StatefulWidget {
   const ListViewGroupsWithWhereInQuerry({

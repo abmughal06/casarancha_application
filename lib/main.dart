@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously, prefer_typing_uninitialized_variables
-
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
@@ -47,20 +45,16 @@ runAgain() async {
   }
 
   runApp(MyApp(
-    home:
-        (document?.exists ?? false) ? DashBoard() : const SetupProfileScreen(),
+    home: (document?.exists ?? false)
+        ? const DashBoard()
+        : const SetupProfileScreen(),
   ));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   MyApp({Key? key, this.home}) : super(key: key);
-  var home;
+  Widget? home;
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -77,7 +71,7 @@ class _MyAppState extends State<MyApp> {
           home: StreamBuilder(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              return snapshot.hasData ? widget.home : const LoginScreen();
+              return snapshot.hasData ? home! : const LoginScreen();
             },
           ),
         );

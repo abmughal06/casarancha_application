@@ -7,7 +7,7 @@ import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:inview_notifier_list/inview_notifier_list.dart';
 
-import 'PostCard/PostCard.dart';
+import 'PostCard/postCard.dart';
 
 class ListViewPostsWithWhereInQuerry extends StatefulWidget {
   const ListViewPostsWithWhereInQuerry({

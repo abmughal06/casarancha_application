@@ -25,7 +25,7 @@ import '../../resources/strings.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/custom_date_picker.dart';
 import '../../utils/snackbar.dart';
-import '../../widgets/PostCard/PostCard.dart';
+import '../../widgets/PostCard/postCard.dart';
 import '../../widgets/PostCard/PostCardController.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
