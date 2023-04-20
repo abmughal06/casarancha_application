@@ -1,14 +1,11 @@
-import 'dart:async';
-
 import 'package:casarancha/models/post_model.dart';
-import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
-import 'package:casarancha/screens/home/story_view_screen.dart';
 
 import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
@@ -99,9 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  const Expanded(
-                    child: ShowAllStory(),
-                  ),
+                  // const Expanded(
+                  //   child: ShowAllStory(),
+                  // ),
                 ],
               ),
             ),
@@ -115,12 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       "Please deactivate ghost mode to \nreturn to the home page",
                       textAlign: TextAlign.center,
                     ),
-                  ) /* ListViewPostsWithWhereInQuerry(
-                        listOfIds: homeScreenController
-                            .profileScreenController.user.value.followingsIds,
-                        field: 'creatorId',
-                        controllerTag: 'Ghost Mode Home',
-                      ) */
+                  )
                 : StreamBuilder<QuerySnapshot>(
                     stream: homeScreenController.postQuerry.snapshots(),
                     builder: (context, snap) {
@@ -159,15 +151,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ontap: () {},
                                         ),
                                         heightBox(10.h),
-                                        Image.network(post.mediaData[0].link),
-                                        heightBox(10.h),
-                                        CustomPostFooter(
-                                          likes:
-                                              post.likesIds.length.toString(),
-                                          comments:
-                                              post.commentIds.length.toString(),
-                                          isDesc: post.description.isNotEmpty,
-                                          desc: post.description.toString(),
+                                        AspectRatio(
+                                          aspectRatio: 2 / 3,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            shrinkWrap: true,
+                                            itemCount: post.mediaData.length,
+                                            itemBuilder: (context, index) =>
+                                                InkWell(
+                                                    onDoubleTap: () {
+                                                      print("clicked");
+                                                      postCardController
+                                                              .isLiked.value =
+                                                          !post.likesIds
+                                                              .contains(
+                                                                  user!.id);
+                                                      postCardController
+                                                          .likeDisLikePost(
+                                                              user!.id,
+                                                              post.id);
+                                                    },
+                                                    child: Image.network(post
+                                                        .mediaData[index]
+                                                        .link)),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -176,97 +183,128 @@ class _HomeScreenState extends State<HomeScreen> {
                                     visible: post.mediaData[0].type == "Video",
                                     child: Column(
                                       children: [
-                                        AspectRatio(
-                                          aspectRatio: 2 / 3,
-                                          child: Stack(
-                                            children: [
-                                              videoPlayerController != null
-                                                  ? VideoPlayer(
-                                                      videoPlayerController!)
-                                                  : const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.black,
+                                        InkWell(
+                                          // onTap: () {
+                                          //   if (videoPlayerController!
+                                          //       .value.isPlaying) {
+                                          //     videoPlayerController!.pause();
+                                          //   } else {
+                                          //     videoPlayerController!.play();
+                                          //   }
+                                          // },s
+                                          onDoubleTap: () {
+                                            print("clicked");
+                                            postCardController.isLiked.value =
+                                                !post.likesIds
+                                                    .contains(user!.id);
+                                            postCardController.likeDisLikePost(
+                                                user!.id, post.id);
+                                          },
+                                          child: AspectRatio(
+                                            aspectRatio: 2 / 3,
+                                            child: Stack(
+                                              children: [
+                                                videoPlayerController != null
+                                                    ? VideoPlayer(
+                                                        videoPlayerController!)
+                                                    : const Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color: Colors.black,
+                                                        ),
                                                       ),
-                                                    ),
-                                              Positioned(
-                                                top: 12,
-                                                left: 0,
-                                                right: 0,
-                                                child: CustomPostHeader(
-                                                  name:
-                                                      post.creatorDetails.name,
-                                                  image: post
-                                                      .creatorDetails.imageUrl,
-                                                  ontap: () {},
-                                                  isVideoPost: true,
+                                                Positioned(
+                                                  top: 12,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: CustomPostHeader(
+                                                    name: post
+                                                        .creatorDetails.name,
+                                                    image: post.creatorDetails
+                                                        .imageUrl,
+                                                    ontap: () {},
+                                                    isVideoPost: true,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         heightBox(12.h),
-                                        CustomPostFooter(
-                                          likes:
-                                              post.likesIds.length.toString(),
-                                          ontapLike: () {},
-                                          comments:
-                                              post.commentIds.length.toString(),
-                                          isDesc: post.description.isNotEmpty,
-                                          desc: post.description.toString(),
-                                        ),
                                       ],
                                     ),
                                   ),
                                   Visibility(
                                     visible: post.mediaData[0].type == "Qoute",
-                                    child: SizedBox(
-                                      height: 229,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          CustomPostHeader(
-                                            name: post.creatorDetails.name,
-                                            image: post.creatorDetails.imageUrl,
-                                            ontap: () {},
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 20.h,
-                                                horizontal: 50.w),
-                                            child: Text(
-                                              post.mediaData[0].link,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w500,
-                                                color: color221,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CustomPostHeader(
+                                          name: post.creatorDetails.name,
+                                          image: post.creatorDetails.imageUrl,
+                                          ontap: () {},
+                                        ),
+                                        SizedBox(
+                                          height: 229,
+                                          child: ListView.builder(
+                                            // shrinkWrap: true,
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: post.mediaData.length,
+                                            itemBuilder: (context, index) =>
+                                                InkWell(
+                                              onDoubleTap: () {
+                                                print("clicked");
+                                                postCardController
+                                                        .isLiked.value =
+                                                    !post.likesIds
+                                                        .contains(user!.id);
+                                                postCardController
+                                                    .likeDisLikePost(
+                                                        user!.id, post.id);
+                                              },
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 40,
+                                                  vertical: 50,
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    post.mediaData[index].link,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: color221,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                          CustomPostFooter(
-                                            likes:
-                                                post.likesIds.length.toString(),
-                                            isLike: post.likesIds
-                                                .contains(post.creatorId),
-                                            ontapLike: () {
-                                              print("clicked");
-                                              postCardController.isLiked.value =
-                                                  !post.likesIds
-                                                      .contains(post.creatorId);
-                                              postCardController
-                                                  .likeDisLikePost(
-                                                      post.creatorId, post.id);
-                                            },
-                                            comments: post.commentIds.length
-                                                .toString(),
-                                            isDesc: post.description.isNotEmpty,
-                                            desc: post.description.toString(),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
+                                  ),
+                                  heightBox(10.h),
+                                  CustomPostFooter(
+                                    likes: post.likesIds.length.toString(),
+                                    isLike: post.likesIds.contains(user!.id),
+                                    ontapLike: () {
+                                      print("clicked");
+                                      postCardController.isLiked.value =
+                                          !post.likesIds.contains(user!.id);
+                                      postCardController.likeDisLikePost(
+                                          user!.id, post.id);
+                                    },
+                                    comments: post.commentIds.length,
+                                    isDesc: post.description.isNotEmpty,
+                                    desc: post.description.toString(),
                                   ),
                                 ],
                               ),
@@ -340,7 +378,7 @@ class CustomPostHeader extends StatelessWidget {
 class CustomPostFooter extends StatelessWidget {
   final bool? isLike;
   final String? likes;
-  final String? comments;
+  final int? comments;
   final String? desc;
   final VoidCallback? ontapLike;
   final VoidCallback? ontapCmnt;
@@ -348,18 +386,18 @@ class CustomPostFooter extends StatelessWidget {
   final VoidCallback? ontapSave;
   final bool? isDesc;
 
-  const CustomPostFooter(
-      {Key? key,
-      this.likes,
-      this.comments,
-      this.ontapLike,
-      this.ontapCmnt,
-      this.ontapShare,
-      this.ontapSave,
-      this.isDesc = false,
-      this.desc,
-      this.isLike = false})
-      : super(key: key);
+  const CustomPostFooter({
+    Key? key,
+    this.likes,
+    this.comments,
+    this.ontapLike,
+    this.ontapCmnt,
+    this.ontapShare,
+    this.ontapSave,
+    this.isDesc = false,
+    this.desc,
+    this.isLike = false,
+  }) : super(key: key);
 
   // final postController = PostCardController(postdata: postdata);
 
@@ -420,7 +458,27 @@ class CustomPostFooter extends StatelessWidget {
               ),
             ),
           ),
-        )
+        ),
+        Visibility(
+          visible: comments != null ? comments! > 0 : false,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+              child: InkWell(
+                onTap: ontapCmnt,
+                child: Text(
+                  "show all $comments comments",
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: color080,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -500,90 +558,90 @@ class _ShowAllPostsState extends State<ShowAllPosts> {
   }
 }
 
-class ShowAllStory extends StatefulWidget {
-  const ShowAllStory({Key? key}) : super(key: key);
+// class ShowAllStory extends StatefulWidget {
+//   const ShowAllStory({Key? key}) : super(key: key);
 
-  @override
-  State<ShowAllStory> createState() => _ShowAllStoryState();
-}
+//   @override
+//   State<ShowAllStory> createState() => _ShowAllStoryState();
+// }
 
-class _ShowAllStoryState extends State<ShowAllStory> {
-  List<Story> list = [];
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? listner;
-  @override
-  void initState() {
-    listner = FirebaseFirestore.instance
-        .collection('stories')
-        .where('createdAt',
-            isLessThan: DateTime.now().toIso8601String(),
-            isGreaterThan: DateTime.now()
-                .subtract(const Duration(days: 1))
-                .toIso8601String())
-        .snapshots()
-        .listen((storiesSnapshot) async {
-      for (var element in storiesSnapshot.docs) {
-        Story story = Story.fromMap(element.data());
-        DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-            await FirebaseFirestore.instance
-                .collection("users")
-                .doc(story.creatorId)
-                .get();
-        story.creatorDetails.isVerified =
-            documentSnapshot.data()?['isVerified'] ?? false;
-        int index = list.indexWhere((element) => element.id == story.id);
-        if (index != -1) {
-          list[index] = story;
-        } else {
-          list.add(story);
-        }
-        setState(() {});
-      }
-    });
+// class _ShowAllStoryState extends State<ShowAllStory> {
+//   List<Story> list = [];
+//   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? listner;
+//   @override
+//   void initState() {
+//     listner = FirebaseFirestore.instance
+//         .collection('stories')
+//         .where('createdAt',
+//             isLessThan: DateTime.now().toIso8601String(),
+//             isGreaterThan: DateTime.now()
+//                 .subtract(const Duration(days: 1))
+//                 .toIso8601String())
+//         .snapshots()
+//         .listen((storiesSnapshot) async {
+//       for (var element in storiesSnapshot.docs) {
+//         Story story = Story.fromMap(element.data());
+//         DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+//             await FirebaseFirestore.instance
+//                 .collection("users")
+//                 .doc(story.creatorId)
+//                 .get();
+//         story.creatorDetails.isVerified =
+//             documentSnapshot.data()?['isVerified'] ?? false;
+//         int index = list.indexWhere((element) => element.id == story.id);
+//         if (index != -1) {
+//           list[index] = story;
+//         } else {
+//           list.add(story);
+//         }
+//         setState(() {});
+//       }
+//     });
 
-    super.initState();
-  }
+//     super.initState();
+//   }
 
-  @override
-  void dispose() {
-    listner?.pause();
-    listner?.cancel();
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     listner?.pause();
+//     listner?.cancel();
+//     super.dispose();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: list.length,
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5.w),
-            child: GestureDetector(
-              onTap: () {
-                Get.to(
-                  () => StoryViewScreen(
-                    story: list[index],
-                  ),
-                );
-              },
-              child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: colorPrimaryA05, width: 1.5),
-                      shape: BoxShape.circle),
-                  height: 90.h,
-                  width: 90.h,
-                  alignment: Alignment.center,
-                  child: AspectRatio(
-                      aspectRatio: 1 / 1,
-                      child: ClipOval(
-                          child: FadeInImage(
-                              fit: BoxFit.cover,
-                              placeholder: const AssetImage(imgUserPlaceHolder),
-                              image: NetworkImage(
-                                  list[index].creatorDetails.imageUrl))))),
-            ),
-          );
-        });
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView.builder(
+//         itemCount: list.length,
+//         shrinkWrap: true,
+//         scrollDirection: Axis.horizontal,
+//         itemBuilder: (context, index) {
+//           return Padding(
+//             padding: EdgeInsets.symmetric(horizontal: 5.w),
+//             child: GestureDetector(
+//               onTap: () {
+//                 Get.to(
+//                   () => StoryViewScreen(
+//                     story: list[index],
+//                   ),
+//                 );
+//               },
+//               child: Container(
+//                   decoration: BoxDecoration(
+//                       border: Border.all(color: colorPrimaryA05, width: 1.5),
+//                       shape: BoxShape.circle),
+//                   height: 90.h,
+//                   width: 90.h,
+//                   alignment: Alignment.center,
+//                   child: AspectRatio(
+//                       aspectRatio: 1 / 1,
+//                       child: ClipOval(
+//                           child: FadeInImage(
+//                               fit: BoxFit.cover,
+//                               placeholder: const AssetImage(imgUserPlaceHolder),
+//                               image: NetworkImage(
+//                                   list[index].creatorDetails.imageUrl))))),
+//             ),
+//           );
+//         });
+//   }
+// }

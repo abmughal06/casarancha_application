@@ -99,7 +99,7 @@ class CreatePostScreen extends StatelessWidget {
                       decoration: const InputDecoration.collapsed(
                         hintText: 'Write Quote',
                       ),
-                      textInputAction: TextInputAction.done,
+                      textInputAction: TextInputAction.newline,
                     ),
                   ),
 
@@ -215,9 +215,9 @@ class CreatePostScreen extends StatelessWidget {
                                     bottom: 10.w,
                                   ),
                                   child: AspectRatio(
-                                    aspectRatio: 16 / 9,
+                                    aspectRatio: 2 / 3,
                                     child: Card(
-                                      elevation: 5,
+                                      elevation: 1,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(

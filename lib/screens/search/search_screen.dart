@@ -1,6 +1,7 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/resources/color_resources.dart';
 
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/widgets/PostCard/postCard.dart';
@@ -52,6 +53,23 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
+  bool compareStrings(String string1, String string2) {
+    int matchCount = 0;
+
+    // Loop through each character of the first string
+    for (int i = 0; i < string1.length; i++) {
+      // Loop through each character of the second string
+      for (int j = 0; j < string2.length; j++) {
+        // If the characters match, increment the match count
+        if (string1[i] == string2[j]) {
+          matchCount++;
+        }
+      }
+    }
+    // Return true if two or more characters match
+    return matchCount >= 4;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +89,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 context: context,
                 controller: searchController,
                 onChange: (value) {
-                  setState(() {});
+                  // setState(() {});
                 },
               ),
             ),
@@ -85,24 +103,53 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   /*people*/
 
-                  FirestoreListView(
-                    query: FirebaseFirestore.instance.collection('users').where(
-                        'username',
-                        isEqualTo: searchController.text.trim()),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 10.w,
-                      horizontal: 20.w,
-                    ),
-                    itemBuilder: (context,
-                        QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-                      final user = UserModel.fromMap(doc.data());
-
-                      return AppUserTile(
-                        appUser: user,
-                        currentUser: profilescreenController.user.value,
-                      );
-                    },
-                  ),
+                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection("users")
+                          // .orderBy("username", descending: false)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          return ListView.builder(
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                var userSnap =
+                                    snapshot.data!.docs[index].data();
+                                var user = UserModel.fromMap(userSnap);
+                                // print(
+                                //     user.name.compareTo(searchController.text));
+                                if (compareStrings(
+                                    user.username, searchController.text)) {
+                                  return ListTile(
+                                    leading: Container(
+                                      height: 38.w,
+                                      width: 38.w,
+                                      decoration: BoxDecoration(
+                                        color: color080,
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: NetworkImage(user.imageStr),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    title: Text(user.name),
+                                    subtitle: Text(user.username),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              });
+                        } else if (snapshot.hasError ||
+                            snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else {
+                          return const Center(
+                              child: Text("No such user found"));
+                        }
+                      }),
 
                   /*group*/
                   FirestoreListView(

@@ -66,6 +66,7 @@ dependencies:
   chewie: ^1.4.0
   crypto: ^3.0.2
   jwt_decoder: ^2.0.1
+  stream_feed_flutter_core: ^0.8.0
 flutter_icons:
   android: "launcher_icon"
   ios: true
