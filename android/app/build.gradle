@@ -54,10 +54,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("../casarancha.jks")
-            storePassword 'casarancha123'
-            keyAlias 'casarancha'
-            keyPassword 'casarancha123'
+            storeFile file("upload-keystore.jks")
+            storePassword 'casarancha'
+            keyAlias 'upload'
+            keyPassword 'casarancha'
         }
     } 
     buildTypes {

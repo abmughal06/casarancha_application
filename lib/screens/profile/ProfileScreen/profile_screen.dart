@@ -1,14 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/main.dart';
-import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/story_view_screen.dart';
 
@@ -29,9 +25,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutterfire_ui/firestore.dart';
 import 'package:get/get.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
@@ -41,7 +35,6 @@ import '../../../utils/app_constants.dart';
 
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/home_page_widgets.dart';
-import '../../../widgets/text_editing_widget.dart';
 import '../../../widgets/text_widget.dart';
 
 import '../../auth/login_screen.dart';
@@ -49,7 +42,7 @@ import '../../chat/GhostMode/ghost_chat_helper.dart';
 import '../follower_following_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -379,54 +372,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      Obx(
-                        () => GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                          ),
-                          itemCount:
-                              profileScreenController.getUserQuotes.length,
-                          itemBuilder: (context, index) {
-                            final String quote = profileScreenController
-                                .getUserQuotes[index]['link'];
-                            return Card(
-                              elevation: 0,
-                              margin: EdgeInsets.zero,
-                              color: Colors.transparent,
-                              child: GestureDetector(
-                                onTap: () => Get.to(() => Card(
-                                      elevation: 0,
-                                      margin: EdgeInsets.zero,
-                                      color: Colors.transparent,
-                                      child: Stack(
-                                        children: [
-                                          FullScreenQoute(
-                                            qoute: quote,
-                                            post: profileScreenController
-                                                .getUserQuotes[index]['post'],
-                                            profileScreenController:
-                                                profileScreenController,
-                                          ),
-                                        ],
-                                      ),
-                                    )),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                    width: 0.1,
-                                    color: Colors.grey,
-                                  )),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    quote,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
+                      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                        stream: FirebaseFirestore.instance
+                            .collection("posts")
+                            .where("creatorId", isEqualTo: user!.id)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var postdata = snapshot.data!.docs;
+                            // var mediaDataList = [];
+                            var qoutesList = [];
+
+                            for (var i = 0; i < postdata.length; i++) {
+                              if (postdata[i].data()['mediaData'][0]['type'] ==
+                                  'Qoute') {
+                                qoutesList.add(postdata[i].data());
+                                // print(qoutesList);
+                              }
+                            }
+                            return GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
                               ),
+                              itemCount: qoutesList.length,
+                              itemBuilder: (context, index) {
+                                final data =
+                                    PostModel.fromMap(qoutesList[index]);
+                                final String quote = data.mediaData[0].link;
+                                // print(quote);
+                                return Card(
+                                  elevation: 0,
+                                  margin: EdgeInsets.zero,
+                                  color: Colors.transparent,
+                                  child: GestureDetector(
+                                    onTap: () => Get.to(() => Card(
+                                          elevation: 0,
+                                          margin: EdgeInsets.zero,
+                                          color: Colors.transparent,
+                                          child: Stack(
+                                            children: [
+                                              FullScreenQoute(
+                                                qoute: quote,
+                                                post: data,
+                                                profileScreenController:
+                                                    profileScreenController,
+                                              ),
+                                            ],
+                                          ),
+                                        )),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                        width: 0.1,
+                                        color: Colors.grey,
+                                      )),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        quote.toString(),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             );
-                          },
-                        ),
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
                       ),
                       Obx(
                         () => GridView.builder(
