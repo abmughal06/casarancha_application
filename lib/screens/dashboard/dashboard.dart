@@ -72,7 +72,7 @@ class _DashBoardState extends State<DashBoard>
                 const SearchScreen(),
                 const MyGroupsScreen(),
                 ChatListScreen(),
-                ProfileScreen(),
+                const ProfileScreen(),
               ],
             ),
           ),

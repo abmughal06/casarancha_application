@@ -52,8 +52,8 @@ runAgain() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key, this.home}) : super(key: key);
-  Widget? home;
+  const MyApp({Key? key, this.home}) : super(key: key);
+  final Widget? home;
 
   @override
   Widget build(BuildContext context) {

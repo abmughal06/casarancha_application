@@ -390,53 +390,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 // print(qoutesList);
                               }
                             }
-                            return GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                              ),
-                              itemCount: qoutesList.length,
-                              itemBuilder: (context, index) {
-                                final data =
-                                    PostModel.fromMap(qoutesList[index]);
-                                final String quote = data.mediaData[0].link;
-                                // print(quote);
-                                return Card(
-                                  elevation: 0,
-                                  margin: EdgeInsets.zero,
-                                  color: Colors.transparent,
-                                  child: GestureDetector(
-                                    onTap: () => Get.to(() => Card(
-                                          elevation: 0,
-                                          margin: EdgeInsets.zero,
-                                          color: Colors.transparent,
-                                          child: Stack(
-                                            children: [
-                                              FullScreenQoute(
-                                                qoute: quote,
-                                                post: data,
-                                                profileScreenController:
-                                                    profileScreenController,
-                                              ),
-                                            ],
-                                          ),
+                            if (qoutesList.length.isEqual(0)) {
+                              return const Center(
+                                child: Text("No Qoutes to show"),
+                              );
+                            } else {
+                              return GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                ),
+                                itemCount: qoutesList.length,
+                                itemBuilder: (context, index) {
+                                  final data =
+                                      PostModel.fromMap(qoutesList[index]);
+                                  final String quote = data.mediaData[0].link;
+                                  // print(quote);
+                                  return Card(
+                                    elevation: 0,
+                                    margin: EdgeInsets.zero,
+                                    color: Colors.transparent,
+                                    child: GestureDetector(
+                                      onTap: () => Get.to(() => Card(
+                                            elevation: 0,
+                                            margin: EdgeInsets.zero,
+                                            color: Colors.transparent,
+                                            child: Stack(
+                                              children: [
+                                                FullScreenQoute(
+                                                  qoute: quote,
+                                                  post: data,
+                                                  profileScreenController:
+                                                      profileScreenController,
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                          width: 0.1,
+                                          color: Colors.grey,
                                         )),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                        width: 0.1,
-                                        color: Colors.grey,
-                                      )),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        quote.toString(),
-                                        textAlign: TextAlign.center,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          quote.toString(),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            );
+                                  );
+                                },
+                              );
+                            }
                           } else {
                             return const Center(
                               child: CircularProgressIndicator(),
@@ -444,115 +450,278 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           }
                         },
                       ),
-                      Obx(
-                        () => GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                          ),
-                          itemCount:
-                              profileScreenController.getUserImages.length,
-                          itemBuilder: (context, index) {
-                            final String imageUrl = profileScreenController
-                                .getUserImages[index]['link'];
-                            return GestureDetector(
-                              onTap: () => Get.to(
-                                () => Card(
-                                  elevation: 0,
-                                  margin: EdgeInsets.zero,
-                                  color: Colors.transparent,
-                                  child: Stack(
-                                    children: [
-                                      FullImageView(
-                                        url: imageUrl,
-                                      ),
-                                      Positioned(
-                                        top: 20,
-                                        right: 15,
-                                        child: menuButton(
-                                            context,
-                                            profileScreenController
-                                                .getUserImages[index]['post'],
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 17),
-                                            profileScreenController:
-                                                profileScreenController),
-                                      )
-                                    ],
-                                  ),
+                      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                        stream: FirebaseFirestore.instance
+                            .collection("posts")
+                            .where("creatorId", isEqualTo: user!.id)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var postdata = snapshot.data!.docs;
+                            // var mediaDataList = [];
+                            var qoutesList = [];
+
+                            for (var i = 0; i < postdata.length; i++) {
+                              if (postdata[i].data()['mediaData'][0]['type'] ==
+                                  'Photo') {
+                                qoutesList.add(postdata[i].data());
+                                // print(qoutesList);
+                              }
+                            }
+                            if (qoutesList.length.isEqual(0)) {
+                              return const Center(
+                                child: Text("No Photos to show"),
+                              );
+                            } else {
+                              return GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
                                 ),
-                              ),
-                              child: FadeInImage(
-                                image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover,
-                                placeholder:
-                                    const AssetImage(imgImagePlaceHolder),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      Obx(
-                        () => GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                          ),
-                          itemCount:
-                              profileScreenController.getUserVideos.length,
-                          itemBuilder: (context, index) {
-                            final String videoUrl = profileScreenController
-                                .getUserVideos[index]['link'];
-                            VideoPlayerController videoPlayerController =
-                                VideoPlayerController.network(videoUrl);
-                            return GestureDetector(
-                              onTap: () => Get.to(
-                                () => Card(
-                                  elevation: 0,
-                                  margin: EdgeInsets.zero,
-                                  color: Colors.transparent,
-                                  child: Stack(
-                                    children: [
-                                      Center(
-                                        child: AspectRatio(
-                                          aspectRatio: videoPlayerController
-                                              .value.aspectRatio,
-                                          child: SizedBox(
-                                            height: 360.w,
-                                            child: VideoPlayerWidget(
-                                              videoUrl: videoUrl,
-                                              videoPlayerController:
-                                                  videoPlayerController,
+                                itemCount: qoutesList.length,
+                                itemBuilder: (context, index) {
+                                  final data =
+                                      PostModel.fromMap(qoutesList[index]);
+                                  final String quote = data.mediaData[0].link;
+                                  // print(quote);
+                                  return Card(
+                                    elevation: 0,
+                                    margin: EdgeInsets.zero,
+                                    color: Colors.transparent,
+                                    child: GestureDetector(
+                                      onTap: () => Get.to(() => Card(
+                                            elevation: 0,
+                                            margin: EdgeInsets.zero,
+                                            color: Colors.transparent,
+                                            child: Stack(
+                                              children: [
+                                                FullImageView(
+                                                  url: quote,
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                          )),
+                                      child: Image.network(
+                                        quote.toString(),
+                                        fit: BoxFit.cover,
+                                        // textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
+                      ),
+                      // Obx(
+                      //   () => GridView.builder(
+                      //     gridDelegate:
+                      //         const SliverGridDelegateWithFixedCrossAxisCount(
+                      //       crossAxisCount: 3,
+                      //     ),
+                      //     itemCount:
+                      //         profileScreenController.getUserImages.length,
+                      //     itemBuilder: (context, index) {
+                      //       final String imageUrl = profileScreenController
+                      //           .getUserImages[index]['link'];
+                      //       return GestureDetector(
+                      //         onTap: () => Get.to(
+                      //           () => Card(
+                      //             elevation: 0,
+                      //             margin: EdgeInsets.zero,
+                      //             color: Colors.transparent,
+                      //             child: Stack(
+                      //               children: [
+                      //                 FullImageView(
+                      //                   url: imageUrl,
+                      //                 ),
+                      //                 Positioned(
+                      //                   top: 20,
+                      //                   right: 15,
+                      //                   child: menuButton(
+                      //                       context,
+                      //                       profileScreenController
+                      //                           .getUserImages[index]['post'],
+                      //                       margin: const EdgeInsets.symmetric(
+                      //                           vertical: 10, horizontal: 17),
+                      //                       profileScreenController:
+                      //                           profileScreenController),
+                      //                 )
+                      //               ],
+                      //             ),
+                      //           ),
+                      //         ),
+                      //         child: FadeInImage(
+                      //           image: NetworkImage(imageUrl),
+                      //           fit: BoxFit.cover,
+                      //           placeholder:
+                      //               const AssetImage(imgImagePlaceHolder),
+                      //         ),
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
+                      StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                        stream: FirebaseFirestore.instance
+                            .collection("posts")
+                            .where("creatorId", isEqualTo: user!.id)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var postdata = snapshot.data!.docs;
+                            // var mediaDataList = [];
+                            var qoutesList = [];
+
+                            for (var i = 0; i < postdata.length; i++) {
+                              if (postdata[i].data()['mediaData'][0]['type'] ==
+                                  'Video') {
+                                qoutesList.add(postdata[i].data());
+                                // print(qoutesList);
+                              }
+                            }
+                            if (qoutesList.length.isEqual(0)) {
+                              return const Center(
+                                child: Text("No Vdeos to show"),
+                              );
+                            } else {
+                              return GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                ),
+                                itemCount: qoutesList.length,
+                                itemBuilder: (context, index) {
+                                  final data =
+                                      PostModel.fromMap(qoutesList[index]);
+                                  final String quote = data.mediaData[0].link;
+                                  // print(quote);
+                                  VideoPlayerController videoPlayerController =
+                                      VideoPlayerController.network(quote);
+                                  return GestureDetector(
+                                    onTap: () => Get.to(
+                                      () => Card(
+                                        elevation: 0,
+                                        margin: EdgeInsets.zero,
+                                        color: Colors.transparent,
+                                        child: Stack(
+                                          children: [
+                                            Center(
+                                              child: AspectRatio(
+                                                aspectRatio:
+                                                    videoPlayerController
+                                                        .value.aspectRatio,
+                                                child: SizedBox(
+                                                  height: 360.w,
+                                                  child: VideoPlayerWidget(
+                                                    videoUrl: quote,
+                                                    videoPlayerController:
+                                                        videoPlayerController,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 20,
+                                              right: 15,
+                                              child: menuButton(
+                                                  context,
+                                                  profileScreenController
+                                                          .getUserVideos[index]
+                                                      ['post'],
+                                                  margin: const EdgeInsets
+                                                          .symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 17),
+                                                  profileScreenController:
+                                                      profileScreenController),
+                                            )
+                                          ],
                                         ),
                                       ),
-                                      Positioned(
-                                        top: 20,
-                                        right: 15,
-                                        child: menuButton(
-                                            context,
-                                            profileScreenController
-                                                .getUserVideos[index]['post'],
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 17),
-                                            profileScreenController:
-                                                profileScreenController),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.video_file_rounded,
-                                  size: 48,
-                                ),
-                              ),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.video_file_rounded,
+                                        size: 48,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
-                          },
-                        ),
+                          }
+                        },
                       ),
+                      // Obx(
+                      //   () => GridView.builder(
+                      //     gridDelegate:
+                      //         const SliverGridDelegateWithFixedCrossAxisCount(
+                      //       crossAxisCount: 3,
+                      //     ),
+                      //     itemCount:
+                      //         profileScreenController.getUserVideos.length,
+                      //     itemBuilder: (context, index) {
+                      //       final String videoUrl = profileScreenController
+                      //           .getUserVideos[index]['link'];
+                      //       VideoPlayerController videoPlayerController =
+                      //           VideoPlayerController.network(videoUrl);
+                      //       return GestureDetector(
+                      //         onTap: () => Get.to(
+                      //           () => Card(
+                      //             elevation: 0,
+                      //             margin: EdgeInsets.zero,
+                      //             color: Colors.transparent,
+                      //             child: Stack(
+                      //               children: [
+                      //                 Center(
+                      //                   child: AspectRatio(
+                      //                     aspectRatio: videoPlayerController
+                      //                         .value.aspectRatio,
+                      //                     child: SizedBox(
+                      //                       height: 360.w,
+                      //                       child: VideoPlayerWidget(
+                      //                         videoUrl: videoUrl,
+                      //                         videoPlayerController:
+                      //                             videoPlayerController,
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 ),
+                      //                 Positioned(
+                      //                   top: 20,
+                      //                   right: 15,
+                      //                   child: menuButton(
+                      //                       context,
+                      //                       profileScreenController
+                      //                           .getUserVideos[index]['post'],
+                      //                       margin: const EdgeInsets.symmetric(
+                      //                           vertical: 10, horizontal: 17),
+                      //                       profileScreenController:
+                      //                           profileScreenController),
+                      //                 )
+                      //               ],
+                      //             ),
+                      //           ),
+                      //         ),
+                      //         child: const Center(
+                      //           child: Icon(
+                      //             Icons.video_file_rounded,
+                      //             size: 48,
+                      //           ),
+                      //         ),
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
                       GridView.builder(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
