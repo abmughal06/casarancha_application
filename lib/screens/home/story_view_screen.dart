@@ -240,73 +240,76 @@ class _StoryViewScreenState extends State<StoryViewScreen>
     final MediaDetails story = widget.story.mediaDetailsList[_currentIndex];
     return Scaffold(
       backgroundColor: Colors.black,
-      body: GestureDetector(
-        onTapDown: (details) => _onTapDown(details, story),
-        child: Stack(
-          children: <Widget>[
-            PageView.builder(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.story.mediaDetailsList.length,
-              itemBuilder: (context, i) {
-                final MediaDetails story = widget.story.mediaDetailsList[i];
-                switch (story.type) {
-                  case 'Photo':
-                    return CachedNetworkImage(
-                      imageUrl: story.link,
-                      // fit: BoxFit.cover,
-                    );
-                  case 'Video':
-                    if (_videoController != null &&
-                        _videoController!.value.isInitialized) {
-                      return FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _videoController!.value.size.width,
-                          height: _videoController!.value.size.height,
-                          child: VideoPlayer(_videoController!),
-                        ),
+      body: SafeArea(
+        bottom: false,
+        child: GestureDetector(
+          onTapDown: (details) => _onTapDown(details, story),
+          child: Stack(
+            children: <Widget>[
+              PageView.builder(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.story.mediaDetailsList.length,
+                itemBuilder: (context, i) {
+                  final MediaDetails story = widget.story.mediaDetailsList[i];
+                  switch (story.type) {
+                    case 'Photo':
+                      return CachedNetworkImage(
+                        imageUrl: story.link,
+                        // fit: BoxFit.cover,
                       );
-                    }
-                }
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
-            ),
-            Positioned(
-              top: 40.0,
-              left: 10.0,
-              right: 10.0,
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    children: widget.story.mediaDetailsList
-                        .asMap()
-                        .map((i, e) {
-                          return MapEntry(
-                            i,
-                            AnimatedBar(
-                              animController: _animController,
-                              position: i,
-                              currentIndex: _currentIndex,
-                            ),
-                          );
-                        })
-                        .values
-                        .toList(),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 1.5,
-                      vertical: 10.0,
-                    ),
-                    child: UserInfo(user: widget.story.creatorDetails),
-                  ),
-                ],
+                    case 'Video':
+                      if (_videoController != null &&
+                          _videoController!.value.isInitialized) {
+                        return FittedBox(
+                          fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: _videoController!.value.size.width,
+                            height: _videoController!.value.size.height,
+                            child: VideoPlayer(_videoController!),
+                          ),
+                        );
+                      }
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
               ),
-            ),
-          ],
+              Positioned(
+                top: 40.0,
+                left: 10.0,
+                right: 10.0,
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: widget.story.mediaDetailsList
+                          .asMap()
+                          .map((i, e) {
+                            return MapEntry(
+                              i,
+                              AnimatedBar(
+                                animController: _animController,
+                                position: i,
+                                currentIndex: _currentIndex,
+                              ),
+                            );
+                          })
+                          .values
+                          .toList(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 1.5,
+                        vertical: 10.0,
+                      ),
+                      child: UserInfo(user: widget.story.creatorDetails),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -320,14 +323,20 @@ class _StoryViewScreenState extends State<StoryViewScreen>
         if (_currentIndex - 1 >= 0) {
           _currentIndex -= 1;
           _loadStory(story: widget.story.mediaDetailsList[_currentIndex]);
+          print('1111111111111111111');
         }
       });
     } else if (dx > 2 * screenWidth / 3) {
+      print('22222222222222');
+
       setState(() {
         if (_currentIndex + 1 < widget.story.mediaDetailsList.length) {
           _currentIndex += 1;
           _loadStory(story: widget.story.mediaDetailsList[_currentIndex]);
+          print('333333333333');
         } else {
+          print('4444444444');
+
           // Out of bounds - loop story
           Get.back();
           // _currentIndex = 0;
@@ -355,7 +364,9 @@ class _StoryViewScreenState extends State<StoryViewScreen>
         _animController.duration = const Duration(
           seconds: 10,
         );
+
         _animController.forward();
+
         break;
       case 'Video':
         _videoController = null;

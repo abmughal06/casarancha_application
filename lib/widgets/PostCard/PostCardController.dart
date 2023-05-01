@@ -16,7 +16,7 @@ class PostCardController extends GetxController {
   PostCardController({required this.postdata});
   final PostModel postdata;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  late ProfileScreenController profileScreenController;
+  ProfileScreenController? profileScreenController;
   late TextEditingController commentController;
 
   String currentUserId = '';
@@ -71,9 +71,9 @@ class PostCardController extends GetxController {
         id: commentId,
         creatorId: currentUserId,
         creatorDetails: CreatorDetails(
-          name: profileScreenController.user.value.name,
-          imageUrl: profileScreenController.user.value.imageStr,
-          isVerified: profileScreenController.user.value.isVerified,
+          name: profileScreenController!.user.value.name,
+          imageUrl: profileScreenController!.user.value.imageStr,
+          isVerified: profileScreenController!.user.value.isVerified,
         ),
         createdAt: DateTime.now().toIso8601String(),
         message: commentText);
@@ -99,14 +99,14 @@ class PostCardController extends GetxController {
         userRef.update({
           'savedPostsIds': FieldValue.arrayRemove([post.value.id])
         });
-        profileScreenController.user.update((val) {
+        profileScreenController!.user.update((val) {
           val!.savedPostsIds.remove(currentUserId);
         });
       } else {
         userRef.update({
           'savedPostsIds': FieldValue.arrayUnion([post.value.id])
         });
-        profileScreenController.user.update((val) {
+        profileScreenController!.user.update((val) {
           val!.savedPostsIds.add(currentUserId);
         });
       }
@@ -123,7 +123,7 @@ class PostCardController extends GetxController {
               appUserController: Get.put(
                 AppUserController(
                   appUserId: appUserId,
-                  currentUserId: profileScreenController.user.value.id,
+                  currentUserId: FirebaseAuth.instance.currentUser!.uid,
                 ),
               ),
             ),
@@ -137,14 +137,14 @@ class PostCardController extends GetxController {
     profileScreenController = Get.find<ProfileScreenController>();
     commentController = TextEditingController();
 
-    currentUserId = profileScreenController.user.value.id;
+    currentUserId = profileScreenController!.user.value.id;
     post.value = postdata;
 
     postRef = FirebaseFirestore.instance.collection('posts').doc(post.value.id);
 
     isLiked.value = post.value.likesIds.contains(currentUserId);
 
-    isSaved.value = profileScreenController.user.value.savedPostsIds
+    isSaved.value = profileScreenController!.user.value.savedPostsIds
         .contains(post.value.id);
 
     super.onInit();
