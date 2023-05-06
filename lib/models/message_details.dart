@@ -50,7 +50,7 @@ class MessageDetails {
     };
   }
 
-  factory MessageDetails.fromMap(Map<String, dynamic> map) {
+  factory MessageDetails.fromMap(map) {
     return MessageDetails(
       id: map['id'] as String,
       lastMessage: map['lastMessage'] as String,

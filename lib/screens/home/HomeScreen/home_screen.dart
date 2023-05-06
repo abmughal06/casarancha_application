@@ -80,20 +80,30 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           SizedBox(height: 10.w),
           SizedBox(
-            height: 70.h,
+            height: 80.h,
             child: Row(
               children: [
                 Padding(
                   padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                  child: StreamBuilder<DocumentSnapshot<Map>>(
+                  child: StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection("stories")
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          // .doc(FirebaseAuth.instance.currentUser!.uid)
                           .snapshots(),
                       builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          print(snapshot.data!.data());
-                          var data = snapshot.data!.data();
+                        print("======================== ${snapshot.data}");
+                        if (snapshot.hasData && snapshot.data != null) {
+                          var listofData = snapshot.data!.docs;
+                          // print(snapshot.data!.data());
+                          var map;
+
+                          // var data = snapshot.data!.data();
+                          for (var i = 0; i < snapshot.data!.docs.length; i++) {
+                            if (snapshot.data!.docs[i].id ==
+                                FirebaseAuth.instance.currentUser!.uid) {
+                              map = snapshot.data!.docs[i].data();
+                            }
+                          }
                           return Column(
                             children: [
                               InkWell(
@@ -102,24 +112,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                                 child: Stack(
                                   children: [
-                                    CircleAvatar(
-                                      minRadius: 25,
-                                      backgroundImage: NetworkImage(
-                                          data!["creatorDetails"]['imageUrl']),
-                                    ),
-                                    Positioned(
-                                        right: -2,
-                                        bottom: -2,
-                                        child: Container(
-                                            padding: const EdgeInsets.all(2.0),
-                                            decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.red),
-                                            child: const Icon(
-                                              Icons.add,
-                                              color: Colors.white,
-                                              size: 18,
-                                            )))
+                                    map != null
+                                        ? CircleAvatar(
+                                            minRadius: 25,
+                                            backgroundImage: NetworkImage(
+                                                map!["creatorDetails"]
+                                                    ['imageUrl']),
+                                          )
+                                        : SvgPicture.asset(
+                                            icProfileAdd,
+                                            height: 50.h,
+                                            width: 50.w,
+                                          ),
+                                    map != null
+                                        ? Positioned(
+                                            right: -2,
+                                            bottom: -2,
+                                            child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(2.0),
+                                                decoration: const BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.red,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.add,
+                                                  color: Colors.white,
+                                                  size: 18,
+                                                )))
+                                        : Container(),
                                   ],
                                 ),
                               ),
@@ -131,6 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               )
                             ],
                           );
+                        } else if (snapshot.hasError) {
+                          return Text("Here");
                         } else {
                           return GestureDetector(
                             onTap: () {
@@ -145,81 +168,103 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                       }),
                 ),
-                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection("stories")
-                      .where("creatorId",
-                          isNotEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                      // .where('createdAt',
-
-                      // isLessThan: DateTime.now().toIso8601String(),
-                      // isGreaterThan: DateTime.now()
-                      //     .subtract(const Duration(days: 1))
-                      //     .toIso8601String())
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    print("+++++++++++++++++++${snapshot.data}");
-                    if (snapshot.hasData && snapshot.data != null) {
-                      final data = snapshot.data!.docs;
-                      // double progress =
-                      // data.bytesTransferred / data.totalBytes;
-                      print("++++++++++++++++++++++++++++- $data");
-                      return Expanded(
-                        child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: data.length,
-                            itemBuilder: (context, index) {
-                              var storyData = data[index].data();
-                              Story story = Story.fromMap(storyData);
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 12),
-                                child: Column(
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        Get.to(
-                                          () => StoryViewScreen(story: story),
-                                        );
-                                      },
-                                      child: CircleAvatar(
-                                        minRadius: 25,
-                                        backgroundImage: NetworkImage(
-                                            story.creatorDetails.imageUrl),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      getFirstName(story.creatorDetails.name),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    stream: FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .snapshots(),
+                    builder: (context, snap) {
+                      if (snap.hasData) {
+                        var userData = snap.data!.data();
+                        var followingIds = userData!['followingsIds'];
+                        print("===============$followingIds");
+                        return StreamBuilder<
+                            QuerySnapshot<Map<String, dynamic>>>(
+                          stream: FirebaseFirestore.instance
+                              .collection("stories")
+                              .where(
+                                "creatorId",
+                                whereIn: followingIds,
+                                // isNotEqualTo:
+                                //     FirebaseAuth.instance.currentUser!.uid,
+                              )
+                              // .where('createdAt',
+                              //     isLessThan: DateTime.now().toIso8601String(),
+                              //     isGreaterThan: DateTime.now()
+                              //         .subtract(const Duration(days: 1))
+                              //         .toIso8601String())
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            print("+++++++++++++++++++${snapshot.data}");
+                            if (snapshot.hasData && snapshot.data != null) {
+                              final data = snapshot.data!.docs;
+                              // double progress =
+                              // data.bytesTransferred / data.totalBytes;
+                              print("++++++++++++++++++++++++++++- $data");
+                              return Expanded(
+                                child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      var storyData = data[index].data();
+                                      Story story = Story.fromMap(storyData);
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 12),
+                                        child: Column(
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                Get.to(
+                                                  () => StoryViewScreen(
+                                                      story: story),
+                                                );
+                                              },
+                                              child: CircleAvatar(
+                                                minRadius: 25,
+                                                backgroundImage: NetworkImage(
+                                                    story.creatorDetails
+                                                        .imageUrl),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 3),
+                                            Text(
+                                              getFirstName(
+                                                  story.creatorDetails.name),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
                               );
-                            }),
-                      );
 
-                      // return Stack(
-                      //   children: [
-                      //     LinearProgressIndicator(
-                      //       value: progress,
-                      //     ),
-                      //     Center(
-                      //       child: Text(
-                      //         '${(100 * progress).roundToDouble()}%',
-                      //       ),
-                      //     )
-                      //   ],
-                      // );
-                    } else {
-                      return const SizedBox(
-                        height: 50,
-                      );
-                    }
-                  },
-                ),
+                              // return Stack(
+                              //   children: [
+                              //     LinearProgressIndicator(
+                              //       value: progress,
+                              //     ),
+                              //     Center(
+                              //       child: Text(
+                              //         '${(100 * progress).roundToDouble()}%',
+                              //       ),
+                              //     )
+                              //   ],
+                              // );
+                            } else {
+                              return const SizedBox(
+                                height: 50,
+                              );
+                            }
+                          },
+                        );
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    })
               ],
             ),
           ),
