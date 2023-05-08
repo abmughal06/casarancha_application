@@ -24,6 +24,7 @@ import '../../../widgets/common_widgets.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
 import '../story_view_screen.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -76,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: ListView(
-        // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: 10.w),
           SizedBox(
@@ -88,22 +88,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection("stories")
-                          // .doc(FirebaseAuth.instance.currentUser!.uid)
                           .snapshots(),
                       builder: (context, snapshot) {
                         print("======================== ${snapshot.data}");
-                        if (snapshot.hasData && snapshot.data != null) {
-                          var listofData = snapshot.data!.docs;
+                        if (snapshot.hasData) {
+                          // var listofData = snapshot.data!.docs;
                           // print(snapshot.data!.data());
                           var map;
 
                           // var data = snapshot.data!.data();
+                          // if (snapshot.data!.docs.isNotEmpty) {
                           for (var i = 0; i < snapshot.data!.docs.length; i++) {
                             if (snapshot.data!.docs[i].id ==
                                 FirebaseAuth.instance.currentUser!.uid) {
                               map = snapshot.data!.docs[i].data();
                             }
                           }
+
                           return Column(
                             children: [
                               InkWell(
@@ -153,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           );
                         } else if (snapshot.hasError) {
-                          return Text("Here");
+                          return const Text("Here");
                         } else {
                           return GestureDetector(
                             onTap: () {
@@ -174,95 +175,123 @@ class _HomeScreenState extends State<HomeScreen> {
                         .doc(FirebaseAuth.instance.currentUser!.uid)
                         .snapshots(),
                     builder: (context, snap) {
-                      if (snap.hasData) {
+                      if (snap.hasData && snap.data!.exists) {
                         var userData = snap.data!.data();
-                        var followingIds = userData!['followingsIds'];
-                        print("===============$followingIds");
-                        return StreamBuilder<
-                            QuerySnapshot<Map<String, dynamic>>>(
-                          stream: FirebaseFirestore.instance
-                              .collection("stories")
-                              .where(
-                                "creatorId",
-                                whereIn: followingIds,
-                                // isNotEqualTo:
-                                //     FirebaseAuth.instance.currentUser!.uid,
-                              )
-                              // .where('createdAt',
-                              //     isLessThan: DateTime.now().toIso8601String(),
-                              //     isGreaterThan: DateTime.now()
-                              //         .subtract(const Duration(days: 1))
-                              //         .toIso8601String())
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            print("+++++++++++++++++++${snapshot.data}");
-                            if (snapshot.hasData && snapshot.data != null) {
-                              final data = snapshot.data!.docs;
-                              // double progress =
-                              // data.bytesTransferred / data.totalBytes;
-                              print("++++++++++++++++++++++++++++- $data");
-                              return Expanded(
-                                child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: snapshot.data!.docs.length,
-                                    itemBuilder: (context, index) {
-                                      var storyData = data[index].data();
-                                      Story story = Story.fromMap(storyData);
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 12),
-                                        child: Column(
-                                          children: [
-                                            InkWell(
-                                              onTap: () {
-                                                Get.to(
-                                                  () => StoryViewScreen(
-                                                      story: story),
-                                                );
-                                              },
-                                              child: CircleAvatar(
-                                                minRadius: 25,
-                                                backgroundImage: NetworkImage(
-                                                    story.creatorDetails
-                                                        .imageUrl),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 3),
-                                            Text(
-                                              getFirstName(
-                                                  story.creatorDetails.name),
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 10,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                              );
 
-                              // return Stack(
-                              //   children: [
-                              //     LinearProgressIndicator(
-                              //       value: progress,
-                              //     ),
-                              //     Center(
-                              //       child: Text(
-                              //         '${(100 * progress).roundToDouble()}%',
-                              //       ),
-                              //     )
-                              //   ],
-                              // );
-                            } else {
-                              return const SizedBox(
-                                height: 50,
-                              );
-                            }
-                          },
-                        );
+                        if (userData!['followingsIds'] != []) {
+                          List followingIds = userData['followingsIds'] != []
+                              ? userData['followingsIds']
+                              : [];
+                          print("===============$followingIds");
+                          // return Container();
+                          return StreamBuilder<
+                              QuerySnapshot<Map<String, dynamic>>>(
+                            stream: followingIds.isEmpty
+                                ? FirebaseFirestore.instance
+                                    .collection("stories")
+                                    .where("creatorId",
+                                        arrayContains: followingIds)
+                                    .snapshots()
+                                : FirebaseFirestore.instance
+                                    .collection("stories")
+                                    .where(
+                                      "creatorId",
+                                      whereIn: followingIds,
+                                    )
+                                    // .where(
+                                    //   'createdAt',
+                                    //   isGreaterThan: DateTime.now()
+                                    //       .subtract(const Duration(days: 1))
+                                    //       .toIso8601String(),
+                                    // )
+                                    // .where(
+                                    //   "createdAt",
+                                    //   isLessThan:
+                                    //       DateTime.now().toIso8601String(),
+                                    // )
+                                    .snapshots(),
+                            builder: (context, snapshot) {
+                              print("hERE +++++++======== $followingIds");
+                              print("+++++++++++++++++++${snapshot.data}");
+                              // if(DateTime.now().toIso8601String() == "2023-05-08T01:14:51.814996"){}
+                              print(DateTime.now().toIso8601String());
+                              if (snapshot.hasData && snapshot.data != null) {
+                                final data = snapshot.data!.docs;
+                                // double progress =
+                                // data.bytesTransferred / data.totalBytes;
+                                print("++++++++++++++++++++++++++++- $data");
+                                return Expanded(
+                                  child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: snapshot.data!.docs.length,
+                                      itemBuilder: (context, index) {
+                                        var storyData = data[index].data();
+                                        Story story = Story.fromMap(storyData);
+
+                                        if ("23 hours ago" == "23 hours ago") {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 12),
+                                            child: Column(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    Get.to(
+                                                      () => StoryViewScreen(
+                                                          story: story),
+                                                    );
+                                                  },
+                                                  child: CircleAvatar(
+                                                    minRadius: 25,
+                                                    backgroundImage:
+                                                        NetworkImage(story
+                                                            .creatorDetails
+                                                            .imageUrl),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 3),
+                                                Text(
+                                                  getFirstName(story
+                                                      .creatorDetails.name),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      }),
+                                );
+
+                                // return Stack(
+                                //   children: [
+                                //     LinearProgressIndicator(
+                                //       value: progress,
+                                //     ),
+                                //     Center(
+                                //       child: Text(
+                                //         '${(100 * progress).roundToDouble()}%',
+                                //       ),
+                                //     )
+                                //   ],
+                                // );
+                              } else {
+                                return const SizedBox(
+                                  height: 50,
+                                );
+                              }
+                            },
+                          );
+                        } else {
+                          return Container();
+                        }
+                        // return Text(snap.data!.data()!['followingsIds']);
                       } else {
-                        return CircularProgressIndicator();
+                        return const CircularProgressIndicator();
                       }
                     })
               ],
