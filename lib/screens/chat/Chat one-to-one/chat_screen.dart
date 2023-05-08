@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/message.dart';
 
@@ -40,118 +42,114 @@ class ChatScreen extends StatelessWidget {
       ChatController(appUserId: appUserId, creatorDetails: creatorDetails),
     );
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(
-              Icons.keyboard_arrow_left,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              chatController.resetMessageCount();
-              Get.back();
-            },
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(
+            Icons.keyboard_arrow_left,
+            color: Colors.black,
           ),
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          title: StreamBuilder(
-              stream: chatController.appUserRef.snapshots(),
-              builder: (context, snapshot) {
-                return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(creatorDetails.name),
-                    subtitle: snapshot.hasData ? Text('Live') : null,
-                    leading: CircleAvatar(
-                      backgroundImage: creatorDetails.imageUrl.isEmpty
-                          ? null
-                          : CachedNetworkImageProvider(
-                              creatorDetails.imageUrl,
-                            ),
-                      child: creatorDetails.imageUrl.isEmpty
-                          ? const Icon(
-                              Icons.question_mark,
-                            )
-                          : null,
-                    ));
-              }),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: svgImgButton(
-                  svgIcon: icChatVideo,
-                  onTap: () {
-                    Get.to(
-                      () => const VideoCallScreen(),
-                    );
-                  }),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 8.w, right: 20.w),
-              child: svgImgButton(
-                  svgIcon: icChatCall,
-                  onTap: () {
-                    Get.to(
-                      () => const AudioCallScreen(),
-                    );
-                  }),
-            ),
-          ],
+          onPressed: () {
+            chatController.resetMessageCount();
+            Get.back();
+          },
         ),
-        body: Column(
-          children: [
-            Obx(
-              () => Expanded(
-                child: chatController.isChecking.value
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : FirestoreListView(
-                        query: chatController.currentUserRef
-                            .collection('messageList')
-                            .doc(appUserId)
-                            .collection(
-                              'messages',
-                            )
-                            .orderBy(
-                              'createdAt',
-                              descending: true,
-                            ),
-                        reverse: true,
-                        physics: const BouncingScrollPhysics(),
-                        padding: EdgeInsets.all(10.h),
-                        itemBuilder: (context,
-                            QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-                          final Message message = Message.fromMap(doc.data());
-                          final isMe = message.sentToId == appUserId;
-                          final isSeen = message.isSeen;
-                          return ChatTile(
-                            // key: UniqueKey(),
-                            message: message,
-                            appUserId: appUserId,
-                            isSeen: isSeen,
-                            isMe: isMe,
-                          );
-                        },
-                        // separatorBuilder: (BuildContext context, int index) {
-                        //   return message[index].separateTime != null
-                        //       ? Center(
-                        //           child: Padding(
-                        //             padding: EdgeInsets.symmetric(vertical: 18.h),
-                        //             child: TextWidget(
-                        //               text: message[index].separateTime,
-                        //               color: color221,
-                        //               fontSize: 11.sp,
-                        //             ),
-                        //           ),
-                        //         )
-                        //       : Container();
-                        // },
-                      ),
-              ),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        title: StreamBuilder(
+            stream: chatController.appUserRef.snapshots(),
+            builder: (context, snapshot) {
+              return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(creatorDetails.name),
+                  subtitle: snapshot.hasData ? Text('Live') : null,
+                  leading: CircleAvatar(
+                    backgroundImage: creatorDetails.imageUrl.isEmpty
+                        ? null
+                        : CachedNetworkImageProvider(
+                            creatorDetails.imageUrl,
+                          ),
+                    child: creatorDetails.imageUrl.isEmpty
+                        ? const Icon(
+                            Icons.question_mark,
+                          )
+                        : null,
+                  ));
+            }),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: svgImgButton(
+                svgIcon: icChatVideo,
+                onTap: () {
+                  Get.to(
+                    () => const VideoCallScreen(),
+                  );
+                }),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 8.w, right: 20.w),
+            child: svgImgButton(
+                svgIcon: icChatCall,
+                onTap: () {
+                  Get.to(
+                    () => const AudioCallScreen(),
+                  );
+                }),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Obx(
+            () => Expanded(
+              child: chatController.isChecking.value
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: chatController.currentUserRef
+                          .collection('messageList')
+                          .doc(appUserId)
+                          .collection(
+                            'messages',
+                          )
+                          .orderBy(
+                            'createdAt',
+                            descending: true,
+                          )
+                          .snapshots(),
+                      // reverse: true,
+                      // physics: const BouncingScrollPhysics(),
+                      // padding: EdgeInsets.all(10.h),
+                      builder: (context, doc) {
+                        if (doc.hasData) {
+                          return ListView.builder(
+                              itemCount: doc.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                final Message message = Message.fromMap(
+                                    doc.data!.docs[index].data());
+                                final isMe = message.sentToId == appUserId;
+                                final isSeen = message.isSeen;
+                                return ChatTile(
+                                  // key: UniqueKey(),
+                                  message: message,
+                                  appUserId: appUserId,
+                                  isSeen: isSeen,
+                                  isMe: isMe,
+                                );
+                              });
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: Platform.isIOS ? 40 : 10),
               child: ClipRect(
                 clipper: const ClipPad(padding: EdgeInsets.only(top: 30)),
                 child: Container(
@@ -227,14 +225,14 @@ class ChatScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class ChatTile extends StatefulWidget {
+class ChatTile extends StatelessWidget {
   const ChatTile({
     Key? key,
     required this.message,
@@ -248,83 +246,89 @@ class ChatTile extends StatefulWidget {
   final bool isSeen;
   final String appUserId;
 
-  @override
-  State<ChatTile> createState() => _ChatTileState();
-}
+  // String? dateText;
+  // @override
+  // void initState() {
+  //   dateText = timeago.format(
+  //     DateTime.parse(
+  //       message.createdAt,
+  //     ),
+  //   );
 
-class _ChatTileState extends State<ChatTile> {
-  late String dateText;
-  @override
-  void initState() {
-    dateText = timeago.format(
-      DateTime.parse(
-        widget.message.createdAt,
-      ),
-    );
+  //   FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(message.sentById)
+  //       .collection('messageList')
+  //       .doc(message.sentToId)
+  //       .collection('messages')
+  //       .doc(message.id)
+  //       .update({'isSeen': true});
 
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(widget.message.sentById)
-        .collection('messageList')
-        .doc(widget.message.sentToId)
-        .collection('messages')
-        .doc(widget.message.id)
-        .update({'isSeen': true});
-
-    super.initState();
-  }
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Align(
-          alignment: widget.isMe ? Alignment.topRight : Alignment.topLeft,
-          child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16.r),
-                    topRight: Radius.circular(16.r),
-                    bottomLeft: Radius.circular(
-                      widget.isMe ? 16.r : 0,
-                    ),
-                    bottomRight: Radius.circular(
-                      widget.isMe ? 0 : 16.r,
-                    )),
-                color: (widget.isMe ? colorF03 : colorFF4),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-              child: TextWidget(
-                text: widget.message.content,
-                color: widget.isMe ? color13F : color55F,
-                fontWeight: FontWeight.w500,
-              )),
-        ),
-        Align(
-          alignment: widget.isMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              widget.isMe
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 3.w),
-                      child: widget.message.isSeen
-                          ? SvgPicture.asset(icChatMsgSend)
-                          : null,
-                    )
-                  : Container(),
-              TextWidget(
-                text: dateText,
-                color: colorAA3,
-                fontSize: 11.sp,
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: isMe ? 70 : 0, right: isMe ? 0 : 70),
+            child: Align(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.r),
+                        topRight: Radius.circular(16.r),
+                        bottomLeft: Radius.circular(
+                          isMe ? 16.r : 0,
+                        ),
+                        bottomRight: Radius.circular(
+                          isMe ? 0 : 16.r,
+                        )),
+                    color: (isMe ? colorF03 : colorFF4),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                  child: TextWidget(
+                    text: message.content,
+                    color: isMe ? color13F : color55F,
+                    fontWeight: FontWeight.w500,
+                  )),
+            ),
           ),
-        ),
-        const SizedBox(
-          height: 8,
-        )
-      ],
+          Align(
+            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                isMe
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 3.w),
+                        child: message.isSeen
+                            ? SvgPicture.asset(icChatMsgSend)
+                            : null,
+                      )
+                    : Container(),
+                TextWidget(
+                  text: timeago.format(
+                    DateTime.parse(
+                      message.createdAt,
+                    ),
+                  ),
+                  color: colorAA3,
+                  fontSize: 11.sp,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
     );
   }
 }
