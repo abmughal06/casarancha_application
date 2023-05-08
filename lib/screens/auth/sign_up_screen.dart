@@ -1,9 +1,11 @@
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
 
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -295,6 +297,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           email: _emailController.text.trim(),
                           password: _passwordController.text.trim(),
                         );
+
                         await Future.delayed(
                           const Duration(
                             seconds: 1,

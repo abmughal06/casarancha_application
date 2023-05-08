@@ -20,6 +20,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
+import '../../resources/firebase_cloud_messaging.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
@@ -97,6 +98,8 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
     }
     return true;
   }
+
+  FirebaseMessagingService message = FirebaseMessagingService();
 
   @override
   void initState() {
@@ -323,12 +326,14 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                     }
 
                     final imageUrl = await imageRef?.ref.getDownloadURL();
+                    var token = await message.getFirebaseToken();
 
                     final userModel = UserModel(
                       id: userId,
                       email: userEmail,
                       username: _userNameController.text.trim(),
                       dob: _selectedDob.toString(),
+                      fcmToken: token,
                       name:
                           '${_firstNameController.text.trim()} ${_lastNameController.text.trim()} ',
                       createdAt: DateTime.now().toIso8601String(),
@@ -346,7 +351,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                             ? Get.find<ProfileScreenController>()
                             : Get.put((ProfileScreenController()));
                     controller.setUserProfile(userModel);
-                    Get.offAll(() => DashBoard());
+                    Get.offAll(() => const DashBoard());
                   }
                 } on FirebaseException catch (e) {
                   GlobalSnackBar.show(
