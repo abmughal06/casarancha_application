@@ -1,47 +1,33 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/auth/sign_up_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
-
-import 'package:casarancha/utils/app_constants.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutterfire_ui/auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:twitter_login/entity/auth_result.dart';
 import 'package:twitter_login/twitter_login.dart';
-
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
-
 import '../../utils/snackbar.dart';
-
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/text_editing_widget.dart';
 import '../../widgets/text_widget.dart';
-
 import 'forgot_password_screen.dart' as pass;
-import 'package:flutterfire_ui/src/auth/oauth/providers/apple_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -147,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Scaffold(
           body: Column(
             children: [
-              Container(
+              SizedBox(
                 height: 170,
                 width: MediaQuery.of(context).size.width,
                 child: Image.asset(
@@ -359,14 +345,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: Container(
                                         height: 40.w,
                                         width: 40.w,
-                                        padding: EdgeInsets.all(5),
+                                        padding: const EdgeInsets.all(5),
                                         decoration: BoxDecoration(
                                             color: Colors.white,
                                             borderRadius:
                                                 BorderRadius.circular(7),
                                             boxShadow: [
                                               BoxShadow(
-                                                  offset: Offset(0, 0),
+                                                  offset: const Offset(0, 0),
                                                   spreadRadius: 1,
                                                   blurRadius: 1,
                                                   color: Colors.grey.shade300)
@@ -484,7 +470,7 @@ class _LoginScreenState extends State<LoginScreen> {
           .doc(userId)
           .get();
       if (document.exists) {
-        Get.offAll(() => DashBoard());
+        Get.offAll(() => const DashBoard());
       } else {
         Get.offAll(() => const SetupProfileScreen());
       }
