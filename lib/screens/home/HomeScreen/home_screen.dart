@@ -1,8 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/models/comment_model.dart';
+import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
+import 'package:casarancha/screens/chat/share_post_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
@@ -10,6 +14,7 @@ import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
 import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
+import 'package:casarancha/widgets/comment_screen.dart';
 import 'package:casarancha/widgets/custome_firebase_list_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -502,6 +507,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                     postCardController.likeDisLikePost(
                                         user!.id, post.id);
                                   },
+                                  ontapShare: () {
+                                    Get.to(() => SharePostScreen());
+                                  },
+                                  ontapCmnt: () {
+                                    Get.to(() => CommentScreen(
+                                          id: post.id,
+                                          comment: post.commentIds,
+                                          creatorDetails: CreatorDetails(
+                                              name: post.creatorDetails.name,
+                                              imageUrl:
+                                                  post.creatorDetails.imageUrl,
+                                              isVerified: post
+                                                  .creatorDetails.isVerified),
+                                        ));
+                                  },
                                   comments: post.commentIds.length,
                                   isDesc: post.description.isNotEmpty,
                                   desc: post.description.toString(),
@@ -556,7 +576,7 @@ class CustomPostHeader extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.amber,
                   image: DecorationImage(
-                    image: NetworkImage("$image"),
+                    image: CachedNetworkImageProvider("$image"),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -630,14 +650,20 @@ class CustomPostFooter extends StatelessWidget {
                 widthBox(12.w),
                 Text("$likes"),
                 widthBox(12.w),
-                const AssetImageWidget(
-                  imageName: postComment,
+                InkWell(
+                  onTap: ontapCmnt,
+                  child: const AssetImageWidget(
+                    imageName: postComment,
+                  ),
                 ),
                 widthBox(12.w),
                 Text("$comments"),
                 widthBox(12.w),
-                const AssetImageWidget(
-                  imageName: postSend,
+                InkWell(
+                  onTap: ontapShare,
+                  child: const AssetImageWidget(
+                    imageName: postSend,
+                  ),
                 ),
               ],
             ),
