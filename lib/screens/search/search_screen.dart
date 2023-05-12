@@ -12,6 +12,7 @@ import 'package:casarancha/widgets/group_tile.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,6 +23,8 @@ import 'package:video_player/video_player.dart';
 
 import '../../widgets/common_widgets.dart';
 import '../dashboard/dashboard.dart';
+import '../profile/AppUser/app_user_controller.dart';
+import '../profile/AppUser/app_user_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -115,26 +118,46 @@ class _SearchScreenState extends State<SearchScreen> {
                               itemBuilder: (context, index) {
                                 var userSnap =
                                     snapshot.data!.docs[index].data();
-                                var user = UserModel.fromMap(userSnap);
+                                // print(userSnap);
+                                // var user = UserModel.fromMap(userSnap);
                                 // print(
                                 //     user.name.compareTo(searchController.text));
                                 if (compareStrings(
-                                    user.username, searchController.text)) {
-                                  return ListTile(
-                                    leading: Container(
-                                      height: 38.w,
-                                      width: 38.w,
-                                      decoration: BoxDecoration(
-                                        color: color080,
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: NetworkImage(user.imageStr),
-                                          fit: BoxFit.cover,
+                                    userSnap['username'].toString(),
+                                    searchController.text)) {
+                                  return InkWell(
+                                    onTap: () {
+                                      Get.to(
+                                        () => AppUserScreen(
+                                          appUserController: Get.put(
+                                            AppUserController(
+                                              appUserId: userSnap['id'],
+                                              currentUserId: FirebaseAuth
+                                                  .instance.currentUser!.uid,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: ListTile(
+                                      leading: Container(
+                                        height: 38.w,
+                                        width: 38.w,
+                                        decoration: BoxDecoration(
+                                          color: color080,
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                            image: NetworkImage(
+                                                userSnap["imageStr"]
+                                                    .toString()),
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
+                                      title: Text(userSnap["name"].toString()),
+                                      subtitle:
+                                          Text(userSnap["username"].toString()),
                                     ),
-                                    title: Text(user.name),
-                                    subtitle: Text(user.username),
                                   );
                                 } else {
                                   return Container();

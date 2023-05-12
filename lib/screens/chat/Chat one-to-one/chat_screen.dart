@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/message.dart';
 
 import 'package:casarancha/models/post_creator_details.dart';
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
@@ -56,20 +57,24 @@ class ChatScreen extends StatelessWidget {
         ),
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        title: StreamBuilder(
-            stream: chatController.appUserRef.snapshots(),
+        title: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .doc(appUserId)
+                .snapshots(),
             builder: (context, snapshot) {
+              UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
               return ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(creatorDetails.name),
-                  subtitle: snapshot.hasData ? Text('Live') : null,
+                  title: Text(userModel.name),
+                  subtitle: snapshot.hasData ? const Text('Live') : null,
                   leading: CircleAvatar(
-                    backgroundImage: creatorDetails.imageUrl.isEmpty
+                    backgroundImage: userModel.imageStr.isEmpty
                         ? null
                         : CachedNetworkImageProvider(
-                            creatorDetails.imageUrl,
+                            userModel.imageStr,
                           ),
-                    child: creatorDetails.imageUrl.isEmpty
+                    child: userModel.imageStr.isEmpty
                         ? const Icon(
                             Icons.question_mark,
                           )
