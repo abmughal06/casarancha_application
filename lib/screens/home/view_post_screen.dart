@@ -1,17 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/comment_model.dart';
-import 'package:casarancha/models/media_details.dart';
-import 'package:casarancha/models/post_model.dart';
-import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/menu_post_button.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,6 +21,7 @@ import '../../widgets/common_widgets.dart';
 
 import '../../widgets/text_widget.dart';
 
+// ignore: must_be_immutable
 class ViewPostScreen extends StatefulWidget {
   ViewPostScreen(
       {Key? key,

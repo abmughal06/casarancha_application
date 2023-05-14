@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/comment_model.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
@@ -11,11 +10,10 @@ import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
-import 'package:casarancha/widgets/PostCard/postCard.dart';
+import 'package:casarancha/screens/profile/saved_post_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
 import 'package:casarancha/widgets/comment_screen.dart';
-import 'package:casarancha/widgets/custome_firebase_list_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -232,8 +230,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                       itemBuilder: (context, index) {
                                         var storyData = data[index].data();
                                         Story story = Story.fromMap(storyData);
-
-                                        if ("23 hours ago" == "23 hours ago") {
+                                        DateTime givenDate =
+                                            DateTime.parse(story.createdAt);
+                                        DateTime twentyFourHoursAgo =
+                                            DateTime.now().subtract(
+                                                const Duration(hours: 24));
+                                        print(
+                                            " ========== $twentyFourHoursAgo");
+                                        if (givenDate
+                                            .isBefore(twentyFourHoursAgo)) {
+                                          return Container();
+                                        } else {
                                           return Padding(
                                             padding: const EdgeInsets.only(
                                                 right: 12),
@@ -266,8 +273,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ],
                                             ),
                                           );
-                                        } else {
-                                          return Container();
                                         }
                                       }),
                                 );
@@ -328,13 +333,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           final post = PostModel.fromMap(prePost);
                           PostCardController postCardController =
                               PostCardController(postdata: post);
-                          AppUserController? appUserController;
+                          // AppUserController? appUserController;
 
                           videoPlayerController = VideoPlayerController.network(
                               post.mediaData.first.type == "Video"
                                   ? post.mediaData[0].link.toString()
                                   : "");
-                          videoPlayerController!.initialize();
+                          videoPlayerController!
+                              .initialize()
+                              .then((value) => videoPlayerController!.play());
 
                           return Padding(
                             padding: EdgeInsets.only(bottom: 15.w),
@@ -383,14 +390,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Column(
                                     children: [
                                       InkWell(
-                                        // onTap: () {
-                                        //   if (videoPlayerController!
-                                        //       .value.isPlaying) {
-                                        //     videoPlayerController!.pause();
-                                        //   } else {
-                                        //     videoPlayerController!.play();
-                                        //   }
-                                        // },s
+                                        onTap: () {
+                                          if (videoPlayerController!
+                                              .value.isPlaying) {
+                                            videoPlayerController!.pause();
+                                          } else {
+                                            videoPlayerController!.play();
+                                          }
+                                        },
                                         onDoubleTap: () {
                                           print("clicked");
                                           postCardController.isLiked.value =
@@ -500,6 +507,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 CustomPostFooter(
                                   likes: post.likesIds.length.toString(),
                                   isLike: post.likesIds.contains(user!.id),
+                                  isPostSaved:
+                                      user!.savedPostsIds.contains(post.id),
                                   ontapLike: () {
                                     print("clicked");
                                     postCardController.isLiked.value =
@@ -507,8 +516,46 @@ class _HomeScreenState extends State<HomeScreen> {
                                     postCardController.likeDisLikePost(
                                         user!.id, post.id);
                                   },
+                                  ontapSave: () {
+                                    print(user!.savedPostsIds);
+
+                                    if (user!.savedPostsIds.contains(post.id)) {
+                                      FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(user!.id)
+                                          .update({
+                                        'savedPostsIds':
+                                            FieldValue.arrayRemove([post.id])
+                                      });
+                                    } else {
+                                      FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(user!.id)
+                                          .update({
+                                        'savedPostsIds':
+                                            FieldValue.arrayUnion([post.id])
+                                      });
+                                    }
+                                  },
                                   ontapShare: () {
-                                    Get.to(() => SharePostScreen());
+                                    Get.to(() => SharePostScreen(
+                                          postModel: PostModel(
+                                            id: post.id,
+                                            creatorId: post.creatorId,
+                                            creatorDetails: post.creatorDetails,
+                                            createdAt: post.createdAt,
+                                            description: post.description,
+                                            locationName: post.locationName,
+                                            shareLink: post.shareLink,
+                                            mediaData: post.mediaData,
+                                            tagsIds: post.tagsIds,
+                                            likesIds: post.likesIds,
+                                            showPostTime: post.showPostTime,
+                                            postBlockStatus:
+                                                post.postBlockStatus,
+                                            commentIds: post.commentIds,
+                                          ),
+                                        ));
                                   },
                                   ontapCmnt: () {
                                     Get.to(() => CommentScreen(
@@ -613,7 +660,9 @@ class CustomPostFooter extends StatelessWidget {
   final VoidCallback? ontapCmnt;
   final VoidCallback? ontapShare;
   final VoidCallback? ontapSave;
+  final bool? isPostSaved;
   final bool? isDesc;
+  final bool? isPostDetail;
 
   const CustomPostFooter({
     Key? key,
@@ -626,6 +675,8 @@ class CustomPostFooter extends StatelessWidget {
     this.isDesc = false,
     this.desc,
     this.isLike = false,
+    this.isPostDetail = false,
+    this.isPostSaved = false,
   }) : super(key: key);
 
   // final postController = PostCardController(postdata: postdata);
@@ -669,8 +720,12 @@ class CustomPostFooter extends StatelessWidget {
             ),
             Row(
               children: [
-                const AssetImageWidget(
-                  imageName: postSave,
+                InkWell(
+                  onTap: ontapSave,
+                  child: AssetImageWidget(
+                    imageName: postSave,
+                    color: isPostSaved! ? Colors.red.shade800 : null,
+                  ),
                 ),
                 widthBox(16.w),
               ],
@@ -695,7 +750,11 @@ class CustomPostFooter extends StatelessWidget {
           ),
         ),
         Visibility(
-          visible: comments != null ? comments! > 0 : false,
+          visible: isPostDetail!
+              ? comments != null
+                  ? comments! > 0
+                  : false
+              : false,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
@@ -725,73 +784,72 @@ class CustomPostFooter extends StatelessWidget {
 //                         parent: AlwaysScrollableScrollPhysics()),
 //                   ),
 
-class ShowAllPosts extends StatefulWidget {
-  const ShowAllPosts({
-    Key? key,
-    required this.query,
-    this.physics,
-    this.shrinkWrap = false,
-  }) : super(key: key);
+// class ShowAllPosts extends StatefulWidget {
+//   const ShowAllPosts({
+//     Key? key,
+//     required this.query,
+//     this.physics,
+//     this.shrinkWrap = false,
+//   }) : super(key: key);
 
-  final Query<Map<String, dynamic>> query;
-  final ScrollPhysics? physics;
-  final bool shrinkWrap;
+//   final Query<Map<String, dynamic>> query;
+//   final ScrollPhysics? physics;
+//   final bool shrinkWrap;
 
-  @override
-  State<ShowAllPosts> createState() => _ShowAllPostsState();
-}
+//   @override
+//   State<ShowAllPosts> createState() => _ShowAllPostsState();
+// }
 
-class _ShowAllPostsState extends State<ShowAllPosts> {
-  late ScrollController _scrollController;
-  @override
-  void setState(VoidCallback fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
-  }
+// class _ShowAllPostsState extends State<ShowAllPosts> {
+//   late ScrollController _scrollController;
+//   @override
+//   void setState(VoidCallback fn) {
+//     if (mounted) {
+//       super.setState(fn);
+//     }
+//   }
 
-  @override
-  void initState() {
-    _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      setState(() {});
-    });
-    super.initState();
-  }
+//   @override
+//   void initState() {
+//     _scrollController = ScrollController();
+//     _scrollController.addListener(() {
+//       setState(() {});
+//     });
+//     super.initState();
+//   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     _scrollController.dispose();
+//     super.dispose();
+//   }
 
-  VideoPlayerController? currentVideoController;
-  @override
-  Widget build(BuildContext context) {
-    return CustomeFirestoreListView(
-      shrinkWrap: widget.shrinkWrap,
-      physics: widget.physics,
-      query: widget.query,
-      addAutomaticKeepAlives: true,
-      itemBuilder: (context, QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-        final post = PostModel.fromMap(doc.data());
+//   VideoPlayerController? currentVideoController;
+//   @override
+//   Widget build(BuildContext context) {
+//     return CustomeFirestoreListView(
+//       shrinkWrap: widget.shrinkWrap,
+//       physics: widget.physics,
+//       query: widget.query,
+//       addAutomaticKeepAlives: true,
+//       itemBuilder: (context, QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+//         final post = PostModel.fromMap(doc.data());
 
-        if ((post.reportCount ?? 0) <= 10 &&
-            (post.postBlockStatus != "Blocked")) {
-          final postCardController = Get.put(
-            PostCardController(postdata: post),
-            tag: post.id,
-          );
+//         if ((post.reportCount ?? 0) <= 10 &&
+//             (post.postBlockStatus != "Blocked")) {
+//           final postCardController = Get.put(
+//             PostCardController(postdata: post),
+//             tag: post.id,
+//           );
 
-          return NewPostCard(
-              postCardController: postCardController,
-              videoPlayerController: currentVideoController);
-        }
-        return const SizedBox(height: 0, width: 0);
-      },
-    );
-  }
-}
+//           return NewPostCard(
+//               z);
+//         }
+//         return const SizedBox(height: 0, width: 0);
+//       },
+//     );
+//   }
+// }
 
 // class ShowAllStory extends StatefulWidget {
 //   const ShowAllStory({Key? key}) : super(key: key);

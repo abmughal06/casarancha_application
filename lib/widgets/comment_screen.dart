@@ -54,39 +54,45 @@ class CommentScreen extends StatelessWidget {
                       // var cDetail =
                       //     CreatorDetails.fromMap(data['creatorDetails']);
                       var cmnt = Comment.fromMap(data);
-                      return ListTile(
-                        horizontalTitleGap: 0,
-                        leading: Container(
-                          height: 30.h,
-                          width: 30.h,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.amber,
-                            image: DecorationImage(
-                              image: CachedNetworkImageProvider(
-                                  cmnt.creatorDetails.imageUrl),
-                              fit: BoxFit.cover,
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          horizontalTitleGap: 0,
+                          leading: Container(
+                            height: 30.h,
+                            width: 30.h,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.amber,
+                              image: DecorationImage(
+                                image: CachedNetworkImageProvider(
+                                    cmnt.creatorDetails.imageUrl),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                        title: Text(cmnt.creatorDetails.name,
-                            style: TextStyle(
-                                fontSize: 13.sp,
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w700)),
-                        subtitle: Text(cmnt.message,
-                            style: TextStyle(
-                                fontSize: 13.sp,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400)),
-                        trailing: Text(
-                          timeago.format(
-                            DateTime.parse(
-                              cmnt.createdAt,
+                          title: Text(cmnt.creatorDetails.name,
+                              style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.w700)),
+                          subtitle: Text(cmnt.message,
+                              style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w400)),
+                          trailing: Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: Text(
+                              timeago.format(
+                                DateTime.parse(
+                                  cmnt.createdAt,
+                                ),
+                              ),
+                              style: TextStyle(
+                                  fontSize: 11.sp, color: Colors.black45),
                             ),
                           ),
-                          style:
-                              TextStyle(fontSize: 11.sp, color: Colors.black45),
                         ),
                       );
                     },
@@ -108,6 +114,7 @@ class CommentScreen extends StatelessWidget {
                     controller: coommenController,
                     color: Colors.black12,
                     isBorderEnable: true,
+                    hint: "Write Comment ...",
                   ),
                 ),
                 IconButton(
