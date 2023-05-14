@@ -4,7 +4,10 @@
     <application
         android:label="Casa Rancha"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+        android:usesCleartextTraffic="true"
+>
+        
         <meta-data               
            android:name="com.facebook.sdk.ApplicationId"
            android:value="@string/facebook_app_id" />
