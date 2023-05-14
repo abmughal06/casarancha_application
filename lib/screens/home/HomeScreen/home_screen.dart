@@ -1,12 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/comment_model.dart';
-import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
-import 'package:casarancha/screens/chat/share_post_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
@@ -14,7 +10,6 @@ import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
 import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
-import 'package:casarancha/widgets/comment_screen.dart';
 import 'package:casarancha/widgets/custome_firebase_list_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,6 +21,10 @@ import 'package:video_player/video_player.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/common_widgets.dart';
+import '../../../widgets/menu_post_button.dart';
+import '../../../widgets/video_card.dart';
+import '../../../widgets/video_player_Url.dart';
+import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
 import '../story_view_screen.dart';
@@ -44,6 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
     List<String> nameParts = fullName.split(" ");
     return nameParts[0];
   }
+
+  ProfileScreenController? profileScreenController;
 
   @override
   Widget build(BuildContext context) {
@@ -216,9 +217,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     // )
                                     .snapshots(),
                             builder: (context, snapshot) {
-                              print("hERE +++++++======== $followingIds");
-                              print("+++++++++++++++++++${snapshot.data}");
-                              // if(DateTime.now().toIso8601String() == "2023-05-08T01:14:51.814996"){}
                               print(DateTime.now().toIso8601String());
                               if (snapshot.hasData && snapshot.data != null) {
                                 final data = snapshot.data!.docs;
@@ -316,8 +314,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context, snap) {
                     if (snap.hasData) {
                       var data = snap.data!.docs;
-                      VideoPlayerController? videoPlayerController;
-                      print("In here _++++++++++____++++");
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -328,14 +324,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           final post = PostModel.fromMap(prePost);
                           PostCardController postCardController =
                               PostCardController(postdata: post);
-                          AppUserController? appUserController;
-
-                          videoPlayerController = VideoPlayerController.network(
-                              post.mediaData.first.type == "Video"
-                                  ? post.mediaData[0].link.toString()
-                                  : "");
-                          videoPlayerController!.initialize();
-
+                          // videoPlayerController = VideoPlayerController.network(
+                          //   post.mediaData.first.type == "Video"
+                          //       ? post.mediaData[0].link.toString()
+                          //       : "",
+                          //   // formatHint: VideoFormat.hls,
+                          // );
+                          // videoPlayerController!.initialize().then((value) {
+                          //   videoPlayerController!.play();
+                          // });
                           return Padding(
                             padding: EdgeInsets.only(bottom: 15.w),
                             child: Column(
@@ -380,61 +377,104 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Visibility(
                                   visible: post.mediaData[0].type == "Video",
-                                  child: Column(
-                                    children: [
-                                      InkWell(
-                                        // onTap: () {
-                                        //   if (videoPlayerController!
-                                        //       .value.isPlaying) {
-                                        //     videoPlayerController!.pause();
-                                        //   } else {
-                                        //     videoPlayerController!.play();
-                                        //   }
-                                        // },s
-                                        onDoubleTap: () {
-                                          print("clicked");
-                                          postCardController.isLiked.value =
-                                              !post.likesIds.contains(user!.id);
-                                          postCardController.likeDisLikePost(
-                                              user!.id, post.id);
-                                        },
-                                        child: AspectRatio(
-                                          aspectRatio: 2 / 3,
-                                          child: Stack(
-                                            children: [
-                                              videoPlayerController != null
-                                                  ? VideoPlayer(
-                                                      videoPlayerController!)
-                                                  : const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                              Positioned(
-                                                top: 12,
-                                                left: 0,
-                                                right: 0,
-                                                child: CustomPostHeader(
-                                                  name:
-                                                      post.creatorDetails.name,
-                                                  image: post
-                                                      .creatorDetails.imageUrl,
-                                                  ontap: () {},
-                                                  headerOnTap: () {
-                                                    postCardController
-                                                        .gotoAppUserScreen(
-                                                            post.creatorId);
-                                                  },
-                                                  isVideoPost: true,
-                                                ),
+                                  child: AspectRatio(
+                                    aspectRatio: 2 / 3,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      shrinkWrap: true,
+                                      itemCount: post.mediaData.length,
+                                      itemBuilder: (context, i) {
+                                        VideoPlayerController?
+                                            videoPlayerController;
+                                        // var video =
+                                        //     VideoPlayerController.network(post
+                                        //         .mediaData[i].link
+                                        //         .toString());
+
+                                        videoPlayerController =
+                                            VideoPlayerController.network(
+                                          post.mediaData.first.type == "Video"
+                                              ? post.mediaData[i].link
+                                                  .toString()
+                                              : "",
+                                        );
+                                        videoPlayerController
+                                            .initialize()
+                                            .then((value) {
+                                          videoPlayerController!.play();
+                                        });
+                                        return InkWell(
+                                          onTap: () {
+                                            print('clicked');
+                                            Get.to(
+                                              () => CustomVideoCard(
+                                                aspectRatio:
+                                                    videoPlayerController!
+                                                        .value.aspectRatio,
+                                                videoPlayerController:
+                                                    videoPlayerController,
+                                                // videoUrl:
+                                                //     post.mediaData[i].link,
+                                                menuButton: menuButton(context,
+                                                    post.mediaData[i].link,
+                                                    margin: const EdgeInsets
+                                                            .symmetric(
+                                                        vertical: 10,
+                                                        horizontal: 17),
+                                                    profileScreenController:
+                                                        profileScreenController),
                                               ),
-                                            ],
+                                            );
+                                            // if (videoPlayerController!
+                                            //     .value.isPlaying) {
+                                            //   videoPlayerController!.pause();
+                                            // } else {
+                                            //   videoPlayerController!.play();
+                                            // }
+                                          },
+                                          onDoubleTap: () {
+                                            print("clicked");
+                                            postCardController.isLiked.value =
+                                                !post.likesIds
+                                                    .contains(user!.id);
+                                            postCardController.likeDisLikePost(
+                                                user!.id, post.id);
+                                          },
+                                          child: AspectRatio(
+                                            aspectRatio: 2 / 3,
+                                            child: Stack(
+                                              children: [
+                                                VideoPlayer(
+                                                  // videoUrl:
+                                                  //     post.mediaData[i].link,
+                                                  // videoPlayerControl/ler:
+                                                  videoPlayerController,
+                                                ),
+                                                // VideoPlayer(
+                                                //     videoPlayerController),
+                                                Positioned(
+                                                  top: 12,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: CustomPostHeader(
+                                                    name: post
+                                                        .creatorDetails.name,
+                                                    image: post.creatorDetails
+                                                        .imageUrl,
+                                                    headerOnTap: () {
+                                                      postCardController
+                                                          .gotoAppUserScreen(
+                                                              post.creatorId);
+                                                    },
+                                                    isVideoPost: true,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                      heightBox(12.h),
-                                    ],
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                                 Visibility(
@@ -507,21 +547,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     postCardController.likeDisLikePost(
                                         user!.id, post.id);
                                   },
-                                  ontapShare: () {
-                                    Get.to(() => SharePostScreen());
-                                  },
-                                  ontapCmnt: () {
-                                    Get.to(() => CommentScreen(
-                                          id: post.id,
-                                          comment: post.commentIds,
-                                          creatorDetails: CreatorDetails(
-                                              name: post.creatorDetails.name,
-                                              imageUrl:
-                                                  post.creatorDetails.imageUrl,
-                                              isVerified: post
-                                                  .creatorDetails.isVerified),
-                                        ));
-                                  },
                                   comments: post.commentIds.length,
                                   isDesc: post.description.isNotEmpty,
                                   desc: post.description.toString(),
@@ -576,7 +601,7 @@ class CustomPostHeader extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.amber,
                   image: DecorationImage(
-                    image: CachedNetworkImageProvider("$image"),
+                    image: NetworkImage("$image"),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -650,20 +675,14 @@ class CustomPostFooter extends StatelessWidget {
                 widthBox(12.w),
                 Text("$likes"),
                 widthBox(12.w),
-                InkWell(
-                  onTap: ontapCmnt,
-                  child: const AssetImageWidget(
-                    imageName: postComment,
-                  ),
+                const AssetImageWidget(
+                  imageName: postComment,
                 ),
                 widthBox(12.w),
                 Text("$comments"),
                 widthBox(12.w),
-                InkWell(
-                  onTap: ontapShare,
-                  child: const AssetImageWidget(
-                    imageName: postSend,
-                  ),
+                const AssetImageWidget(
+                  imageName: postSend,
                 ),
               ],
             ),

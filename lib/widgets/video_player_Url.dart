@@ -55,7 +55,7 @@ class _VideoPlayerUrlState extends State<VideoPlayerUrl>
           DeviceOrientation.landscapeRight
         ],
         deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-        aspectRatio: 1,
+        aspectRatio: 2 / 3,
         looping: false);
   }
 
@@ -127,7 +127,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     chewieController = ChewieController(
         videoPlayerController: videoPlayerController!,
         showOptions: false,
-        autoPlay: false,
+        autoPlay: true,
         allowPlaybackSpeedChanging: false,
         autoInitialize: true,
         showControlsOnInitialize: false,
@@ -137,7 +137,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           DeviceOrientation.landscapeRight
         ],
         deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-        aspectRatio: 1,
+        aspectRatio: 2 / 3,
         looping: false);
   }
 
