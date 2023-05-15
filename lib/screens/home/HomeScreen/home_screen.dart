@@ -1,16 +1,14 @@
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
-import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
-import 'package:casarancha/screens/profile/saved_post_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
-import 'package:casarancha/widgets/custome_firebase_list_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +23,6 @@ import '../../../widgets/comment_screen.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/menu_post_button.dart';
 import '../../../widgets/video_card.dart';
-import '../../../widgets/video_player_Url.dart';
 import '../../chat/share_post_screen.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../CreatePost/create_post_screen.dart';
@@ -233,14 +230,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                       itemBuilder: (context, index) {
                                         var storyData = data[index].data();
                                         Story story = Story.fromMap(storyData);
-                                        DateTime givenDate =
-                                            DateTime.parse(story.createdAt);
+                                        DateTime? givenDate;
+                                        for (int i = 0;
+                                            i < story.mediaDetailsList.length;
+                                            i++) {
+                                          givenDate = DateTime.parse(
+                                              story.mediaDetailsList[i].id);
+                                        }
+
                                         DateTime twentyFourHoursAgo =
                                             DateTime.now().subtract(
                                                 const Duration(hours: 24));
                                         print(
                                             " ========== $twentyFourHoursAgo");
-                                        if (givenDate
+                                        if (givenDate!
                                             .isBefore(twentyFourHoursAgo)) {
                                           return Container();
                                         } else {
@@ -550,8 +553,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 CustomPostFooter(
                                   likes: post.likesIds.length.toString(),
                                   isLike: post.likesIds.contains(user!.id),
-                                  isPostSaved:
-                                      user!.savedPostsIds.contains(post.id),
+
                                   ontapLike: () {
                                     print("clicked");
                                     postCardController.isLiked.value =
@@ -559,27 +561,58 @@ class _HomeScreenState extends State<HomeScreen> {
                                     postCardController.likeDisLikePost(
                                         user!.id, post.id);
                                   },
-                                  ontapSave: () {
-                                    print(user!.savedPostsIds);
+                                  // ontapSave: () {
+                                  //   print(user!.savedPostsIds);
 
-                                    if (user!.savedPostsIds.contains(post.id)) {
-                                      FirebaseFirestore.instance
-                                          .collection("users")
-                                          .doc(user!.id)
-                                          .update({
-                                        'savedPostsIds':
-                                            FieldValue.arrayRemove([post.id])
-                                      });
-                                    } else {
-                                      FirebaseFirestore.instance
-                                          .collection("users")
-                                          .doc(user!.id)
-                                          .update({
-                                        'savedPostsIds':
-                                            FieldValue.arrayUnion([post.id])
-                                      });
-                                    }
-                                  },
+                                  // },
+                                  saveBtn: StreamBuilder<
+                                      DocumentSnapshot<Map<String, dynamic>>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection("users")
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        var userData = snapshot.data!.data();
+                                        var userModel =
+                                            UserModel.fromMap(userData!);
+                                        return GestureDetector(
+                                          onTap: () {
+                                            if (userModel.savedPostsIds
+                                                .contains(post.id)) {
+                                              FirebaseFirestore.instance
+                                                  .collection("users")
+                                                  .doc(userModel.id)
+                                                  .update({
+                                                'savedPostsIds':
+                                                    FieldValue.arrayRemove(
+                                                        [post.id])
+                                              });
+                                            } else {
+                                              FirebaseFirestore.instance
+                                                  .collection("users")
+                                                  .doc(userModel.id)
+                                                  .update({
+                                                'savedPostsIds':
+                                                    FieldValue.arrayUnion(
+                                                        [post.id])
+                                              });
+                                            }
+                                          },
+                                          child: Image.asset(
+                                            postSave,
+                                            color: userModel.savedPostsIds
+                                                    .contains(post.id)
+                                                ? Colors.red
+                                                : null,
+                                          ),
+                                        );
+                                      } else {
+                                        return Image.asset(postSave);
+                                      }
+                                    },
+                                  ),
                                   ontapShare: () {
                                     Get.to(() => SharePostScreen(
                                           postModel: PostModel(
@@ -702,8 +735,7 @@ class CustomPostFooter extends StatelessWidget {
   final VoidCallback? ontapLike;
   final VoidCallback? ontapCmnt;
   final VoidCallback? ontapShare;
-  final VoidCallback? ontapSave;
-  final bool? isPostSaved;
+  final Widget? saveBtn;
   final bool? isDesc;
   final bool? isPostDetail;
 
@@ -714,12 +746,11 @@ class CustomPostFooter extends StatelessWidget {
     this.ontapLike,
     this.ontapCmnt,
     this.ontapShare,
-    this.ontapSave,
     this.isDesc = false,
     this.desc,
     this.isLike = false,
     this.isPostDetail = false,
-    this.isPostSaved = false,
+    this.saveBtn,
   }) : super(key: key);
 
   // final postController = PostCardController(postdata: postdata);
@@ -744,26 +775,26 @@ class CustomPostFooter extends StatelessWidget {
                 widthBox(12.w),
                 Text("$likes"),
                 widthBox(12.w),
-                const AssetImageWidget(
-                  imageName: postComment,
+                InkWell(
+                  onTap: ontapCmnt,
+                  child: const AssetImageWidget(
+                    imageName: postComment,
+                  ),
                 ),
                 widthBox(12.w),
                 Text("$comments"),
                 widthBox(12.w),
-                const AssetImageWidget(
-                  imageName: postSend,
+                InkWell(
+                  onTap: ontapShare,
+                  child: const AssetImageWidget(
+                    imageName: postSend,
+                  ),
                 ),
               ],
             ),
             Row(
               children: [
-                InkWell(
-                  onTap: ontapSave,
-                  child: AssetImageWidget(
-                    imageName: postSave,
-                    color: isPostSaved! ? Colors.red.shade800 : null,
-                  ),
-                ),
+                saveBtn!,
                 widthBox(16.w),
               ],
             ),

@@ -9,6 +9,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../models/comment_model.dart';
+import '../resources/color_resources.dart';
+import '../resources/image_resources.dart';
+import '../resources/localization_text_strings.dart';
+import '../resources/strings.dart';
+import 'clip_pad_shadow.dart';
 
 // ignore: must_be_immutable
 class CommentScreen extends StatelessWidget {
@@ -36,132 +41,233 @@ class CommentScreen extends StatelessWidget {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance
-                  .collection("posts")
-                  .doc(id)
-                  .collection("comments")
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      var data = snapshot.data!.docs[index].data();
-                      // var cDetail =
-                      //     CreatorDetails.fromMap(data['creatorDetails']);
-                      var cmnt = Comment.fromMap(data);
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          horizontalTitleGap: 0,
-                          leading: Container(
-                            height: 30.h,
-                            width: 30.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.amber,
-                              image: DecorationImage(
-                                image: CachedNetworkImageProvider(
-                                    cmnt.creatorDetails.imageUrl),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          title: Text(cmnt.creatorDetails.name,
-                              style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.black54,
-                                  fontWeight: FontWeight.w700)),
-                          subtitle: Text(cmnt.message,
-                              style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w400)),
-                          trailing: Padding(
-                            padding: const EdgeInsets.only(left: 12),
-                            child: Text(
-                              timeago.format(
-                                DateTime.parse(
-                                  cmnt.createdAt,
+          Column(
+            children: [
+              Expanded(
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection("posts")
+                      .doc(id)
+                      .collection("comments")
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          var data = snapshot.data!.docs[index].data();
+                          // var cDetail =
+                          //     CreatorDetails.fromMap(data['creatorDetails']);
+                          var cmnt = Comment.fromMap(data);
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: ListTile(
+                              horizontalTitleGap: 0,
+                              leading: Container(
+                                height: 30.h,
+                                width: 30.h,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.amber,
+                                  image: DecorationImage(
+                                    image: CachedNetworkImageProvider(
+                                        cmnt.creatorDetails.imageUrl),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                              style: TextStyle(
-                                  fontSize: 11.sp, color: Colors.black45),
+                              title: Text(cmnt.creatorDetails.name,
+                                  style: TextStyle(
+                                      fontSize: 13.sp,
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w700)),
+                              subtitle: Text(cmnt.message,
+                                  style: TextStyle(
+                                      fontSize: 13.sp,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400)),
+                              trailing: Padding(
+                                padding: const EdgeInsets.only(left: 12),
+                                child: Text(
+                                  timeago.format(
+                                    DateTime.parse(
+                                      cmnt.createdAt,
+                                    ),
+                                  ),
+                                  style: TextStyle(
+                                      fontSize: 11.sp, color: Colors.black45),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       );
-                    },
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 70.h,
+                width: MediaQuery.of(context).size.width * .9,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: TextEditingWidget(
+                        controller: coommenController,
+                        color: Colors.black12,
+                        isBorderEnable: true,
+                        hint: "Write Comment ...",
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          var cmnt = Comment(
+                            id: id,
+                            creatorId: FirebaseAuth.instance.currentUser!.uid,
+                            creatorDetails: CreatorDetails(
+                                name: user!.name,
+                                imageUrl: user!.imageStr,
+                                isVerified: user!.isVerified),
+                            createdAt: DateTime.now().toIso8601String(),
+                            message: coommenController.text,
+                          );
+
+                          FirebaseFirestore.instance
+                              .collection("posts")
+                              .doc(id)
+                              .collection("comments")
+                              .doc()
+                              .set(cmnt.toMap(), SetOptions(merge: true))
+                              .then((value) async {
+                            coommenController.clear();
+                            var cmntId = await FirebaseFirestore.instance
+                                .collection("posts")
+                                .doc(id)
+                                .collection("comments")
+                                .get();
+
+                            List listOfCommentsId = [];
+                            for (var i in cmntId.docs) {
+                              listOfCommentsId.add(i.id);
+                            }
+
+                            print(
+                                "+++========+++++++++============+++++++++ $listOfCommentsId ");
+                            FirebaseFirestore.instance
+                                .collection("posts")
+                                .doc(id)
+                                .set({"commentIds": listOfCommentsId},
+                                    SetOptions(merge: true));
+                          });
+                        },
+                        icon: const Icon(Icons.send)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: ClipRect(
+              clipper: const ClipPad(padding: EdgeInsets.only(top: 30)),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                decoration: BoxDecoration(color: colorWhite, boxShadow: [
+                  BoxShadow(
+                    color: colorPrimaryA05.withOpacity(.36),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(4, 0),
+                  ),
+                ]),
+                child: TextField(
+                  controller: coommenController,
+                  style: TextStyle(
+                    color: color239,
+                    fontSize: 16.sp,
+                    fontFamily: strFontName,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: strWriteComment,
+                    hintStyle: TextStyle(
+                      color: color55F,
+                      fontSize: 14.sp,
+                      fontFamily: strFontName,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    suffixIcon: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: GestureDetector(
+                            onTap: () {
+                              var cmnt = Comment(
+                                id: id,
+                                creatorId:
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                creatorDetails: CreatorDetails(
+                                    name: user!.name,
+                                    imageUrl: user!.imageStr,
+                                    isVerified: user!.isVerified),
+                                createdAt: DateTime.now().toIso8601String(),
+                                message: coommenController.text,
+                              );
+
+                              FirebaseFirestore.instance
+                                  .collection("posts")
+                                  .doc(id)
+                                  .collection("comments")
+                                  .doc()
+                                  .set(cmnt.toMap(), SetOptions(merge: true))
+                                  .then((value) async {
+                                coommenController.clear();
+                                var cmntId = await FirebaseFirestore.instance
+                                    .collection("posts")
+                                    .doc(id)
+                                    .collection("comments")
+                                    .get();
+
+                                List listOfCommentsId = [];
+                                for (var i in cmntId.docs) {
+                                  listOfCommentsId.add(i.id);
+                                }
+
+                                print(
+                                    "+++========+++++++++============+++++++++ $listOfCommentsId ");
+                                FirebaseFirestore.instance
+                                    .collection("posts")
+                                    .doc(id)
+                                    .set({"commentIds": listOfCommentsId},
+                                        SetOptions(merge: true));
+                              });
+                            },
+                            child: Image.asset(
+                              imgSendComment,
+                              height: 38.h,
+                              width: 38.w,
+                            ))),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 20.h),
+                    focusColor: Colors.transparent,
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 0,
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: () => FocusScope.of(context).unfocus(),
+                ),
+              ),
             ),
           ),
-          SizedBox(
-            height: 70.h,
-            width: MediaQuery.of(context).size.width * .9,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: TextEditingWidget(
-                    controller: coommenController,
-                    color: Colors.black12,
-                    isBorderEnable: true,
-                    hint: "Write Comment ...",
-                  ),
-                ),
-                IconButton(
-                    onPressed: () {
-                      var cmnt = Comment(
-                        id: id,
-                        creatorId: FirebaseAuth.instance.currentUser!.uid,
-                        creatorDetails: CreatorDetails(
-                            name: user!.name,
-                            imageUrl: user!.imageStr,
-                            isVerified: user!.isVerified),
-                        createdAt: DateTime.now().toIso8601String(),
-                        message: coommenController.text,
-                      );
-
-                      FirebaseFirestore.instance
-                          .collection("posts")
-                          .doc(id)
-                          .collection("comments")
-                          .doc()
-                          .set(cmnt.toMap(), SetOptions(merge: true))
-                          .then((value) async {
-                        coommenController.clear();
-                        var cmntId = await FirebaseFirestore.instance
-                            .collection("posts")
-                            .doc(id)
-                            .collection("comments")
-                            .get();
-
-                        List listOfCommentsId = [];
-                        for (var i in cmntId.docs) {
-                          listOfCommentsId.add(i.id);
-                        }
-
-                        print(
-                            "+++========+++++++++============+++++++++ $listOfCommentsId ");
-                        FirebaseFirestore.instance
-                            .collection("posts")
-                            .doc(id)
-                            .set({"commentIds": listOfCommentsId},
-                                SetOptions(merge: true));
-                      });
-                    },
-                    icon: const Icon(Icons.send)),
-              ],
-            ),
-          )
         ],
       ),
     );

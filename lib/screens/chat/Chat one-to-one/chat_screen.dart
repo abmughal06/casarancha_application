@@ -497,8 +497,8 @@ class ChatPostTile extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
                   child: message.type == "Photo"
-                      ? Image.network(
-                          message.content['mediaData'][0]['link'],
+                      ? CachedNetworkImage(
+                          imageUrl: message.content['mediaData'][0]['link'],
                           // color: isMe ? color13F : color55F,
                           // fontWeight: FontWeight.w500,
                         )
