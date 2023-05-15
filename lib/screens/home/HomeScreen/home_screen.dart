@@ -6,11 +6,9 @@ import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
-import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
-import 'package:casarancha/screens/profile/saved_post_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
-import 'package:casarancha/widgets/custome_firebase_list_view.dart';
+import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -396,10 +394,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       itemBuilder: (context, i) {
                                         VideoPlayerController?
                                             videoPlayerController;
-                                        // var video =
-                                        //     VideoPlayerController.network(post
-                                        //         .mediaData[i].link
-                                        //         .toString());
 
                                         videoPlayerController =
                                             VideoPlayerController.network(
@@ -408,40 +402,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   .toString()
                                               : "",
                                         );
-                                        videoPlayerController
-                                            .initialize()
-                                            .then((value) {
-                                          videoPlayerController!.play();
-                                        });
+                                        videoPlayerController.initialize();
+
+                                        var chewie = ChewieController(
+                                            autoInitialize: false,
+                                            autoPlay: false,
+                                            aspectRatio: 2 / 3,
+                                            looping: false,
+                                            videoPlayerController:
+                                                videoPlayerController);
                                         return InkWell(
-                                          onTap: () {
-                                            print('clicked');
-                                            Get.to(
-                                              () => CustomVideoCard(
-                                                aspectRatio:
-                                                    videoPlayerController!
-                                                        .value.aspectRatio,
-                                                videoPlayerController:
-                                                    videoPlayerController,
-                                                // videoUrl:
-                                                //     post.mediaData[i].link,
-                                                menuButton: menuButton(context,
-                                                    post.mediaData[i].link,
-                                                    margin: const EdgeInsets
-                                                            .symmetric(
-                                                        vertical: 10,
-                                                        horizontal: 17),
-                                                    profileScreenController:
-                                                        profileScreenController),
-                                              ),
-                                            );
-                                            // if (videoPlayerController!
-                                            //     .value.isPlaying) {
-                                            //   videoPlayerController!.pause();
-                                            // } else {
-                                            //   videoPlayerController!.play();
-                                            // }
-                                          },
+                                          // onTap: () {
+                                          //   print('clicked');
+                                          //   Get.to(
+                                          //     () => CustomVideoCard(
+                                          //       aspectRatio:
+                                          //           videoPlayerController!
+                                          //               .value.aspectRatio,
+                                          //       videoPlayerController:
+                                          //           videoPlayerController,
+                                          //       // videoUrl:
+                                          //       //     post.mediaData[i].link,
+                                          //       menuButton: menuButton(context,
+                                          //           post.mediaData[i].link,
+                                          //           margin: const EdgeInsets
+                                          //                   .symmetric(
+                                          //               vertical: 10,
+                                          //               horizontal: 17),
+                                          //           profileScreenController:
+                                          //               profileScreenController),
+                                          //     ),
+                                          //   );
+                                          // },
                                           onDoubleTap: () {
                                             print("clicked");
                                             postCardController.isLiked.value =
@@ -454,14 +446,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             aspectRatio: 2 / 3,
                                             child: Stack(
                                               children: [
-                                                VideoPlayer(
-                                                  // videoUrl:
-                                                  //     post.mediaData[i].link,
-                                                  // videoPlayerControl/ler:
-                                                  videoPlayerController,
+                                                Chewie(
+                                                  controller: chewie,
                                                 ),
-                                                // VideoPlayer(
-                                                //     videoPlayerController),
                                                 Positioned(
                                                   top: 12,
                                                   left: 0,

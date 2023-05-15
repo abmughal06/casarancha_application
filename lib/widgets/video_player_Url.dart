@@ -127,7 +127,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     chewieController = ChewieController(
         videoPlayerController: videoPlayerController!,
         showOptions: false,
-        autoPlay: true,
+        autoPlay: false,
         allowPlaybackSpeedChanging: false,
         autoInitialize: true,
         showControlsOnInitialize: false,
@@ -141,12 +141,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         looping: false);
   }
 
-  @override
-  void dispose() {
-    videoPlayerController?.dispose();
-    chewieController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   videoPlayerController?.dispose();
+  //   chewieController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
