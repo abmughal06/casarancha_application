@@ -1,6 +1,8 @@
 import 'package:casarancha/models/comment_model.dart';
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
@@ -11,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../screens/chat/GhostMode/ghost_chat_screen.dart';
 
 class PostCardController extends GetxController {
   PostCardController({required this.postdata});
@@ -23,6 +26,7 @@ class PostCardController extends GetxController {
   late var isLiked = false.obs;
   late var isSaved = false.obs;
   late DocumentReference<Map<String, dynamic>> postRef;
+  MediaDetails? message;
 
   //Obserables
   var post = PostModel(
@@ -47,6 +51,22 @@ class PostCardController extends GetxController {
       if (isLiked.value) {
         ref.update({
           'likesIds': FieldValue.arrayUnion([currentUser])
+        }).whenComplete(() async {
+          var recieverRef = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(postId)
+              .get();
+          var recieverFCMToken = recieverRef.data()!['fcmToken'];
+          FirebaseMessagingService.sendNotificationToUser(
+            title: user!.name,
+            devRegToken: recieverFCMToken,
+            userReqID: postId,
+            msg: message!.type == 'Video'
+                ? "${user!.name} has liked your video"
+                : message!.type == "Quote"
+                    ? "${user!.name} has liked your quote"
+                    : "${user!.name} has liked your picture",
+          );
         });
       } else {
         ref.update({

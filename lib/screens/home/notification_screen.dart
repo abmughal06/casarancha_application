@@ -1,6 +1,7 @@
+import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:timeago/timeago.dart' as timeago;
 import '../../base/base_stateful_widget.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/localization_text_strings.dart';
@@ -54,19 +55,9 @@ class _NotificationScreenState
               heightBox(21.h),
               Expanded(
                   child: TabBarView(children: [
-                Center(
-                  child: Container(
-                    child: Text("Coming soon"),
-                  ),
-                ),
-                Center(
-                  child: Container(
-                    child: Text("Coming soon"),
-                  ),
-                )
-                /*  ListView.builder(
+                ListView.builder(
                     shrinkWrap: true,
-                    itemCount: 0,
+                    itemCount: 1,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
@@ -77,29 +68,33 @@ class _NotificationScreenState
                           children: [
                             profileImgName(
                               // onTapOtherProfile: ()=> AppUtils.instance.push(enterPage: const OtherProfileScreen()),
-                              imgUserNet: postProfileImg,
+                              imgUserNet: user!.imageStr,
                               isVerifyWithName: true,
                               isVerifyWithIc: false,
                               idIsVerified: true,
-                              userName: "Esther85",
-                              subText: "2 min ago",
+                              userName: user!.name,
+                              subText: timeago
+                                  .format(DateTime.parse(user!.createdAt)),
                               txtWithUName: strLikeYourPic,
                             ),
                           ],
                         ),
                       );
-                    }), */
-                /*   ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: 6,
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return profileAcceptDecline(
-                        userName: "Marcuswilly889",
-                        subText: "Marcuswilly",
-                        imgUserNet: postProfileImg,
-                      );
-                    }) */
+                    }),
+                const Center(
+                  child: Text("Coming soon"),
+                ),
+                // ListView.builder(
+                //     shrinkWrap: true,
+                //     itemCount: 6,
+                //     physics: const BouncingScrollPhysics(),
+                //     itemBuilder: (BuildContext context, int index) {
+                //       return profileAcceptDecline(
+                //         userName: "Marcuswilly889",
+                //         subText: "Marcuswilly",
+                //         imgUserNet: postProfileImg,
+                //       );
+                //     })
               ])),
             ],
           ),

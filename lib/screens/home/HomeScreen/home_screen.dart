@@ -2,6 +2,7 @@ import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
@@ -372,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemCount: post.mediaData.length,
                                           itemBuilder: (context, index) =>
                                               InkWell(
-                                                  onDoubleTap: () {
+                                                  onDoubleTap: () async {
                                                     print("clicked");
                                                     postCardController
                                                             .isLiked.value =
@@ -381,6 +382,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     postCardController
                                                         .likeDisLikePost(
                                                             user!.id, post.id);
+                                                    // var recieverRef =
+                                                    //     await FirebaseFirestore
+                                                    //         .instance
+                                                    //         .collection("users")
+                                                    //         .doc(post.creatorId)
+                                                    //         .get();
+                                                    // var recieverFCMToken =
+                                                    //     recieverRef.data()![
+                                                    //         'fcmToken'];
+                                                    // print(
+                                                    //     "=========> reciever fcm token = $recieverFCMToken");
+                                                    // FirebaseMessagingService
+                                                    //     .sendNotificationToUser(
+                                                    //   devRegToken:
+                                                    //       recieverFCMToken,
+                                                    //   userReqID: post.creatorId,
+                                                    //   title: user!.name,
+                                                    //   msg:
+                                                    //       "${user!.name} has liked your photo",
+                                                    // );
                                                   },
                                                   child: Image.network(post
                                                       .mediaData[index].link)),

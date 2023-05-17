@@ -509,29 +509,30 @@ Widget shareProfileCard(
   );
 }
 
-Widget profileImgName(
-    {double? dpRadius,
-    double? positionBottom,
-    double? positionRight,
-    userName,
-    txtWithUName,
-    subText,
-    Color? userNameClr,
-    txtWithUNameClr,
-    subTxtClr,
-    double? subTxtWidth,
-    FontWeight? userNameFontWeight,
-    txtWithUNameWeight,
-    subTxtFontWeight,
-    double? userNameFontSize,
-    txtWithUNameSize,
-    subTxtFontSize,
-    bool? needDot,
-    GestureTapCallback? onTapOtherProfile,
-    required String? imgUserNet,
-    required bool isVerifyWithIc,
-    required bool isVerifyWithName,
-    required bool idIsVerified}) {
+Widget profileImgName({
+  double? dpRadius,
+  double? positionBottom,
+  double? positionRight,
+  userName,
+  txtWithUName,
+  subText,
+  Color? userNameClr,
+  txtWithUNameClr,
+  subTxtClr,
+  double? subTxtWidth,
+  FontWeight? userNameFontWeight,
+  txtWithUNameWeight,
+  subTxtFontWeight,
+  double? userNameFontSize,
+  txtWithUNameSize,
+  subTxtFontSize,
+  bool? needDot,
+  GestureTapCallback? onTapOtherProfile,
+  required String? imgUserNet,
+  required bool isVerifyWithIc,
+  required bool isVerifyWithName,
+  required bool idIsVerified,
+}) {
   return GestureDetector(
     onTap: onTapOtherProfile,
     child: Row(

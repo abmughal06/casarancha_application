@@ -8,12 +8,14 @@ class MediaDetails {
   String? imageHeight;
   String? imageWidth;
   String? videoAspectRatio;
+  String? videoViews;
   MediaDetails(
       {required this.id,
       required this.name,
       required this.type,
       required this.link,
       this.imageHeight,
+      this.videoViews,
       this.imageWidth,
       this.videoAspectRatio});
 
@@ -25,6 +27,7 @@ class MediaDetails {
     String? imageHeight,
     String? imageWidth,
     String? videoAspectRatio,
+    String? videoViews,
   }) {
     return MediaDetails(
       id: id ?? this.id,
@@ -34,6 +37,7 @@ class MediaDetails {
       imageHeight: imageHeight ?? this.imageHeight,
       imageWidth: imageWidth ?? this.imageWidth,
       videoAspectRatio: videoAspectRatio ?? this.videoAspectRatio,
+      videoViews: videoViews ?? this.videoViews,
     );
   }
 
@@ -54,6 +58,7 @@ class MediaDetails {
                 'type': type,
                 'link': link,
                 'videoAspectRatio': videoAspectRatio,
+                'videoViews': videoViews,
               }
             : {
                 'id': id,
@@ -72,6 +77,7 @@ class MediaDetails {
       imageHeight: map['imageHeight'] ?? '',
       imageWidth: map['imageWidth'] ?? '',
       videoAspectRatio: map['videoAspectRatio'] ?? '',
+      videoViews: map['videoViews'] ?? '',
     );
   }
 
@@ -85,7 +91,7 @@ class MediaDetails {
     if (type.toLowerCase() == "photo") {
       return 'MediaDetails(id: $id, name: $name, type: $type, link: $link, imageHeight: $imageHeight, imageWidth: $imageWidth)';
     } else if (type.toLowerCase() == "video") {
-      return 'MediaDetails(id: $id, name: $name, type: $type, link: $link, videoAspectRatio: $videoAspectRatio)';
+      return 'MediaDetails(id: $id, name: $name, type: $type, link: $link, videoAspectRatio: $videoAspectRatio, videoViews: $videoViews)';
     } else {
       return 'MediaDetails(id: $id, name: $name, type: $type, link: $link)';
     }
@@ -108,6 +114,7 @@ class MediaDetails {
           other.name == name &&
           other.type == type &&
           other.link == link &&
+          other.videoViews == videoViews &&
           other.videoAspectRatio == videoAspectRatio;
     } else {
       return other is MediaDetails &&
@@ -132,6 +139,7 @@ class MediaDetails {
           name.hashCode ^
           type.hashCode ^
           link.hashCode ^
+          videoViews.hashCode ^
           videoAspectRatio.hashCode;
     } else {
       return id.hashCode ^ name.hashCode ^ type.hashCode ^ link.hashCode;

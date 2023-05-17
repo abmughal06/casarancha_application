@@ -1,30 +1,24 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/message.dart';
-
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
-import 'package:casarancha/screens/home/view_post_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
-
 import 'package:timeago/timeago.dart' as timeago;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/video_call_screen.dart';
 import 'package:video_player/video_player.dart';
-
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../resources/strings.dart';
@@ -36,9 +30,9 @@ import '../audio_call_screen.dart';
 class ChatScreen extends StatelessWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
+  Message? messageType;
 
-  const ChatScreen(
-      {Key? key, required this.appUserId, required this.creatorDetails})
+  ChatScreen({Key? key, required this.appUserId, required this.creatorDetails})
       : super(key: key);
 
   @override
@@ -247,7 +241,34 @@ class ChatScreen extends StatelessWidget {
                             children: [
                               widthBox(12.w),
                               GestureDetector(
-                                onTap: () => chatController.sentMessage(),
+                                onTap: () {
+                                  chatController
+                                      .sentMessage()
+                                      .whenComplete(() async {
+                                    var recieverRef = await FirebaseFirestore
+                                        .instance
+                                        .collection("users")
+                                        .doc(appUserId)
+                                        .get();
+                                    var recieverFCMToken =
+                                        recieverRef.data()!['fcmToken'];
+                                    print(
+                                        "=========> reciever fcm token = $recieverFCMToken");
+                                    FirebaseMessagingService
+                                        .sendNotificationToUser(
+                                      devRegToken: recieverFCMToken,
+                                      userReqID: appUserId,
+                                      title: user!.name,
+                                      msg: messageType!.type == "Text"
+                                          ? "${user!.name} has sent you a message"
+                                          : messageType!.type == 'Video'
+                                              ? "${user!.name} has sent you a video"
+                                              : messageType!.type == "Quote"
+                                                  ? "${user!.name} has sent you a quote"
+                                                  : "${user!.name} has sent you a picture",
+                                    );
+                                  });
+                                },
                                 child: Image.asset(
                                   imgSendComment,
                                   height: 38.h,

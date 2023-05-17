@@ -20,6 +20,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:twitter_login/entity/auth_result.dart';
 import 'package:twitter_login/twitter_login.dart';
 import '../../resources/color_resources.dart';
+import '../../resources/firebase_cloud_messaging.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../utils/snackbar.dart';
@@ -125,6 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void _pwdFocusChange(BuildContext context) {
     setPwdFocusChange();
   }
+
+  FirebaseMessagingService message = FirebaseMessagingService();
 
   @override
   Widget build(BuildContext context) {
@@ -243,11 +246,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
 
                           try {
+                            var token = await message.getFirebaseToken();
+                            print("[[[[[[[[]]]]]]]]]$token");
+
                             final userData = await FirebaseAuth.instance
                                 .signInWithEmailAndPassword(
                               email: _emailController.text.trim(),
                               password: _passwordController.text.trim(),
-                            );
+                            )
+                                .whenComplete(() {
+                              FirebaseFirestore.instance
+                                  .collection("users")
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .set({"fcmToken": token!},
+                                      SetOptions(merge: true));
+                            });
 
                             await isSetupProfile(userData.user?.uid);
                           } catch (e) {
