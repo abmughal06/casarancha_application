@@ -411,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         videoPlayerController.initialize();
 
                                         var chewie = ChewieController(
-                                            autoInitialize: false,
+                                            autoInitialize: true,
                                             autoPlay: false,
                                             aspectRatio: 2 / 3,
                                             looping: false,

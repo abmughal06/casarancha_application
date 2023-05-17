@@ -12,6 +12,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../models/comment_model.dart';
 import '../../models/post_creator_details.dart';
+import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
@@ -156,6 +157,7 @@ class PostDetailScreen extends StatelessWidget {
                                   //     ]
                                   //   },
                                   // );
+
                                   postCardController!.isLiked.value =
                                       !post.likesIds.contains(FirebaseAuth
                                           .instance.currentUser!.uid);
@@ -164,6 +166,54 @@ class PostDetailScreen extends StatelessWidget {
                                       post.id);
                                   // Get.back();
                                 },
+                                saveBtn: StreamBuilder<
+                                    DocumentSnapshot<Map<String, dynamic>>>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection("users")
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      var userData = snapshot.data!.data();
+                                      var userModel =
+                                          UserModel.fromMap(userData!);
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (userModel.savedPostsIds
+                                              .contains(post.id)) {
+                                            FirebaseFirestore.instance
+                                                .collection("users")
+                                                .doc(userModel.id)
+                                                .update({
+                                              'savedPostsIds':
+                                                  FieldValue.arrayRemove(
+                                                      [post.id])
+                                            });
+                                          } else {
+                                            FirebaseFirestore.instance
+                                                .collection("users")
+                                                .doc(userModel.id)
+                                                .update({
+                                              'savedPostsIds':
+                                                  FieldValue.arrayUnion(
+                                                      [post.id])
+                                            });
+                                          }
+                                        },
+                                        child: Image.asset(
+                                          postSave,
+                                          color: userModel.savedPostsIds
+                                                  .contains(post.id)
+                                              ? Colors.red
+                                              : null,
+                                        ),
+                                      );
+                                    } else {
+                                      return Image.asset(postSave);
+                                    }
+                                  },
+                                ),
                                 ontapShare: () {
                                   Get.to(() => SharePostScreen(
                                         postModel: PostModel(
