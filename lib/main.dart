@@ -1,3 +1,5 @@
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
+import 'package:casarancha/resources/local_notification_service.dart';
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
@@ -15,7 +17,14 @@ import 'utils/app_constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseMessaging.instance.getInitialMessage();
+  // FirebaseMessaging.onBackgroundMessage(
+  // (message) => FirebaseMessagingService().backgroundHandler(message));
+  //  onBackgroundMessage((message) {
+  //   print("=======>>>>>>>>>>$message");
+  //   return FirebaseMessagingService().backgroundHandler(message);
+  // });
+  // LocalNotificationService.initialize();
+
   await runAgain();
 }
 

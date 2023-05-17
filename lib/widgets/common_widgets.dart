@@ -95,8 +95,8 @@ Widget imgProVerified(
     required String? profileImg,
     required bool idIsVerified}) {
   return Container(
-      height: 120,
-      width: 120,
+      height: 40,
+      width: 40,
       alignment: Alignment.center,
       decoration: BoxDecoration(shape: BoxShape.circle),
       child: AspectRatio(
