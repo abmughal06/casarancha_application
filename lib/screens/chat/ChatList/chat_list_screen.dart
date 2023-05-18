@@ -101,6 +101,7 @@ class _MessageListState extends State<MessageList>
     with AutomaticKeepAliveClientMixin {
   final ChatListController chatListController = Get.put(ChatListController());
   final homeScreenController = Get.put(HomeScreenController());
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -133,6 +134,21 @@ class _MessageListState extends State<MessageList>
   bool get wantKeepAlive => true;
 }
 
+// class ChatListWidget extends StatefulWidget {
+//   const ChatListWidget({Key? key}) : super(key: key);
+//   //   final Query<Map<String, dynamic>> query;
+
+//   @override
+//   State<ChatListWidget> createState() => _ChatListWidgetState();
+// }
+
+// class _ChatListWidgetState extends State<ChatListWidget> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Placeholder();
+//   }
+// }
+
 class ChatListWidget extends StatefulWidget {
   const ChatListWidget({
     Key? key,
@@ -148,6 +164,7 @@ class ChatListWidget extends StatefulWidget {
 class _ChatListWidgetState extends State<ChatListWidget> {
   final homeScreenController = Get.put(HomeScreenController());
   bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -163,15 +180,27 @@ class _ChatListWidgetState extends State<ChatListWidget> {
               List followerIds = doc.data!.data()!['followersIds'];
               List userWhoCanMessage = followingIds + followerIds;
 
+              print(
+                  "============== <<<<<<<<<=========>>>>>>>>> user with conversation $userWhoCanMessage");
+              List yes = [];
+              yes = List.generate(userWhoCanMessage.length, (i) async {
+                var ref = await FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(userWhoCanMessage[i])
+                    .collection("messageList")
+                    .get();
+
+                return userWhoCanMessage[i];
+              });
+              print(yes);
               return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: userWhoCanMessage.isNotEmpty
                     ? FirebaseFirestore.instance
                         .collection("users")
                         .where("id", whereIn: userWhoCanMessage)
+                        // .orderBy("createdAt", descending: true)
                         .snapshots()
-                    : FirebaseFirestore.instance
-                        .collection("users")
-                        .snapshots(),
+                    : null,
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data != null) {
                     print(
@@ -180,6 +209,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                       return ListView.builder(
                         shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,
+                        padding: const EdgeInsets.only(bottom: 85),
                         itemBuilder: (context, index) {
                           final UserModel userMmessage = UserModel.fromMap(
                               snapshot.data!.docs[index].data());
@@ -294,8 +324,19 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                         ),
                       );
                     }
-                  } else {
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const CircularProgressIndicator();
+                  } else {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Text(
+                          "Please start follow people to start conversation with them",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
                   }
                 },
               );

@@ -2,7 +2,6 @@ import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
@@ -10,6 +9,7 @@ import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
+import 'package:casarancha/widgets/video_player_Url.dart';
 import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,14 +23,12 @@ import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/comment_screen.dart';
 import '../../../widgets/common_widgets.dart';
-import '../../../widgets/menu_post_button.dart';
-import '../../../widgets/video_card.dart';
 import '../../chat/share_post_screen.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
 import '../story_view_screen.dart';
-import 'package:timeago/timeago.dart' as timeago;
+// import 'package:timeago/timeago.dart' as timeago;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -103,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           // var listofData = snapshot.data!.docs;
                           // print(snapshot.data!.data());
                           var map;
+                          Story? story;
 
                           // var data = snapshot.data!.data();
                           // if (snapshot.data!.docs.isNotEmpty) {
@@ -110,33 +109,57 @@ class _HomeScreenState extends State<HomeScreen> {
                             if (snapshot.data!.docs[i].id ==
                                 FirebaseAuth.instance.currentUser!.uid) {
                               map = snapshot.data!.docs[i].data();
+                              story = Story.fromMap(map);
                             }
                           }
 
+                          DateTime? givenDate;
+                          for (int i = 0;
+                              i < story!.mediaDetailsList.length;
+                              i++) {
+                            givenDate =
+                                DateTime.parse(story.mediaDetailsList[i].id);
+                          }
+
+                          DateTime twentyFourHoursAgo = DateTime.now()
+                              .subtract(const Duration(hours: 24));
+                          print(" ========== $twentyFourHoursAgo");
+
                           return Column(
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  Get.to(() => AddStoryScreen());
-                                },
-                                child: Stack(
-                                  children: [
-                                    map != null
-                                        ? CircleAvatar(
+                              Stack(
+                                children: [
+                                  givenDate!.isAfter(twentyFourHoursAgo)
+                                      ? InkWell(
+                                          onTap: () {
+                                            Get.to(() =>
+                                                StoryViewScreen(story: story!));
+                                          },
+                                          child: CircleAvatar(
                                             minRadius: 25,
                                             backgroundImage: NetworkImage(
                                                 map!["creatorDetails"]
                                                     ['imageUrl']),
-                                          )
-                                        : SvgPicture.asset(
+                                          ),
+                                        )
+                                      : InkWell(
+                                          onTap: () {
+                                            Get.to(() => AddStoryScreen());
+                                          },
+                                          child: SvgPicture.asset(
                                             icProfileAdd,
                                             height: 50.h,
                                             width: 50.w,
                                           ),
-                                    map != null
-                                        ? Positioned(
-                                            right: -2,
-                                            bottom: -2,
+                                        ),
+                                  givenDate.isAfter(twentyFourHoursAgo)
+                                      ? Positioned(
+                                          right: -2,
+                                          bottom: -2,
+                                          child: InkWell(
+                                            onTap: () {
+                                              Get.to(() => AddStoryScreen());
+                                            },
                                             child: Container(
                                                 padding:
                                                     const EdgeInsets.all(2.0),
@@ -148,10 +171,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Icons.add,
                                                   color: Colors.white,
                                                   size: 18,
-                                                )))
-                                        : Container(),
-                                  ],
-                                ),
+                                                )),
+                                          ))
+                                      : Container(),
+                                ],
                               ),
                               const SizedBox(height: 3),
                               const Text(
@@ -186,37 +209,31 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (snap.hasData && snap.data!.exists) {
                         var userData = snap.data!.data();
 
-                        if (userData!['followingsIds'] != []) {
+                        if (userData!['followingsIds'] != [] &&
+                            userData['followersIds'] != null) {
                           List followingIds = userData['followingsIds'] != []
                               ? userData['followingsIds']
                               : [];
-                          print("===============$followingIds");
+
+                          List followerIds = userData['followersIds'] != []
+                              ? userData['followersIds']
+                              : [];
+                          List storyIds = followerIds + followingIds;
+                          print("===============$storyIds");
                           // return Container();
                           return StreamBuilder<
                               QuerySnapshot<Map<String, dynamic>>>(
-                            stream: followingIds.isEmpty
+                            stream: storyIds.isEmpty
                                 ? FirebaseFirestore.instance
                                     .collection("stories")
-                                    .where("creatorId",
-                                        arrayContains: followingIds)
+                                    .where("creatorId", arrayContains: storyIds)
                                     .snapshots()
                                 : FirebaseFirestore.instance
                                     .collection("stories")
                                     .where(
                                       "creatorId",
-                                      whereIn: followingIds,
+                                      whereIn: storyIds,
                                     )
-                                    // .where(
-                                    //   'createdAt',
-                                    //   isGreaterThan: DateTime.now()
-                                    //       .subtract(const Duration(days: 1))
-                                    //       .toIso8601String(),
-                                    // )
-                                    // .where(
-                                    //   "createdAt",
-                                    //   isLessThan:
-                                    //       DateTime.now().toIso8601String(),
-                                    // )
                                     .snapshots(),
                             builder: (context, snapshot) {
                               print(DateTime.now().toIso8601String());
@@ -429,15 +446,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   .toString()
                                               : "",
                                         );
-                                        videoPlayerController.initialize();
+                                        // videoPlayerController.initialize();
 
-                                        var chewie = ChewieController(
-                                            autoInitialize: true,
-                                            autoPlay: false,
-                                            aspectRatio: 2 / 3,
-                                            looping: false,
-                                            videoPlayerController:
-                                                videoPlayerController);
+                                        // var chewie = ChewieController(
+                                        //   autoInitialize: true,
+                                        //   autoPlay: false,
+                                        //   aspectRatio: 2 / 3,
+                                        //   looping: false,
+                                        //   videoPlayerController:
+                                        //       videoPlayerController,
+                                        // );
                                         return InkWell(
                                           // onTap: () {
                                           //   print('clicked');
@@ -473,8 +491,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             aspectRatio: 2 / 3,
                                             child: Stack(
                                               children: [
-                                                Chewie(
-                                                  controller: chewie,
+                                                VideoPlayerWidget(
+                                                  videoPlayerController:
+                                                      videoPlayerController,
+                                                  videoUrl:
+                                                      post.mediaData[i].link,
                                                 ),
                                                 Positioned(
                                                   top: 12,

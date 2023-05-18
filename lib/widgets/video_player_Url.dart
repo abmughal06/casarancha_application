@@ -130,7 +130,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         autoPlay: false,
         allowPlaybackSpeedChanging: false,
         autoInitialize: true,
-        showControlsOnInitialize: false,
+        showControlsOnInitialize: true,
         allowFullScreen: false,
         deviceOrientationsOnEnterFullScreen: [
           DeviceOrientation.landscapeLeft,
@@ -141,12 +141,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         looping: false);
   }
 
-  // @override
-  // void dispose() {
-  //   videoPlayerController?.dispose();
-  //   chewieController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    videoPlayerController?.dispose();
+    chewieController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
