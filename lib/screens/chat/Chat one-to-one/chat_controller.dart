@@ -156,10 +156,17 @@ class ChatController extends GetxController {
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       print("=========> reciever fcm token = $recieverFCMToken");
       FirebaseMessagingService().sendNotificationToUser(
-        creatorDetails: creatorDetails,
-        // cimg: creatorDetails.imageUrl,
-        // cname: creatorDetails.name,
-        // cisVerified: creatorDetails.isVerified,
+        creatorDetails: CreatorDetails(
+          name: profileScreenController.isGhostModeOn.value
+              ? 'Ghost_${Random().nextInt(10000).toString()}'
+              : profileScreenController.user.value.name,
+          imageUrl: profileScreenController.isGhostModeOn.value
+              ? ''
+              : profileScreenController.user.value.imageStr,
+          isVerified: profileScreenController.isGhostModeOn.value
+              ? false
+              : profileScreenController.user.value.isVerified,
+        ),
         devRegToken: recieverFCMToken,
         userReqID: appUserId,
         title: user!.name,

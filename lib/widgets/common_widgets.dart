@@ -98,14 +98,14 @@ Widget imgProVerified(
       height: 40,
       width: 40,
       alignment: Alignment.center,
-      decoration: BoxDecoration(shape: BoxShape.circle),
+      decoration: const BoxDecoration(shape: BoxShape.circle),
       child: AspectRatio(
         aspectRatio: 1,
         child: ClipOval(
           child: FadeInImage(
             fit: BoxFit.cover,
             image: NetworkImage(profileImg!),
-            placeholder: AssetImage(imgUserPlaceHolder),
+            placeholder: const AssetImage(imgUserPlaceHolder),
           ),
         ),
       ));

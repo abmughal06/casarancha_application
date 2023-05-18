@@ -1,5 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/notification_model.dart';
-import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,6 @@ import '../../resources/color_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../widgets/common_appbar.dart';
 import '../../widgets/common_widgets.dart';
-import '../../widgets/home_page_widgets.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -58,43 +57,66 @@ class _NotificationScreenState
               Expanded(
                   child: TabBarView(children: [
                 StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                    stream: FirebaseFirestore.instance
-                        .collection("users")
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .collection("notification")
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else {
-                        return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.docs.length,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 28.w, vertical: 11.h),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    profileImgName(
-                                      // onTapOtherProfile: ()=> AppUtils.instance.push(enterPage: const OtherProfileScreen()),
-                                      imgUserNet: user!.imageStr,
-                                      isVerifyWithName: true,
-                                      isVerifyWithIc: false,
-                                      idIsVerified: true,
-                                      userName: user!.name,
-                                      subText: timeago.format(
-                                          DateTime.parse(user!.createdAt)),
-                                      txtWithUName: strLikeYourPic,
+                  stream: FirebaseFirestore.instance
+                      .collection("users")
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .collection("notification")
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else {
+                      return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          physics: const BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            var data = snapshot.data!.docs[index].data();
+                            print("daldasldkasl;dkald;kasd $data");
+                            var notification = NotificationModel.fromMap(data);
+
+                            return ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: notification
+                                        .createdDetails!.imageUrl.isEmpty
+                                    ? null
+                                    : CachedNetworkImageProvider(
+                                        notification.createdDetails!.imageUrl,
+                                      ),
+                                child: notification
+                                        .createdDetails!.imageUrl.isEmpty
+                                    ? const Icon(
+                                        Icons.question_mark,
+                                      )
+                                    : null,
+                              ),
+                              title: Text(
+                                notification.title!,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                              subtitle: Text(
+                                notification.msg!,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      timeago.format(DateTime.parse(
+                                          notification.createdAt!)),
+                                      style: const TextStyle(
+                                          fontSize: 11, color: Colors.black54),
                                     ),
-                                  ],
-                                ),
-                              );
-                            });
-                      }
-                    }),
+                                  ),
+                                ],
+                              ),
+                            );
+                          });
+                    }
+                  },
+                ),
                 const Center(
                   child: Text("Coming soon"),
                 ),

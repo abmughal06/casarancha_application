@@ -51,12 +51,12 @@ class NotificationModel {
 
   factory NotificationModel.fromMap(Map<String, dynamic> map) {
     return NotificationModel(
-      id: map['id'] as String,
-      title: map['title'] as String,
-      createdDetails: CreatorDetails.fromMap(map['creatorDetails']),
-      appUserId: map['appUserId'] as String,
+      id: map['id'],
+      title: map['title'],
+      createdDetails: CreatorDetails.fromMap(map['createdDetails']),
+      appUserId: map['appUserId'],
       msg: map['content'] as dynamic,
-      createdAt: map['createdAt'] as String,
+      createdAt: map['createdAt'],
     );
   }
 

@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
+import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
+import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/widgets/text_editing_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../models/comment_model.dart';
@@ -14,6 +17,7 @@ import '../resources/firebase_cloud_messaging.dart';
 import '../resources/image_resources.dart';
 import '../resources/localization_text_strings.dart';
 import '../resources/strings.dart';
+import 'PostCard/PostCardController.dart';
 import 'clip_pad_shadow.dart';
 
 // ignore: must_be_immutable
@@ -31,6 +35,7 @@ class CommentScreen extends StatelessWidget {
   final coommenController = TextEditingController();
   CreatorDetails creatorDetails;
   String? creatorId;
+  PostCardController? postCardController;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +59,7 @@ class CommentScreen extends StatelessWidget {
                       .collection("posts")
                       .doc(id)
                       .collection("comments")
+                      .orderBy("createdAt", descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -113,85 +119,92 @@ class CommentScreen extends StatelessWidget {
                   },
                 ),
               ),
-              SizedBox(
-                height: 70.h,
-                width: MediaQuery.of(context).size.width * .9,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: TextEditingWidget(
-                        controller: coommenController,
-                        color: Colors.black12,
-                        isBorderEnable: true,
-                        hint: "Write Comment ...",
-                      ),
-                    ),
-                    IconButton(
-                        onPressed: () {
-                          var cmnt = Comment(
-                            id: id,
-                            creatorId: FirebaseAuth.instance.currentUser!.uid,
-                            creatorDetails: CreatorDetails(
-                                name: user!.name,
-                                imageUrl: user!.imageStr,
-                                isVerified: user!.isVerified),
-                            createdAt: DateTime.now().toIso8601String(),
-                            message: coommenController.text,
-                          );
+              // SizedBox(
+              //   height: 70.h,
+              //   width: MediaQuery.of(context).size.width * .9,
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Expanded(
+              //         child: TextEditingWidget(
+              //           controller: coommenController,
+              //           color: Colors.black12,
+              //           isBorderEnable: true,
+              //           hint: "Write Comment ...",
+              //         ),
+              //       ),
+              //       IconButton(
+              //           onPressed: () async {
+              //             print(
+              //                 "================================== >>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<< kdasnaldaldkalkds");
+              //             var cmnt = Comment(
+              //               id: id,
+              //               creatorId: FirebaseAuth.instance.currentUser!.uid,
+              //               creatorDetails: CreatorDetails(
+              //                   name: user!.name,
+              //                   imageUrl: user!.imageStr,
+              //                   isVerified: user!.isVerified),
+              //               createdAt: DateTime.now().toIso8601String(),
+              //               message: coommenController.text,
+              //             );
 
-                          FirebaseFirestore.instance
-                              .collection("posts")
-                              .doc(id)
-                              .collection("comments")
-                              .doc()
-                              .set(cmnt.toMap(), SetOptions(merge: true))
-                              .then((value) async {
-                            coommenController.clear();
-                            var cmntId = await FirebaseFirestore.instance
-                                .collection("posts")
-                                .doc(id)
-                                .collection("comments")
-                                .get();
+              //             print(
+              //                 "================================== >>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<< kdasnaldaldkalkds");
 
-                            List listOfCommentsId = [];
-                            for (var i in cmntId.docs) {
-                              listOfCommentsId.add(i.id);
-                            }
+              //             // FirebaseFirestore.instance
+              //             //     .collection("posts")
+              //             //     .doc(id)
+              //             //     .collection("comments")
+              //             //     .doc()
+              //             //     .set(cmnt.toMap(), SetOptions(merge: true))
+              //             //     .then((value) async {
+              //             //   coommenController.clear();
+              //             //   var cmntId = await FirebaseFirestore.instance
+              //             //       .collection("posts")
+              //             //       .doc(id)
+              //             //       .collection("comments")
+              //             //       .get();
 
-                            print(
-                                "+++========+++++++++============+++++++++ $listOfCommentsId ");
-                            FirebaseFirestore.instance
-                                .collection("posts")
-                                .doc(id)
-                                .set({"commentIds": listOfCommentsId},
-                                    SetOptions(merge: true));
+              //             //   List listOfCommentsId = [];
+              //             //   for (var i in cmntId.docs) {
+              //             //     listOfCommentsId.add(i.id);
+              //             //   }
 
-                            var recieverRef = await FirebaseFirestore.instance
-                                .collection("users")
-                                .doc(creatorId)
-                                .get();
+              //             //   print(
+              //             //       "+++========+++++++++============+++++++++ $listOfCommentsId ");
+              //             //   FirebaseFirestore.instance
+              //             //       .collection("posts")
+              //             //       .doc(id)
+              //             //       .set({"commentIds": listOfCommentsId},
+              //             //           SetOptions(merge: true));
+              //             // }).whenComplete(() async {
 
-                            var recieverFCMToken =
-                                recieverRef.data()!['fcmToken'];
-                            print(
-                                "=========> reciever fcm token = $recieverFCMToken");
-                            FirebaseMessagingService().sendNotificationToUser(
-                              creatorDetails: CreatorDetails(
-                                  name: cmnt.creatorDetails.name,
-                                  imageUrl: cmnt.creatorDetails.imageUrl,
-                                  isVerified: cmnt.creatorDetails.isVerified),
-                              devRegToken: recieverFCMToken,
-                              userReqID: creatorId,
-                              title: user!.name,
-                              msg: "${user!.name} has commented on your post.",
-                            );
-                          });
-                        },
-                        icon: const Icon(Icons.send)),
-                  ],
-                ),
-              ),
+              //             // });
+              //             var recieverRef = await FirebaseFirestore.instance
+              //                 .collection("users")
+              //                 .doc(creatorId)
+              //                 .get();
+
+              //             var recieverFCMToken =
+              //                 recieverRef.data()!['fcmToken'];
+              //             print(
+              //                 "=========>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> reciever fcm token = $recieverFCMToken");
+              //             await FirebaseMessagingService()
+              //                 .sendNotificationToUser(
+              //               creatorDetails: CreatorDetails(
+              //                   name: cmnt.creatorDetails.name,
+              //                   imageUrl: cmnt.creatorDetails.imageUrl,
+              //                   isVerified: cmnt.creatorDetails.isVerified),
+              //               devRegToken: recieverFCMToken,
+              //               userReqID: creatorId,
+              //               title: user!.name,
+              //               msg: "${user!.name} has commented on your post.",
+              //             );
+              //           },
+              //           icon: const Icon(Icons.send)),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
           Align(
@@ -267,6 +280,29 @@ class CommentScreen extends StatelessWidget {
                                     .doc(id)
                                     .set({"commentIds": listOfCommentsId},
                                         SetOptions(merge: true));
+                                var recieverRef = await FirebaseFirestore
+                                    .instance
+                                    .collection("users")
+                                    .doc(creatorId)
+                                    .get();
+
+                                var recieverFCMToken =
+                                    recieverRef.data()!['fcmToken'];
+                                print(
+                                    "=========>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> reciever fcm token = $recieverFCMToken");
+                                await FirebaseMessagingService()
+                                    .sendNotificationToUser(
+                                  creatorDetails: CreatorDetails(
+                                      name: cmnt.creatorDetails.name,
+                                      imageUrl: cmnt.creatorDetails.imageUrl,
+                                      isVerified:
+                                          cmnt.creatorDetails.isVerified),
+                                  devRegToken: recieverFCMToken,
+                                  userReqID: creatorId,
+                                  title: user!.name,
+                                  msg:
+                                      "${user!.name} has commented on your post.",
+                                );
                               });
                             },
                             child: Image.asset(

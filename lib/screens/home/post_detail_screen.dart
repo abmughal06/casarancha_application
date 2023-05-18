@@ -289,6 +289,7 @@ class PostDetailScreen extends StatelessWidget {
                         .collection("posts")
                         .doc(postModel.id)
                         .collection("comments")
+                        .orderBy("createdAt", descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -439,10 +440,11 @@ class PostDetailScreen extends StatelessWidget {
                                       "=========> reciever fcm token = $recieverFCMToken");
                                   FirebaseMessagingService()
                                       .sendNotificationToUser(
-                                    cname: postModel.creatorDetails.name,
-                                    cimg: postModel.creatorDetails.imageUrl,
-                                    cisVerified:
-                                        postModel.creatorDetails.isVerified,
+                                    creatorDetails: CreatorDetails(
+                                        name: cmnt.creatorDetails.name,
+                                        imageUrl: cmnt.creatorDetails.imageUrl,
+                                        isVerified:
+                                            cmnt.creatorDetails.isVerified),
                                     devRegToken: recieverFCMToken,
                                     userReqID: postModel.creatorId,
                                     title: user!.name,
