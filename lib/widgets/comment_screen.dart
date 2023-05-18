@@ -10,6 +10,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../models/comment_model.dart';
 import '../resources/color_resources.dart';
+import '../resources/firebase_cloud_messaging.dart';
 import '../resources/image_resources.dart';
 import '../resources/localization_text_strings.dart';
 import '../resources/strings.dart';
@@ -20,6 +21,7 @@ class CommentScreen extends StatelessWidget {
   CommentScreen(
       {Key? key,
       required this.id,
+      required this.creatorId,
       required this.comment,
       required this.creatorDetails})
       : super(key: key);
@@ -28,6 +30,7 @@ class CommentScreen extends StatelessWidget {
   List comment;
   final coommenController = TextEditingController();
   CreatorDetails creatorDetails;
+  String? creatorId;
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +166,26 @@ class CommentScreen extends StatelessWidget {
                                 .doc(id)
                                 .set({"commentIds": listOfCommentsId},
                                     SetOptions(merge: true));
+
+                            var recieverRef = await FirebaseFirestore.instance
+                                .collection("users")
+                                .doc(creatorId)
+                                .get();
+
+                            var recieverFCMToken =
+                                recieverRef.data()!['fcmToken'];
+                            print(
+                                "=========> reciever fcm token = $recieverFCMToken");
+                            FirebaseMessagingService().sendNotificationToUser(
+                              creatorDetails: CreatorDetails(
+                                  name: cmnt.creatorDetails.name,
+                                  imageUrl: cmnt.creatorDetails.imageUrl,
+                                  isVerified: cmnt.creatorDetails.isVerified),
+                              devRegToken: recieverFCMToken,
+                              userReqID: creatorId,
+                              title: user!.name,
+                              msg: "${user!.name} has commented on your post.",
+                            );
                           });
                         },
                         icon: const Icon(Icons.send)),

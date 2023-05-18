@@ -356,15 +356,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           final post = PostModel.fromMap(prePost);
                           PostCardController postCardController =
                               PostCardController(postdata: post);
-                          // videoPlayerController = VideoPlayerController.network(
-                          //   post.mediaData.first.type == "Video"
-                          //       ? post.mediaData[0].link.toString()
-                          //       : "",
-                          //   // formatHint: VideoFormat.hls,
-                          // );
-                          // videoPlayerController!.initialize().then((value) {
-                          //   videoPlayerController!.play();
-                          // });
                           return Padding(
                             padding: EdgeInsets.only(bottom: 15.w),
                             child: Column(
@@ -398,27 +389,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             .contains(user!.id);
                                                     postCardController
                                                         .likeDisLikePost(
-                                                            user!.id, post.id);
-                                                    // var recieverRef =
-                                                    //     await FirebaseFirestore
-                                                    //         .instance
-                                                    //         .collection("users")
-                                                    //         .doc(post.creatorId)
-                                                    //         .get();
-                                                    // var recieverFCMToken =
-                                                    //     recieverRef.data()![
-                                                    //         'fcmToken'];
-                                                    // print(
-                                                    //     "=========> reciever fcm token = $recieverFCMToken");
-                                                    // FirebaseMessagingService
-                                                    //     .sendNotificationToUser(
-                                                    //   devRegToken:
-                                                    //       recieverFCMToken,
-                                                    //   userReqID: post.creatorId,
-                                                    //   title: user!.name,
-                                                    //   msg:
-                                                    //       "${user!.name} has liked your photo",
-                                                    // );
+                                                            user!.id,
+                                                            post.id,
+                                                            post.creatorId);
                                                   },
                                                   child: Image.network(post
                                                       .mediaData[index].link)),
@@ -485,7 +458,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 !post.likesIds
                                                     .contains(user!.id);
                                             postCardController.likeDisLikePost(
-                                                user!.id, post.id);
+                                                user!.id,
+                                                post.id,
+                                                post.creatorId);
                                           },
                                           child: AspectRatio(
                                             aspectRatio: 2 / 3,
@@ -551,8 +526,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   !post.likesIds
                                                       .contains(user!.id);
                                               postCardController
-                                                  .likeDisLikePost(
-                                                      user!.id, post.id);
+                                                  .likeDisLikePost(user!.id,
+                                                      post.id, post.creatorId);
                                             },
                                             child: Container(
                                               width: MediaQuery.of(context)
@@ -591,7 +566,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     postCardController.isLiked.value =
                                         !post.likesIds.contains(user!.id);
                                     postCardController.likeDisLikePost(
-                                        user!.id, post.id);
+                                        user!.id, post.id, post.creatorId);
                                   },
                                   // ontapSave: () {
                                   //   print(user!.savedPostsIds);
@@ -668,6 +643,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ontapCmnt: () {
                                     Get.to(() => CommentScreen(
                                           id: post.id,
+                                          creatorId: post.creatorId,
                                           comment: post.commentIds,
                                           creatorDetails: CreatorDetails(
                                               name: post.creatorDetails.name,
