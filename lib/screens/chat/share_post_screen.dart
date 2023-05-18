@@ -11,9 +11,11 @@ import '../../models/message.dart';
 import '../../models/message_details.dart';
 import '../../models/post_creator_details.dart';
 import '../../models/user_model.dart';
+import '../../resources/firebase_cloud_messaging.dart';
 import '../../widgets/common_button.dart';
 import 'Chat one-to-one/chat_screen.dart';
 import 'ChatList/chat_list_screen.dart';
+import 'GhostMode/ghost_chat_screen.dart';
 
 class SharePostScreen extends StatelessWidget {
   SharePostScreen({Key? key, required this.postModel}) : super(key: key);
@@ -166,7 +168,7 @@ class SharePostScreen extends StatelessWidget {
                                               BorderRadius.circular(30),
                                         ),
                                         child: InkWell(
-                                          onTap: () {
+                                          onTap: () async {
                                             // ChatController()x
                                             final messageRefForCurrentUser =
                                                 FirebaseFirestore.instance
@@ -190,52 +192,6 @@ class SharePostScreen extends StatelessWidget {
                                                       messageRefForCurrentUser
                                                           .id,
                                                     );
-
-                                            // final MessageDetails appUserMessageDetails = MessageDetails(
-                                            //   id: FirebaseAuth.instance.currentUser!.uid,
-                                            //   lastMessage: messageController.text,
-                                            //   unreadMessageCount: unreadMessages + 1,
-                                            //   searchCharacters: [...creatorDetails.name.toLowerCase().split('')],
-                                            //   creatorDetails: CreatorDetails(
-                                            //     name: creatorDetails.name,
-                                            //     imageUrl: creatorDetails.imageUrl,
-                                            //     isVerified: creatorDetails.isVerified,
-                                            //   ),
-                                            //   createdAt: DateTime.now().toIso8601String(),
-                                            // );
-
-                                            // final MessageDetails currentUserMessageDetails = MessageDetails(
-                                            //   id: currentUserId,
-                                            //   lastMessage: messageController.text,
-                                            //   unreadMessageCount: unreadMessages + 1,
-                                            //   searchCharacters: [
-                                            //     ...profileScreenController.user.value.name.toLowerCase().split('')
-                                            //   ],
-                                            //   creatorDetails: CreatorDetails(
-                                            //     name: profileScreenController.isGhostModeOn.value
-                                            //         ? 'Ghost_${Random().nextInt(10000).toString()}'
-                                            //         : profileScreenController.user.value.name,
-                                            //     imageUrl: profileScreenController.isGhostModeOn.value
-                                            //         ? ''
-                                            //         : profileScreenController.user.value.imageStr,
-                                            //     isVerified: profileScreenController.isGhostModeOn.value
-                                            //         ? false
-                                            //         : profileScreenController.user.value.isVerified,
-                                            //   ),
-                                            //   createdAt: DateTime.now().toIso8601String(),
-                                            // );
-
-                                            // if (!isChatExits.value) {
-                                            //   await currentUserRef.collection('messageList').doc(appUserId).set(
-                                            //         appUserMessageDetails.toMap(),
-                                            //       );
-
-                                            //   await appUserRef.collection('messageList').doc(currentUserId).set(
-                                            //         currentUserMessageDetails.toMap(),
-                                            //       );
-
-                                            //   isChatExits.value = true;
-                                            // }
 
                                             var post = postModel.toMap();
 
@@ -263,6 +219,35 @@ class SharePostScreen extends StatelessWidget {
                                             messageRefForAppUser
                                                 .set(appUserMessage.toMap());
                                             isSent.value = true;
+                                            var recieverRef =
+                                                await FirebaseFirestore.instance
+                                                    .collection("users")
+                                                    .doc(userMmessage.id)
+                                                    .get();
+
+                                            var recieverFCMToken =
+                                                recieverRef.data()!['fcmToken'];
+                                            print(
+                                                "=========> reciever fcm token = $recieverFCMToken");
+                                            FirebaseMessagingService()
+                                                .sendNotificationToUser(
+                                              creatorDetails: CreatorDetails(
+                                                  name: postModel
+                                                      .creatorDetails.name,
+                                                  imageUrl: postModel
+                                                      .creatorDetails.imageUrl,
+                                                  isVerified: postModel
+                                                      .creatorDetails
+                                                      .isVerified),
+                                              // createdAt: message.createdAt,
+                                              // creatorDetails: creatorDetails,
+                                              devRegToken: recieverFCMToken,
+                                              userReqID: userMmessage.id,
+                                              title: user!.name,
+                                              msg:
+                                                  "${user!.name} has sent you a post",
+                                            );
+
                                             //   if (isChatExits.value) {
                                             //     appUserRef.collection('messageList').doc(currentUserId).update(
                                             //           currentUserMessageDetails.toMap(),

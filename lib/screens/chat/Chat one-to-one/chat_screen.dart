@@ -30,9 +30,9 @@ import '../audio_call_screen.dart';
 class ChatScreen extends StatelessWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
-  Message? messageType;
 
-  ChatScreen({Key? key, required this.appUserId, required this.creatorDetails})
+  const ChatScreen(
+      {Key? key, required this.appUserId, required this.creatorDetails})
       : super(key: key);
 
   @override
@@ -242,32 +242,7 @@ class ChatScreen extends StatelessWidget {
                               widthBox(12.w),
                               GestureDetector(
                                 onTap: () {
-                                  chatController
-                                      .sentMessage()
-                                      .whenComplete(() async {
-                                    var recieverRef = await FirebaseFirestore
-                                        .instance
-                                        .collection("users")
-                                        .doc(appUserId)
-                                        .get();
-                                    var recieverFCMToken =
-                                        recieverRef.data()!['fcmToken'];
-                                    print(
-                                        "=========> reciever fcm token = $recieverFCMToken");
-                                    FirebaseMessagingService
-                                        .sendNotificationToUser(
-                                      devRegToken: recieverFCMToken,
-                                      userReqID: appUserId,
-                                      title: user!.name,
-                                      msg: messageType!.type == "Text"
-                                          ? "${user!.name} has sent you a message"
-                                          : messageType!.type == 'Video'
-                                              ? "${user!.name} has sent you a video"
-                                              : messageType!.type == "Quote"
-                                                  ? "${user!.name} has sent you a quote"
-                                                  : "${user!.name} has sent you a picture",
-                                    );
-                                  });
+                                  chatController.sentMessage();
                                 },
                                 child: Image.asset(
                                   imgSendComment,

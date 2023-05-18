@@ -45,7 +45,7 @@ class PostCardController extends GetxController {
 
   //Methods
 
-  Future<void> likeDisLikePost(currentUser, postId) async {
+  Future<void> likeDisLikePost(currentUser, postId, creatorId) async {
     try {
       var ref = FirebaseFirestore.instance.collection("posts").doc(postId);
       if (isLiked.value) {
@@ -54,18 +54,18 @@ class PostCardController extends GetxController {
         }).whenComplete(() async {
           var recieverRef = await FirebaseFirestore.instance
               .collection("users")
-              .doc(postId)
+              .doc(creatorId)
               .get();
           var recieverFCMToken = recieverRef.data()!['fcmToken'];
-          FirebaseMessagingService.sendNotificationToUser(
+          FirebaseMessagingService().sendNotificationToUser(
+            creatorDetails: CreatorDetails(
+                name: postdata.creatorDetails.name,
+                imageUrl: postdata.creatorDetails.imageUrl,
+                isVerified: postdata.creatorDetails.isVerified),
             title: user!.name,
             devRegToken: recieverFCMToken,
-            userReqID: postId,
-            msg: message!.type == 'Video'
-                ? "${user!.name} has liked your video"
-                : message!.type == "Quote"
-                    ? "${user!.name} has liked your quote"
-                    : "${user!.name} has liked your picture",
+            userReqID: creatorId,
+            msg: "${user!.name} has liked your post.",
           );
         });
       } else {

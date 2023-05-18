@@ -1,11 +1,13 @@
+import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../base/base_stateful_widget.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/localization_text_strings.dart';
-import '../../utils/app_constants.dart';
 import '../../widgets/common_appbar.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/home_page_widgets.dart';
@@ -55,31 +57,43 @@ class _NotificationScreenState
               heightBox(21.h),
               Expanded(
                   child: TabBarView(children: [
-                ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: 1,
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 28.w, vertical: 11.h),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            profileImgName(
-                              // onTapOtherProfile: ()=> AppUtils.instance.push(enterPage: const OtherProfileScreen()),
-                              imgUserNet: user!.imageStr,
-                              isVerifyWithName: true,
-                              isVerifyWithIc: false,
-                              idIsVerified: true,
-                              userName: user!.name,
-                              subText: timeago
-                                  .format(DateTime.parse(user!.createdAt)),
-                              txtWithUName: strLikeYourPic,
-                            ),
-                          ],
-                        ),
-                      );
+                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .collection("notification")
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.docs.length,
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 28.w, vertical: 11.h),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    profileImgName(
+                                      // onTapOtherProfile: ()=> AppUtils.instance.push(enterPage: const OtherProfileScreen()),
+                                      imgUserNet: user!.imageStr,
+                                      isVerifyWithName: true,
+                                      isVerifyWithIc: false,
+                                      idIsVerified: true,
+                                      userName: user!.name,
+                                      subText: timeago.format(
+                                          DateTime.parse(user!.createdAt)),
+                                      txtWithUName: strLikeYourPic,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            });
+                      }
                     }),
                 const Center(
                   child: Text("Coming soon"),

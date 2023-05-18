@@ -14,6 +14,7 @@ import '../../models/comment_model.dart';
 import '../../models/post_creator_details.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
+import '../../resources/firebase_cloud_messaging.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
@@ -82,7 +83,8 @@ class PostDetailScreen extends StatelessWidget {
                                             postCardController!.likeDisLikePost(
                                                 FirebaseAuth
                                                     .instance.currentUser!.uid,
-                                                post.id);
+                                                post.id,
+                                                post.creatorId);
                                           },
                                           child: CachedNetworkImage(
                                               imageUrl: mediaData.link));
@@ -163,7 +165,8 @@ class PostDetailScreen extends StatelessWidget {
                                           .instance.currentUser!.uid);
                                   postCardController!.likeDisLikePost(
                                       FirebaseAuth.instance.currentUser!.uid,
-                                      post.id);
+                                      post.id,
+                                      post.creatorId);
                                   // Get.back();
                                 },
                                 saveBtn: StreamBuilder<
@@ -423,6 +426,29 @@ class PostDetailScreen extends StatelessWidget {
                                       .doc(postModel.id)
                                       .set({"commentIds": listOfCommentsId},
                                           SetOptions(merge: true));
+
+                                  var recieverRef = await FirebaseFirestore
+                                      .instance
+                                      .collection("users")
+                                      .doc(postModel.creatorId)
+                                      .get();
+
+                                  var recieverFCMToken =
+                                      recieverRef.data()!['fcmToken'];
+                                  print(
+                                      "=========> reciever fcm token = $recieverFCMToken");
+                                  FirebaseMessagingService()
+                                      .sendNotificationToUser(
+                                    cname: postModel.creatorDetails.name,
+                                    cimg: postModel.creatorDetails.imageUrl,
+                                    cisVerified:
+                                        postModel.creatorDetails.isVerified,
+                                    devRegToken: recieverFCMToken,
+                                    userReqID: postModel.creatorId,
+                                    title: user!.name,
+                                    msg:
+                                        "${user!.name} has commented on your post.",
+                                  );
                                 });
                               },
                               child: Image.asset(

@@ -1,37 +1,39 @@
 import 'dart:convert';
 
+import 'package:casarancha/models/post_creator_details.dart';
+
 class NotificationModel {
-  String id;
-  String type;
-  String createdDetails;
-  String sentById;
-  String content;
-  String createdAt;
+  String? id;
+  String? appUserId;
+  String? title;
+  CreatorDetails? createdDetails;
+  String? msg;
+  String? createdAt;
 
   NotificationModel({
-    required this.id,
-    required this.createdDetails,
-    required this.sentById,
-    required this.content,
-    required this.type,
-    required this.createdAt,
+    this.id,
+    this.createdDetails,
+    this.appUserId,
+    this.msg,
+    this.title,
+    this.createdAt,
   });
 
   NotificationModel copyWith({
     String? id,
-    String? createdDetails,
-    String? sentById,
-    dynamic content,
+    CreatorDetails? createdDetails,
+    String? appUserId,
+    dynamic msg,
     String? caption,
-    String? type,
+    String? title,
     String? createdAt,
   }) {
     return NotificationModel(
       id: id ?? this.id,
+      title: title ?? this.title,
       createdDetails: createdDetails ?? this.createdDetails,
-      sentById: sentById ?? this.sentById,
-      content: content ?? this.content,
-      type: type ?? this.type,
+      appUserId: appUserId ?? this.appUserId,
+      msg: msg ?? this.msg,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -39,10 +41,10 @@ class NotificationModel {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'createdDetails': createdDetails,
-      'sentById': sentById,
-      'content': content,
-      'type': type,
+      'title': title,
+      'createdDetails': createdDetails!.toMap(),
+      'appUserId': appUserId,
+      'content': msg,
       'createdAt': createdAt
     };
   }
@@ -50,10 +52,10 @@ class NotificationModel {
   factory NotificationModel.fromMap(Map<String, dynamic> map) {
     return NotificationModel(
       id: map['id'] as String,
-      createdDetails: map['createdDetails'] as String,
-      sentById: map['sentById'] as String,
-      content: map['content'] as dynamic,
-      type: map['type'] as String,
+      title: map['title'] as String,
+      createdDetails: CreatorDetails.fromMap(map['creatorDetails']),
+      appUserId: map['appUserId'] as String,
+      msg: map['content'] as dynamic,
       createdAt: map['createdAt'] as String,
     );
   }
@@ -65,7 +67,7 @@ class NotificationModel {
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, createdDetails: $createdDetails, sentById: $sentById, content: $content, type: $type, createdAt: $createdAt)';
+    return 'NotificationModel(id: $id, title: $title, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt)';
   }
 
   @override
@@ -73,10 +75,10 @@ class NotificationModel {
     if (identical(this, other)) return true;
 
     return other.id == id &&
+        other.title == title &&
         other.createdDetails == createdDetails &&
-        other.sentById == sentById &&
-        other.content == content &&
-        other.type == type &&
+        other.appUserId == appUserId &&
+        other.msg == msg &&
         other.createdAt == createdAt;
   }
 
@@ -84,9 +86,9 @@ class NotificationModel {
   int get hashCode {
     return id.hashCode ^
         createdDetails.hashCode ^
-        sentById.hashCode ^
-        content.hashCode ^
-        type.hashCode ^
+        title.hashCode ^
+        appUserId.hashCode ^
+        msg.hashCode ^
         createdAt.hashCode;
   }
 }

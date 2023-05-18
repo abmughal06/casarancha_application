@@ -10,6 +10,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../resources/firebase_cloud_messaging.dart';
+import '../GhostMode/ghost_chat_screen.dart';
+
 class ChatController extends GetxController {
   String appUserId;
   CreatorDetails creatorDetails;
@@ -146,6 +149,22 @@ class ChatController extends GetxController {
 
       messageRefForCurrentUser.set(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUserId)
+          .get();
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      print("=========> reciever fcm token = $recieverFCMToken");
+      FirebaseMessagingService().sendNotificationToUser(
+        creatorDetails: creatorDetails,
+        // cimg: creatorDetails.imageUrl,
+        // cname: creatorDetails.name,
+        // cisVerified: creatorDetails.isVerified,
+        devRegToken: recieverFCMToken,
+        userReqID: appUserId,
+        title: user!.name,
+        msg: "${user!.name} has sent you a message",
+      );
 
       if (isChatExits.value) {
         appUserRef.collection('messageList').doc(currentUserId).update(
