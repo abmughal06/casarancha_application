@@ -61,6 +61,7 @@ class _NotificationScreenState
                       .collection("users")
                       .doc(FirebaseAuth.instance.currentUser!.uid)
                       .collection("notification")
+                      .orderBy('createdAt', descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
