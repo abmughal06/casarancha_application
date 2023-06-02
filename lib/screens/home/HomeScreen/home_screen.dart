@@ -1,22 +1,23 @@
+import 'dart:developer';
+
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
-import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
 import 'package:casarancha/widgets/video_player_Url.dart';
-import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import '../../../models/post_creator_details.dart';
 import '../../../resources/image_resources.dart';
@@ -24,10 +25,11 @@ import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/comment_screen.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../chat/share_post_screen.dart';
-import '../../profile/ProfileScreen/profile_screen_controller.dart';
+import '../../dashboard/dashboard.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
 import '../story_view_screen.dart';
+import 'package:badges/badges.dart' as badges;
 // import 'package:timeago/timeago.dart' as timeago;
 
 class HomeScreen extends StatefulWidget {
@@ -44,7 +46,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return nameParts[0];
   }
 
-  ProfileScreenController? profileScreenController;
+  // ProfileScreenController profileScreenController =
+  //     Get.put(ProfileScreenController());
+
+  @override
+  void initState() {
+    super.initState();
+    // getPrefData();
+  }
+
+  getPrefData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    // homeScreenController.profileScreenController.toggleGhostMode();
+    Future.delayed(const Duration(seconds: 2)).then((value) {
+      // profileScreenController.toggleGhostMode();
+      bool getVal = sharedPreferences.getBool('isGhostEnable') ?? false;
+      log("000000000000000000000");
+      log(getVal.toString());
+    });
+  }
+
+  List followingIds = [];
+  List followerIds = [];
 
   @override
   Widget build(BuildContext context) {
@@ -73,16 +97,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           IconButton(
-            onPressed: () {
-              Get.to(() => const NotificationScreen());
-            },
-            icon: SvgPicture.asset(
-              icNotifyBell,
-            ),
-          ),
+              onPressed: () {
+                Get.to(() => const NotificationScreen());
+              },
+              icon: badges.Badge(
+                badgeContent: const Text(
+                  '0',
+                  style: TextStyle(color: Colors.white),
+                ),
+                child: SvgPicture.asset(
+                  icNotifyBell,
+                ),
+              )),
         ],
       ),
       body: ListView(
+        shrinkWrap: true,
         children: [
           SizedBox(height: 10.w),
           SizedBox(
@@ -95,12 +125,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       stream: FirebaseFirestore.instance
                           .collection("stories")
                           .snapshots(),
-                      builder: (context, snapshot) {
+                      builder:
+                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                         print("======================== ${snapshot.data}");
                         if (snapshot.hasData) {
                           // var listofData = snapshot.data!.docs;
                           // print(snapshot.data!.data());
-                          var map;
+                          dynamic map;
                           Story? story;
 
                           // var data = snapshot.data!.data();
@@ -165,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     const EdgeInsets.all(2.0),
                                                 decoration: const BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: Colors.red,
+                                                  color: colorPrimaryA05,
                                                 ),
                                                 child: const Icon(
                                                   Icons.add,
@@ -186,6 +217,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         } else if (snapshot.hasError) {
                           return const Text("Here");
+                        } else if (!snapshot.hasData) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         } else {
                           return GestureDetector(
                             onTap: () {
@@ -197,6 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 50.w,
                             ),
                           );
+                          // return  Text('Story');
                         }
                       }),
                 ),
@@ -211,15 +246,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (userData!['followingsIds'] != [] &&
                             userData['followersIds'] != null) {
-                          List followingIds = userData['followingsIds'] != []
+                          followingIds = userData['followingsIds'] != []
                               ? userData['followingsIds']
                               : [];
 
-                          List followerIds = userData['followersIds'] != []
+                          followerIds = userData['followersIds'] != []
                               ? userData['followersIds']
                               : [];
-                          List storyIds = followerIds + followingIds;
-                          print("===============$storyIds");
+                          log(followingIds.toString());
+                          log(followerIds.toString());
+                          List storyIds = !homeScreenController
+                                  .profileScreenController.isGhostModeOn.value
+                              ? followingIds
+                              : followerIds + followingIds;
+
+                          log("storyiD ===============$storyIds");
                           // return Container();
                           return StreamBuilder<
                               QuerySnapshot<Map<String, dynamic>>>(
@@ -248,6 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       itemCount: snapshot.data!.docs.length,
                                       itemBuilder: (context, index) {
                                         var storyData = data[index].data();
+
                                         Story story = Story.fromMap(storyData);
                                         DateTime? givenDate;
                                         for (int i = 0;
@@ -326,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                         // return Text(snap.data!.data()!['followingsIds']);
                       } else {
-                        return const CircularProgressIndicator();
+                        return const Center(child: CircularProgressIndicator());
                       }
                     })
               ],
@@ -334,16 +376,335 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           SizedBox(height: 10.w),
           homeScreenController.profileScreenController.isGhostModeOn.value
-              ? Container(
-                  alignment: Alignment.center,
-                  child: const Text(
-                    "Please deactivate ghost mode to \nreturn to the home page",
-                    textAlign: TextAlign.center,
-                  ),
+              ? StreamBuilder<QuerySnapshot>(
+                  stream: homeScreenController.postQuerry.snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snap) {
+                    if (snap.hasData) {
+                      var data = snap.data!.docs;
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          final prePost =
+                              data[index].data() as Map<String, dynamic>;
+                          final post = PostModel.fromMap(prePost);
+                          PostCardController postCardController =
+                              PostCardController(postdata: post);
+                          log("creator id==================");
+                          log(postCardController.postdata.creatorId);
+                          if (followingIds.contains(
+                              postCardController.postdata.creatorId)) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 15.w),
+                              child: Column(
+                                children: [
+                                  Visibility(
+                                    visible: post.mediaData[0].type == "Photo",
+                                    child: Column(
+                                      children: [
+                                        CustomPostHeader(
+                                            name: post.creatorDetails.name,
+                                            image: post.creatorDetails.imageUrl,
+                                            headerOnTap: () {
+                                              postCardController
+                                                  .gotoAppUserScreen(
+                                                      post.creatorId);
+                                            }),
+                                        heightBox(10.h),
+                                        AspectRatio(
+                                          aspectRatio: 2 / 3,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            shrinkWrap: true,
+                                            itemCount: post.mediaData.length,
+                                            itemBuilder: (context, index) =>
+                                                InkWell(
+                                                    onDoubleTap: () async {
+                                                      print(
+                                                          "ghost mode clicked");
+
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(const SnackBar(
+                                                              backgroundColor:
+                                                                  colorPrimaryA05,
+                                                              content: Text(
+                                                                  'Ghost Mode Enabled!')));
+                                                    },
+                                                    child: Image.network(post
+                                                        .mediaData[index]
+                                                        .link)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: post.mediaData[0].type == "Video",
+                                    child: AspectRatio(
+                                      aspectRatio: 2 / 3,
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        shrinkWrap: true,
+                                        itemCount: post.mediaData.length,
+                                        itemBuilder: (context, i) {
+                                          VideoPlayerController?
+                                              videoPlayerController;
+
+                                          videoPlayerController =
+                                              VideoPlayerController.network(
+                                            post.mediaData.first.type == "Video"
+                                                ? post.mediaData[i].link
+                                                    .toString()
+                                                : "",
+                                          );
+                                          // videoPlayerController.initialize();
+
+                                          // var chewie = ChewieController(
+                                          //   autoInitialize: true,
+                                          //   autoPlay: false,
+                                          //   aspectRatio: 2 / 3,
+                                          //   looping: false,
+                                          //   videoPlayerController:
+                                          //       videoPlayerController,
+                                          // );
+                                          return InkWell(
+                                            // onTap: () {
+                                            //   print('clicked');
+                                            //   Get.to(
+                                            //     () => CustomVideoCard(
+                                            //       aspectRatio:
+                                            //           videoPlayerController!
+                                            //               .value.aspectRatio,
+                                            //       videoPlayerController:
+                                            //           videoPlayerController,
+                                            //       // videoUrl:
+                                            //       //     post.mediaData[i].link,
+                                            //       menuButton: menuButton(context,
+                                            //           post.mediaData[i].link,
+                                            //           margin:  EdgeInsets
+                                            //                   .symmetric(
+                                            //               vertical: 10,
+                                            //               horizontal: 17),
+                                            //           profileScreenController:
+                                            //               profileScreenController),
+                                            //     ),
+                                            //   );
+                                            // },
+                                            onDoubleTap: () {
+                                              print("ghost mode clicked");
+
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                      backgroundColor:
+                                                          colorPrimaryA05,
+                                                      content: Text(
+                                                          'Ghost Mode Enabled!')));
+                                            },
+                                            child: AspectRatio(
+                                              aspectRatio: 2 / 3,
+                                              child: Stack(
+                                                children: [
+                                                  VideoPlayerWidget(
+                                                    videoPlayerController:
+                                                        videoPlayerController,
+                                                    videoUrl:
+                                                        post.mediaData[i].link,
+                                                  ),
+                                                  Positioned(
+                                                    top: 12,
+                                                    left: 0,
+                                                    right: 0,
+                                                    child: CustomPostHeader(
+                                                      name: post
+                                                          .creatorDetails.name,
+                                                      image: post.creatorDetails
+                                                          .imageUrl,
+                                                      headerOnTap: () {
+                                                        postCardController
+                                                            .gotoAppUserScreen(
+                                                                post.creatorId);
+                                                      },
+                                                      isVideoPost: true,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: post.mediaData[0].type == "Qoute",
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CustomPostHeader(
+                                            name: post.creatorDetails.name,
+                                            image: post.creatorDetails.imageUrl,
+                                            ontap: () {},
+                                            headerOnTap: () {
+                                              postCardController
+                                                  .gotoAppUserScreen(
+                                                      post.creatorId);
+                                            }),
+                                        SizedBox(
+                                          height: 229,
+                                          child: ListView.builder(
+                                            // shrinkWrap: true,
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: post.mediaData.length,
+                                            itemBuilder: (context, index) =>
+                                                InkWell(
+                                              onDoubleTap: () {
+                                                print("ghost mode clicked");
+
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(const SnackBar(
+                                                        backgroundColor:
+                                                            colorPrimaryA05,
+                                                        content: Text(
+                                                            'Ghost Mode Enabled!')));
+                                              },
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 40,
+                                                  vertical: 50,
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    post.mediaData[index].link,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: color221,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  heightBox(10.h),
+                                  CustomPostFooter(
+                                    likes: post.likesIds.length.toString(),
+                                    isLike: post.likesIds.contains(user!.id),
+
+                                    ontapLike: () {
+                                      print("ghost mode clicked");
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              backgroundColor: colorPrimaryA05,
+                                              content:
+                                                  Text('Ghost Mode Enabled!')));
+                                    },
+                                    // ontapSave: () {
+                                    //   print(user!.savedPostsIds);
+
+                                    // },
+                                    saveBtn: StreamBuilder<
+                                        DocumentSnapshot<Map<String, dynamic>>>(
+                                      stream: FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .snapshots(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          var userData = snapshot.data!.data();
+                                          var userModel =
+                                              UserModel.fromMap(userData!);
+                                          return GestureDetector(
+                                            onTap: () {
+                                              print("ghost mode clicked");
+
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                backgroundColor:
+                                                    colorPrimaryA05,
+                                                content:
+                                                    Text('Ghost Mode Enabled!'),
+                                              ));
+                                            },
+                                            child: Image.asset(
+                                              postSave,
+                                              color: userModel.savedPostsIds
+                                                      .contains(post.id)
+                                                  ? colorPrimaryA05
+                                                  : null,
+                                            ),
+                                          );
+                                        } else if (!snapshot.hasData) {
+                                          return const Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        } else {
+                                          return Image.asset(postSave);
+                                        }
+                                      },
+                                    ),
+                                    ontapShare: () {
+                                      print("ghost mode clicked");
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              backgroundColor: colorPrimaryA05,
+                                              content:
+                                                  Text('Ghost Mode Enabled!')));
+                                    },
+                                    ontapCmnt: () {
+                                      print("ghost mode clicked");
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              backgroundColor: colorPrimaryA05,
+                                              content:
+                                                  Text('Ghost Mode Enabled!')));
+                                    },
+                                    comments: post.commentIds.length,
+                                    isDesc: post.description.isNotEmpty,
+                                    desc: post.description.toString(),
+                                  ),
+                                ],
+                              ),
+                            );
+                            log("contain================================");
+                          } else {
+                            return const SizedBox();
+                            log("not contain================================");
+                          }
+                        },
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
                 )
+
+              // ? Container(
+              //     alignment: Alignment.center,
+              //     child:  Text(
+              //       "Please deactivate ghost mode to \nreturn to the home page",
+              //       textAlign: TextAlign.center,
+              //     ),
+              //   )
               : StreamBuilder<QuerySnapshot>(
                   stream: homeScreenController.postQuerry.snapshots(),
-                  builder: (context, snap) {
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snap) {
                     if (snap.hasData) {
                       var data = snap.data!.docs;
                       return ListView.builder(
@@ -443,7 +804,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           //       //     post.mediaData[i].link,
                                           //       menuButton: menuButton(context,
                                           //           post.mediaData[i].link,
-                                          //           margin: const EdgeInsets
+                                          //           margin:  EdgeInsets
                                           //                   .symmetric(
                                           //               vertical: 10,
                                           //               horizontal: 17),
@@ -515,7 +876,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       SizedBox(
                                         height: 229,
                                         child: ListView.builder(
-                                          // shrinkWrap: true,
+                                          shrinkWrap: true,
                                           scrollDirection: Axis.horizontal,
                                           itemCount: post.mediaData.length,
                                           itemBuilder: (context, index) =>
@@ -596,6 +957,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     FieldValue.arrayRemove(
                                                         [post.id])
                                               });
+                                            } else if (!snapshot.hasData) {
+                                              const Center(
+                                                  child:
+                                                      CircularProgressIndicator());
                                             } else {
                                               FirebaseFirestore.instance
                                                   .collection("users")
@@ -611,7 +976,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             postSave,
                                             color: userModel.savedPostsIds
                                                     .contains(post.id)
-                                                ? Colors.red
+                                                ? colorPrimaryA05
                                                 : null,
                                           ),
                                         );
@@ -854,14 +1219,16 @@ class CustomPostFooter extends StatelessWidget {
   }
 }
 
+
+
 // ShowAllPosts(
 //                     query: homeScreenController.postQuerry,
-//                     physics: const BouncingScrollPhysics(
+//                     physics:  BouncingScrollPhysics(
 //                         parent: AlwaysScrollableScrollPhysics()),
 //                   ),
 
 // class ShowAllPosts extends StatefulWidget {
-//   const ShowAllPosts({
+//    ShowAllPosts({
 //     Key? key,
 //     required this.query,
 //     this.physics,
@@ -921,14 +1288,14 @@ class CustomPostFooter extends StatelessWidget {
 //           return NewPostCard(
 //               z);
 //         }
-//         return const SizedBox(height: 0, width: 0);
+//         return  SizedBox(height: 0, width: 0);
 //       },
 //     );
 //   }
 // }
 
 // class ShowAllStory extends StatefulWidget {
-//   const ShowAllStory({Key? key}) : super(key: key);
+//    ShowAllStory({Key? key}) : super(key: key);
 
 //   @override
 //   State<ShowAllStory> createState() => _ShowAllStoryState();
@@ -944,7 +1311,7 @@ class CustomPostFooter extends StatelessWidget {
 //         .where('createdAt',
 //             isLessThan: DateTime.now().toIso8601String(),
 //             isGreaterThan: DateTime.now()
-//                 .subtract(const Duration(days: 1))
+//                 .subtract( Duration(days: 1))
 //                 .toIso8601String())
 //         .snapshots()
 //         .listen((storiesSnapshot) async {
@@ -1006,7 +1373,7 @@ class CustomPostFooter extends StatelessWidget {
 //                       child: ClipOval(
 //                           child: FadeInImage(
 //                               fit: BoxFit.cover,
-//                               placeholder: const AssetImage(imgUserPlaceHolder),
+//                               placeholder:  AssetImage(imgUserPlaceHolder),
 //                               image: NetworkImage(
 //                                   list[index].creatorDetails.imageUrl))))),
 //             ),

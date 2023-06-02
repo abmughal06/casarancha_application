@@ -1,25 +1,18 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/screens/home/story_view_screen.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
 import 'package:casarancha/widgets/FullImageView.dart';
-import 'package:casarancha/widgets/listView_with_whereIn_querry.dart';
 import 'package:casarancha/widgets/menu_post_button.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:casarancha/widgets/video_player_Url.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutterfire_ui/firestore.dart';
 import 'package:get/get.dart';
 
-import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
-import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
 import 'package:casarancha/screens/profile/follower_following_screen.dart';
 
 import '../../../resources/localization_text_strings.dart';

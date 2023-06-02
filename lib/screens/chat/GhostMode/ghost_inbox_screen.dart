@@ -21,6 +21,7 @@ class GhostModeInbox extends StatefulWidget {
 
 class _GhostModeInboxState extends State<GhostModeInbox> {
   final TextEditingController _searchTextController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<GhostMessageController>(

@@ -12,16 +12,22 @@ import 'package:rxdart/rxdart.dart';
 class GhostMessageController extends GetxController {
   static final List<GhostConversationModel> _arrFriends = [];
   static final List<GhostConversationModel> _searchFriends = [];
+
   List<GhostConversationModel> get arrFriends =>
       searchQuery.isEmpty ? _arrFriends : _searchFriends;
   static String? _currentChatId;
   static String _searchQuery = "";
   bool _isChatLoading = false;
+
   bool get isChatLoading => _isChatLoading;
+
   String get searchQuery => _searchQuery.trim();
   static final List<String> _totalUserCount = [];
+
   List<String> get totalUserCount => _totalUserCount;
+
   String? get currentChatId => _currentChatId;
+
   void setChatId(String chatId) {
     _currentChatId = chatId;
     update();
@@ -115,6 +121,7 @@ class GhostMessageController extends GetxController {
 
   Stream? conversationStream;
   StreamSubscription? conversationListner;
+
   void disposeStream() {
     conversationListner?.pause();
     conversationListner?.cancel();

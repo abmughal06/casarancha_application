@@ -10,6 +10,7 @@ class GhostConversationModel {
   String? objectId;
   String? receiverHashId;
   String? name;
+
   GhostConversationModel(
       {this.lastMessage,
       this.messageCreatedAt,

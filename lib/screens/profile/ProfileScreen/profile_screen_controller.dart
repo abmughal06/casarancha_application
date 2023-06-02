@@ -1,22 +1,29 @@
+import 'dart:developer';
+
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
+
 import 'package:casarancha/screens/auth/login_screen.dart';
-import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_helper.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
+import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/utils/snackbar.dart';
-import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreenController extends SuperController {
   ProfileScreenController({this.isFromDelete = false});
+
+  late HomeScreenController homeScreenController;
+
   bool isFromDelete;
   final firebaseAuth = FirebaseAuth.instance;
   final fbfirestore = FirebaseFirestore.instance;
+
   //Obserables
   var user = UserModel(
     id: '',
@@ -30,7 +37,7 @@ class ProfileScreenController extends SuperController {
     isOnline: false,
   ).obs;
 
-  var isGhostModeOn = false.obs;
+  RxBool isGhostModeOn = false.obs;
 
   var isGettingUserData = false.obs;
 
@@ -53,6 +60,7 @@ class ProfileScreenController extends SuperController {
   }
 
   RxList<Map<String, dynamic>> getUserImages = <Map<String, dynamic>>[].obs;
+
   List<Map<String, dynamic>> userImages() {
     List<Map<String, dynamic>> imagesUrls = [];
     for (var element in userPosts) {
@@ -64,6 +72,7 @@ class ProfileScreenController extends SuperController {
   }
 
   RxList<Map<String, dynamic>> getUserQuotes = <Map<String, dynamic>>[].obs;
+
   List<Map<String, dynamic>> userQuotes() {
     List<Map<String, dynamic>> quotes = [];
     for (var element in userPosts) {
@@ -75,6 +84,7 @@ class ProfileScreenController extends SuperController {
   }
 
   RxList<Map<String, dynamic>> getUserVideos = <Map<String, dynamic>>[].obs;
+
   List<Map<String, dynamic>> userVideos() {
     List<Map<String, dynamic>> videosUrls = [];
     for (var element in userPosts) {
@@ -122,6 +132,7 @@ class ProfileScreenController extends SuperController {
 
   Future<void> getUserPosts() async {
     isGettingUserPosts.value = true;
+
     try {
       List<PostModel> helperList = [];
       final userPostsRef = await userPostsQuerry.get();
@@ -160,14 +171,25 @@ class ProfileScreenController extends SuperController {
     isGettingUserStories.value = false;
   }
 
-  void toggleGhostMode() {
+  void toggleGhostMode() async {
     Get.find<DashboardController>().currentIndex.value = 0;
+
     isGhostModeOn.toggle();
+    log("========================================");
+    log(isGhostModeOn.value.toString());
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setBool('isGhostEnable', isGhostModeOn.value);
+
+    var val = sharedPreferences.getBool('isGhostEnable');
+    log("get val====================");
+    log(val.toString());
   }
 
   Future<void> logout() async {
     try {
       setUserAgain();
+
       GhostChatHelper.shared.gMessageCtrl.disposeStream();
       await FirebaseAuth.instance.signOut();
       Get.offAll(() => const LoginScreen());

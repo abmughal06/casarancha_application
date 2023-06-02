@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../resources/firebase_cloud_messaging.dart';
+
 import '../GhostMode/ghost_chat_screen.dart';
 
 class ChatController extends GetxController {

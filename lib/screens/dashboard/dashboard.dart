@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'dart:io';
+import 'package:badges/badges.dart' as badges;
 
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
@@ -16,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../resources/color_resources.dart';
 import '../home/HomeScreen/home_screen_controller.dart';
@@ -29,7 +32,8 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard>
     with AutomaticKeepAliveClientMixin {
-  late ProfileScreenController profileScreenController;
+  late ProfileScreenController profileScreenController =
+      Get.put(ProfileScreenController());
 
   late DashboardController dashboardController;
 
@@ -38,16 +42,31 @@ class _DashBoardState extends State<DashBoard>
     dashboardController = Get.isRegistered<DashboardController>()
         ? Get.find<DashboardController>()
         : Get.put(DashboardController());
-    profileScreenController = Get.put(ProfileScreenController());
+   
     Future.delayed(Duration.zero, () {
       GhostMessageController gmCtrl = GhostChatHelper.shared.gMessageCtrl;
       gmCtrl.createConversationStreamSubscription(
           FirebaseAuth.instance.currentUser?.uid ?? "");
     });
+   
+    getPrefData();
     super.initState();
   }
 
-  get() {}
+  getPrefData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    Future.delayed(const Duration(seconds: 0)).then((value) {
+      var getVal = sharedPreferences.getBool('isGhostEnable') ?? false;
+      log("000000000000000000000");
+      if (getVal == true) {
+        profileScreenController.toggleGhostMode();
+      } else {
+        log('no val preference');
+      }
+      log(getVal.toString());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,10 +152,16 @@ class _DashBoardState extends State<DashBoard>
                         onPressed: () {
                           dashboardController.pageController.jumpToPage(3);
                         },
-                        icon: SvgPicture.asset(
-                          dashboardController.currentIndex.value == 3
-                              ? icBottomSelChat
-                              : icBottomDeSelChat,
+                        icon: badges.Badge(
+                          badgeContent: const Text(
+                            '0',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          child: SvgPicture.asset(
+                            dashboardController.currentIndex.value == 3
+                                ? icBottomSelChat
+                                : icBottomDeSelChat,
+                          ),
                         ),
                       ),
                       IconButton(
@@ -172,10 +197,33 @@ class _DashBoardState extends State<DashBoard>
 IconButton ghostModeBtn({HomeScreenController? homeCtrl, double? iconSize}) {
   HomeScreenController homeScreenController =
       homeCtrl ?? Get.put(HomeScreenController());
+  
   return IconButton(
     iconSize: iconSize,
-    onPressed: () {
+    onPressed: () async {
+      // setState(() {});
+      // SharedPreferences sharedPreferences =
+      //     await SharedPreferences.getInstance();
+
+      // sharedPreferences.getBool('isGhostEnable') == false
+      //     ? null
+      //     : await sharedPreferences.setBool('isGhostEnable',
+      //         homeScreenController.profileScreenController.isGhostModeOn.value);
+
+      // await appPreferencesController.getString('isGhostEnable') == true
+      //     ? null
+      //     : await appPreferencesController.setString(
+      //         'isGhostEnable',
+      //         homeScreenController.profileScreenController.isGhostModeOn.value
+      //             .toString());
       homeScreenController.profileScreenController.toggleGhostMode();
+      //     await appPreferencesController.setString(
+      //         'isGhostEnable',homeScreenController.profileScreenController.isGhostModeOn.value
+      //             .toString());
+      //              var getVal = await appPreferencesController.getString('isGhostEnable');
+      //   log("0-0--------------------");
+      //   log(getVal.toString());
+      //     print(appPreferencesController.getString('isGhostEnable'));
     },
     icon: SvgPicture.asset(icGhostMode,
         color: homeScreenController.profileScreenController.isGhostModeOn.value

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -10,10 +12,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
 // import 'package:intl/intl.dart';s
+import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
 import '../../dashboard/dashboard.dart';
 import '../../home/HomeScreen/home_screen_controller.dart';
+import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../Chat one-to-one/chat_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -31,6 +36,7 @@ class ChatListScreen extends StatelessWidget {
   ChatListScreen({Key? key}) : super(key: key);
   final ChatListController chatListController = Get.put(ChatListController());
   final homeScreenController = Get.put(HomeScreenController());
+  ProfileScreenController profileScreenController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -69,20 +75,32 @@ class ChatListScreen extends StatelessWidget {
                   onTap: (v) {},
                   labelColor: Colors.black,
                   unselectedLabelColor: Colors.grey.shade500,
-                  tabs: const [
-                    Tab(child: Text("Messages")),
-                    Tab(
-                      child: Text("Ghost Messages"),
-                    )
+                  tabs: [
+                    profileScreenController.isGhostModeOn.value
+                        ? Tab(
+                            child: Text("Ghost Messages",style: TextStyle(
+                                color: colorPrimaryA05,
+                                fontSize: 12),),
+                          )
+                        : Tab(child: Text("Messages")),
+                    profileScreenController.isGhostModeOn.value
+                        ? Tab(
+                            child: Text("Messages"),
+                          )
+                        : Tab(child: Text("Ghost Messages")),
                   ],
                 ),
                 const SizedBox(height: 5),
-                const Expanded(
+                Expanded(
                   child: TabBarView(
                       physics: NeverScrollableScrollPhysics(),
                       children: [
-                        MessageList(),
-                        GhostModeInbox(),
+                        profileScreenController.isGhostModeOn.value
+                            ? const MessageList1()
+                            : const MessageList(),
+                        profileScreenController.isGhostModeOn.value
+                            ? const MessageList()
+                            : const MessageList1(),
                       ]),
                 )
               ],
@@ -90,17 +108,30 @@ class ChatListScreen extends StatelessWidget {
   }
 }
 
-class MessageList extends StatefulWidget {
-  const MessageList({Key? key}) : super(key: key);
-
-  @override
-  State<MessageList> createState() => _MessageListState();
+String generateRandomString(int lengthOfString) {
+  final random = Random();
+  const allChars =
+      'AaBbCcDdlMmNnOoPpQqRrS234567890sTtUuVvWwXxYyZz1EeFfGgHhIiJjKkL';
+  // below statement will generate a random string of length using the characters
+  // and length provided to it
+  final randomString = List.generate(
+          lengthOfString, (index) => allChars[random.nextInt(allChars.length)])
+      .join();
+  return randomString; // return the generated string
 }
 
-class _MessageListState extends State<MessageList>
+class MessageList1 extends StatefulWidget {
+  const MessageList1({Key? key}) : super(key: key);
+
+  @override
+  State<MessageList1> createState() => _MessageList1State();
+}
+
+class _MessageList1State extends State<MessageList1>
     with AutomaticKeepAliveClientMixin {
   final ChatListController chatListController = Get.put(ChatListController());
   final homeScreenController = Get.put(HomeScreenController());
+  ProfileScreenController profileScreenController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -117,15 +148,17 @@ class _MessageListState extends State<MessageList>
           ),
         ),
         heightBox(10.h),
-        Expanded(
-          child: Obx(
-            () => ChatListWidget(
-              query: chatListController.searchQuery.isEmpty
-                  ? chatListController.chatListQuery
-                  : chatListController.searchListQuery,
-            ),
-          ),
-        )
+        profileScreenController.isGhostModeOn.value
+            ? Expanded(
+                child: Obx(
+                  () => ChatListWidget(
+                    query: chatListController.searchQuery.isEmpty
+                        ? chatListController.chatListQuery
+                        : chatListController.searchListQuery,
+                  ),
+                ),
+              )
+            : const SizedBox(),
       ],
     );
   }
@@ -134,6 +167,54 @@ class _MessageListState extends State<MessageList>
   bool get wantKeepAlive => true;
 }
 
+///////////////////////////////////////////////////////////////////////
+class MessageList extends StatefulWidget {
+  const MessageList({Key? key}) : super(key: key);
+
+  @override
+  State<MessageList> createState() => _MessageListState();
+}
+
+class _MessageListState extends State<MessageList>
+    with AutomaticKeepAliveClientMixin {
+  final ChatListController chatListController = Get.put(ChatListController());
+  final homeScreenController = Get.put(HomeScreenController());
+  ProfileScreenController profileScreenController = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: searchTextField(
+            context: context,
+            controller: chatListController.searchController,
+            onChange: (value) {
+              chatListController.searchQuery.value = value;
+            },
+          ),
+        ),
+        heightBox(10.h),
+        profileScreenController.isGhostModeOn.value
+            ? const SizedBox()
+            : Expanded(
+                child: Obx(
+                  () => ChatListWidget(
+                    query: chatListController.searchQuery.isEmpty
+                        ? chatListController.chatListQuery
+                        : chatListController.searchListQuery,
+                  ),
+                ),
+              )
+      ],
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+////////////////////////////////////////////////////////////////////////////
 // class ChatListWidget extends StatefulWidget {
 //   const ChatListWidget({Key? key}) : super(key: key);
 //   //   final Query<Map<String, dynamic>> query;
@@ -163,6 +244,7 @@ class ChatListWidget extends StatefulWidget {
 
 class _ChatListWidgetState extends State<ChatListWidget> {
   final homeScreenController = Get.put(HomeScreenController());
+  ProfileScreenController profileScreenController = Get.find();
   bool isLoading = false;
 
   @override
@@ -228,7 +310,23 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                   ),
                                 );
                               },
-                              title: Text(userMmessage.name),
+                              title: Row(
+                                children: [
+                                  profileScreenController.isGhostModeOn.value
+                                      ? Text(
+                                          "Ghost---",
+                                          style: TextStyle(
+                                              color: colorPrimaryA05,
+                                              fontSize: 12),
+                                        )
+                                      : SizedBox(),
+                                  profileScreenController.isGhostModeOn.value
+                                      ? Text(
+                                          generateRandomString(7),
+                                        )
+                                      : Text(userMmessage.name),
+                                ],
+                              ),
                               subtitle: StreamBuilder<DocumentSnapshot<Map>>(
                                 stream: FirebaseFirestore.instance
                                     .collection("users")

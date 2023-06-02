@@ -109,8 +109,7 @@ class _GhostChatScreenState extends State<GhostChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(widget.name ??
-              "Ghost-${(widget.receiverUserId ?? "Person").hashCode}")),
+          title: Text(widget.name ?? "Ghost-${(widget.receiverUserId ?? "Person").hashCode}")),
       body: SafeArea(
         child: GetBuilder<GhostMessageController>(
             init: GhostChatHelper.shared.gMessageCtrl,
