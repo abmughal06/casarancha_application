@@ -47,6 +47,8 @@ class _DashBoardState extends State<DashBoard>
     super.initState();
   }
 
+  get() {}
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
