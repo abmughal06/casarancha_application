@@ -51,25 +51,6 @@ class SharePostScreen extends StatelessWidget {
             ],
           ),
           SizedBox(height: 20.h),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          //   children: [
-          //     Text(
-          //       "Share with Freinds",
-          //       style: TextStyle(
-          //           fontSize: 16.sp,
-          //           color: Colors.black,
-          //           fontWeight: FontWeight.w600),
-          //     ),
-          //     Text(
-          //       "Share on social media",
-          //       style: TextStyle(
-          //           fontSize: 16.sp,
-          //           color: Colors.black,
-          //           fontWeight: FontWeight.w400),
-          //     ),
-          //   ],
-          // ),
           StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection("users")
@@ -244,8 +225,7 @@ class SharePostScreen extends StatelessWidget {
                                               devRegToken: recieverFCMToken,
                                               userReqID: userMmessage.id,
                                               title: user!.name,
-                                              msg:
-                                                  "${user!.name} has sent you a post",
+                                              msg: "has sent you a post",
                                             );
 
                                             //   if (isChatExits.value) {
