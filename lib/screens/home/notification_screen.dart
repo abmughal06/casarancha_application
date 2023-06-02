@@ -91,27 +91,36 @@ class _NotificationScreenState
                                       )
                                     : null,
                               ),
-                              title: Text(
-                                notification.title!,
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                              subtitle: Text(
-                                notification.msg!,
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              trailing: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: Text(
-                                      timeago.format(DateTime.parse(
-                                          notification.createdAt!)),
-                                      style: const TextStyle(
-                                          fontSize: 11, color: Colors.black54),
-                                    ),
+                              title: RichText(
+                                text: TextSpan(
+                                  text: "",
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 13,
                                   ),
-                                ],
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                        text: "${notification.title!} ",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        )),
+                                    TextSpan(
+                                      text: notification.msg!,
+                                    )
+                                  ],
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  timeago.format(
+                                      DateTime.parse(notification.createdAt!)),
+                                  style: const TextStyle(
+                                      fontSize: 11, color: Colors.black54),
+                                ),
                               ),
                             );
                           });

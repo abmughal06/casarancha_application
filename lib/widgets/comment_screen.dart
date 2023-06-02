@@ -300,8 +300,7 @@ class CommentScreen extends StatelessWidget {
                                   devRegToken: recieverFCMToken,
                                   userReqID: creatorId,
                                   title: user!.name,
-                                  msg:
-                                      "${user!.name} has commented on your post.",
+                                  msg: "has commented on your post.",
                                 );
                               });
                             },

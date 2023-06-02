@@ -9,6 +9,7 @@ import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/screens/home/story_view_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +20,7 @@ import 'package:get/get.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/video_call_screen.dart';
 import 'package:video_player/video_player.dart';
+import '../../../models/story_model.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../resources/strings.dart';
@@ -186,6 +188,23 @@ class ChatScreen extends StatelessWidget {
                               videoPlayerController: videoPlayerController,
                             ),
                           );
+                        } else if (message.type == "story") {
+                          // var story = Story.fromJson(message.content);
+
+                          // var media = story.mediaDetailsList
+                          //     .where((element) => DateTime.parse(element.id)
+                          //         .isAfter(DateTime.now()
+                          //             .subtract(const Duration(hours: 24))))
+                          //     .map((e) => e)
+                          //     .toList();
+                          return Container();
+                          // InkWell(
+                          //     onTap: () => Get.to(() => StoryViewScreen(
+                          //           story: story,
+                          //         )),
+                          //     child: CachedNetworkImage(
+                          //       imageUrl: media.first.link,
+                          //     ));
                         } else {
                           return Container();
                         }

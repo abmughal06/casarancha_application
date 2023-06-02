@@ -47,6 +47,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.11.0
+  story_viewer: ^0.2.0
   flutter_native_splash: ^2.2.10+1
   flutter_screenutil: ^5.5.4
   flutter_svg: ^1.1.3
