@@ -171,7 +171,7 @@ class ChatController extends GetxController {
         devRegToken: recieverFCMToken,
         userReqID: appUserId,
         title: user!.name,
-        msg: "${user!.name} has sent you a message",
+        msg: "has sent you a message",
       );
 
       if (isChatExits.value) {

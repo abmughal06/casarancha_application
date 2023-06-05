@@ -264,10 +264,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             await isSetupProfile(userData.user?.uid);
                           } catch (e) {
-                            GlobalSnackBar.show(
-                              context: context,
-                              message: e.toString(),
-                            );
+                            // GlobalSnackBar.show(
+                            //   context: context,
+                            //   message: e.toString(),
+                            // );
                             setState(() {
                               isSigningIn = false;
                             });

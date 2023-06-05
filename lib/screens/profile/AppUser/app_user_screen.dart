@@ -15,11 +15,13 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/profile/follower_following_screen.dart';
 
+import '../../../models/post_creator_details.dart';
 import '../../../resources/localization_text_strings.dart';
 
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/menu_user_button.dart';
 import '../../../widgets/text_widget.dart';
+import '../../chat/Chat one-to-one/chat_screen.dart';
 
 class AppUserScreen extends StatelessWidget {
   const AppUserScreen({
@@ -230,7 +232,7 @@ class AppUserScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                /* widthBox(15.w),
+                                widthBox(10.w),
                                 GestureDetector(
                                   onTap: () => Get.to(() => ChatScreen(
                                         appUserId: appUserController.appUserId,
@@ -245,10 +247,9 @@ class AppUserScreen extends StatelessWidget {
                                       )),
                                   child: Image.asset(
                                     imgProMsg,
-                                    height: 45.h,
-                                    width: 45.w,
+                                    height: 60.h,
                                   ),
-                                ), */
+                                ),
                               ],
                             ),
                           ),

@@ -10,6 +10,7 @@ import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:casarancha/widgets/video_player_Url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -121,100 +122,112 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Padding(
                   padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                  child: StreamBuilder<QuerySnapshot>(
+                  child: StreamBuilder<DocumentSnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection("stories")
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
                           .snapshots(),
-                      builder:
-                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        print("======================== ${snapshot.data}");
-                        if (snapshot.hasData) {
-                          // var listofData = snapshot.data!.docs;
-                          // print(snapshot.data!.data());
-                          dynamic map;
-                          Story? story;
+                      builder: (context, snapshot) {
+                        log("======================== daldjalsdjlsdasl  ${snapshot.data}");
+                        if (snapshot.hasData && snapshot.data != null) {
+                          if (snapshot.data!.data() == null) {
+                            return GestureDetector(
+                              onTap: () {
+                                Get.to(() => AddStoryScreen());
+                              },
+                              child: SvgPicture.asset(
+                                icProfileAdd,
+                                height: 50.h,
+                                width: 50.w,
+                              ),
+                            );
+                          } else {
+                            log("==================== snapshot has data");
+                            // var listofData = snapshot.data!.docs;
+                            // log(snapshot.data!.data());
+                            dynamic map;
+                            Story? story;
 
-                          // var data = snapshot.data!.data();
-                          // if (snapshot.data!.docs.isNotEmpty) {
-                          for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                            if (snapshot.data!.docs[i].id ==
-                                FirebaseAuth.instance.currentUser!.uid) {
-                              map = snapshot.data!.docs[i].data();
-                              story = Story.fromMap(map);
+                            // var data = snapshot.data!.data();
+                            // if (snapshot.data!.docs.isNotEmpty) {
+
+                            map = snapshot.data!.data();
+                            story = Story.fromMap(map);
+
+                            DateTime? givenDate;
+                            for (int i = 0;
+                                i < story.mediaDetailsList.length;
+                                i++) {
+                              givenDate =
+                                  DateTime.parse(story.mediaDetailsList[i].id);
                             }
-                          }
 
-                          DateTime? givenDate;
-                          for (int i = 0;
-                              i < story!.mediaDetailsList.length;
-                              i++) {
-                            givenDate =
-                                DateTime.parse(story.mediaDetailsList[i].id);
-                          }
+                            DateTime twentyFourHoursAgo = DateTime.now()
+                                .subtract(const Duration(hours: 24));
+                            log(" ========== $twentyFourHoursAgo");
 
-                          DateTime twentyFourHoursAgo = DateTime.now()
-                              .subtract(const Duration(hours: 24));
-                          print(" ========== $twentyFourHoursAgo");
-
-                          return Column(
-                            children: [
-                              Stack(
-                                children: [
-                                  givenDate!.isAfter(twentyFourHoursAgo)
-                                      ? InkWell(
-                                          onTap: () {
-                                            Get.to(() =>
-                                                StoryViewScreen(story: story!));
-                                          },
-                                          child: CircleAvatar(
-                                            minRadius: 25,
-                                            backgroundImage: NetworkImage(
-                                                map!["creatorDetails"]
-                                                    ['imageUrl']),
-                                          ),
-                                        )
-                                      : InkWell(
-                                          onTap: () {
-                                            Get.to(() => AddStoryScreen());
-                                          },
-                                          child: SvgPicture.asset(
-                                            icProfileAdd,
-                                            height: 50.h,
-                                            width: 50.w,
-                                          ),
-                                        ),
-                                  givenDate.isAfter(twentyFourHoursAgo)
-                                      ? Positioned(
-                                          right: -2,
-                                          bottom: -2,
-                                          child: InkWell(
+                            return Column(
+                              children: [
+                                Stack(
+                                  children: [
+                                    givenDate!.isAfter(twentyFourHoursAgo)
+                                        ? InkWell(
+                                            onTap: () {
+                                              Get.to(() => StoryViewScreen(
+                                                  story: story!));
+                                            },
+                                            child: CircleAvatar(
+                                              minRadius: 25,
+                                              backgroundImage: NetworkImage(
+                                                  map!["creatorDetails"]
+                                                      ['imageUrl']),
+                                            ),
+                                          )
+                                        : InkWell(
                                             onTap: () {
                                               Get.to(() => AddStoryScreen());
                                             },
-                                            child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(2.0),
-                                                decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: colorPrimaryA05,
-                                                ),
-                                                child: const Icon(
-                                                  Icons.add,
-                                                  color: Colors.white,
-                                                  size: 18,
-                                                )),
-                                          ))
-                                      : Container(),
-                                ],
-                              ),
-                              const SizedBox(height: 3),
-                              const Text(
-                                "Your Story",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 10),
-                              )
-                            ],
-                          );
+                                            child: SvgPicture.asset(
+                                              icProfileAdd,
+                                              height: 50.h,
+                                              width: 50.w,
+                                            ),
+                                          ),
+                                    givenDate.isAfter(twentyFourHoursAgo)
+                                        ? Positioned(
+                                            right: -2,
+                                            bottom: -2,
+                                            child: InkWell(
+                                              onTap: () {
+                                                Get.to(() => AddStoryScreen());
+                                              },
+                                              child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(2.0),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: colorPrimaryA05,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.add,
+                                                    color: Colors.white,
+                                                    size: 18,
+                                                  )),
+                                            ))
+                                        : Container(),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                const Text(
+                                  "Your Story",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10),
+                                )
+                              ],
+                            );
+                          }
                         } else if (snapshot.hasError) {
                           return const Text("Here");
                         } else if (!snapshot.hasData) {
@@ -277,12 +290,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )
                                     .snapshots(),
                             builder: (context, snapshot) {
-                              print(DateTime.now().toIso8601String());
+                              log(DateTime.now().toIso8601String());
                               if (snapshot.hasData && snapshot.data != null) {
                                 final data = snapshot.data!.docs;
                                 // double progress =
                                 // data.bytesTransferred / data.totalBytes;
-                                print("++++++++++++++++++++++++++++- $data");
+                                log("++++++++++++++++++++++++++++- $data");
                                 return Expanded(
                                   child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
@@ -302,8 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         DateTime twentyFourHoursAgo =
                                             DateTime.now().subtract(
                                                 const Duration(hours: 24));
-                                        print(
-                                            " ========== $twentyFourHoursAgo");
+                                        log(" ========== $twentyFourHoursAgo");
                                         if (givenDate!
                                             .isBefore(twentyFourHoursAgo)) {
                                           return Container();
@@ -421,8 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             itemBuilder: (context, index) =>
                                                 InkWell(
                                                     onDoubleTap: () async {
-                                                      print(
-                                                          "ghost mode clicked");
+                                                      log("ghost mode clicked");
 
                                                       ScaffoldMessenger.of(
                                                               context)
@@ -471,7 +482,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           // );
                                           return InkWell(
                                             // onTap: () {
-                                            //   print('clicked');
+                                            //   log('clicked');
                                             //   Get.to(
                                             //     () => CustomVideoCard(
                                             //       aspectRatio:
@@ -493,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             //   );
                                             // },
                                             onDoubleTap: () {
-                                              print("ghost mode clicked");
+                                              log("ghost mode clicked");
 
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(const SnackBar(
@@ -561,7 +572,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             itemBuilder: (context, index) =>
                                                 InkWell(
                                               onDoubleTap: () {
-                                                print("ghost mode clicked");
+                                                log("ghost mode clicked");
 
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(const SnackBar(
@@ -604,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     isLike: post.likesIds.contains(user!.id),
 
                                     ontapLike: () {
-                                      print("ghost mode clicked");
+                                      log("ghost mode clicked");
 
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
@@ -613,7 +624,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Text('Ghost Mode Enabled!')));
                                     },
                                     // ontapSave: () {
-                                    //   print(user!.savedPostsIds);
+                                    //   log(user!.savedPostsIds);
 
                                     // },
                                     saveBtn: StreamBuilder<
@@ -630,7 +641,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               UserModel.fromMap(userData!);
                                           return GestureDetector(
                                             onTap: () {
-                                              print("ghost mode clicked");
+                                              log("ghost mode clicked");
 
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(const SnackBar(
@@ -658,7 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                     ),
                                     ontapShare: () {
-                                      print("ghost mode clicked");
+                                      log("ghost mode clicked");
 
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
@@ -667,7 +678,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Text('Ghost Mode Enabled!')));
                                     },
                                     ontapCmnt: () {
-                                      print("ghost mode clicked");
+                                      log("ghost mode clicked");
 
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
@@ -682,10 +693,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             );
-                            log("contain================================");
+                            // log("contain================================");
                           } else {
                             return const SizedBox();
-                            log("not contain================================");
+                            // log("not contain================================");
                           }
                         },
                       );
@@ -722,17 +733,30 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               children: [
                                 Visibility(
+                                  visible: post.mediaData[0].type != "Video",
+                                  child: CustomPostHeader(
+                                      onVertItemClick: () {
+                                        Get.back();
+
+                                        Get.bottomSheet(
+                                          BottomSheetWidget(
+                                            ontapBlock: () {},
+                                          ),
+                                          isScrollControlled: true,
+                                        );
+                                      },
+                                      name: post.creatorDetails.name,
+                                      image: post.creatorDetails.imageUrl,
+                                      ontap: () {},
+                                      headerOnTap: () {
+                                        postCardController
+                                            .gotoAppUserScreen(post.creatorId);
+                                      }),
+                                ),
+                                Visibility(
                                   visible: post.mediaData[0].type == "Photo",
                                   child: Column(
                                     children: [
-                                      CustomPostHeader(
-                                          name: post.creatorDetails.name,
-                                          image: post.creatorDetails.imageUrl,
-                                          headerOnTap: () {
-                                            postCardController
-                                                .gotoAppUserScreen(
-                                                    post.creatorId);
-                                          }),
                                       heightBox(10.h),
                                       AspectRatio(
                                         aspectRatio: 2 / 3,
@@ -743,7 +767,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemBuilder: (context, index) =>
                                               InkWell(
                                                   onDoubleTap: () async {
-                                                    print("clicked");
+                                                    log("clicked");
                                                     postCardController
                                                             .isLiked.value =
                                                         !post.likesIds
@@ -792,7 +816,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         // );
                                         return InkWell(
                                           // onTap: () {
-                                          //   print('clicked');
+                                          //   log('clicked');
                                           //   Get.to(
                                           //     () => CustomVideoCard(
                                           //       aspectRatio:
@@ -814,7 +838,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           //   );
                                           // },
                                           onDoubleTap: () {
-                                            print("clicked");
+                                            log("clicked");
                                             postCardController.isLiked.value =
                                                 !post.likesIds
                                                     .contains(user!.id);
@@ -864,15 +888,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      CustomPostHeader(
-                                          name: post.creatorDetails.name,
-                                          image: post.creatorDetails.imageUrl,
-                                          ontap: () {},
-                                          headerOnTap: () {
-                                            postCardController
-                                                .gotoAppUserScreen(
-                                                    post.creatorId);
-                                          }),
                                       SizedBox(
                                         height: 229,
                                         child: ListView.builder(
@@ -882,7 +897,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemBuilder: (context, index) =>
                                               InkWell(
                                             onDoubleTap: () {
-                                              print("clicked");
+                                              log("clicked");
                                               postCardController.isLiked.value =
                                                   !post.likesIds
                                                       .contains(user!.id);
@@ -923,14 +938,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   isLike: post.likesIds.contains(user!.id),
 
                                   ontapLike: () {
-                                    print("clicked");
+                                    log("clicked");
                                     postCardController.isLiked.value =
                                         !post.likesIds.contains(user!.id);
                                     postCardController.likeDisLikePost(
                                         user!.id, post.id, post.creatorId);
                                   },
                                   // ontapSave: () {
-                                  //   print(user!.savedPostsIds);
+                                  //   log(user!.savedPostsIds);
 
                                   // },
                                   saveBtn: StreamBuilder<
@@ -1038,13 +1053,150 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class BottomSheetWidget extends StatelessWidget {
+  BottomSheetWidget({Key? key, this.ontapBlock}) : super(key: key);
+
+  final List reportList = [
+    "It's a spam",
+    "Nudity or sexual activity",
+    "I just don't like it",
+    "Scam or fraud",
+    "False Information",
+    "Hate speech or symbols",
+  ];
+
+  final VoidCallback? ontapBlock;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: SvgPicture.asset(icBottomSheetScroller),
+          ),
+          heightBox(12.h),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              Get.bottomSheet(Container(
+                height: 425.h,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30)),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: SvgPicture.asset(icBottomSheetScroller),
+                    ),
+                    heightBox(12.h),
+                    TextWidget(
+                        text:
+                            """Are you sure you wanted to report this post if yes then choose the reason for the report which is the related to the post""",
+                        textAlign: TextAlign.center,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black.withOpacity(0.6)),
+                    ListView.builder(
+                        itemCount: reportList.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            onTap: () {
+                              Get.back();
+
+                              Get.bottomSheet(Container(
+                                height: 280.h,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(30),
+                                      topRight: Radius.circular(30)),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 20),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(icBottomSheetScroller),
+                                    heightBox(15.h),
+                                    SvgPicture.asset(icReportPostDone),
+                                    heightBox(15.h),
+                                    TextWidget(
+                                      text: "Thank you for the Report Us",
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18.sp,
+                                      color: const Color(0xff212121),
+                                    ),
+                                    heightBox(12.h),
+                                    TextWidget(
+                                      text: "We have sparm the report",
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14.sp,
+                                      color: const Color(0xff5f5f5f),
+                                    ),
+                                  ],
+                                ),
+                              ));
+                            },
+                            title: TextWidget(
+                              textAlign: TextAlign.left,
+                              text: reportList[index],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
+                        }),
+                  ],
+                ),
+              ));
+            },
+            child: TextWidget(
+              text: "Report Post",
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          TextButton(
+            onPressed: ontapBlock,
+            child: TextWidget(
+              text: "Block User",
+              fontWeight: FontWeight.w600,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class CustomPostHeader extends StatelessWidget {
   final String? name;
   final String? image;
   final VoidCallback? ontap;
   final VoidCallback? headerOnTap;
+  final bool? isVerified;
 
   final bool? isVideoPost;
+  final VoidCallback? onVertItemClick;
 
   const CustomPostHeader(
       {Key? key,
@@ -1052,7 +1204,9 @@ class CustomPostHeader extends StatelessWidget {
       this.image,
       this.ontap,
       this.isVideoPost = false,
-      this.headerOnTap})
+      this.headerOnTap,
+      this.isVerified = false,
+      this.onVertItemClick})
       : super(key: key);
 
   @override
@@ -1077,7 +1231,7 @@ class CustomPostHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              widthBox(15.w),
+              widthBox(10.w),
               Text(
                 "$name",
                 style: TextStyle(
@@ -1085,11 +1239,20 @@ class CustomPostHeader extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: isVideoPost! ? colorFF7 : color221),
               ),
+              widthBox(5.w),
+              Visibility(
+                visible: isVerified!,
+                child: SvgPicture.asset(
+                  icVerifyBadge,
+                  width: 17.w,
+                  height: 17.h,
+                ),
+              )
             ],
           ),
         ),
         IconButton(
-          onPressed: ontap,
+          onPressed: onVertItemClick,
           icon: Icon(
             Icons.more_vert,
             color: isVideoPost! ? colorFF7 : color221,
@@ -1137,29 +1300,25 @@ class CustomPostFooter extends StatelessWidget {
           children: [
             Row(
               children: [
-                widthBox(12.w),
-                InkWell(
-                  onTap: ontapLike,
-                  child: AssetImageWidget(
+                widthBox(5.w),
+                IconButton(
+                  onPressed: ontapLike,
+                  icon: AssetImageWidget(
                     imageName: isLike! ? postLikeRed : postLike,
                     // height: 13,
                   ),
                 ),
-                widthBox(12.w),
                 Text("$likes"),
-                widthBox(12.w),
-                InkWell(
-                  onTap: ontapCmnt,
-                  child: const AssetImageWidget(
+                IconButton(
+                  onPressed: ontapCmnt,
+                  icon: const AssetImageWidget(
                     imageName: postComment,
                   ),
                 ),
-                widthBox(12.w),
                 Text("$comments"),
-                widthBox(12.w),
-                InkWell(
-                  onTap: ontapShare,
-                  child: const AssetImageWidget(
+                IconButton(
+                  onPressed: ontapShare,
+                  icon: const AssetImageWidget(
                     imageName: postSend,
                   ),
                 ),
@@ -1218,8 +1377,6 @@ class CustomPostFooter extends StatelessWidget {
     );
   }
 }
-
-
 
 // ShowAllPosts(
 //                     query: homeScreenController.postQuerry,
@@ -1285,7 +1442,7 @@ class CustomPostFooter extends StatelessWidget {
 //             tag: post.id,
 //           );
 
-//           return NewPostCard(
+// return NewPostCard(
 //               z);
 //         }
 //         return  SizedBox(height: 0, width: 0);

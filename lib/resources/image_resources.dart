@@ -56,6 +56,8 @@ const icTagPeople = "assets/images/img_home_page/ic_tag_people.svg";
 const icPlayCircle = "assets/images/ic_play_circle.svg";
 const imgSendComment = "assets/images/img_home_page/ic_comment_send.png";
 const icThreeDots = "assets/images/ic_three_dots.svg";
+const icBottomSheetScroller = "assets/images/ic_bottomSheet_scroller.svg";
+
 //Search Page
 const icSearchText = "assets/images/img_search_page/ic_search_txt.svg";
 

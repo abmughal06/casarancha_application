@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
@@ -133,6 +134,7 @@ class ChatScreen extends StatelessWidget {
                             Message.fromMap(doc.data!.docs[index].data());
                         final isMe = message.sentToId == appUserId;
                         final isSeen = message.isSeen;
+
                         if (message.type == "Photo" ||
                             message.type == "Qoute") {
                           final prePost = doc.data!.docs[index].data();
@@ -153,6 +155,7 @@ class ChatScreen extends StatelessWidget {
                               isMe: isMe,
                             ),
                           );
+
                           // return Text("sda  $index");
                           // return Container();
                         } else if (message.type == "Text") {
@@ -188,23 +191,32 @@ class ChatScreen extends StatelessWidget {
                               videoPlayerController: videoPlayerController,
                             ),
                           );
-                        } else if (message.type == "story") {
-                          // var story = Story.fromJson(message.content);
+                        } else if (message.type == "story-Video") {
+                          final postModel =
+                              MediaDetails.fromMap(message.content);
+                          print(postModel);
+                          VideoPlayerController videoPlayerController;
+                          videoPlayerController =
+                              VideoPlayerController.network(postModel.link);
+                          // videoPlayerController.initialize();
+                          return ChatVideoTile(
+                            aspectRatio:
+                                videoPlayerController.value.aspectRatio,
+                            appUserId: appUserId,
+                            isSeen: message.isSeen,
+                            isMe: isMe,
+                            date: message.createdAt,
+                            videoPlayerController: videoPlayerController,
+                          );
+                        } else if (message.type == "story-Photo") {
+                          var story = MediaDetails.fromMap(message.content);
 
-                          // var media = story.mediaDetailsList
-                          //     .where((element) => DateTime.parse(element.id)
-                          //         .isAfter(DateTime.now()
-                          //             .subtract(const Duration(hours: 24))))
-                          //     .map((e) => e)
-                          //     .toList();
-                          return Container();
-                          // InkWell(
-                          //     onTap: () => Get.to(() => StoryViewScreen(
-                          //           story: story,
-                          //         )),
-                          //     child: CachedNetworkImage(
-                          //       imageUrl: media.first.link,
-                          //     ));
+                          return ChatStoryTile(
+                            message: message,
+                            appUserId: appUserId,
+                            isSeen: isSeen,
+                            isMe: isMe,
+                          );
                         } else {
                           return Container();
                         }
@@ -582,4 +594,109 @@ class ChatMessage {
     required this.isSendByMe,
     this.separateTime,
   });
+}
+
+class ChatStoryTile extends StatelessWidget {
+  const ChatStoryTile({
+    Key? key,
+    required this.message,
+    required this.appUserId,
+    required this.isMe,
+    required this.isSeen,
+  }) : super(key: key);
+
+  final Message message;
+  final bool isMe;
+  final bool isSeen;
+  final String appUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    final story = MediaDetails.fromMap(message.content);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: isMe ? 70 : 0, right: isMe ? 0 : 70),
+            child: Align(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.r),
+                        topRight: Radius.circular(16.r),
+                        bottomLeft: Radius.circular(
+                          isMe ? 16.r : 0,
+                        ),
+                        bottomRight: Radius.circular(
+                          isMe ? 0 : 16.r,
+                        )),
+                    color: (isMe ? colorF03 : colorFF4),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                  child: Column(
+                    crossAxisAlignment: isMe
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: story.link,
+                        // color: isMe ? color13F : color55F,
+                        // fontWeight: FontWeight.w500,
+                      ),
+                      message.caption != ""
+                          ? const SizedBox(height: 5)
+                          : const SizedBox(
+                              height: 0,
+                            ),
+                      message.caption != ""
+                          ? Text(
+                              message.caption,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            )
+                          : const SizedBox(
+                              height: 0,
+                            )
+                    ],
+                  )),
+            ),
+          ),
+          Align(
+            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                isMe
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 3.w),
+                        child: message.isSeen
+                            ? SvgPicture.asset(icChatMsgSend)
+                            : null,
+                      )
+                    : Container(),
+                TextWidget(
+                  text: timeago.format(
+                    DateTime.parse(
+                      message.createdAt,
+                    ),
+                  ),
+                  color: colorAA3,
+                  fontSize: 11.sp,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
+    );
+  }
 }
