@@ -15,11 +15,13 @@ class CustomDatePicker extends StatefulWidget {
   List<bool> showSelected = [];
   Function dateChangedCallback;
   DateTime? getDateTime;
+  final String? userDateTime;
   CustomDatePicker(
       {Key? key,
       required this.dateChangedCallback,
       required this.showSelected,
-      this.getDateTime})
+      this.getDateTime,
+      this.userDateTime})
       : super(key: key);
 
   @override
@@ -35,9 +37,29 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   List<String> yearList = [];
   List<String> monthList = [];
 
+  String convertDate({inputString, list}) {
+    List<String> dateParts = inputString.split('-');
+
+    if (list == 1) {
+      return dateParts[0];
+    } else if (list == 2) {
+      return dateParts[1];
+    } else {
+      return dateParts[2];
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    if (widget.getDateTime != null) {
+      currentDate = widget.getDateTime!;
+      selectedDay = currentDate.day.toString();
+      selectedMonth = DateFormat.MMM().format(currentDate).toString();
+      selectedYear = currentDate.year.toString();
+
+      widget.dateChangedCallback(currentDate);
+    }
   }
 
   int get daysInMonthConverter {
@@ -54,7 +76,6 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
       widget.dateChangedCallback(currentDate);
     }
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
   }
 
@@ -104,7 +125,9 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                       widget.dateChangedCallback(currentDate);
                     });
                   },
-                  buttonValue: widget.showSelected[0] ? selectedDay : null)
+                  buttonValue: widget.showSelected[0]
+                      ? selectedDay
+                      : convertDate(inputString: widget.userDateTime, list: 1))
               : comp == PickerDateComponent.month
                   ? _dropDowns(
                       hint: strMonth,
@@ -131,8 +154,10 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                           widget.dateChangedCallback(currentDate);
                         });
                       },
-                      buttonValue:
-                          widget.showSelected[1] ? selectedMonth : null)
+                      buttonValue: widget.showSelected[1]
+                          ? selectedMonth
+                          : convertDate(
+                              inputString: widget.userDateTime, list: 2))
                   : _dropDowns(
                       dymList: yearList,
                       hint: strYear,
@@ -160,8 +185,10 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                           widget.dateChangedCallback(currentDate);
                         });
                       },
-                      buttonValue:
-                          widget.showSelected[2] ? selectedYear : null)),
+                      buttonValue: widget.showSelected[2]
+                          ? selectedYear
+                          : convertDate(
+                              inputString: widget.userDateTime, list: 3))),
     );
   }
 

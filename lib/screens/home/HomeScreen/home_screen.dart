@@ -117,8 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           SizedBox(height: 10.w),
           SizedBox(
-            height: 80.h,
+            // height: 80.h,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.only(left: 15.w, right: 15.w),
@@ -298,6 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 log("++++++++++++++++++++++++++++- $data");
                                 return Expanded(
                                   child: ListView.builder(
+                                      // padding: EdgeInsets.only(top: 10.w),
                                       scrollDirection: Axis.horizontal,
                                       itemCount: snapshot.data!.docs.length,
                                       itemBuilder: (context, index) {

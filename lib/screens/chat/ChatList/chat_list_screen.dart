@@ -12,10 +12,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_time_patterns.dart';
 
 // import 'package:intl/intl.dart';s
 import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
+import '../../../widgets/text_widget.dart';
 import '../../dashboard/dashboard.dart';
 import '../../home/HomeScreen/home_screen_controller.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
@@ -77,23 +79,25 @@ class ChatListScreen extends StatelessWidget {
                   unselectedLabelColor: Colors.grey.shade500,
                   tabs: [
                     profileScreenController.isGhostModeOn.value
-                        ? Tab(
-                            child: Text("Ghost Messages",style: TextStyle(
-                                color: colorPrimaryA05,
-                                fontSize: 12),),
+                        ? const Tab(
+                            child: Text(
+                              "Ghost Messages",
+                              style: TextStyle(
+                                  color: colorPrimaryA05, fontSize: 12),
+                            ),
                           )
-                        : Tab(child: Text("Messages")),
+                        : const Tab(child: Text("Messages")),
                     profileScreenController.isGhostModeOn.value
-                        ? Tab(
+                        ? const Tab(
                             child: Text("Messages"),
                           )
-                        : Tab(child: Text("Ghost Messages")),
+                        : const Tab(child: Text("Ghost Messages")),
                   ],
                 ),
                 const SizedBox(height: 5),
                 Expanded(
                   child: TabBarView(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       children: [
                         profileScreenController.isGhostModeOn.value
                             ? const MessageList1()
@@ -251,197 +255,268 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection("users")
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .snapshots(),
-          builder: (context, doc) {
-            if (doc.hasData && doc.data != null) {
-              List followingIds = doc.data!.data()!['followingsIds'];
-              List followerIds = doc.data!.data()!['followersIds'];
-              List userWhoCanMessage = followingIds + followerIds;
-
-              print(
-                  "============== <<<<<<<<<=========>>>>>>>>> user with conversation $userWhoCanMessage");
-              List yes = [];
-              yes = List.generate(userWhoCanMessage.length, (i) async {
-                var ref = await FirebaseFirestore.instance
+        SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
                     .collection("users")
-                    .doc(userWhoCanMessage[i])
-                    .collection("messageList")
-                    .get();
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .collection(profileScreenController.isGhostModeOn.value
+                        ? "ghostMessageList"
+                        : "messageList")
+                    .orderBy("createdAt", descending: true)
+                    .snapshots(),
+                builder: (context, doc) {
+                  if (doc.hasData && doc.data != null) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: doc.data!.docs.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final CreatorDetails creatorDetails =
+                            CreatorDetails.fromMap(
+                                doc.data!.docs[index].data()['creatorDetails']);
+                        final appUserId = doc.data!.docs[index].data()['id'];
+                        final data = doc.data!.docs[index].data();
 
-                return userWhoCanMessage[i];
-              });
-              print(yes);
-              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: userWhoCanMessage.isNotEmpty
-                    ? FirebaseFirestore.instance
-                        .collection("users")
-                        .where("id", whereIn: userWhoCanMessage)
-                        // .orderBy("createdAt", descending: true)
-                        .snapshots()
-                    : null,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data != null) {
+                        return SizedBox(
+                          child: ListTile(
+                            onTap: () {
+                              Get.to(
+                                () => ChatScreen(
+                                  appUserId: appUserId,
+                                  creatorDetails: creatorDetails,
+                                ),
+                              );
+                            },
+                            title: Row(
+                              children: [
+                                profileScreenController.isGhostModeOn.value
+                                    ? const Text(
+                                        "Ghost---",
+                                        style: TextStyle(
+                                            color: colorPrimaryA05,
+                                            fontSize: 12),
+                                      )
+                                    : const SizedBox(),
+                                profileScreenController.isGhostModeOn.value
+                                    ? Text(
+                                        generateRandomString(7),
+                                      )
+                                    : Text(creatorDetails.name),
+                              ],
+                            ),
+                            subtitle: Text(
+                              data['lastMessage'].toString(),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            leading: CircleAvatar(
+                              backgroundImage: creatorDetails.imageUrl.isEmpty
+                                  ? null
+                                  : CachedNetworkImageProvider(
+                                      creatorDetails.imageUrl,
+                                    ),
+                              child: creatorDetails.imageUrl.isEmpty
+                                  ? const Icon(
+                                      Icons.question_mark,
+                                    )
+                                  : null,
+                            ),
+                            trailing: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextWidget(
+                                  text: convertDateIntoTime(
+                                      data['createdAt'].toString()),
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 11,
+                                  color: Colors.black.withOpacity(0.6),
+                                ),
+                                SizedBox(height: 5.h),
+                                data['unreadMessageCount'] == 0
+                                    ? const Icon(Icons.navigate_next)
+                                    : data['unreadMessageCount'].toString() ==
+                                            "0"
+                                        ? const Text("")
+                                        : Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: const BoxDecoration(
+                                                color: Colors.teal,
+                                                shape: BoxShape.circle),
+                                            child: Text(
+                                              data['unreadMessageCount']
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else if (doc.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
+              const Divider(),
+              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
+                builder: (context, doc) {
+                  if (doc.hasData && doc.data != null) {
+                    List followingIds = doc.data!.data()!['followingsIds'];
+                    List followerIds = doc.data!.data()!['followersIds'];
+                    List userWhoCanMessage = followingIds + followerIds;
+
                     print(
-                        "========================= ======== ======= $userWhoCanMessage");
-                    if (userWhoCanMessage.isNotEmpty) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.docs.length,
-                        padding: const EdgeInsets.only(bottom: 85),
-                        itemBuilder: (context, index) {
-                          final UserModel userMmessage = UserModel.fromMap(
-                              snapshot.data!.docs[index].data());
-                          final CreatorDetails creatorDetails =
-                              CreatorDetails.fromMap(
-                                  snapshot.data!.docs[index].data());
+                        "============== <<<<<<<<<=========>>>>>>>>> user with conversation $userWhoCanMessage");
 
-                          return SizedBox(
-                            height: 70,
-                            child: ListTile(
-                              onTap: () {
-                                Get.to(
-                                  () => ChatScreen(
-                                    appUserId: userMmessage.id,
-                                    creatorDetails: creatorDetails,
-                                  ),
+                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: userWhoCanMessage.isNotEmpty
+                          ? FirebaseFirestore.instance
+                              .collection("users")
+                              .where("id", whereIn: userWhoCanMessage)
+                              .snapshots()
+                          : null,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          print(
+                              "========================= ======== ======= $userWhoCanMessage");
+                          if (userWhoCanMessage.isNotEmpty) {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data!.docs.length,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: const EdgeInsets.only(bottom: 85),
+                              itemBuilder: (context, index) {
+                                final UserModel userMmessage =
+                                    UserModel.fromMap(
+                                        snapshot.data!.docs[index].data());
+                                final CreatorDetails creatorDetails =
+                                    CreatorDetails.fromMap(
+                                        snapshot.data!.docs[index].data());
+
+                                return StreamBuilder<DocumentSnapshot<Map>>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection("users")
+                                      .doc(FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                      .collection(profileScreenController
+                                              .isGhostModeOn.value
+                                          ? "ghostMessageList"
+                                          : "messageList")
+                                      .doc(userMmessage.id)
+                                      .snapshots(),
+                                  builder: (context, d) {
+                                    if (d.hasData && d.data!.exists) {
+                                      return Container();
+                                    } else {
+                                      return SizedBox(
+                                        height: 70,
+                                        child: ListTile(
+                                          onTap: () {
+                                            Get.to(
+                                              () => ChatScreen(
+                                                appUserId: userMmessage.id,
+                                                creatorDetails: creatorDetails,
+                                              ),
+                                            );
+                                          },
+                                          title: Row(
+                                            children: [
+                                              profileScreenController
+                                                      .isGhostModeOn.value
+                                                  ? const Text(
+                                                      "Ghost---",
+                                                      style: TextStyle(
+                                                          color:
+                                                              colorPrimaryA05,
+                                                          fontSize: 12),
+                                                    )
+                                                  : const SizedBox(),
+                                              profileScreenController
+                                                      .isGhostModeOn.value
+                                                  ? Text(
+                                                      generateRandomString(7),
+                                                    )
+                                                  : Text(userMmessage.name),
+                                            ],
+                                          ),
+                                          subtitle: Text(
+                                            'Start a conversation with ${profileScreenController.isGhostModeOn.value ? "Ghost" : userMmessage.name}',
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          leading: CircleAvatar(
+                                            backgroundImage:
+                                                profileScreenController
+                                                        .isGhostModeOn.value
+                                                    ? null
+                                                    : CachedNetworkImageProvider(
+                                                        userMmessage.imageStr,
+                                                      ),
+                                            child: profileScreenController
+                                                    .isGhostModeOn.value
+                                                ? const Icon(
+                                                    Icons.question_mark,
+                                                  )
+                                                : null,
+                                          ),
+                                          trailing:
+                                              const Icon(Icons.navigate_next),
+                                        ),
+                                      );
+                                    }
+                                  },
                                 );
                               },
-                              title: Row(
-                                children: [
-                                  profileScreenController.isGhostModeOn.value
-                                      ? Text(
-                                          "Ghost---",
-                                          style: TextStyle(
-                                              color: colorPrimaryA05,
-                                              fontSize: 12),
-                                        )
-                                      : SizedBox(),
-                                  profileScreenController.isGhostModeOn.value
-                                      ? Text(
-                                          generateRandomString(7),
-                                        )
-                                      : Text(userMmessage.name),
-                                ],
+                            );
+                          } else {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 40),
+                                child: Text(
+                                  "Please start follow people to start conversation with them",
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                              subtitle: StreamBuilder<DocumentSnapshot<Map>>(
-                                stream: FirebaseFirestore.instance
-                                    .collection("users")
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .collection("messageList")
-                                    .doc(userMmessage.id)
-                                    .snapshots(),
-                                builder: (context, d) {
-                                  if (d.hasData && d.data!.exists) {
-                                    print("hello");
-                                    print(d.data!.data()!['lastMessage']);
-                                    var data = d.data!.data()!['lastMessage'];
-                                    return Text(
-                                      data!.toString(),
-                                      overflow: TextOverflow.ellipsis,
-                                    );
-                                  } else {
-                                    return Text(
-                                      'Start a conversation with ${userMmessage.name}',
-                                      overflow: TextOverflow.ellipsis,
-                                    );
-                                  }
-                                },
-                              ),
-                              leading: CircleAvatar(
-                                backgroundImage: userMmessage.imageStr.isEmpty
-                                    ? null
-                                    : CachedNetworkImageProvider(
-                                        userMmessage.imageStr,
-                                      ),
-                                child: userMmessage.imageStr.isEmpty
-                                    ? const Icon(
-                                        Icons.question_mark,
-                                      )
-                                    : null,
-                              ),
-                              trailing: StreamBuilder<DocumentSnapshot<Map>>(
-                                stream: FirebaseFirestore.instance
-                                    .collection("users")
-                                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    .collection("messageList")
-                                    .doc(userMmessage.id)
-                                    .snapshots(),
-                                builder: (context, d) {
-                                  if (d.hasData && d.data!.exists) {
-                                    print("hello");
-                                    print(d.data!.data()!['createdAt']);
-                                    var data = d.data!.data()!;
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(convertDateIntoTime(
-                                            data['createdAt'].toString())),
-                                        data['unreadMessageCount'].toString() ==
-                                                "0"
-                                            ? const Text("")
-                                            : Container(
-                                                padding:
-                                                    const EdgeInsets.all(6),
-                                                decoration: const BoxDecoration(
-                                                    color: Colors.teal,
-                                                    shape: BoxShape.circle),
-                                                child: Text(
-                                                  data['unreadMessageCount']
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                ),
-                                              ),
-                                      ],
-                                    );
-                                  } else {
-                                    return const Icon(Icons.navigate_next);
-                                  }
-                                },
+                            );
+                          }
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40),
+                              child: Text(
+                                "Please start follow people to start conversation with them",
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           );
-                        },
-                      );
-                    } else {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Text(
-                            "Please start follow people to start conversation with them",
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      );
-                    }
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40),
-                        child: Text(
-                          "Please start follow people to start conversation with them",
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                        }
+                      },
                     );
+                  } else {
+                    return const CircularProgressIndicator();
                   }
                 },
-              );
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
+              ),
+              const SizedBox(height: 90)
+            ],
+          ),
         ),
         Visibility(
           visible: isLoading,

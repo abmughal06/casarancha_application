@@ -66,6 +66,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     var name = widget.currentUser.name.split(' ');
 
     _selectedDob = widget.currentUser.dob;
+    _getDateTime = DateTime.parse(_selectedDob!);
+
     _profileImage = widget.currentUser.imageStr;
 
     _firstNameController = TextEditingController(text: name.first);
@@ -268,8 +270,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 heightBox(10.w),
                 CustomDatePicker(
-                  getDateTime: _getDateTime,
+                  getDateTime: _getDateTime!,
                   showSelected: showSelectedDates,
+                  userDateTime: widget.currentUser.dob,
                   dateChangedCallback: (DateTime value) {
                     _getDateTime = value;
                     _selectedDob =

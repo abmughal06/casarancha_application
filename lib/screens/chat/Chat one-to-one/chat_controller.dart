@@ -76,13 +76,17 @@ class ChatController extends GetxController {
     }
     try {
       final messageRefForCurrentUser = currentUserRef
-          .collection('messageList')
+          .collection(profileScreenController.isGhostModeOn.value
+              ? "ghostMessageList"
+              : 'messageList')
           .doc(appUserId)
           .collection('messages')
           .doc();
 
       final messageRefForAppUser = appUserRef
-          .collection('messageList')
+          .collection(profileScreenController.isGhostModeOn.value
+              ? "ghostMessageList"
+              : 'messageList')
           .doc(currentUserId)
           .collection('messages')
           .doc(
@@ -124,11 +128,21 @@ class ChatController extends GetxController {
       );
 
       if (!isChatExits.value) {
-        await currentUserRef.collection('messageList').doc(appUserId).set(
+        await currentUserRef
+            .collection(profileScreenController.isGhostModeOn.value
+                ? "ghostMessageList"
+                : 'messageList')
+            .doc(appUserId)
+            .set(
               appUserMessageDetails.toMap(),
             );
 
-        await appUserRef.collection('messageList').doc(currentUserId).set(
+        await appUserRef
+            .collection(profileScreenController.isGhostModeOn.value
+                ? "ghostMessageList"
+                : 'messageList')
+            .doc(currentUserId)
+            .set(
               currentUserMessageDetails.toMap(),
             );
 
@@ -175,7 +189,12 @@ class ChatController extends GetxController {
       );
 
       if (isChatExits.value) {
-        appUserRef.collection('messageList').doc(currentUserId).update(
+        appUserRef
+            .collection(profileScreenController.isGhostModeOn.value
+                ? "ghostMessageList"
+                : 'messageList')
+            .doc(currentUserId)
+            .update(
               currentUserMessageDetails.toMap(),
             );
         unreadMessages += 1;
@@ -188,7 +207,12 @@ class ChatController extends GetxController {
   }
 
   Future<void> resetMessageCount() async {
-    currentUserRef.collection('messageList').doc(appUserId).update({
+    currentUserRef
+        .collection(profileScreenController.isGhostModeOn.value
+            ? "ghostMessageList"
+            : 'messageList')
+        .doc(appUserId)
+        .update({
       'unreadMessageCount': 0,
     });
   }
