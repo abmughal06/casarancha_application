@@ -1,14 +1,7 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/story_model.dart';
-import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/widgets/home_page_widgets.dart';
-import 'package:casarancha/widgets/text_editing_widget.dart';
-import 'package:casarancha/widgets/video_player_Url.dart';
 import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,9 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:story_view/story_view.dart';
-import 'package:story_viewer/models/story_item.dart';
-import 'package:story_viewer/viewer.dart';
+
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
 
@@ -30,7 +21,6 @@ import '../../resources/firebase_cloud_messaging.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
-import '../../widgets/clip_pad_shadow.dart';
 import '../../widgets/common_widgets.dart';
 import '../chat/GhostMode/ghost_chat_screen.dart';
 
@@ -288,7 +278,7 @@ class StoryViewScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StoryViewScreenState createState() => _StoryViewScreenState();
+  State<StoryViewScreen> createState() => _StoryViewScreenState();
 }
 
 class _StoryViewScreenState extends State<StoryViewScreen>
@@ -364,6 +354,8 @@ class _StoryViewScreenState extends State<StoryViewScreen>
               itemCount: storyList.length,
               onPageChanged: (c) {
                 _videoController!.pause();
+                _animController.reset();
+                _animController.forward();
               },
               itemBuilder: (context, i) {
                 final MediaDetails story = storyList[i];
