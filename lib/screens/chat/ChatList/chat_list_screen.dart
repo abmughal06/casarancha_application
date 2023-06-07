@@ -288,6 +288,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                 () => ChatScreen(
                                   appUserId: appUserId,
                                   creatorDetails: creatorDetails,
+                                  profileScreenController:
+                                      profileScreenController,
                                 ),
                               );
                             },
@@ -431,6 +433,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                               () => ChatScreen(
                                                 appUserId: userMmessage.id,
                                                 creatorDetails: creatorDetails,
+                                                profileScreenController:
+                                                    profileScreenController,
                                               ),
                                             );
                                           },

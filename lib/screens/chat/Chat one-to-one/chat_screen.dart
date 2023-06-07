@@ -11,7 +11,9 @@ import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/story_view_screen.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -28,14 +30,21 @@ import '../../../resources/strings.dart';
 import '../../../widgets/clip_pad_shadow.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/text_widget.dart';
+import '../../profile/AppUser/app_user_controller.dart';
+import '../../profile/AppUser/app_user_screen.dart';
+import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../audio_call_screen.dart';
 
 class ChatScreen extends StatelessWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
+  final ProfileScreenController? profileScreenController;
 
   const ChatScreen(
-      {Key? key, required this.appUserId, required this.creatorDetails})
+      {Key? key,
+      required this.appUserId,
+      required this.creatorDetails,
+      this.profileScreenController})
       : super(key: key);
 
   @override
@@ -67,6 +76,19 @@ class ChatScreen extends StatelessWidget {
               if (snapshot.hasData) {
                 UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
                 return ListTile(
+                    onTap: () {
+                      Get.to(
+                        () => AppUserScreen(
+                          appUserController: Get.put(
+                            AppUserController(
+                              appUserId: appUserId,
+                              currentUserId:
+                                  FirebaseAuth.instance.currentUser!.uid,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                     contentPadding: EdgeInsets.zero,
                     title: Text(userModel.name),
                     subtitle: snapshot.hasData ? const Text('Live') : null,
@@ -92,9 +114,10 @@ class ChatScreen extends StatelessWidget {
             child: svgImgButton(
                 svgIcon: icChatVideo,
                 onTap: () {
-                  Get.to(
-                    () => const VideoCallScreen(),
-                  );
+                  // Get.to(
+                  //   () => const VideoCallScreen(),
+                  // );
+                  GlobalSnackBar.show(message: "Comming Soon");
                 }),
           ),
           Padding(
@@ -102,9 +125,10 @@ class ChatScreen extends StatelessWidget {
             child: svgImgButton(
                 svgIcon: icChatCall,
                 onTap: () {
-                  Get.to(
-                    () => const AudioCallScreen(),
-                  );
+                  // Get.to(
+                  //   () => const AudioCallScreen(),
+                  // );
+                  GlobalSnackBar.show(message: "Comming Soon");
                 }),
           ),
         ],
@@ -113,7 +137,9 @@ class ChatScreen extends StatelessWidget {
         children: [
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: chatController.currentUserRef
-                .collection('messageList')
+                .collection(profileScreenController!.isGhostModeOn.value
+                    ? "ghostMessageList"
+                    : 'messageList')
                 .doc(appUserId)
                 .collection(
                   'messages',

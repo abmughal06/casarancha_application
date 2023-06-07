@@ -34,6 +34,7 @@ class AppUserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
         body: Obx(
           () => appUserController.isGettingUserData.value
@@ -46,7 +47,8 @@ class AppUserScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 5, right: 10),
+                            padding: const EdgeInsets.only(
+                                left: 5, right: 10, top: 40),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

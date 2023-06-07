@@ -308,8 +308,8 @@ class _StoryViewScreenState extends State<StoryViewScreen>
     _animController = AnimationController(vsync: this);
 
     storyList = widget.story.mediaDetailsList
-        .where(
-            (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
+        // .where(
+        //     (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
         .map((e) => e)
         .toList();
     print(storyList);
@@ -731,10 +731,10 @@ class _StoryViewScreenState extends State<StoryViewScreen>
       //   } else {
       //     print('4444444444');
 
-      //     // Out of bounds - loop story
-      //     Get.back();
-      //     // _currentIndex = 0;
-      //     // _loadStory(story: widget.story.mediaDetailsList[_currentIndex]);
+      // Out of bounds - loop story
+      Get.back();
+      // _currentIndex = 0;
+      // _loadStory(story: widget.story.mediaDetailsList[_currentIndex]);
       //   }
       // });
       _animController.stop();
@@ -770,7 +770,9 @@ class _StoryViewScreenState extends State<StoryViewScreen>
           ..initialize().then((_) {
             setState(() {});
             if (_videoController!.value.isInitialized) {
-              _animController.duration = _videoController!.value.duration;
+              _animController.duration = const Duration(
+                seconds: 15,
+              );
               // _videoController!.play();
               _animController.forward();
             }
