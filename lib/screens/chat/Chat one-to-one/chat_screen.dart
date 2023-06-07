@@ -33,26 +33,30 @@ import '../../../widgets/text_widget.dart';
 import '../../profile/AppUser/app_user_controller.dart';
 import '../../profile/AppUser/app_user_screen.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
+import '../ChatList/chat_list_controller.dart';
 import '../audio_call_screen.dart';
 
 class ChatScreen extends StatelessWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
   final ProfileScreenController? profileScreenController;
+  final String? val;
 
-  const ChatScreen(
-      {Key? key,
-      required this.appUserId,
-      required this.creatorDetails,
-      this.profileScreenController})
-      : super(key: key);
+  const ChatScreen({
+    Key? key,
+    required this.appUserId,
+    required this.creatorDetails,
+    this.profileScreenController,
+    this.val,
+    //required this.indexId
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final ChatController chatController = Get.put(
       ChatController(appUserId: appUserId, creatorDetails: creatorDetails),
     );
-
+    final ChatListController chatListController = Get.find();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -90,15 +94,19 @@ class ChatScreen extends StatelessWidget {
                       );
                     },
                     contentPadding: EdgeInsets.zero,
-                    title: Text(userModel.name),
+                    title: profileScreenController!.isGhostModeOn.value
+                        ? Text(val.toString())
+                        : Text(userModel.name),
                     subtitle: snapshot.hasData ? const Text('Live') : null,
                     leading: CircleAvatar(
-                      backgroundImage: userModel.imageStr.isEmpty
+                      backgroundImage: userModel.imageStr.isEmpty ||
+                              profileScreenController!.isGhostModeOn.value
                           ? null
                           : CachedNetworkImageProvider(
                               userModel.imageStr,
                             ),
-                      child: userModel.imageStr.isEmpty
+                      child: userModel.imageStr.isEmpty ||
+                              profileScreenController!.isGhostModeOn.value
                           ? const Icon(
                               Icons.question_mark,
                             )
@@ -614,6 +622,7 @@ class ChatMessage {
   String time;
   bool isSendByMe;
   String? separateTime;
+
   ChatMessage({
     required this.msgText,
     required this.time,

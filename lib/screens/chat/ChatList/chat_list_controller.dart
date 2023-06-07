@@ -9,7 +9,7 @@ class ChatListController extends GetxController {
       Get.find<ProfileScreenController>();
 
   TextEditingController searchController = TextEditingController();
-
+  var encodeName ="";
   var searchQuery = ''.obs;
 
   List<String> get searchCharacters {
