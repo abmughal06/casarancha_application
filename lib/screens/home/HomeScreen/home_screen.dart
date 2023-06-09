@@ -106,21 +106,131 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           SizedBox(height: 10.w),
           SizedBox(
-            // height: 65.h,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                  child: StreamBuilder<DocumentSnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection("stories")
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        log("======================== daldjalsdjlsdasl  ${snapshot.data}");
-                        if (snapshot.hasData && snapshot.data != null) {
-                          if (snapshot.data!.data() == null) {
+            // color: Colors.red,
+            height: 85.h,
+            child: Padding(
+              padding: EdgeInsets.all(1.h),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.w, right: 15.w),
+                    child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection("stories")
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          log("======================== daldjalsdjlsdasl  ${snapshot.data}");
+                          if (snapshot.hasData && snapshot.data != null) {
+                            if (snapshot.data!.data() == null) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Get.to(() => AddStoryScreen());
+                                },
+                                child: SvgPicture.asset(
+                                  icProfileAdd,
+                                  height: 50.h,
+                                  width: 50.w,
+                                ),
+                              );
+                            } else {
+                              log("==================== snapshot has data");
+                              // var listofData = snapshot.data!.docs;
+                              // log(snapshot.data!.data());
+                              dynamic map;
+                              Story? story;
+
+                              // var data = snapshot.data!.data();
+                              // if (snapshot.data!.docs.isNotEmpty) {
+
+                              map = snapshot.data!.data();
+                              story = Story.fromMap(map);
+
+                              DateTime? givenDate;
+                              for (int i = 0;
+                                  i < story.mediaDetailsList.length;
+                                  i++) {
+                                givenDate = DateTime.parse(
+                                    story.mediaDetailsList[i].id);
+                              }
+
+                              DateTime twentyFourHoursAgo = DateTime.now()
+                                  .subtract(const Duration(hours: 24));
+                              log(" ========== $twentyFourHoursAgo");
+
+                              return Column(
+                                // mainAxisAlignment:
+                                // MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Stack(
+                                    children: [
+                                      givenDate!.isAfter(twentyFourHoursAgo)
+                                          ? InkWell(
+                                              onTap: () {
+                                                Get.to(() => StoryViewScreen(
+                                                    story: story!));
+                                              },
+                                              child: CircleAvatar(
+                                                minRadius: 25,
+                                                backgroundImage: NetworkImage(
+                                                    map!["creatorDetails"]
+                                                        ['imageUrl']),
+                                              ),
+                                            )
+                                          : InkWell(
+                                              onTap: () {
+                                                Get.to(() => AddStoryScreen());
+                                              },
+                                              child: SvgPicture.asset(
+                                                icProfileAdd,
+                                                height: 50.h,
+                                                width: 50.w,
+                                              ),
+                                            ),
+                                      givenDate.isAfter(twentyFourHoursAgo)
+                                          ? Positioned(
+                                              right: -2,
+                                              bottom: -2,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Get.to(
+                                                      () => AddStoryScreen());
+                                                },
+                                                child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: colorPrimaryA05,
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.add,
+                                                      color: Colors.white,
+                                                      size: 18,
+                                                    )),
+                                              ))
+                                          : Container(),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  const Text(
+                                    "Your Story",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 10),
+                                  )
+                                ],
+                              );
+                            }
+                          } else if (snapshot.hasError) {
+                            return const Text("Here");
+                          } else if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else {
                             return GestureDetector(
                               onTap: () {
                                 Get.to(() => AddStoryScreen());
@@ -131,250 +241,152 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: 50.w,
                               ),
                             );
-                          } else {
-                            log("==================== snapshot has data");
-                            // var listofData = snapshot.data!.docs;
-                            // log(snapshot.data!.data());
-                            dynamic map;
-                            Story? story;
-
-                            // var data = snapshot.data!.data();
-                            // if (snapshot.data!.docs.isNotEmpty) {
-
-                            map = snapshot.data!.data();
-                            story = Story.fromMap(map);
-
-                            DateTime? givenDate;
-                            for (int i = 0;
-                                i < story.mediaDetailsList.length;
-                                i++) {
-                              givenDate =
-                                  DateTime.parse(story.mediaDetailsList[i].id);
-                            }
-
-                            DateTime twentyFourHoursAgo = DateTime.now()
-                                .subtract(const Duration(hours: 24));
-                            log(" ========== $twentyFourHoursAgo");
-
-                            return Column(
-                              children: [
-                                Stack(
-                                  children: [
-                                    givenDate!.isAfter(twentyFourHoursAgo)
-                                        ? InkWell(
-                                            onTap: () {
-                                              Get.to(() => StoryViewScreen(
-                                                  story: story!));
-                                            },
-                                            child: CircleAvatar(
-                                              minRadius: 25,
-                                              backgroundImage: NetworkImage(
-                                                  map!["creatorDetails"]
-                                                      ['imageUrl']),
-                                            ),
-                                          )
-                                        : InkWell(
-                                            onTap: () {
-                                              Get.to(() => AddStoryScreen());
-                                            },
-                                            child: SvgPicture.asset(
-                                              icProfileAdd,
-                                              height: 50.h,
-                                              width: 50.w,
-                                            ),
-                                          ),
-                                    givenDate.isAfter(twentyFourHoursAgo)
-                                        ? Positioned(
-                                            right: -2,
-                                            bottom: -2,
-                                            child: InkWell(
-                                              onTap: () {
-                                                Get.to(() => AddStoryScreen());
-                                              },
-                                              child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(2.0),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: colorPrimaryA05,
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.add,
-                                                    color: Colors.white,
-                                                    size: 18,
-                                                  )),
-                                            ))
-                                        : Container(),
-                                  ],
-                                ),
-                                const SizedBox(height: 3),
-                                const Text(
-                                  "Your Story",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 10),
-                                )
-                              ],
-                            );
+                            // return  Text('Story');
                           }
-                        } else if (snapshot.hasError) {
-                          return const Text("Here");
-                        } else if (!snapshot.hasData) {
+                        }),
+                  ),
+                  StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .snapshots(),
+                      builder: (context, snap) {
+                        if (snap.hasData && snap.data!.exists) {
+                          var userData = snap.data!.data();
+
+                          if (userData!['followingsIds'] != [] &&
+                              userData['followersIds'] != null) {
+                            followingIds = userData['followingsIds'] != []
+                                ? userData['followingsIds']
+                                : [];
+
+                            followerIds = userData['followersIds'] != []
+                                ? userData['followersIds']
+                                : [];
+                            log(followingIds.toString());
+                            log(followerIds.toString());
+                            List storyIds = !homeScreenController
+                                    .profileScreenController.isGhostModeOn.value
+                                ? followingIds
+                                : followerIds + followingIds;
+
+                            log("storyiD ===============$storyIds");
+                            // return Container();
+                            return StreamBuilder<
+                                QuerySnapshot<Map<String, dynamic>>>(
+                              stream: storyIds.isEmpty
+                                  ? FirebaseFirestore.instance
+                                      .collection("stories")
+                                      .where("creatorId",
+                                          arrayContains: storyIds)
+                                      .snapshots()
+                                  : FirebaseFirestore.instance
+                                      .collection("stories")
+                                      .where(
+                                        "creatorId",
+                                        whereIn: storyIds,
+                                      )
+                                      .snapshots(),
+                              builder: (context, snapshot) {
+                                log(DateTime.now().toIso8601String());
+                                if (snapshot.hasData && snapshot.data != null) {
+                                  final data = snapshot.data!.docs;
+                                  // double progress =
+                                  // data.bytesTransferred / data.totalBytes;
+                                  log("++++++++++++++++++++++++++++- $data");
+                                  return Expanded(
+                                    child: ListView.builder(
+                                        // padding: EdgeInsets.only(top: 10.w),
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: snapshot.data!.docs.length,
+                                        itemBuilder: (context, index) {
+                                          var storyData = data[index].data();
+
+                                          Story story =
+                                              Story.fromMap(storyData);
+                                          DateTime? givenDate;
+                                          for (int i = 0;
+                                              i < story.mediaDetailsList.length;
+                                              i++) {
+                                            givenDate = DateTime.parse(
+                                                story.mediaDetailsList[i].id);
+                                          }
+
+                                          DateTime twentyFourHoursAgo =
+                                              DateTime.now().subtract(
+                                                  const Duration(hours: 24));
+                                          log(" ========== $twentyFourHoursAgo");
+                                          if (givenDate!
+                                              .isBefore(twentyFourHoursAgo)) {
+                                            return Container();
+                                          } else {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 12),
+                                              child: Column(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Get.to(
+                                                        () => StoryViewScreen(
+                                                            story: story),
+                                                      );
+                                                    },
+                                                    child: CircleAvatar(
+                                                      minRadius: 25,
+                                                      backgroundImage:
+                                                          NetworkImage(story
+                                                              .creatorDetails
+                                                              .imageUrl),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 3),
+                                                  Text(
+                                                    getFirstName(story
+                                                        .creatorDetails.name),
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                        }),
+                                  );
+
+                                  // return Stack(
+                                  //   children: [
+                                  //     LinearProgressIndicator(
+                                  //       value: progress,
+                                  //     ),
+                                  //     Center(
+                                  //       child: Text(
+                                  //         '${(100 * progress).roundToDouble()}%',
+                                  //       ),
+                                  //     )
+                                  //   ],
+                                  // );
+                                } else {
+                                  return const SizedBox(
+                                    height: 50,
+                                  );
+                                }
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                          // return Text(snap.data!.data()!['followingsIds']);
+                        } else {
                           return const Center(
                               child: CircularProgressIndicator());
-                        } else {
-                          return GestureDetector(
-                            onTap: () {
-                              Get.to(() => AddStoryScreen());
-                            },
-                            child: SvgPicture.asset(
-                              icProfileAdd,
-                              height: 50.h,
-                              width: 50.w,
-                            ),
-                          );
-                          // return  Text('Story');
                         }
-                      }),
-                ),
-                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                    stream: FirebaseFirestore.instance
-                        .collection("users")
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .snapshots(),
-                    builder: (context, snap) {
-                      if (snap.hasData && snap.data!.exists) {
-                        var userData = snap.data!.data();
-
-                        if (userData!['followingsIds'] != [] &&
-                            userData['followersIds'] != null) {
-                          followingIds = userData['followingsIds'] != []
-                              ? userData['followingsIds']
-                              : [];
-
-                          followerIds = userData['followersIds'] != []
-                              ? userData['followersIds']
-                              : [];
-                          log(followingIds.toString());
-                          log(followerIds.toString());
-                          List storyIds = !homeScreenController
-                                  .profileScreenController.isGhostModeOn.value
-                              ? followingIds
-                              : followerIds + followingIds;
-
-                          log("storyiD ===============$storyIds");
-                          // return Container();
-                          return StreamBuilder<
-                              QuerySnapshot<Map<String, dynamic>>>(
-                            stream: storyIds.isEmpty
-                                ? FirebaseFirestore.instance
-                                    .collection("stories")
-                                    .where("creatorId", arrayContains: storyIds)
-                                    .snapshots()
-                                : FirebaseFirestore.instance
-                                    .collection("stories")
-                                    .where(
-                                      "creatorId",
-                                      whereIn: storyIds,
-                                    )
-                                    .snapshots(),
-                            builder: (context, snapshot) {
-                              log(DateTime.now().toIso8601String());
-                              if (snapshot.hasData && snapshot.data != null) {
-                                final data = snapshot.data!.docs;
-                                // double progress =
-                                // data.bytesTransferred / data.totalBytes;
-                                log("++++++++++++++++++++++++++++- $data");
-                                return Expanded(
-                                  child: ListView.builder(
-                                      // padding: EdgeInsets.only(top: 10.w),
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: snapshot.data!.docs.length,
-                                      itemBuilder: (context, index) {
-                                        var storyData = data[index].data();
-
-                                        Story story = Story.fromMap(storyData);
-                                        DateTime? givenDate;
-                                        for (int i = 0;
-                                            i < story.mediaDetailsList.length;
-                                            i++) {
-                                          givenDate = DateTime.parse(
-                                              story.mediaDetailsList[i].id);
-                                        }
-
-                                        DateTime twentyFourHoursAgo =
-                                            DateTime.now().subtract(
-                                                const Duration(hours: 24));
-                                        log(" ========== $twentyFourHoursAgo");
-                                        if (givenDate!
-                                            .isBefore(twentyFourHoursAgo)) {
-                                          return Container();
-                                        } else {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 12),
-                                            child: Column(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    Get.to(
-                                                      () => StoryViewScreen(
-                                                          story: story),
-                                                    );
-                                                  },
-                                                  child: CircleAvatar(
-                                                    minRadius: 25,
-                                                    backgroundImage:
-                                                        NetworkImage(story
-                                                            .creatorDetails
-                                                            .imageUrl),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 3),
-                                                Text(
-                                                  getFirstName(story
-                                                      .creatorDetails.name),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 10,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                      }),
-                                );
-
-                                // return Stack(
-                                //   children: [
-                                //     LinearProgressIndicator(
-                                //       value: progress,
-                                //     ),
-                                //     Center(
-                                //       child: Text(
-                                //         '${(100 * progress).roundToDouble()}%',
-                                //       ),
-                                //     )
-                                //   ],
-                                // );
-                              } else {
-                                return const SizedBox(
-                                  height: 50,
-                                );
-                              }
-                            },
-                          );
-                        } else {
-                          return Container();
-                        }
-                        // return Text(snap.data!.data()!['followingsIds']);
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    })
-              ],
+                      })
+                ],
+              ),
             ),
           ),
           SizedBox(height: 10.w),
