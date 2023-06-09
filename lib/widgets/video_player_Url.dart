@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class VideoPlayerUrl extends StatefulWidget {
   VideoPlayerUrl({
@@ -26,9 +27,12 @@ class VideoPlayerUrl extends StatefulWidget {
 
 class _VideoPlayerUrlState extends State<VideoPlayerUrl>
     with AutomaticKeepAliveClientMixin {
-  VideoPlayerController? videoPlayerController;
+  late VideoPlayerController videoPlayerController;
 
   late ChewieController chewieController;
+  bool isPlaying = false;
+  bool isVisible = false;
+  bool isMuted = true;
 
   @override
   void initState() {
@@ -42,8 +46,20 @@ class _VideoPlayerUrlState extends State<VideoPlayerUrl>
     } else {
       videoPlayerController = widget.videoPlayerController!;
     }
+    videoPlayerController =
+        VideoPlayerController.network(widget.mediaDetails.link)
+          ..initialize().then((_) async {
+            // Future.delayed(const Duration(seconds: 3));
+            setState(() {
+              isPlaying = true;
+
+              videoPlayerController.setVolume(0.0); // Mute the video initially
+              videoPlayerController.addListener(_videoPlayerListener);
+            });
+          });
     chewieController = ChewieController(
-        videoPlayerController: videoPlayerController!,
+        videoPlayerController: videoPlayerController,
+        allowMuting: true,
         showOptions: false,
         autoPlay: false,
         allowPlaybackSpeedChanging: false,
@@ -59,18 +75,42 @@ class _VideoPlayerUrlState extends State<VideoPlayerUrl>
         looping: false);
   }
 
+  void _videoPlayerListener() {
+    if (isPlaying && isVisible && isMuted) {
+      videoPlayerController.setVolume(1.0); // Enable sound when visible
+      isMuted = false;
+    }
+  }
+
   @override
   void dispose() {
-    videoPlayerController?.dispose();
+    videoPlayerController.dispose();
     chewieController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Chewie(
-        controller:
-            chewieController); /* Stack(
+    return VisibilityDetector(
+      key: Key(widget.mediaDetails.link),
+      onVisibilityChanged: (visibilityInfo) {
+        setState(() {
+          isVisible = visibilityInfo.visibleFraction == 1.0;
+          if (isVisible) {
+            videoPlayerController.play();
+            isPlaying = true;
+            // isMuted = false;
+            videoPlayerController.setVolume(1.0);
+          } else {
+            videoPlayerController.pause();
+            // isMuted = true;
+            isPlaying = false;
+            videoPlayerController.setVolume(0.0);
+          }
+        });
+      },
+      child: Chewie(controller: chewieController),
+    ); /* Stack(
       children: [
         (videoPlayerController?.value.isInitialized ?? false)
             ? VideoPlayer(videoPlayerController!)
@@ -113,22 +153,38 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  VideoPlayerController? videoPlayerController;
+  late VideoPlayerController videoPlayerController;
+  bool isPlaying = false;
+  bool isVisible = false;
+  bool isMuted = true;
 
   late ChewieController chewieController;
   @override
   void initState() {
     super.initState();
-    if (widget.videoPlayerController == null) {
-      videoPlayerController = VideoPlayerController.network(widget.videoUrl);
-    } else {
-      videoPlayerController = widget.videoPlayerController!;
-    }
+    // if (widget.videoPlayerController == null) {
+    //   videoPlayerController = VideoPlayerController.network(widget.videoUrl);
+    // } else {
+    //   videoPlayerController = widget.videoPlayerController!;
+    // }
+
+    videoPlayerController = VideoPlayerController.network(widget.videoUrl)
+      ..initialize().then((_) async {
+        // Future.delayed(const Duration(seconds: 3));
+        setState(() {
+          isPlaying = true;
+
+          videoPlayerController.setVolume(0.0); // Mute the video initially
+          videoPlayerController.addListener(_videoPlayerListener);
+        });
+      });
+
     chewieController = ChewieController(
-        videoPlayerController: videoPlayerController!,
+        // allowMuting: true,
+        videoPlayerController: videoPlayerController,
         showOptions: false,
         autoPlay: false,
-        allowPlaybackSpeedChanging: false,
+        allowPlaybackSpeedChanging: true,
         autoInitialize: true,
         showControlsOnInitialize: true,
         allowFullScreen: true,
@@ -138,18 +194,40 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         looping: false);
   }
 
+  void _videoPlayerListener() {
+    if (isPlaying && isVisible && isMuted) {
+      videoPlayerController.setVolume(1.0); // Enable sound when visible
+      isMuted = false;
+    }
+  }
+
   @override
   void dispose() {
-    videoPlayerController?.dispose();
+    videoPlayerController.dispose();
     chewieController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Chewie(
-        controller:
-            chewieController); /* Stack(
+    return VisibilityDetector(
+      key: Key(widget.videoUrl),
+      onVisibilityChanged: (visibilityInfo) {
+        setState(() {
+          isVisible = visibilityInfo.visibleFraction > 0.5;
+          if (isVisible) {
+            videoPlayerController.play();
+            isPlaying = true;
+            videoPlayerController.setVolume(1.0);
+          } else {
+            videoPlayerController.pause();
+            isPlaying = false;
+            videoPlayerController.setVolume(0.0);
+          }
+        });
+      },
+      child: Chewie(controller: chewieController),
+    ); /* Stack(
       children: [
         (videoPlayerController?.value.isInitialized ?? false)
             ? VideoPlayer(videoPlayerController!)

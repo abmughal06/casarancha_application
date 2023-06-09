@@ -54,213 +54,312 @@ import '../chat/GhostMode/ghost_chat_screen.dart';
 //     controller.dispose();
 //     commentController.dispose();
 //     super.dispose();
+//     currentIndex.value = 0;
 //   }
+
+//   var currentIndex = 0.obs;
 
 //   @override
 //   Widget build(BuildContext context) {
-//     String? dateText;
+//     controller = StoryController();
 //     return SafeArea(
 //       child: Scaffold(
 //         body: Stack(
 //           children: [
 //             Expanded(
-//               child:  StoryView(
-//                   inline: true,
+//               child: StoryView(
 //                   storyItems: [
 //                     ...widget.story.mediaDetailsList
-//                         .where((element) => DateTime.parse(element.id)
-//                             .isAfter(twentyFourHoursAgo))
+//                         .asMap()
+//                         .entries
+//                         // .where((element) => DateTime.parse(element.value.id)
+//                         //     .isAfter(twentyFourHoursAgo))
 //                         .map((e) {
-//                       dateText = timeago.format(DateTime.parse(e.id));
-//                       print("==============  ${e.type}");
-//                       return  e.type == "Photo"
-//                           ? StoryItem.pageImage(
-//                               url: e.link,
-//                               controller: controller,
-//                             )
-//                           : StoryItem.pageVideo(e.link, controller: controller);
+//                       // dateText = timeago.format(DateTime.parse(e.value.id));
+//                       print("==============  ${e.value.type}");
+//                       return
+//                           // e.value.type == "Photo"
+//                           //     ?
+//                           // StoryItem.pageImage(
+//                           //     url: e.value.link,
+//                           //     controller: controller,
+//                           //   )
+//                           StoryItem(
+//                               Stack(
+//                                 children: [
+//                                   Visibility(
+//                                     visible: e.value.type == "Photo",
+//                                     child: CachedNetworkImage(
+//                                       imageUrl: e.value.link,
+//                                       fit: BoxFit.contain,
+//                                     ),
+//                                   ),
+//                                   Column(
+//                                     crossAxisAlignment:
+//                                         CrossAxisAlignment.stretch,
+//                                     mainAxisAlignment:
+//                                         MainAxisAlignment.spaceBetween,
+//                                     children: [
+//                                       Padding(
+//                                         padding: EdgeInsets.only(
+//                                             left: 20.w, right: 20.w, top: 20.h),
+//                                         child: profileImgName(
+//                                           imgUserNet: widget
+//                                               .story.creatorDetails.imageUrl,
+//                                           isVerifyWithIc: widget
+//                                               .story.creatorDetails.isVerified,
+//                                           isVerifyWithName: false,
+//                                           idIsVerified: widget
+//                                               .story.creatorDetails.isVerified,
+//                                           dpRadius: 17.r,
+//                                           userName:
+//                                               widget.story.creatorDetails.name,
+//                                           userNameClr: colorWhite,
+//                                           userNameFontSize: 12.sp,
+//                                           userNameFontWeight: FontWeight.w600,
+//                                           subText: timeago.format(
+//                                               DateTime.parse(e.value.id)),
+//                                           subTxtFontSize: 9.sp,
+//                                           subTxtClr: colorWhite.withOpacity(.5),
+//                                         ),
+//                                       ),
+//                                       Container(),
+//                                       Align(
+//                                         alignment: Alignment.bottomCenter,
+//                                         child: Padding(
+//                                           padding: const EdgeInsets.all(10.0),
+//                                           child: Focus(
+//                                             focusNode: _commentFocus,
+//                                             onFocusChange: (hasFocus) {
+//                                               hasFocus
+//                                                   ? controller.pause()
+//                                                   : null;
+//                                             },
+//                                             child: TextFormField(
+//                                               controller: commentController,
+//                                               onChanged: (val) {
+//                                                 controller.pause();
+//                                               },
+//                                               style: TextStyle(
+//                                                 color: color887,
+//                                                 fontSize: 16.sp,
+//                                                 fontFamily: strFontName,
+//                                                 fontWeight: FontWeight.w500,
+//                                               ),
+//                                               decoration: InputDecoration(
+//                                                 hintText: strWriteCommentHere,
+//                                                 hintStyle: TextStyle(
+//                                                   color: color887,
+//                                                   fontSize: 14.sp,
+//                                                   fontFamily: strFontName,
+//                                                   fontWeight: FontWeight.w400,
+//                                                 ),
+//                                                 suffixIcon: Padding(
+//                                                   padding: EdgeInsets.symmetric(
+//                                                       horizontal: 10.w),
+//                                                   child: svgImgButton(
+//                                                       svgIcon: icStoryCmtSend,
+//                                                       onTap: () async {
+//                                                         print(
+//                                                             "comment == ${commentController.text}");
+
+//                                                         FocusScope.of(context)
+//                                                             .unfocus();
+//                                                         commentController.text =
+//                                                             "";
+//                                                         controller.play();
+//                                                         final messageRefForCurrentUser =
+//                                                             FirebaseFirestore
+//                                                                 .instance
+//                                                                 .collection(
+//                                                                     "users")
+//                                                                 .doc(FirebaseAuth
+//                                                                     .instance
+//                                                                     .currentUser!
+//                                                                     .uid)
+//                                                                 .collection(
+//                                                                     'messageList')
+//                                                                 .doc(widget
+//                                                                     .story
+//                                                                     .creatorId)
+//                                                                 .collection(
+//                                                                     'messages')
+//                                                                 .doc();
+
+//                                                         final messageRefForAppUser =
+//                                                             FirebaseFirestore
+//                                                                 .instance
+//                                                                 .collection(
+//                                                                     "users")
+//                                                                 .doc(widget.story
+//                                                                     .creatorId)
+//                                                                 .collection(
+//                                                                     'messageList')
+//                                                                 .doc(FirebaseAuth
+//                                                                     .instance
+//                                                                     .currentUser!
+//                                                                     .uid)
+//                                                                 .collection(
+//                                                                     'messages')
+//                                                                 .doc(
+//                                                                   messageRefForCurrentUser
+//                                                                       .id,
+//                                                                 );
+
+//                                                         var story = widget.story
+//                                                             .toMap();
+
+//                                                         final Message message =
+//                                                             Message(
+//                                                           id: messageRefForCurrentUser
+//                                                               .id,
+//                                                           sentToId: widget
+//                                                               .story.creatorId,
+//                                                           sentById: FirebaseAuth
+//                                                               .instance
+//                                                               .currentUser!
+//                                                               .uid,
+//                                                           content: story,
+//                                                           caption:
+//                                                               commentController
+//                                                                   .text,
+//                                                           type: "story",
+//                                                           createdAt: DateTime
+//                                                                   .now()
+//                                                               .toIso8601String(),
+//                                                           isSeen: false,
+//                                                         );
+//                                                         print(
+//                                                             "============= ------------------- ------- --= ====== ==== $message");
+//                                                         final appUserMessage =
+//                                                             message.copyWith(
+//                                                                 id: messageRefForAppUser
+//                                                                     .id);
+
+//                                                         messageRefForCurrentUser
+//                                                             .set(
+//                                                                 message.toMap())
+//                                                             .then((value) => print(
+//                                                                 "=========== XXXXXXXXXXXXXXXX ++++++++++ message sent success"));
+//                                                         messageRefForAppUser
+//                                                             .set(appUserMessage
+//                                                                 .toMap());
+//                                                         var recieverRef =
+//                                                             await FirebaseFirestore
+//                                                                 .instance
+//                                                                 .collection(
+//                                                                     "users")
+//                                                                 .doc(widget
+//                                                                     .story
+//                                                                     .creatorId)
+//                                                                 .get();
+
+//                                                         var recieverFCMToken =
+//                                                             recieverRef.data()![
+//                                                                 'fcmToken'];
+//                                                         print(
+//                                                             "=========> reciever fcm token = $recieverFCMToken");
+//                                                         FirebaseMessagingService()
+//                                                             .sendNotificationToUser(
+//                                                           creatorDetails:
+//                                                               CreatorDetails(
+//                                                                   name: user!
+//                                                                       .name,
+//                                                                   imageUrl: user!
+//                                                                       .imageStr,
+//                                                                   isVerified: user!
+//                                                                       .isVerified),
+//                                                           // createdAt: message.createdAt,
+//                                                           // creatorDetails: creatorDetails,
+//                                                           devRegToken:
+//                                                               recieverFCMToken,
+//                                                           userReqID: widget
+//                                                               .story.creatorId,
+//                                                           title: user!.name,
+//                                                           msg:
+//                                                               "has commented on your story",
+//                                                         );
+//                                                       }),
+//                                                 ),
+//                                                 contentPadding:
+//                                                     EdgeInsets.symmetric(
+//                                                         horizontal: 12.w,
+//                                                         vertical: 12.h),
+//                                                 filled: true,
+//                                                 fillColor: Colors.transparent,
+//                                                 border: OutlineInputBorder(
+//                                                     borderRadius:
+//                                                         BorderRadius.circular(
+//                                                             16.0),
+//                                                     borderSide:
+//                                                         BorderSide.none),
+//                                                 focusedBorder:
+//                                                     OutlineInputBorder(
+//                                                   borderRadius:
+//                                                       BorderRadius.circular(
+//                                                           30.r),
+//                                                   borderSide: const BorderSide(
+//                                                     color: color887,
+//                                                   ),
+//                                                 ),
+//                                                 enabledBorder:
+//                                                     OutlineInputBorder(
+//                                                   borderRadius:
+//                                                       BorderRadius.circular(
+//                                                           30.r),
+//                                                   borderSide: const BorderSide(
+//                                                     color: color887,
+//                                                     width: 1.0,
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                               textInputAction:
+//                                                   TextInputAction.done,
+//                                               onFieldSubmitted: (val) {
+//                                                 FocusScope.of(context)
+//                                                     .unfocus();
+//                                                 commentController.text = "";
+//                                                 controller.play();
+//                                               },
+//                                               onEditingComplete: () {
+//                                                 FocusScope.of(context)
+//                                                     .unfocus();
+//                                                 commentController.text = "";
+//                                                 controller.play();
+//                                               },
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       )
+//                                     ],
+//                                   ),
+//                                 ],
+//                               ),
+//                               duration: Duration(
+//                                   seconds: e.value.type == "Photo" ? 5 : 15));
+//                       // :
+//                       // StoryItem.pageVideo(e.value.link,
+//                       //     controller: controller,
+//                       //     duration: const Duration(seconds: 15)
+//                       //     );
 //                     })
 //                   ],
 //                   controller: controller,
-//                   // onComplete: () {
-//                   //   Get.back();
-//                   // },
+//                   onComplete: () {
+//                     Get.back();
+//                     // currentIndex.value = 0;
+//                   },
+//                   onStoryShow: (s) {
+//                     // currentIndex.value++;
+
+//                     print("=============================== > ${s.view.key}");
+//                   },
 //                   onVerticalSwipeComplete: (direction) {
 //                     if (direction == Direction.down) {
 //                       Get.back();
+//                       // currentIndex.value++;
 //                     }
 //                   }),
-//             ),
-//             Column(
-//               crossAxisAlignment: CrossAxisAlignment.stretch,
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Padding(
-//                   padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h),
-//                   child: profileImgName(
-//                     imgUserNet: widget.story.creatorDetails.imageUrl,
-//                     isVerifyWithIc: widget.story.creatorDetails.isVerified,
-//                     isVerifyWithName: false,
-//                     idIsVerified: widget.story.creatorDetails.isVerified,
-//                     dpRadius: 17.r,
-//                     userName: widget.story.creatorDetails.name,
-//                     userNameClr: colorWhite,
-//                     userNameFontSize: 12.sp,
-//                     userNameFontWeight: FontWeight.w600,
-//                     subText: dateText,
-//                     subTxtFontSize: 9.sp,
-//                     subTxtClr: colorWhite.withOpacity(.5),
-//                   ),
-//                 ),
-//                 Container(),
-//                 Align(
-//                   alignment: Alignment.bottomCenter,
-//                   child: Padding(
-//                     padding: const EdgeInsets.all(10.0),
-//                     child: Focus(
-//                       focusNode: _commentFocus,
-//                       onFocusChange: (hasFocus) {
-//                         hasFocus ? controller.pause() : null;
-//                       },
-//                       child: TextFormField(
-//                         controller: commentController,
-//                         onChanged: (val) {
-//                           controller.pause();
-//                         },
-//                         style: TextStyle(
-//                           color: color887,
-//                           fontSize: 16.sp,
-//                           fontFamily: strFontName,
-//                           fontWeight: FontWeight.w500,
-//                         ),
-//                         decoration: InputDecoration(
-//                           hintText: strWriteCommentHere,
-//                           hintStyle: TextStyle(
-//                             color: color887,
-//                             fontSize: 14.sp,
-//                             fontFamily: strFontName,
-//                             fontWeight: FontWeight.w400,
-//                           ),
-//                           suffixIcon: Padding(
-//                             padding: EdgeInsets.symmetric(horizontal: 10.w),
-//                             child: svgImgButton(
-//                                 svgIcon: icStoryCmtSend,
-//                                 onTap: () async {
-//                                   print("comment == " +
-//                                       commentController.text.toString());
-
-//                                   FocusScope.of(context).unfocus();
-//                                   commentController.text = "";
-//                                   controller.play();
-//                                   final messageRefForCurrentUser =
-//                                       FirebaseFirestore
-//                                           .instance
-//                                           .collection("users")
-//                                           .doc(FirebaseAuth
-//                                               .instance.currentUser!.uid)
-//                                           .collection('messageList')
-//                                           .doc(widget.story.creatorId)
-//                                           .collection('messages')
-//                                           .doc();
-
-//                                   final messageRefForAppUser = FirebaseFirestore
-//                                       .instance
-//                                       .collection("users")
-//                                       .doc(widget.story.creatorId)
-//                                       .collection('messageList')
-//                                       .doc(FirebaseAuth
-//                                           .instance.currentUser!.uid)
-//                                       .collection('messages')
-//                                       .doc(
-//                                         messageRefForCurrentUser.id,
-//                                       );
-
-//                                   var story = widget.story.toMap();
-
-//                                   final Message message = Message(
-//                                     id: messageRefForCurrentUser.id,
-//                                     sentToId: widget.story.creatorId,
-//                                     sentById:
-//                                         FirebaseAuth.instance.currentUser!.uid,
-//                                     content: story,
-//                                     caption: commentController.text,
-//                                     type: "story",
-//                                     createdAt: DateTime.now().toIso8601String(),
-//                                     isSeen: false,
-//                                   );
-//                                   print(
-//                                       "============= ------------------- ------- --= ====== ==== $message");
-//                                   final appUserMessage = message.copyWith(
-//                                       id: messageRefForAppUser.id);
-
-//                                   messageRefForCurrentUser
-//                                       .set(message.toMap())
-//                                       .then((value) => print(
-//                                           "=========== XXXXXXXXXXXXXXXX ++++++++++ message sent success"));
-//                                   messageRefForAppUser
-//                                       .set(appUserMessage.toMap());
-//                                   var recieverRef = await FirebaseFirestore
-//                                       .instance
-//                                       .collection("users")
-//                                       .doc(widget.story.creatorId)
-//                                       .get();
-
-//                                   var recieverFCMToken =
-//                                       recieverRef.data()!['fcmToken'];
-//                                   print(
-//                                       "=========> reciever fcm token = $recieverFCMToken");
-//                                   FirebaseMessagingService()
-//                                       .sendNotificationToUser(
-//                                     creatorDetails: CreatorDetails(
-//                                         name: user!.name,
-//                                         imageUrl: user!.imageStr,
-//                                         isVerified: user!.isVerified),
-//                                     // createdAt: message.createdAt,
-//                                     // creatorDetails: creatorDetails,
-//                                     devRegToken: recieverFCMToken,
-//                                     userReqID: widget.story.creatorId,
-//                                     title: user!.name,
-//                                     msg: "has commented on your story",
-//                                   );
-//                                 }),
-//                           ),
-//                           contentPadding: EdgeInsets.symmetric(
-//                               horizontal: 12.w, vertical: 12.h),
-//                           filled: true,
-//                           fillColor: Colors.transparent,
-//                           border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(16.0),
-//                               borderSide: BorderSide.none),
-//                           focusedBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(30.r),
-//                             borderSide: const BorderSide(
-//                               color: color887,
-//                             ),
-//                           ),
-//                           enabledBorder: OutlineInputBorder(
-//                             borderRadius: BorderRadius.circular(30.r),
-//                             borderSide: const BorderSide(
-//                               color: color887,
-//                               width: 1.0,
-//                             ),
-//                           ),
-//                         ),
-//                         textInputAction: TextInputAction.done,
-//                         onFieldSubmitted: (val) {
-//                           FocusScope.of(context).unfocus();
-//                           commentController.text = "";
-//                           controller.play();
-//                         },
-//                         onEditingComplete: () {
-//                           FocusScope.of(context).unfocus();
-//                           commentController.text = "";
-//                           controller.play();
-//                         },
-//                       ),
-//                     ),
-//                   ),
-//                 )
-//               ],
 //             ),
 //           ],
 //         ),
@@ -354,8 +453,6 @@ class _StoryViewScreenState extends State<StoryViewScreen>
               itemCount: storyList.length,
               onPageChanged: (c) {
                 _videoController!.pause();
-                _animController.reset();
-                _animController.forward();
               },
               itemBuilder: (context, i) {
                 final MediaDetails story = storyList[i];
@@ -744,7 +841,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
   }
 
   void _loadStory({MediaDetails? story, bool animateToPage = true}) {
-    _animController.stop();
+    _animController.reset();
     switch (story!.type) {
       case 'Photo':
         _animController.duration = const Duration(
@@ -904,7 +1001,6 @@ class UserInfo extends StatelessWidget {
     );
   }
 }
-
 
 // class StoryViewScreen extends StatefulWidget {
 //   final Story story;

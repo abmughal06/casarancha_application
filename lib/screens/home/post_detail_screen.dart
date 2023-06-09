@@ -38,8 +38,8 @@ class PostDetailScreen extends StatelessWidget {
       : super(key: key);
   final PostModel postModel;
   PostCardController? postCardController;
-  VideoPlayerController? videoPlayerController;
   final coommenController = TextEditingController();
+  Future<void>? iniializedFuturePlay;
 
   @override
   Widget build(BuildContext context) {
@@ -103,34 +103,45 @@ class PostDetailScreen extends StatelessWidget {
                                             ));
                                       } else if (mediaData.type == 'Video') {
                                         print("============ ${mediaData.link}");
-                                        videoPlayerController =
-                                            VideoPlayerController.network(
-                                                mediaData.link);
-                                        videoPlayerController!.initialize();
-                                        print(mediaData.link);
-                                        videoPlayerController!.play();
-                                        var chweieController = ChewieController(
-                                          videoPlayerController:
-                                              videoPlayerController!,
-                                          aspectRatio: 2 / 3,
-                                          looping: true,
-                                          autoPlay: true,
-                                          zoomAndPan: true,
-                                        );
+                                        return FutureBuilder(
+                                            future: iniializedFuturePlay,
+                                            builder: (context, snap) {
+                                              VideoPlayerController?
+                                                  videoPlayerController;
 
-                                        return InkWell(
-                                          onLongPress: () {
-                                            videoPlayerController!.pause();
-                                          },
-                                          onTap: () {
-                                            videoPlayerController!.play();
-                                          },
-                                          child: AspectRatio(
-                                              aspectRatio: 2 / 3,
-                                              child: Chewie(
-                                                controller: chweieController,
-                                              )),
-                                        );
+                                              videoPlayerController =
+                                                  VideoPlayerController.network(
+                                                      mediaData.link);
+                                              // videoPlayerController
+                                              //     .initialize();
+                                              print(mediaData.link);
+                                              // videoPlayerController!.play();
+                                              var chweieController =
+                                                  ChewieController(
+                                                videoPlayerController:
+                                                    videoPlayerController,
+                                                aspectRatio: 9 / 16,
+                                                looping: true,
+                                                autoPlay: true,
+                                                zoomAndPan: true,
+                                              );
+
+                                              return InkWell(
+                                                onLongPress: () {
+                                                  videoPlayerController!
+                                                      .pause();
+                                                },
+                                                onTap: () {
+                                                  videoPlayerController!.play();
+                                                },
+                                                child: AspectRatio(
+                                                    aspectRatio: 2 / 3,
+                                                    child: Chewie(
+                                                      controller:
+                                                          chweieController,
+                                                    )),
+                                              );
+                                            });
                                       } else {
                                         return Container(
                                           width:

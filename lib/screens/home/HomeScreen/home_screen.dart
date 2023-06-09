@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -9,7 +8,7 @@ import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
-import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -20,7 +19,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import '../../../models/post_creator_details.dart';
 import '../../../resources/image_resources.dart';
@@ -31,11 +29,8 @@ import '../../chat/share_post_screen.dart';
 import '../../dashboard/dashboard.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
-import '../post_detail_screen.dart';
 import '../story_view_screen.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:timeago/timeago.dart' as timeago;
-
 // import 'package:timeago/timeago.dart' as timeago;
 
 class HomeScreen extends StatefulWidget {
@@ -52,6 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return nameParts[0];
   }
 
+  Future<void>? initializedFuturePlay;
+
   // ProfileScreenController profileScreenController =
   //     Get.put(ProfileScreenController());
 
@@ -59,18 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // getPrefData();
-  }
-
-  getPrefData() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    // homeScreenController.profileScreenController.toggleGhostMode();
-    Future.delayed(const Duration(seconds: 2)).then((value) {
-      // profileScreenController.toggleGhostMode();
-      bool getVal = sharedPreferences.getBool('isGhostEnable') ?? false;
-      log("000000000000000000000");
-      log(getVal.toString());
-    });
   }
 
   List followingIds = [];
@@ -108,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               icon: badges.Badge(
                 badgeContent: const Text(
-                  '1',
+                  '0',
                   style: TextStyle(color: Colors.white),
                 ),
                 child: SvgPicture.asset(
@@ -122,21 +107,131 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           SizedBox(height: 10.w),
           SizedBox(
-            height: 65.h,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 15.w, right: 15.w),
-                  child: StreamBuilder<DocumentSnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection("stories")
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        log("======================== daldjalsdjlsdasl  ${snapshot.data}");
-                        if (snapshot.hasData && snapshot.data != null) {
-                          if (snapshot.data!.data() == null) {
+            // color: Colors.red,
+            height: 85.h,
+            child: Padding(
+              padding: EdgeInsets.all(1.h),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.w, right: 15.w),
+                    child: StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection("stories")
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          log("======================== daldjalsdjlsdasl  ${snapshot.data}");
+                          if (snapshot.hasData && snapshot.data != null) {
+                            if (snapshot.data!.data() == null) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Get.to(() => AddStoryScreen());
+                                },
+                                child: SvgPicture.asset(
+                                  icProfileAdd,
+                                  height: 50.h,
+                                  width: 50.w,
+                                ),
+                              );
+                            } else {
+                              log("==================== snapshot has data");
+                              // var listofData = snapshot.data!.docs;
+                              // log(snapshot.data!.data());
+                              dynamic map;
+                              Story? story;
+
+                              // var data = snapshot.data!.data();
+                              // if (snapshot.data!.docs.isNotEmpty) {
+
+                              map = snapshot.data!.data();
+                              story = Story.fromMap(map);
+
+                              DateTime? givenDate;
+                              for (int i = 0;
+                                  i < story.mediaDetailsList.length;
+                                  i++) {
+                                givenDate = DateTime.parse(
+                                    story.mediaDetailsList[i].id);
+                              }
+
+                              DateTime twentyFourHoursAgo = DateTime.now()
+                                  .subtract(const Duration(hours: 24));
+                              log(" ========== $twentyFourHoursAgo");
+
+                              return Column(
+                                // mainAxisAlignment:
+                                // MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Stack(
+                                    children: [
+                                      givenDate!.isAfter(twentyFourHoursAgo)
+                                          ? InkWell(
+                                              onTap: () {
+                                                Get.to(() => StoryViewScreen(
+                                                    story: story!));
+                                              },
+                                              child: CircleAvatar(
+                                                minRadius: 25,
+                                                backgroundImage: NetworkImage(
+                                                    map!["creatorDetails"]
+                                                        ['imageUrl']),
+                                              ),
+                                            )
+                                          : InkWell(
+                                              onTap: () {
+                                                Get.to(() => AddStoryScreen());
+                                              },
+                                              child: SvgPicture.asset(
+                                                icProfileAdd,
+                                                height: 50.h,
+                                                width: 50.w,
+                                              ),
+                                            ),
+                                      givenDate.isAfter(twentyFourHoursAgo)
+                                          ? Positioned(
+                                              right: -2,
+                                              bottom: -2,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  Get.to(
+                                                      () => AddStoryScreen());
+                                                },
+                                                child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            2.0),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: colorPrimaryA05,
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.add,
+                                                      color: Colors.white,
+                                                      size: 18,
+                                                    )),
+                                              ))
+                                          : Container(),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  const Text(
+                                    "Your Story",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 10),
+                                  )
+                                ],
+                              );
+                            }
+                          } else if (snapshot.hasError) {
+                            return const Text("Here");
+                          } else if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else {
                             return GestureDetector(
                               onTap: () {
                                 Get.to(() => AddStoryScreen());
@@ -147,250 +242,152 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: 50.w,
                               ),
                             );
-                          } else {
-                            log("==================== snapshot has data");
-                            // var listofData = snapshot.data!.docs;
-                            // log(snapshot.data!.data());
-                            dynamic map;
-                            Story? story;
-
-                            // var data = snapshot.data!.data();
-                            // if (snapshot.data!.docs.isNotEmpty) {
-
-                            map = snapshot.data!.data();
-                            story = Story.fromMap(map);
-
-                            DateTime? givenDate;
-                            for (int i = 0;
-                                i < story.mediaDetailsList.length;
-                                i++) {
-                              givenDate =
-                                  DateTime.parse(story.mediaDetailsList[i].id);
-                            }
-
-                            DateTime twentyFourHoursAgo = DateTime.now()
-                                .subtract(const Duration(hours: 24));
-                            log(" ========== $twentyFourHoursAgo");
-
-                            return Column(
-                              children: [
-                                Stack(
-                                  children: [
-                                    givenDate!.isAfter(twentyFourHoursAgo)
-                                        ? InkWell(
-                                            onTap: () {
-                                              Get.to(() => StoryViewScreen(
-                                                  story: story!));
-                                            },
-                                            child: CircleAvatar(
-                                              minRadius: 25,
-                                              backgroundImage: NetworkImage(
-                                                  map!["creatorDetails"]
-                                                      ['imageUrl']),
-                                            ),
-                                          )
-                                        : InkWell(
-                                            onTap: () {
-                                              Get.to(() => AddStoryScreen());
-                                            },
-                                            child: SvgPicture.asset(
-                                              icProfileAdd,
-                                              height: 50.h,
-                                              width: 50.w,
-                                            ),
-                                          ),
-                                    givenDate.isAfter(twentyFourHoursAgo)
-                                        ? Positioned(
-                                            right: -2,
-                                            bottom: -2,
-                                            child: InkWell(
-                                              onTap: () {
-                                                Get.to(() => AddStoryScreen());
-                                              },
-                                              child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(2.0),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: colorPrimaryA05,
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.add,
-                                                    color: Colors.white,
-                                                    size: 18,
-                                                  )),
-                                            ))
-                                        : Container(),
-                                  ],
-                                ),
-                                const SizedBox(height: 3),
-                                const Text(
-                                  "Your Story",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 10),
-                                )
-                              ],
-                            );
+                            // return  Text('Story');
                           }
-                        } else if (snapshot.hasError) {
-                          return const Text("Here");
-                        } else if (!snapshot.hasData) {
+                        }),
+                  ),
+                  StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .snapshots(),
+                      builder: (context, snap) {
+                        if (snap.hasData && snap.data!.exists) {
+                          var userData = snap.data!.data();
+
+                          if (userData!['followingsIds'] != [] &&
+                              userData['followersIds'] != null) {
+                            followingIds = userData['followingsIds'] != []
+                                ? userData['followingsIds']
+                                : [];
+
+                            followerIds = userData['followersIds'] != []
+                                ? userData['followersIds']
+                                : [];
+                            log(followingIds.toString());
+                            log(followerIds.toString());
+                            List storyIds = !homeScreenController
+                                    .profileScreenController.isGhostModeOn.value
+                                ? followingIds
+                                : followerIds + followingIds;
+
+                            log("storyiD ===============$storyIds");
+                            // return Container();
+                            return StreamBuilder<
+                                QuerySnapshot<Map<String, dynamic>>>(
+                              stream: storyIds.isEmpty
+                                  ? FirebaseFirestore.instance
+                                      .collection("stories")
+                                      .where("creatorId",
+                                          arrayContains: storyIds)
+                                      .snapshots()
+                                  : FirebaseFirestore.instance
+                                      .collection("stories")
+                                      .where(
+                                        "creatorId",
+                                        whereIn: storyIds,
+                                      )
+                                      .snapshots(),
+                              builder: (context, snapshot) {
+                                log(DateTime.now().toIso8601String());
+                                if (snapshot.hasData && snapshot.data != null) {
+                                  final data = snapshot.data!.docs;
+                                  // double progress =
+                                  // data.bytesTransferred / data.totalBytes;
+                                  log("++++++++++++++++++++++++++++- $data");
+                                  return Expanded(
+                                    child: ListView.builder(
+                                        // padding: EdgeInsets.only(top: 10.w),
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: snapshot.data!.docs.length,
+                                        itemBuilder: (context, index) {
+                                          var storyData = data[index].data();
+
+                                          Story story =
+                                              Story.fromMap(storyData);
+                                          DateTime? givenDate;
+                                          for (int i = 0;
+                                              i < story.mediaDetailsList.length;
+                                              i++) {
+                                            givenDate = DateTime.parse(
+                                                story.mediaDetailsList[i].id);
+                                          }
+
+                                          DateTime twentyFourHoursAgo =
+                                              DateTime.now().subtract(
+                                                  const Duration(hours: 24));
+                                          log(" ========== $twentyFourHoursAgo");
+                                          if (givenDate!
+                                              .isBefore(twentyFourHoursAgo)) {
+                                            return Container();
+                                          } else {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 12),
+                                              child: Column(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Get.to(
+                                                        () => StoryViewScreen(
+                                                            story: story),
+                                                      );
+                                                    },
+                                                    child: CircleAvatar(
+                                                      minRadius: 25,
+                                                      backgroundImage:
+                                                          NetworkImage(story
+                                                              .creatorDetails
+                                                              .imageUrl),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 3),
+                                                  Text(
+                                                    getFirstName(story
+                                                        .creatorDetails.name),
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                        }),
+                                  );
+
+                                  // return Stack(
+                                  //   children: [
+                                  //     LinearProgressIndicator(
+                                  //       value: progress,
+                                  //     ),
+                                  //     Center(
+                                  //       child: Text(
+                                  //         '${(100 * progress).roundToDouble()}%',
+                                  //       ),
+                                  //     )
+                                  //   ],
+                                  // );
+                                } else {
+                                  return const SizedBox(
+                                    height: 50,
+                                  );
+                                }
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                          // return Text(snap.data!.data()!['followingsIds']);
+                        } else {
                           return const Center(
                               child: CircularProgressIndicator());
-                        } else {
-                          return GestureDetector(
-                            onTap: () {
-                              Get.to(() => AddStoryScreen());
-                            },
-                            child: SvgPicture.asset(
-                              icProfileAdd,
-                              height: 50.h,
-                              width: 50.w,
-                            ),
-                          );
-                          // return  Text('Story');
                         }
-                      }),
-                ),
-                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                    stream: FirebaseFirestore.instance
-                        .collection("users")
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .snapshots(),
-                    builder: (context, snap) {
-                      if (snap.hasData && snap.data!.exists) {
-                        var userData = snap.data!.data();
-
-                        if (userData!['followingsIds'] != [] &&
-                            userData['followersIds'] != null) {
-                          followingIds = userData['followingsIds'] != []
-                              ? userData['followingsIds']
-                              : [];
-
-                          followerIds = userData['followersIds'] != []
-                              ? userData['followersIds']
-                              : [];
-                          log(followingIds.toString());
-                          log(followerIds.toString());
-                          List storyIds = !homeScreenController
-                                  .profileScreenController.isGhostModeOn.value
-                              ? followingIds
-                              : followerIds + followingIds;
-
-                          log("storyiD ===============$storyIds");
-                          // return Container();
-                          return StreamBuilder<
-                              QuerySnapshot<Map<String, dynamic>>>(
-                            stream: storyIds.isEmpty
-                                ? FirebaseFirestore.instance
-                                    .collection("stories")
-                                    .where("creatorId", arrayContains: storyIds)
-                                    .snapshots()
-                                : FirebaseFirestore.instance
-                                    .collection("stories")
-                                    .where(
-                                      "creatorId",
-                                      whereIn: storyIds,
-                                    )
-                                    .snapshots(),
-                            builder: (context, snapshot) {
-                              log(DateTime.now().toIso8601String());
-                              if (snapshot.hasData && snapshot.data != null) {
-                                final data = snapshot.data!.docs;
-                                // double progress =
-                                // data.bytesTransferred / data.totalBytes;
-                                log("++++++++++++++++++++++++++++- $data");
-                                return Expanded(
-                                  child: ListView.builder(
-                                      // padding: EdgeInsets.only(top: 10.w),
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: snapshot.data!.docs.length,
-                                      itemBuilder: (context, index) {
-                                        var storyData = data[index].data();
-
-                                        Story story = Story.fromMap(storyData);
-                                        DateTime? givenDate;
-                                        for (int i = 0;
-                                            i < story.mediaDetailsList.length;
-                                            i++) {
-                                          givenDate = DateTime.parse(
-                                              story.mediaDetailsList[i].id);
-                                        }
-
-                                        DateTime twentyFourHoursAgo =
-                                            DateTime.now().subtract(
-                                                const Duration(hours: 24));
-                                        log(" ========== $twentyFourHoursAgo");
-                                        if (givenDate!
-                                            .isBefore(twentyFourHoursAgo)) {
-                                          return Container();
-                                        } else {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 12),
-                                            child: Column(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    Get.to(
-                                                      () => StoryViewScreen(
-                                                          story: story),
-                                                    );
-                                                  },
-                                                  child: CircleAvatar(
-                                                    minRadius: 25,
-                                                    backgroundImage:
-                                                        NetworkImage(story
-                                                            .creatorDetails
-                                                            .imageUrl),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 3),
-                                                Text(
-                                                  getFirstName(story
-                                                      .creatorDetails.name),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 10,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                      }),
-                                );
-
-                                // return Stack(
-                                //   children: [
-                                //     LinearProgressIndicator(
-                                //       value: progress,
-                                //     ),
-                                //     Center(
-                                //       child: Text(
-                                //         '${(100 * progress).roundToDouble()}%',
-                                //       ),
-                                //     )
-                                //   ],
-                                // );
-                              } else {
-                                return const SizedBox(
-                                  height: 50,
-                                );
-                              }
-                            },
-                          );
-                        } else {
-                          return Container();
-                        }
-                        // return Text(snap.data!.data()!['followingsIds']);
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    })
-              ],
+                      })
+                ],
+              ),
             ),
           ),
           SizedBox(height: 10.w),
@@ -425,13 +422,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         CustomPostHeader(
                                             name: post.creatorDetails.name,
                                             image: post.creatorDetails.imageUrl,
-                                            onVertItemClick: () {
-                                              GlobalSnackBar.show(
-                                                  message:
-                                                      "Ghost mode is enabled");
-                                            },
-                                            time: timeago.format(
-                                                DateTime.parse(post.createdAt)),
                                             headerOnTap: () {
                                               postCardController
                                                   .gotoAppUserScreen(
@@ -446,6 +436,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             itemCount: post.mediaData.length,
                                             itemBuilder: (context, index) =>
                                                 InkWell(
+                                                    onTap: () => Get.to(() =>
+                                                        PostDetailScreen(
+                                                            postModel: post,
+                                                            postCardController:
+                                                                postCardController)),
                                                     onDoubleTap: () async {
                                                       log("ghost mode clicked");
 
@@ -467,108 +462,89 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Visibility(
                                     visible: post.mediaData[0].type == "Video",
-                                    child: AspectRatio(
-                                      aspectRatio: 9 / 16,
-                                      child: ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        shrinkWrap: true,
-                                        itemCount: post.mediaData.length,
-                                        itemBuilder: (context, i) {
-                                          VideoPlayerController?
-                                              videoPlayerController;
-
-                                          videoPlayerController =
-                                              VideoPlayerController.network(
-                                            post.mediaData.first.type == "Video"
-                                                ? post.mediaData[i].link
-                                                    .toString()
-                                                : "",
-                                          );
-                                          // videoPlayerController.initialize();
-
-                                          // var chewie = ChewieController(
-                                          //   autoInitialize: true,
-                                          //   autoPlay: false,
-                                          //   aspectRatio: 2 / 3,
-                                          //   looping: false,
-                                          //   videoPlayerController:
-                                          //       videoPlayerController,
-                                          // );
-                                          return InkWell(
-                                            // onTap: () {
-                                            //   log('clicked');
-                                            //   Get.to(
-                                            //     () => CustomVideoCard(
-                                            //       aspectRatio:
-                                            //           videoPlayerController!
-                                            //               .value.aspectRatio,
-                                            //       videoPlayerController:
-                                            //           videoPlayerController,
-                                            //       // videoUrl:
-                                            //       //     post.mediaData[i].link,
-                                            //       menuButton: menuButton(context,
-                                            //           post.mediaData[i].link,
-                                            //           margin:  EdgeInsets
-                                            //                   .symmetric(
-                                            //               vertical: 10,
-                                            //               horizontal: 17),
-                                            //           profileScreenController:
-                                            //               profileScreenController),
-                                            //     ),
-                                            //   );
-                                            // },
-                                            onDoubleTap: () {
-                                              log("ghost mode clicked");
-
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(const SnackBar(
-                                                      backgroundColor:
-                                                          colorPrimaryA05,
-                                                      content: Text(
-                                                          'Ghost Mode Enabled!')));
-                                            },
+                                    child: FutureBuilder(
+                                        future: initializedFuturePlay,
+                                        builder: (context, snapshot) {
+                                          return Visibility(
                                             child: AspectRatio(
                                               aspectRatio: 9 / 16,
-                                              child: Stack(
-                                                children: [
-                                                  VideoPlayerWidget(
-                                                    videoPlayerController:
-                                                        videoPlayerController,
-                                                    videoUrl:
-                                                        post.mediaData[i].link,
-                                                  ),
-                                                  Positioned(
-                                                    top: 12,
-                                                    left: 0,
-                                                    right: 0,
-                                                    child: CustomPostHeader(
-                                                      name: post
-                                                          .creatorDetails.name,
-                                                      image: post.creatorDetails
-                                                          .imageUrl,
-                                                      headerOnTap: () {
-                                                        postCardController
-                                                            .gotoAppUserScreen(
-                                                                post.creatorId);
-                                                      },
-                                                      isVideoPost: true,
-                                                      onVertItemClick: () {
-                                                        GlobalSnackBar.show(
-                                                            message:
-                                                                "Ghost mode is enabled");
-                                                      },
-                                                      time: timeago.format(
-                                                          DateTime.parse(
-                                                              post.createdAt)),
+                                              child: ListView.builder(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    post.mediaData.length,
+                                                itemBuilder: (context, i) {
+                                                  VideoPlayerController?
+                                                      videoPlayerController;
+
+                                                  videoPlayerController =
+                                                      VideoPlayerController
+                                                          .network(
+                                                    post.mediaData.first.type ==
+                                                            "Video"
+                                                        ? post.mediaData[i].link
+                                                            .toString()
+                                                        : "",
+                                                  );
+
+                                                  return InkWell(
+                                                    onTap: () => Get.to(() =>
+                                                        PostDetailScreen(
+                                                            postModel: post,
+                                                            postCardController:
+                                                                postCardController)),
+                                                    onDoubleTap: () {
+                                                      log("ghost mode clicked");
+
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(const SnackBar(
+                                                              backgroundColor:
+                                                                  colorPrimaryA05,
+                                                              content: Text(
+                                                                  'Ghost Mode Enabled!')));
+                                                    },
+                                                    child: AspectRatio(
+                                                      aspectRatio: 9 / 16,
+                                                      child: Stack(
+                                                        children: [
+                                                          VideoPlayerWidget(
+                                                            videoPlayerController:
+                                                                videoPlayerController,
+                                                            videoUrl: post
+                                                                .mediaData[i]
+                                                                .link,
+                                                          ),
+                                                          Positioned(
+                                                            top: 12,
+                                                            left: 0,
+                                                            right: 0,
+                                                            child:
+                                                                CustomPostHeader(
+                                                              name: post
+                                                                  .creatorDetails
+                                                                  .name,
+                                                              image: post
+                                                                  .creatorDetails
+                                                                  .imageUrl,
+                                                              headerOnTap: () {
+                                                                postCardController
+                                                                    .gotoAppUserScreen(
+                                                                        post.creatorId);
+                                                              },
+                                                              isVideoPost: true,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  );
+                                                },
                                               ),
                                             ),
                                           );
-                                        },
-                                      ),
-                                    ),
+                                        }),
                                   ),
                                   Visibility(
                                     visible: post.mediaData[0].type == "Qoute",
@@ -593,6 +569,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             itemCount: post.mediaData.length,
                                             itemBuilder: (context, index) =>
                                                 InkWell(
+                                              onTap: () => Get.to(() =>
+                                                  PostDetailScreen(
+                                                      postModel: post,
+                                                      postCardController:
+                                                          postCardController)),
                                               onDoubleTap: () {
                                                 log("ghost mode clicked");
 
@@ -767,8 +748,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                           isScrollControlled: true,
                                         );
                                       },
-                                      time: timeago.format(
-                                          DateTime.parse(post.createdAt)),
                                       name: post.creatorDetails.name,
                                       image: post.creatorDetails.imageUrl,
                                       ontap: () {},
@@ -790,14 +769,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemCount: post.mediaData.length,
                                           itemBuilder: (context, index) =>
                                               InkWell(
-                                                  onTap: () {
-                                                    Get.to(
-                                                        () => PostDetailScreen(
-                                                              postCardController:
-                                                                  postCardController,
-                                                              postModel: post,
-                                                            ));
-                                                  },
+                                                  onTap: () => Get.to(() =>
+                                                      PostDetailScreen(
+                                                          postModel: post,
+                                                          postCardController:
+                                                              postCardController)),
                                                   onDoubleTap: () async {
                                                     log("clicked");
                                                     postCardController
@@ -819,88 +795,93 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Visibility(
                                   visible: post.mediaData[0].type == "Video",
-                                  child: AspectRatio(
-                                    aspectRatio: 9 / 16,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      shrinkWrap: true,
-                                      itemCount: post.mediaData.length,
-                                      itemBuilder: (context, i) {
-                                        VideoPlayerController?
-                                            videoPlayerController;
-
-                                        videoPlayerController =
-                                            VideoPlayerController.network(
-                                          post.mediaData.first.type == "Video"
-                                              ? post.mediaData[i].link
-                                                  .toString()
-                                              : "",
-                                        );
-                                        // videoPlayerController.initialize();
-
-                                        // var chewie = ChewieController(
-                                        //   autoInitialize: true,
-                                        //   autoPlay: false,
-                                        //   aspectRatio: 2 / 3,
-                                        //   looping: false,
-                                        //   videoPlayerController:
-                                        //       videoPlayerController,
-                                        // );
-                                        return InkWell(
-                                          onTap: () {
-                                            Get.to(() => PostDetailScreen(
-                                                  postCardController:
-                                                      postCardController,
-                                                  postModel: post,
-                                                ));
-                                          },
-                                          onDoubleTap: () {
-                                            log("clicked");
-                                            postCardController.isLiked.value =
-                                                !post.likesIds
-                                                    .contains(user!.id);
-                                            postCardController.likeDisLikePost(
-                                                user!.id,
-                                                post.id,
-                                                post.creatorId);
-                                          },
+                                  child: FutureBuilder(
+                                      future: initializedFuturePlay,
+                                      builder: (context, snapshot) {
+                                        // if (snapshot.connectionState ==
+                                        //     ConnectionState.done) {
+                                        return Visibility(
                                           child: AspectRatio(
                                             aspectRatio: 9 / 16,
-                                            child: Stack(
-                                              children: [
-                                                VideoPlayerWidget(
-                                                  videoPlayerController:
-                                                      videoPlayerController,
-                                                  videoUrl:
-                                                      post.mediaData[i].link,
-                                                ),
-                                                Positioned(
-                                                  top: 12,
-                                                  left: 0,
-                                                  right: 0,
-                                                  child: CustomPostHeader(
-                                                    time: timeago.format(
-                                                        DateTime.parse(
-                                                            post.createdAt)),
-                                                    name: post
-                                                        .creatorDetails.name,
-                                                    image: post.creatorDetails
-                                                        .imageUrl,
-                                                    headerOnTap: () {
-                                                      postCardController
-                                                          .gotoAppUserScreen(
-                                                              post.creatorId);
-                                                    },
-                                                    isVideoPost: true,
+                                            child: ListView.builder(
+                                              scrollDirection: Axis.horizontal,
+                                              shrinkWrap: true,
+                                              itemCount: post.mediaData.length,
+                                              itemBuilder: (context, i) {
+                                                VideoPlayerController?
+                                                    videoPlayerController;
+                                                videoPlayerController =
+                                                    VideoPlayerController
+                                                        .network(
+                                                  post.mediaData.first.type ==
+                                                          "Video"
+                                                      ? post.mediaData[i].link
+                                                          .toString()
+                                                      : "",
+                                                );
+
+                                                return InkWell(
+                                                  onTap: () => Get.to(() =>
+                                                      PostDetailScreen(
+                                                          postModel: post,
+                                                          postCardController:
+                                                              postCardController)),
+                                                  onDoubleTap: () {
+                                                    log("clicked");
+                                                    postCardController
+                                                            .isLiked.value =
+                                                        !post.likesIds
+                                                            .contains(user!.id);
+                                                    postCardController
+                                                        .likeDisLikePost(
+                                                            user!.id,
+                                                            post.id,
+                                                            post.creatorId);
+                                                  },
+                                                  child: AspectRatio(
+                                                    aspectRatio: 9 / 16,
+                                                    child: Stack(
+                                                      children: [
+                                                        VideoPlayerWidget(
+                                                          videoPlayerController:
+                                                              videoPlayerController,
+                                                          videoUrl: post
+                                                              .mediaData[i]
+                                                              .link,
+                                                        ),
+                                                        Positioned(
+                                                          top: 12,
+                                                          left: 0,
+                                                          right: 0,
+                                                          child:
+                                                              CustomPostHeader(
+                                                            name: post
+                                                                .creatorDetails
+                                                                .name,
+                                                            image: post
+                                                                .creatorDetails
+                                                                .imageUrl,
+                                                            headerOnTap: () {
+                                                              postCardController
+                                                                  .gotoAppUserScreen(
+                                                                      post.creatorId);
+                                                            },
+                                                            isVideoPost: true,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                );
+                                              },
                                             ),
                                           ),
                                         );
-                                      },
-                                    ),
-                                  ),
+                                        // }
+                                        // else {
+                                        //   return const CircularProgressIndicator();
+                                        // }
+                                      }),
                                 ),
                                 Visibility(
                                   visible: post.mediaData[0].type == "Qoute",
@@ -916,13 +897,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemCount: post.mediaData.length,
                                           itemBuilder: (context, index) =>
                                               InkWell(
-                                            onTap: () {
-                                              Get.to(() => PostDetailScreen(
-                                                    postCardController:
-                                                        postCardController,
+                                            onTap: () => Get.to(() =>
+                                                PostDetailScreen(
                                                     postModel: post,
-                                                  ));
-                                            },
+                                                    postCardController:
+                                                        postCardController)),
                                             onDoubleTap: () {
                                               log("clicked");
                                               postCardController.isLiked.value =
@@ -963,6 +942,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 CustomPostFooter(
                                   likes: post.likesIds.length.toString(),
                                   isLike: post.likesIds.contains(user!.id),
+
                                   ontapLike: () {
                                     log("clicked");
                                     postCardController.isLiked.value =
@@ -970,8 +950,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     postCardController.likeDisLikePost(
                                         user!.id, post.id, post.creatorId);
                                   },
-                                  postId: post.id,
-                                  cmntIds: post.commentIds,
+                                  // ontapSave: () {
+                                  //   log(user!.savedPostsIds);
+
+                                  // },
                                   saveBtn: StreamBuilder<
                                       DocumentSnapshot<Map<String, dynamic>>>(
                                     stream: FirebaseFirestore.instance
@@ -1045,23 +1027,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ));
                                   },
                                   ontapCmnt: () {
+                                    // Get.to(() => CommentScreen(
+                                    //       id: post.id,
+                                    //       creatorId: post.creatorId,
+                                    //       comment: post.commentIds,
+                                    //       creatorDetails: CreatorDetails(
+                                    //           name: post.creatorDetails.name,
+                                    //           imageUrl:
+                                    //               post.creatorDetails.imageUrl,
+                                    //           isVerified: post
+                                    //               .creatorDetails.isVerified),
+                                    //     ));
                                     Get.to(() => PostDetailScreen(
-                                              postCardController:
-                                                  postCardController,
-                                              postModel: post,
-                                            )
-                                        // CommentScreen(
-                                        //       id: post.id,
-                                        //       creatorId: post.creatorId,
-                                        //       comment: post.commentIds,
-                                        //       creatorDetails: CreatorDetails(
-                                        //           name: post.creatorDetails.name,
-                                        //           imageUrl:
-                                        //               post.creatorDetails.imageUrl,
-                                        //           isVerified: post
-                                        //               .creatorDetails.isVerified),
-                                        // )
-                                        );
+                                        postModel: post,
+                                        postCardController:
+                                            postCardController));
                                   },
                                   comments: post.commentIds.length,
                                   isDesc: post.description.isNotEmpty,
@@ -1224,7 +1204,6 @@ class CustomPostHeader extends StatelessWidget {
   final VoidCallback? ontap;
   final VoidCallback? headerOnTap;
   final bool? isVerified;
-  final String? time;
 
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
@@ -1237,8 +1216,7 @@ class CustomPostHeader extends StatelessWidget {
       this.isVideoPost = false,
       this.headerOnTap,
       this.isVerified = false,
-      this.onVertItemClick,
-      this.time})
+      this.onVertItemClick})
       : super(key: key);
 
   @override
@@ -1252,8 +1230,8 @@ class CustomPostHeader extends StatelessWidget {
             children: [
               widthBox(12.w),
               Container(
-                height: 40.h,
-                width: 40.h,
+                height: 30.h,
+                width: 30.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.amber,
@@ -1264,26 +1242,12 @@ class CustomPostHeader extends StatelessWidget {
                 ),
               ),
               widthBox(10.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "$name",
-                    style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: isVideoPost! ? colorFF7 : color221),
-                  ),
-                  Text(
-                    time ?? "",
-                    style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w400,
-                        color: isVideoPost!
-                            ? colorFF7.withOpacity(0.6)
-                            : const Color(0xff5f5f5f)),
-                  ),
-                ],
+              Text(
+                "$name",
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    color: isVideoPost! ? colorFF7 : color221),
               ),
               widthBox(5.w),
               Visibility(
@@ -1293,7 +1257,7 @@ class CustomPostHeader extends StatelessWidget {
                   width: 17.w,
                   height: 17.h,
                 ),
-              ),
+              )
             ],
           ),
         ),
@@ -1320,8 +1284,6 @@ class CustomPostFooter extends StatelessWidget {
   final Widget? saveBtn;
   final bool? isDesc;
   final bool? isPostDetail;
-  final List<String>? cmntIds;
-  final String? postId;
 
   const CustomPostFooter({
     Key? key,
@@ -1335,8 +1297,6 @@ class CustomPostFooter extends StatelessWidget {
     this.isLike = false,
     this.isPostDetail = false,
     this.saveBtn,
-    this.cmntIds,
-    this.postId,
   }) : super(key: key);
 
   // final postController = PostCardController(postdata: postdata);
@@ -1392,95 +1352,34 @@ class CustomPostFooter extends StatelessWidget {
                 "$desc",
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: const Color(0xff5f5f5f),
-                  fontWeight: FontWeight.w400,
+                  color: color13F,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
           ),
         ),
         Visibility(
-          visible: cmntIds != null && cmntIds!.isNotEmpty,
+          visible: isPostDetail!
+              ? comments != null
+                  ? comments! > 0
+                  : false
+              : false,
           child: Align(
             alignment: Alignment.centerLeft,
-            child: InkWell(
-              onTap: ontapCmnt,
-              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection("posts")
-                      .doc(postId)
-                      .collection("comments")
-                      .orderBy("createdAt", descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    return snapshot.hasData
-                        ? Container(
-                            height: 50,
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 34.h,
-                                  width: 34.h,
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        height: 30.h,
-                                        width: 30.h,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                            image: CachedNetworkImageProvider(
-                                              snapshot.data!.docs.first
-                                                      .data()['creatorDetails']
-                                                  ['imageUrl'],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Visibility(
-                                        visible: snapshot.data!.docs.first
-                                                .data()['creatorDetails']
-                                            ['isVerified'],
-                                        child: Positioned(
-                                          bottom: 0,
-                                          right: 0,
-                                          child:
-                                              SvgPicture.asset(icVerifyBadge),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                widthBox(7.w),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    TextWidget(
-                                      text: snapshot.data!.docs.first
-                                          .data()['creatorDetails']['name'],
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                    Expanded(
-                                      child: TextWidget(
-                                        text: snapshot.data!.docs.first
-                                            .data()['message'],
-                                        textOverflow: TextOverflow.ellipsis,
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 9.sp,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        : Container();
-                  }),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+              child: InkWell(
+                onTap: ontapCmnt,
+                child: Text(
+                  "show all $comments comments",
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: color080,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             ),
           ),
         ),
