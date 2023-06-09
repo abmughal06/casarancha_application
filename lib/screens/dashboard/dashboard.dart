@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-import 'package:badges/badges.dart' as badges;
 
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
@@ -32,7 +31,7 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard>
     with AutomaticKeepAliveClientMixin {
-  late ProfileScreenController profileScreenController =
+  ProfileScreenController profileScreenController =
       Get.put(ProfileScreenController());
 
   late DashboardController dashboardController;
@@ -42,13 +41,13 @@ class _DashBoardState extends State<DashBoard>
     dashboardController = Get.isRegistered<DashboardController>()
         ? Get.find<DashboardController>()
         : Get.put(DashboardController());
-   
+
     Future.delayed(Duration.zero, () {
       GhostMessageController gmCtrl = GhostChatHelper.shared.gMessageCtrl;
       gmCtrl.createConversationStreamSubscription(
           FirebaseAuth.instance.currentUser?.uid ?? "");
     });
-   
+
     getPrefData();
     super.initState();
   }
@@ -152,16 +151,10 @@ class _DashBoardState extends State<DashBoard>
                         onPressed: () {
                           dashboardController.pageController.jumpToPage(3);
                         },
-                        icon: badges.Badge(
-                          badgeContent: const Text(
-                            '0',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          child: SvgPicture.asset(
-                            dashboardController.currentIndex.value == 3
-                                ? icBottomSelChat
-                                : icBottomDeSelChat,
-                          ),
+                        icon: SvgPicture.asset(
+                          dashboardController.currentIndex.value == 3
+                              ? icBottomSelChat
+                              : icBottomDeSelChat,
                         ),
                       ),
                       IconButton(
@@ -197,7 +190,7 @@ class _DashBoardState extends State<DashBoard>
 IconButton ghostModeBtn({HomeScreenController? homeCtrl, double? iconSize}) {
   HomeScreenController homeScreenController =
       homeCtrl ?? Get.put(HomeScreenController());
-  
+
   return IconButton(
     iconSize: iconSize,
     onPressed: () async {

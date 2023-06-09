@@ -298,8 +298,8 @@ class _StoryViewScreenState extends State<StoryViewScreen>
     _animController = AnimationController(vsync: this);
 
     storyList = widget.story.mediaDetailsList
-        // .where(
-        //     (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
+        .where(
+            (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
         .map((e) => e)
         .toList();
     print(storyList);

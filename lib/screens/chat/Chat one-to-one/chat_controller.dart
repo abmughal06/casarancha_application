@@ -127,7 +127,7 @@ class ChatController extends GetxController {
         createdAt: DateTime.now().toIso8601String(),
       );
 
-      if (!isChatExits.value) {
+      if (isChatExits.value) {
         await currentUserRef
             .collection(profileScreenController.isGhostModeOn.value
                 ? "ghostMessageList"

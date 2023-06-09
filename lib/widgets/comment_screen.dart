@@ -44,6 +44,7 @@ class CommentScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        centerTitle: true,
         title: const Text(
           "Comments",
           style: TextStyle(color: Colors.black),
@@ -71,9 +72,11 @@ class CommentScreen extends StatelessWidget {
                           //     CreatorDetails.fromMap(data['creatorDetails']);
                           var cmnt = Comment.fromMap(data);
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.only(
+                                bottom: 24, right: 20, left: 20),
                             child: ListTile(
                               horizontalTitleGap: 0,
+                              isThreeLine: true,
                               leading: Container(
                                 height: 30.h,
                                 width: 30.h,
@@ -319,8 +322,10 @@ class CommentScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.done,
+                  minLines: 1,
+                  maxLines: 3,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
                 ),
               ),

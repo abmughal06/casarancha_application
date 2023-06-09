@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -8,6 +9,7 @@ import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/asset_image_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -29,8 +31,11 @@ import '../../chat/share_post_screen.dart';
 import '../../dashboard/dashboard.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
+import '../post_detail_screen.dart';
 import '../story_view_screen.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:timeago/timeago.dart' as timeago;
+
 // import 'package:timeago/timeago.dart' as timeago;
 
 class HomeScreen extends StatefulWidget {
@@ -103,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               icon: badges.Badge(
                 badgeContent: const Text(
-                  '0',
+                  '1',
                   style: TextStyle(color: Colors.white),
                 ),
                 child: SvgPicture.asset(
@@ -420,6 +425,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                         CustomPostHeader(
                                             name: post.creatorDetails.name,
                                             image: post.creatorDetails.imageUrl,
+                                            onVertItemClick: () {
+                                              GlobalSnackBar.show(
+                                                  message:
+                                                      "Ghost mode is enabled");
+                                            },
+                                            time: timeago.format(
+                                                DateTime.parse(post.createdAt)),
                                             headerOnTap: () {
                                               postCardController
                                                   .gotoAppUserScreen(
@@ -456,7 +468,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Visibility(
                                     visible: post.mediaData[0].type == "Video",
                                     child: AspectRatio(
-                                      aspectRatio: 2 / 3,
+                                      aspectRatio: 9 / 16,
                                       child: ListView.builder(
                                         scrollDirection: Axis.horizontal,
                                         shrinkWrap: true,
@@ -516,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           'Ghost Mode Enabled!')));
                                             },
                                             child: AspectRatio(
-                                              aspectRatio: 2 / 3,
+                                              aspectRatio: 9 / 16,
                                               child: Stack(
                                                 children: [
                                                   VideoPlayerWidget(
@@ -540,6 +552,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 post.creatorId);
                                                       },
                                                       isVideoPost: true,
+                                                      onVertItemClick: () {
+                                                        GlobalSnackBar.show(
+                                                            message:
+                                                                "Ghost mode is enabled");
+                                                      },
+                                                      time: timeago.format(
+                                                          DateTime.parse(
+                                                              post.createdAt)),
                                                     ),
                                                   ),
                                                 ],
@@ -747,6 +767,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           isScrollControlled: true,
                                         );
                                       },
+                                      time: timeago.format(
+                                          DateTime.parse(post.createdAt)),
                                       name: post.creatorDetails.name,
                                       image: post.creatorDetails.imageUrl,
                                       ontap: () {},
@@ -768,6 +790,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemCount: post.mediaData.length,
                                           itemBuilder: (context, index) =>
                                               InkWell(
+                                                  onTap: () {
+                                                    Get.to(
+                                                        () => PostDetailScreen(
+                                                              postCardController:
+                                                                  postCardController,
+                                                              postModel: post,
+                                                            ));
+                                                  },
                                                   onDoubleTap: () async {
                                                     log("clicked");
                                                     postCardController
@@ -790,7 +820,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Visibility(
                                   visible: post.mediaData[0].type == "Video",
                                   child: AspectRatio(
-                                    aspectRatio: 2 / 3,
+                                    aspectRatio: 9 / 16,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       shrinkWrap: true,
@@ -817,28 +847,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                         //       videoPlayerController,
                                         // );
                                         return InkWell(
-                                          // onTap: () {
-                                          //   log('clicked');
-                                          //   Get.to(
-                                          //     () => CustomVideoCard(
-                                          //       aspectRatio:
-                                          //           videoPlayerController!
-                                          //               .value.aspectRatio,
-                                          //       videoPlayerController:
-                                          //           videoPlayerController,
-                                          //       // videoUrl:
-                                          //       //     post.mediaData[i].link,
-                                          //       menuButton: menuButton(context,
-                                          //           post.mediaData[i].link,
-                                          //           margin:  EdgeInsets
-                                          //                   .symmetric(
-                                          //               vertical: 10,
-                                          //               horizontal: 17),
-                                          //           profileScreenController:
-                                          //               profileScreenController),
-                                          //     ),
-                                          //   );
-                                          // },
+                                          onTap: () {
+                                            Get.to(() => PostDetailScreen(
+                                                  postCardController:
+                                                      postCardController,
+                                                  postModel: post,
+                                                ));
+                                          },
                                           onDoubleTap: () {
                                             log("clicked");
                                             postCardController.isLiked.value =
@@ -850,7 +865,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 post.creatorId);
                                           },
                                           child: AspectRatio(
-                                            aspectRatio: 2 / 3,
+                                            aspectRatio: 9 / 16,
                                             child: Stack(
                                               children: [
                                                 VideoPlayerWidget(
@@ -864,6 +879,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   left: 0,
                                                   right: 0,
                                                   child: CustomPostHeader(
+                                                    time: timeago.format(
+                                                        DateTime.parse(
+                                                            post.createdAt)),
                                                     name: post
                                                         .creatorDetails.name,
                                                     image: post.creatorDetails
@@ -898,6 +916,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemCount: post.mediaData.length,
                                           itemBuilder: (context, index) =>
                                               InkWell(
+                                            onTap: () {
+                                              Get.to(() => PostDetailScreen(
+                                                    postCardController:
+                                                        postCardController,
+                                                    postModel: post,
+                                                  ));
+                                            },
                                             onDoubleTap: () {
                                               log("clicked");
                                               postCardController.isLiked.value =
@@ -938,7 +963,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 CustomPostFooter(
                                   likes: post.likesIds.length.toString(),
                                   isLike: post.likesIds.contains(user!.id),
-
                                   ontapLike: () {
                                     log("clicked");
                                     postCardController.isLiked.value =
@@ -946,10 +970,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     postCardController.likeDisLikePost(
                                         user!.id, post.id, post.creatorId);
                                   },
-                                  // ontapSave: () {
-                                  //   log(user!.savedPostsIds);
-
-                                  // },
+                                  postId: post.id,
+                                  cmntIds: post.commentIds,
                                   saveBtn: StreamBuilder<
                                       DocumentSnapshot<Map<String, dynamic>>>(
                                     stream: FirebaseFirestore.instance
@@ -1023,17 +1045,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ));
                                   },
                                   ontapCmnt: () {
-                                    Get.to(() => CommentScreen(
-                                          id: post.id,
-                                          creatorId: post.creatorId,
-                                          comment: post.commentIds,
-                                          creatorDetails: CreatorDetails(
-                                              name: post.creatorDetails.name,
-                                              imageUrl:
-                                                  post.creatorDetails.imageUrl,
-                                              isVerified: post
-                                                  .creatorDetails.isVerified),
-                                        ));
+                                    Get.to(() => PostDetailScreen(
+                                              postCardController:
+                                                  postCardController,
+                                              postModel: post,
+                                            )
+                                        // CommentScreen(
+                                        //       id: post.id,
+                                        //       creatorId: post.creatorId,
+                                        //       comment: post.commentIds,
+                                        //       creatorDetails: CreatorDetails(
+                                        //           name: post.creatorDetails.name,
+                                        //           imageUrl:
+                                        //               post.creatorDetails.imageUrl,
+                                        //           isVerified: post
+                                        //               .creatorDetails.isVerified),
+                                        // )
+                                        );
                                   },
                                   comments: post.commentIds.length,
                                   isDesc: post.description.isNotEmpty,
@@ -1196,6 +1224,7 @@ class CustomPostHeader extends StatelessWidget {
   final VoidCallback? ontap;
   final VoidCallback? headerOnTap;
   final bool? isVerified;
+  final String? time;
 
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
@@ -1208,7 +1237,8 @@ class CustomPostHeader extends StatelessWidget {
       this.isVideoPost = false,
       this.headerOnTap,
       this.isVerified = false,
-      this.onVertItemClick})
+      this.onVertItemClick,
+      this.time})
       : super(key: key);
 
   @override
@@ -1222,8 +1252,8 @@ class CustomPostHeader extends StatelessWidget {
             children: [
               widthBox(12.w),
               Container(
-                height: 30.h,
-                width: 30.h,
+                height: 40.h,
+                width: 40.h,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.amber,
@@ -1234,12 +1264,26 @@ class CustomPostHeader extends StatelessWidget {
                 ),
               ),
               widthBox(10.w),
-              Text(
-                "$name",
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: isVideoPost! ? colorFF7 : color221),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "$name",
+                    style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: isVideoPost! ? colorFF7 : color221),
+                  ),
+                  Text(
+                    time ?? "",
+                    style: TextStyle(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w400,
+                        color: isVideoPost!
+                            ? colorFF7.withOpacity(0.6)
+                            : const Color(0xff5f5f5f)),
+                  ),
+                ],
               ),
               widthBox(5.w),
               Visibility(
@@ -1249,7 +1293,7 @@ class CustomPostHeader extends StatelessWidget {
                   width: 17.w,
                   height: 17.h,
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -1276,6 +1320,8 @@ class CustomPostFooter extends StatelessWidget {
   final Widget? saveBtn;
   final bool? isDesc;
   final bool? isPostDetail;
+  final List<String>? cmntIds;
+  final String? postId;
 
   const CustomPostFooter({
     Key? key,
@@ -1289,6 +1335,8 @@ class CustomPostFooter extends StatelessWidget {
     this.isLike = false,
     this.isPostDetail = false,
     this.saveBtn,
+    this.cmntIds,
+    this.postId,
   }) : super(key: key);
 
   // final postController = PostCardController(postdata: postdata);
@@ -1344,34 +1392,95 @@ class CustomPostFooter extends StatelessWidget {
                 "$desc",
                 style: TextStyle(
                   fontSize: 13.sp,
-                  color: color13F,
-                  fontWeight: FontWeight.w500,
+                  color: const Color(0xff5f5f5f),
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
           ),
         ),
         Visibility(
-          visible: isPostDetail!
-              ? comments != null
-                  ? comments! > 0
-                  : false
-              : false,
+          visible: cmntIds != null && cmntIds!.isNotEmpty,
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-              child: InkWell(
-                onTap: ontapCmnt,
-                child: Text(
-                  "show all $comments comments",
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: color080,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+            child: InkWell(
+              onTap: ontapCmnt,
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection("posts")
+                      .doc(postId)
+                      .collection("comments")
+                      .orderBy("createdAt", descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    return snapshot.hasData
+                        ? Container(
+                            height: 50,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 34.h,
+                                  width: 34.h,
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        height: 30.h,
+                                        width: 30.h,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                            image: CachedNetworkImageProvider(
+                                              snapshot.data!.docs.first
+                                                      .data()['creatorDetails']
+                                                  ['imageUrl'],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: snapshot.data!.docs.first
+                                                .data()['creatorDetails']
+                                            ['isVerified'],
+                                        child: Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child:
+                                              SvgPicture.asset(icVerifyBadge),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                widthBox(7.w),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextWidget(
+                                      text: snapshot.data!.docs.first
+                                          .data()['creatorDetails']['name'],
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                    ),
+                                    Expanded(
+                                      child: TextWidget(
+                                        text: snapshot.data!.docs.first
+                                            .data()['message'],
+                                        textOverflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 9.sp,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        : Container();
+                  }),
             ),
           ),
         ),

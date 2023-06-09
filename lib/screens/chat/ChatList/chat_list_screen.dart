@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_controller.dart';
-import 'package:casarancha/screens/chat/GhostMode/ghost_inbox_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +11,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:intl/date_time_patterns.dart';
 
 // import 'package:intl/intl.dart';s
 import '../../../resources/color_resources.dart';
@@ -23,8 +21,6 @@ import '../../home/HomeScreen/home_screen_controller.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../Chat one-to-one/chat_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-import '../GhostMode/ghost_chat_screen.dart';
 
 String convertDateIntoTime(String date) {
   var time = timeago.format(
@@ -114,7 +110,6 @@ class ChatListScreen extends StatelessWidget {
                   child: TabBarView(
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-
                         // MessageList(),
                         // MessageList1()
                         profileScreenController.isGhostModeOn.value
@@ -343,12 +338,24 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                     ? Text(
                                         val1,
                                       )
-                                    : Text(creatorDetails.name),
+                                    : TextWidget(
+                                        text: creatorDetails.name,
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xff222939),
+                                      ),
                               ],
                             ),
-                            subtitle: Text(
-                              data['lastMessage'].toString(),
-                              overflow: TextOverflow.ellipsis,
+                            subtitle: TextWidget(
+                              text: data['lastMessage'].toString(),
+                              textOverflow: TextOverflow.ellipsis,
+                              fontWeight: data['unreadMessageCount'] == 0
+                                  ? FontWeight.w400
+                                  : FontWeight.w700,
+                              fontSize: 14.sp,
+                              color: data['unreadMessageCount'] == 0
+                                  ? const Color(0xff8a8a8a)
+                                  : const Color(0xff000000),
                             ),
                             leading: CircleAvatar(
                               backgroundImage: creatorDetails.imageUrl.isEmpty
@@ -370,8 +377,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                   text: convertDateIntoTime(
                                       data['createdAt'].toString()),
                                   fontWeight: FontWeight.w400,
-                                  fontSize: 11,
-                                  color: Colors.black.withOpacity(0.6),
+                                  fontSize: 12.sp,
+                                  color: const Color(0xff878787),
                                 ),
                                 SizedBox(height: 5.h),
                                 data['unreadMessageCount'] == 0
@@ -380,17 +387,17 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                             "0"
                                         ? const Text("")
                                         : Container(
-                                            padding: const EdgeInsets.all(6),
+                                            padding: const EdgeInsets.all(3),
                                             decoration: const BoxDecoration(
-                                                color: Colors.teal,
+                                                color: Color(0xff7BC246),
                                                 shape: BoxShape.circle),
                                             child: Text(
                                               data['unreadMessageCount']
                                                   .toString(),
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w700),
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w400),
                                             ),
                                           ),
                               ],
@@ -445,7 +452,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                 final CreatorDetails creatorDetails =
                                     CreatorDetails.fromMap(
                                         snapshot.data!.docs[index].data());
-                              var  val11=generateRandomString(7);
+                                var val11 = generateRandomString(7);
                                 return StreamBuilder<DocumentSnapshot<Map>>(
                                   stream: FirebaseFirestore.instance
                                       .collection("users")
@@ -492,12 +499,23 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                                   ? Text(
                                                       val11,
                                                     )
-                                                  : Text(userMmessage.name),
+                                                  : TextWidget(
+                                                      text: creatorDetails.name,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: const Color(
+                                                          0xff222939),
+                                                    ),
                                             ],
                                           ),
-                                          subtitle: Text(
-                                            'Start a conversation with ${profileScreenController.isGhostModeOn.value ? "Ghost" : userMmessage.name}',
-                                            overflow: TextOverflow.ellipsis,
+                                          subtitle: TextWidget(
+                                            text:
+                                                'Start a conversation with ${profileScreenController.isGhostModeOn.value ? "Ghost" : userMmessage.name}',
+                                            textOverflow: TextOverflow.ellipsis,
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 14.sp,
+                                            color: const Color(0xff8a8a8a),
                                           ),
                                           leading: CircleAvatar(
                                             backgroundImage:

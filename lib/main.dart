@@ -3,6 +3,7 @@ import 'package:casarancha/resources/local_notification_service.dart';
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +24,8 @@ void main() async {
   //   print("=======>>>>>>>>>>$message");
   //   return FirebaseMessagingService().backgroundHandler(message);
   // });
-  // LocalNotificationService.initialize();
+  // LocalNotificationService.initialize()
+  // Get.put<ProfileScreenController>(ProfileScreenController());
 
   await runAgain();
 }

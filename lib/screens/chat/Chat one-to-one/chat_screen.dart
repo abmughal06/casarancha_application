@@ -327,8 +327,8 @@ class ChatScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.done,
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
                     onEditingComplete: () => FocusScope.of(context).unfocus(),
                   ),
                 ),
@@ -378,7 +378,7 @@ class ChatTile extends StatelessWidget {
                         bottomRight: Radius.circular(
                           isMe ? 0 : 16.r,
                         )),
-                    color: (isMe ? colorF03 : colorFF4),
+                    color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
                   ),
                   padding:
                       EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
@@ -475,7 +475,8 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                           bottomRight: Radius.circular(
                             widget.isMe ? 0 : 16.r,
                           )),
-                      color: (widget.isMe ? colorF03 : colorFF4),
+                      color:
+                          (widget.isMe ? colorF03.withOpacity(0.6) : colorFF4),
                     ),
                     padding:
                         EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
@@ -553,7 +554,7 @@ class ChatPostTile extends StatelessWidget {
                         bottomRight: Radius.circular(
                           isMe ? 0 : 16.r,
                         )),
-                    color: (isMe ? colorF03 : colorFF4),
+                    color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
                   ),
                   padding:
                       EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
@@ -667,7 +668,7 @@ class ChatStoryTile extends StatelessWidget {
                         bottomRight: Radius.circular(
                           isMe ? 0 : 16.r,
                         )),
-                    color: (isMe ? colorF03 : colorFF4),
+                    color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
                   ),
                   padding:
                       EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),

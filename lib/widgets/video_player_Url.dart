@@ -134,7 +134,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         allowFullScreen: true,
         deviceOrientationsOnEnterFullScreen: [DeviceOrientation.portraitUp],
         deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-        aspectRatio: 2 / 3,
+        aspectRatio: 9 / 16,
         looping: false);
   }
 

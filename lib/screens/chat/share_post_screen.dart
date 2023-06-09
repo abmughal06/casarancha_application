@@ -143,7 +143,7 @@ class SharePostScreen extends StatelessWidget {
                                       () => Container(
                                         decoration: BoxDecoration(
                                           color: isSent.value
-                                              ? Colors.red.shade400
+                                              ? Colors.red.shade300
                                               : Colors.red.shade900,
                                           borderRadius:
                                               BorderRadius.circular(30),
@@ -240,12 +240,12 @@ class SharePostScreen extends StatelessWidget {
                                             //   GlobalSnackBar(message: e.toString());
                                             // }
                                           },
-                                          child: const Padding(
-                                            padding: EdgeInsets.symmetric(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
                                                 horizontal: 17, vertical: 9),
                                             child: Text(
-                                              "Send",
-                                              style: TextStyle(
+                                              isSent.value ? "Sent" : "Send",
+                                              style: const TextStyle(
                                                 letterSpacing: 0.7,
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w700,

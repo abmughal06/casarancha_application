@@ -2,6 +2,7 @@ import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/screens/home/story_view_screen.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/widgets/FullImageView.dart';
 import 'package:casarancha/widgets/menu_post_button.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
@@ -246,6 +247,9 @@ class AppUserScreen extends StatelessWidget {
                                           isVerified: appUserController
                                               .appUserData.value.isVerified,
                                         ),
+                                        profileScreenController:
+                                            ProfileScreenController(),
+                                        val: "",
                                       )),
                                   child: Image.asset(
                                     imgProMsg,
