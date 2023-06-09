@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
-import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +18,6 @@ import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../../widgets/clip_pad_shadow.dart';
-import '../../widgets/comment_screen.dart';
-import '../../widgets/text_editing_widget.dart';
 import '../chat/GhostMode/ghost_chat_screen.dart';
 import '../chat/share_post_screen.dart';
 
@@ -93,31 +90,31 @@ class PostDetailScreen extends StatelessWidget {
                                       videoPlayerController =
                                           VideoPlayerController.network(
                                               mediaData.link);
-                                      videoPlayerController!.initialize();
-                                      print(mediaData.link);
-                                      videoPlayerController!.play();
-                                      var chweieController = ChewieController(
-                                        videoPlayerController:
-                                            videoPlayerController!,
-                                        aspectRatio: 2 / 3,
-                                        looping: true,
-                                        autoPlay: true,
-                                        zoomAndPan: true,
-                                      );
+                                      // videoPlayerController!.initialize();
+                                      // print(mediaData.link);
+                                      // videoPlayerController!.play();
+                                      // var chweieController = ChewieController(
+                                      //   videoPlayerController:
+                                      //       videoPlayerController!,
+                                      //   aspectRatio: 2 / 3,
+                                      //   looping: true,
+                                      //   autoPlay: true,
+                                      //   zoomAndPan: true,
+                                      // );
 
-                                      return InkWell(
-                                        onLongPress: () {
-                                          videoPlayerController!.pause();
-                                        },
-                                        onTap: () {
-                                          videoPlayerController!.play();
-                                        },
-                                        child: AspectRatio(
-                                            aspectRatio: 2 / 3,
-                                            child: Chewie(
-                                              controller: chweieController,
-                                            )),
-                                      );
+                                      // return InkWell(
+                                      //   onLongPress: () {
+                                      //     videoPlayerController!.pause();
+                                      //   },
+                                      //   onTap: () {
+                                      //     videoPlayerController!.play();
+                                      //   },
+                                      //   child: AspectRatio(
+                                      //       aspectRatio: 2 / 3,
+                                      //       child: Chewie(
+                                      //         controller: chweieController,
+                                      //       )),
+                                      // );
                                     } else {
                                       return Container(
                                         width:
@@ -139,6 +136,7 @@ class PostDetailScreen extends StatelessWidget {
                                         ),
                                       );
                                     }
+                                    return null;
                                   },
                                 ),
                               ),
@@ -283,7 +281,7 @@ class PostDetailScreen extends StatelessWidget {
                           return const CircularProgressIndicator();
                         }
                       }),
-                  Divider(),
+                  const Divider(),
                   StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                     stream: FirebaseFirestore.instance
                         .collection("posts")

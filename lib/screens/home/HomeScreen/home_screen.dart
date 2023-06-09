@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import '../../../models/post_creator_details.dart';
 import '../../../resources/image_resources.dart';
@@ -47,6 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return nameParts[0];
   }
 
+  Future<void>? initializedFuturePlay;
+
   // ProfileScreenController profileScreenController =
   //     Get.put(ProfileScreenController());
 
@@ -54,18 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // getPrefData();
-  }
-
-  getPrefData() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    // homeScreenController.profileScreenController.toggleGhostMode();
-    Future.delayed(const Duration(seconds: 2)).then((value) {
-      // profileScreenController.toggleGhostMode();
-      bool getVal = sharedPreferences.getBool('isGhostEnable') ?? false;
-      log("000000000000000000000");
-      log(getVal.toString());
-    });
   }
 
   List followingIds = [];
@@ -117,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           SizedBox(height: 10.w),
           SizedBox(
-            height: 65.h,
+            // height: 65.h,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -789,100 +778,131 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Visibility(
                                   visible: post.mediaData[0].type == "Video",
-                                  child: AspectRatio(
-                                    aspectRatio: 2 / 3,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      shrinkWrap: true,
-                                      itemCount: post.mediaData.length,
-                                      itemBuilder: (context, i) {
-                                        VideoPlayerController?
-                                            videoPlayerController;
-
-                                        videoPlayerController =
-                                            VideoPlayerController.network(
-                                          post.mediaData.first.type == "Video"
-                                              ? post.mediaData[i].link
-                                                  .toString()
-                                              : "",
-                                        );
-                                        // videoPlayerController.initialize();
-
-                                        // var chewie = ChewieController(
-                                        //   autoInitialize: true,
-                                        //   autoPlay: false,
-                                        //   aspectRatio: 2 / 3,
-                                        //   looping: false,
-                                        //   videoPlayerController:
-                                        //       videoPlayerController,
-                                        // );
-                                        return InkWell(
-                                          // onTap: () {
-                                          //   log('clicked');
-                                          //   Get.to(
-                                          //     () => CustomVideoCard(
-                                          //       aspectRatio:
-                                          //           videoPlayerController!
-                                          //               .value.aspectRatio,
-                                          //       videoPlayerController:
-                                          //           videoPlayerController,
-                                          //       // videoUrl:
-                                          //       //     post.mediaData[i].link,
-                                          //       menuButton: menuButton(context,
-                                          //           post.mediaData[i].link,
-                                          //           margin:  EdgeInsets
-                                          //                   .symmetric(
-                                          //               vertical: 10,
-                                          //               horizontal: 17),
-                                          //           profileScreenController:
-                                          //               profileScreenController),
-                                          //     ),
-                                          //   );
-                                          // },
-                                          onDoubleTap: () {
-                                            log("clicked");
-                                            postCardController.isLiked.value =
-                                                !post.likesIds
-                                                    .contains(user!.id);
-                                            postCardController.likeDisLikePost(
-                                                user!.id,
-                                                post.id,
-                                                post.creatorId);
-                                          },
+                                  child: FutureBuilder(
+                                      future: initializedFuturePlay,
+                                      builder: (context, snapshot) {
+                                        // if (snapshot.connectionState ==
+                                        //     ConnectionState.done) {
+                                        return Visibility(
                                           child: AspectRatio(
                                             aspectRatio: 2 / 3,
-                                            child: Stack(
-                                              children: [
-                                                VideoPlayerWidget(
-                                                  videoPlayerController:
-                                                      videoPlayerController,
-                                                  videoUrl:
-                                                      post.mediaData[i].link,
-                                                ),
-                                                Positioned(
-                                                  top: 12,
-                                                  left: 0,
-                                                  right: 0,
-                                                  child: CustomPostHeader(
-                                                    name: post
-                                                        .creatorDetails.name,
-                                                    image: post.creatorDetails
-                                                        .imageUrl,
-                                                    headerOnTap: () {
-                                                      postCardController
-                                                          .gotoAppUserScreen(
-                                                              post.creatorId);
-                                                    },
-                                                    isVideoPost: true,
+                                            // child: VideoPlayer(
+                                            //     videoPlayerController),
+                                            child: ListView.builder(
+                                              scrollDirection: Axis.horizontal,
+                                              shrinkWrap: true,
+                                              itemCount: post.mediaData.length,
+                                              itemBuilder: (context, i) {
+                                                VideoPlayerController?
+                                                    videoPlayerController;
+                                                videoPlayerController =
+                                                    VideoPlayerController
+                                                        .network(
+                                                  post.mediaData.first.type ==
+                                                          "Video"
+                                                      ? post.mediaData[i].link
+                                                          .toString()
+                                                      : "",
+                                                );
+
+                                                // initializedFuturePlay =
+                                                //     videoPlayerController
+                                                //         .initialize()
+                                                //         .then((value) {
+                                                //   setState(() {
+                                                //     videoPlayerController!.play();
+                                                //   });
+                                                // });
+
+                                                // videoPlayerController.initialize();
+
+                                                // var chewie = ChewieController(
+                                                //   autoInitialize: true,
+                                                //   autoPlay: false,
+                                                //   aspectRatio: 2 / 3,
+                                                //   looping: false,
+                                                //   videoPlayerController:
+                                                //       videoPlayerController,
+                                                // );
+                                                return InkWell(
+                                                  // onTap: () {
+                                                  //   log('clicked');
+                                                  //   Get.to(
+                                                  //     () => CustomVideoCard(
+                                                  //       aspectRatio:
+                                                  //           videoPlayerController!
+                                                  //               .value.aspectRatio,
+                                                  //       videoPlayerController:
+                                                  //           videoPlayerController,
+                                                  //       // videoUrl:
+                                                  //       //     post.mediaData[i].link,
+                                                  //       menuButton: menuButton(context,
+                                                  //           post.mediaData[i].link,
+                                                  //           margin:  EdgeInsets
+                                                  //                   .symmetric(
+                                                  //               vertical: 10,
+                                                  //               horizontal: 17),
+                                                  //           profileScreenController:
+                                                  //               profileScreenController),
+                                                  //     ),
+                                                  //   );
+                                                  // },
+                                                  onDoubleTap: () {
+                                                    log("clicked");
+                                                    postCardController
+                                                            .isLiked.value =
+                                                        !post.likesIds
+                                                            .contains(user!.id);
+                                                    postCardController
+                                                        .likeDisLikePost(
+                                                            user!.id,
+                                                            post.id,
+                                                            post.creatorId);
+                                                  },
+                                                  child: AspectRatio(
+                                                    aspectRatio: 2 / 3,
+                                                    child: Stack(
+                                                      children: [
+                                                        VideoPlayerWidget(
+                                                          videoPlayerController:
+                                                              videoPlayerController,
+                                                          videoUrl: post
+                                                              .mediaData[i]
+                                                              .link,
+                                                        ),
+                                                        Positioned(
+                                                          top: 12,
+                                                          left: 0,
+                                                          right: 0,
+                                                          child:
+                                                              CustomPostHeader(
+                                                            name: post
+                                                                .creatorDetails
+                                                                .name,
+                                                            image: post
+                                                                .creatorDetails
+                                                                .imageUrl,
+                                                            headerOnTap: () {
+                                                              postCardController
+                                                                  .gotoAppUserScreen(
+                                                                      post.creatorId);
+                                                            },
+                                                            isVideoPost: true,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                );
+                                              },
                                             ),
                                           ),
                                         );
-                                      },
-                                    ),
-                                  ),
+                                        // }
+                                        // else {
+                                        //   return const CircularProgressIndicator();
+                                        // }
+                                      }),
                                 ),
                                 Visibility(
                                   visible: post.mediaData[0].type == "Qoute",
