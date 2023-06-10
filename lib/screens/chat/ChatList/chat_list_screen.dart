@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 // import 'package:intl/intl.dart';s
@@ -344,6 +345,10 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                         fontWeight: FontWeight.w500,
                                         color: const Color(0xff222939),
                                       ),
+                                widthBox(5.w),
+                                Visibility(
+                                    visible: creatorDetails.isVerified,
+                                    child: SvgPicture.asset(icVerifyBadge))
                               ],
                             ),
                             subtitle: TextWidget(
@@ -507,6 +512,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                                       color: const Color(
                                                           0xff222939),
                                                     ),
+                                              widthBox(5.w),
+                                              Visibility(
+                                                  visible:
+                                                      creatorDetails.isVerified,
+                                                  child: SvgPicture.asset(
+                                                      icVerifyBadge))
                                             ],
                                           ),
                                           subtitle: TextWidget(

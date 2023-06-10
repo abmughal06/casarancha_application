@@ -96,7 +96,15 @@ class ChatScreen extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     title: profileScreenController!.isGhostModeOn.value
                         ? Text(val.toString())
-                        : Text(userModel.name),
+                        : Row(
+                            children: [
+                              Text(userModel.name),
+                              widthBox(5.w),
+                              Visibility(
+                                  visible: userModel.isVerified,
+                                  child: SvgPicture.asset(icVerifyBadge))
+                            ],
+                          ),
                     subtitle: snapshot.hasData ? const Text('Live') : null,
                     leading: CircleAvatar(
                       backgroundImage: userModel.imageStr.isEmpty ||

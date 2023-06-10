@@ -2,6 +2,7 @@ import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/resources/image_resources.dart';
 
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/widgets/PostCard/postCard.dart';
@@ -16,12 +17,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'package:flutterfire_ui/firestore.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../widgets/common_widgets.dart';
+import '../../widgets/text_widget.dart';
 import '../dashboard/dashboard.dart';
 import '../profile/AppUser/app_user_controller.dart';
 import '../profile/AppUser/app_user_screen.dart';
@@ -73,6 +76,45 @@ class _SearchScreenState extends State<SearchScreen> {
     return matchCount >= 4;
   }
 
+  Rx<bool> follow = false.obs;
+
+  // void toggleFollow(id, yes) async {
+  //   var ref = FirebaseFirestore.instance
+  //       .collection("users")
+  //       .doc(FirebaseAuth.instance.currentUser!.uid);
+  //   if (yes) {
+  //     await ref.update({"followersIds": FieldValue.arrayUnion(id)});
+  //   } else {
+  //     await ref.update({"followersIds": FieldValue.arrayRemove(id)});
+  //   }
+  // }
+
+  Future<void> toggleFollow(String idToToggle) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final DocumentReference documentRef = firestore
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+
+    try {
+      final DocumentSnapshot snapshot = await documentRef.get();
+      final List<dynamic> array = snapshot.get("followersIds") ?? [];
+
+      follow.value = array.contains(idToToggle);
+
+      if (follow.value) {
+        documentRef.update({
+          "followersIds": FieldValue.arrayRemove([idToToggle]),
+        });
+      } else {
+        documentRef.update({
+          "followersIds": FieldValue.arrayUnion([idToToggle]),
+        });
+      }
+    } catch (e) {
+      // Handle the error according to your application's needs.
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,7 +161,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                 var userSnap =
                                     snapshot.data!.docs[index].data();
                                 // print(userSnap);
-                                // var user = UserModel.fromMap(userSnap);
                                 // print(
                                 //     user.name.compareTo(searchController.text));
                                 if (compareStrings(
@@ -141,8 +182,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                     },
                                     child: ListTile(
                                       leading: Container(
-                                        height: 38.w,
-                                        width: 38.w,
+                                        height: 50.w,
+                                        width: 50.w,
                                         decoration: BoxDecoration(
                                           color: color080,
                                           shape: BoxShape.circle,
@@ -154,9 +195,47 @@ class _SearchScreenState extends State<SearchScreen> {
                                           ),
                                         ),
                                       ),
-                                      title: Text(userSnap["name"].toString()),
-                                      subtitle:
-                                          Text(userSnap["username"].toString()),
+                                      title: Row(
+                                        children: [
+                                          TextWidget(
+                                            text: userSnap["name"].toString(),
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: color221,
+                                          ),
+                                          widthBox(5.w),
+                                          Visibility(
+                                            visible: userSnap['isVerified'],
+                                            child: SvgPicture.asset(
+                                              icVerifyBadge,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      subtitle: TextWidget(
+                                        text: userSnap["username"].toString(),
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: colorAA3,
+                                      ),
+                                      trailing: Obx(
+                                        () => TextButton(
+                                          child: TextWidget(
+                                            text: follow.value
+                                                ? "Unfollow"
+                                                : "Follow",
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: follow.value
+                                                ? const Color(0xffAA0505)
+                                                    .withOpacity(0.5)
+                                                : const Color(0xffAA0505),
+                                          ),
+                                          onPressed: () async {
+                                            toggleFollow(userSnap['id']);
+                                          },
+                                        ),
+                                      ),
                                     ),
                                   );
                                 } else {

@@ -32,14 +32,29 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../profile/AppUser/app_user_controller.dart';
 import '../profile/AppUser/app_user_screen.dart';
 
-class PostDetailScreen extends StatelessWidget {
+class PostDetailScreen extends StatefulWidget {
   PostDetailScreen(
       {Key? key, required this.postModel, required this.postCardController})
       : super(key: key);
   final PostModel postModel;
   PostCardController? postCardController;
+
+  @override
+  State<PostDetailScreen> createState() => _PostDetailScreenState();
+}
+
+class _PostDetailScreenState extends State<PostDetailScreen> {
   final coommenController = TextEditingController();
+
   Future<void>? iniializedFuturePlay;
+
+  VideoPlayerController? videoPlayerController;
+  @override
+  void dispose() {
+    super.dispose();
+    videoPlayerController!.pause();
+    videoPlayerController!.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +75,7 @@ class PostDetailScreen extends StatelessWidget {
                   StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                     stream: FirebaseFirestore.instance
                         .collection("posts")
-                        .doc(postModel.id)
+                        .doc(widget.postModel.id)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -77,19 +92,19 @@ class PostDetailScreen extends StatelessWidget {
                                     scrollDirection: Axis.horizontal,
                                     shrinkWrap: true,
                                     itemBuilder: (context, index) {
-                                      postCardController =
+                                      widget.postCardController =
                                           PostCardController(postdata: post);
                                       var mediaData = post.mediaData[index];
                                       if (mediaData.type == 'Photo') {
                                         return InkWell(
                                             onDoubleTap: () {
                                               print("clicked");
-                                              postCardController!
-                                                      .isLiked.value =
+                                              widget.postCardController!.isLiked
+                                                      .value =
                                                   !post.likesIds.contains(
                                                       FirebaseAuth.instance
                                                           .currentUser!.uid);
-                                              postCardController!
+                                              widget.postCardController!
                                                   .likeDisLikePost(
                                                       FirebaseAuth.instance
                                                           .currentUser!.uid,
@@ -106,9 +121,6 @@ class PostDetailScreen extends StatelessWidget {
                                         return FutureBuilder(
                                             future: iniializedFuturePlay,
                                             builder: (context, snap) {
-                                              VideoPlayerController?
-                                                  videoPlayerController;
-
                                               videoPlayerController =
                                                   VideoPlayerController.network(
                                                       mediaData.link);
@@ -119,7 +131,7 @@ class PostDetailScreen extends StatelessWidget {
                                               var chweieController =
                                                   ChewieController(
                                                 videoPlayerController:
-                                                    videoPlayerController,
+                                                    videoPlayerController!,
                                                 aspectRatio: 9 / 16,
                                                 looping: true,
                                                 autoPlay: true,
@@ -208,30 +220,21 @@ class PostDetailScreen extends StatelessWidget {
                                     likes: post.likesIds.length.toString(),
                                     isLike: post.likesIds.contains(
                                         FirebaseAuth.instance.currentUser!.uid),
+                                    isPostDetail: true,
                                     ontapLike: () {
                                       print("clicked");
-                                      // FirebaseFirestore.instance
-                                      //     .collection("posts")
-                                      //     .doc(post.id)
-                                      //     .update(
-                                      //   {
-                                      //     "likesIds": [
-                                      //       FirebaseAuth.instance.currentUser!.uid
-                                      //     ]
-                                      //   },
-                                      // );
 
-                                      postCardController!.isLiked.value =
+                                      widget.postCardController!.isLiked.value =
                                           !post.likesIds.contains(FirebaseAuth
                                               .instance.currentUser!.uid);
-                                      postCardController!.likeDisLikePost(
-                                          FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                          post.id,
-                                          post.creatorId);
+                                      widget.postCardController!
+                                          .likeDisLikePost(
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid,
+                                              post.id,
+                                              post.creatorId);
                                       // Get.back();
                                     },
-                                    isPostDetail: true,
                                     saveBtn: StreamBuilder<
                                         DocumentSnapshot<Map<String, dynamic>>>(
                                       stream: FirebaseFirestore.instance
@@ -244,8 +247,8 @@ class PostDetailScreen extends StatelessWidget {
                                           var userData = snapshot.data!.data();
                                           var userModel =
                                               UserModel.fromMap(userData!);
-                                          return GestureDetector(
-                                            onTap: () {
+                                          return IconButton(
+                                            onPressed: () {
                                               if (userModel.savedPostsIds
                                                   .contains(post.id)) {
                                                 FirebaseFirestore.instance
@@ -267,7 +270,7 @@ class PostDetailScreen extends StatelessWidget {
                                                 });
                                               }
                                             },
-                                            child: Image.asset(
+                                            icon: Image.asset(
                                               postSave,
                                               color: userModel.savedPostsIds
                                                       .contains(post.id)
@@ -429,7 +432,7 @@ class PostDetailScreen extends StatelessWidget {
                   StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                     stream: FirebaseFirestore.instance
                         .collection("posts")
-                        .doc(postModel.id)
+                        .doc(widget.postModel.id)
                         .collection("comments")
                         .orderBy("createdAt", descending: true)
                         .snapshots(),
@@ -439,105 +442,88 @@ class PostDetailScreen extends StatelessWidget {
                           itemCount: snapshot.data!.docs.length,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          padding: EdgeInsets.zero,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 24),
                           itemBuilder: (context, index) {
                             var data = snapshot.data!.docs[index].data();
                             // var cDetail =
                             //     CreatorDetails.fromMap(data['creatorDetails']);
                             var cmnt = Comment.fromMap(data);
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 24),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(
-                                        () => AppUserScreen(
-                                          appUserController: Get.put(
-                                            AppUserController(
-                                              appUserId: cmnt.creatorId,
-                                              currentUserId: FirebaseAuth
-                                                  .instance.currentUser!.uid,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      height: 46.h,
-                                      width: 46.h,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.amber,
-                                        image: DecorationImage(
-                                          image: CachedNetworkImageProvider(
-                                              cmnt.creatorDetails.imageUrl),
-                                          fit: BoxFit.cover,
+                            return ListTile(
+                              leading: InkWell(
+                                onTap: () {
+                                  Get.to(
+                                    () => AppUserScreen(
+                                      appUserController: Get.put(
+                                        AppUserController(
+                                          appUserId: cmnt.creatorId,
+                                          currentUserId: FirebaseAuth
+                                              .instance.currentUser!.uid,
                                         ),
                                       ),
                                     ),
+                                  );
+                                },
+                                child: Container(
+                                  height: 46.h,
+                                  width: 46.h,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.amber,
+                                    image: DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          cmnt.creatorDetails.imageUrl),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                  widthBox(12.w),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          Get.to(
-                                            () => AppUserScreen(
-                                              appUserController: Get.put(
-                                                AppUserController(
-                                                  appUserId: cmnt.creatorId,
-                                                  currentUserId: FirebaseAuth
-                                                      .instance
-                                                      .currentUser!
-                                                      .uid,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Row(
-                                          children: [
-                                            TextWidget(
-                                                text: cmnt.creatorDetails.name,
-                                                fontSize: 14.sp,
-                                                color: const Color(0xff212121),
-                                                fontWeight: FontWeight.w600),
-                                            widthBox(4.w),
-                                            if (cmnt.creatorDetails.isVerified)
-                                              SvgPicture.asset(icVerifyBadge),
-                                            widthBox(8.w),
-                                            Text(
-                                              timeago.format(
-                                                DateTime.parse(
-                                                  cmnt.createdAt,
-                                                ),
-                                              ),
-                                              style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                  fontWeight: FontWeight.w400,
-                                                  color:
-                                                      const Color(0xff5c5c5c)),
-                                            ),
-                                          ],
+                                ),
+                              ),
+                              title: InkWell(
+                                onTap: () {
+                                  Get.to(
+                                    () => AppUserScreen(
+                                      appUserController: Get.put(
+                                        AppUserController(
+                                          appUserId: cmnt.creatorId,
+                                          currentUserId: FirebaseAuth
+                                              .instance.currentUser!.uid,
                                         ),
                                       ),
-                                      heightBox(4.h),
-                                      Text(
-                                        cmnt.message,
-                                        style: TextStyle(
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    TextWidget(
+                                        text: cmnt.creatorDetails.name,
+                                        fontSize: 14.sp,
+                                        color: const Color(0xff212121),
+                                        fontWeight: FontWeight.w600),
+                                    widthBox(4.w),
+                                    if (cmnt.creatorDetails.isVerified)
+                                      SvgPicture.asset(icVerifyBadge),
+                                    widthBox(8.w),
+                                    Text(
+                                      timeago.format(
+                                        DateTime.parse(
+                                          cmnt.createdAt,
+                                        ),
+                                      ),
+                                      style: TextStyle(
                                           fontSize: 12.sp,
-                                          color: const Color(0xff5f5f5f),
                                           fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                          color: const Color(0xff5c5c5c)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              subtitle: TextWidget(
+                                text:
+                                    cmnt.message.isEmpty ? "---" : cmnt.message,
+                                fontSize: 12.sp,
+                                color: const Color(0xff5f5f5f),
+                                fontWeight: FontWeight.w400,
+                                textOverflow: TextOverflow.visible,
                               ),
                             );
                           },
@@ -587,7 +573,7 @@ class PostDetailScreen extends StatelessWidget {
                           child: GestureDetector(
                               onTap: () {
                                 var cmnt = Comment(
-                                  id: postModel.id,
+                                  id: widget.postModel.id,
                                   creatorId:
                                       FirebaseAuth.instance.currentUser!.uid,
                                   creatorDetails: CreatorDetails(
@@ -600,7 +586,7 @@ class PostDetailScreen extends StatelessWidget {
 
                                 FirebaseFirestore.instance
                                     .collection("posts")
-                                    .doc(postModel.id)
+                                    .doc(widget.postModel.id)
                                     .collection("comments")
                                     .doc()
                                     .set(cmnt.toMap(), SetOptions(merge: true))
@@ -608,7 +594,7 @@ class PostDetailScreen extends StatelessWidget {
                                   coommenController.clear();
                                   var cmntId = await FirebaseFirestore.instance
                                       .collection("posts")
-                                      .doc(postModel.id)
+                                      .doc(widget.postModel.id)
                                       .collection("comments")
                                       .get();
 
@@ -621,14 +607,14 @@ class PostDetailScreen extends StatelessWidget {
                                       "+++========+++++++++============+++++++++ $listOfCommentsId ");
                                   FirebaseFirestore.instance
                                       .collection("posts")
-                                      .doc(postModel.id)
+                                      .doc(widget.postModel.id)
                                       .set({"commentIds": listOfCommentsId},
                                           SetOptions(merge: true));
 
                                   var recieverRef = await FirebaseFirestore
                                       .instance
                                       .collection("users")
-                                      .doc(postModel.creatorId)
+                                      .doc(widget.postModel.creatorId)
                                       .get();
 
                                   var recieverFCMToken =
@@ -643,7 +629,7 @@ class PostDetailScreen extends StatelessWidget {
                                         isVerified:
                                             cmnt.creatorDetails.isVerified),
                                     devRegToken: recieverFCMToken,
-                                    userReqID: postModel.creatorId,
+                                    userReqID: widget.postModel.creatorId,
                                     title: user!.name,
                                     msg:
                                         "${user!.name} has commented on your post.",

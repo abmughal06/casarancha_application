@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
+import '../../../models/comment_model.dart';
 import '../../../models/post_creator_details.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
@@ -27,11 +29,13 @@ import '../../../widgets/comment_screen.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../chat/share_post_screen.dart';
 import '../../dashboard/dashboard.dart';
+import '../../profile/AppUser/app_user_controller.dart';
+import '../../profile/AppUser/app_user_screen.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
 import '../story_view_screen.dart';
 import 'package:badges/badges.dart' as badges;
-// import 'package:timeago/timeago.dart' as timeago;
+import 'package:timeago/timeago.dart' as timeago;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -88,18 +92,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           IconButton(
-              onPressed: () {
-                Get.to(() => const NotificationScreen());
-              },
-              icon: badges.Badge(
-                badgeContent: const Text(
-                  '0',
-                  style: TextStyle(color: Colors.white),
-                ),
-                child: SvgPicture.asset(
-                  icNotifyBell,
-                ),
-              )),
+            onPressed: () {
+              Get.to(() => const NotificationScreen());
+            },
+            icon: badges.Badge(
+              position: badges.BadgePosition.topEnd(end: -7, top: -6),
+              child: SvgPicture.asset(
+                icNotifyBell,
+              ),
+            ),
+          ),
         ],
       ),
       body: ListView(
@@ -421,6 +423,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       children: [
                                         CustomPostHeader(
                                             name: post.creatorDetails.name,
+                                            isVerified:
+                                                post.creatorDetails.isVerified,
                                             image: post.creatorDetails.imageUrl,
                                             headerOnTap: () {
                                               postCardController
@@ -522,6 +526,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             right: 0,
                                                             child:
                                                                 CustomPostHeader(
+                                                              isVerified: post
+                                                                  .creatorDetails
+                                                                  .isVerified,
                                                               name: post
                                                                   .creatorDetails
                                                                   .name,
@@ -553,9 +560,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomPostHeader(
+                                            isVerified:
+                                                post.creatorDetails.isVerified,
                                             name: post.creatorDetails.name,
                                             image: post.creatorDetails.imageUrl,
                                             ontap: () {},
+                                            time: timeago.format(
+                                                DateTime.parse(post.createdAt)),
                                             headerOnTap: () {
                                               postCardController
                                                   .gotoAppUserScreen(
@@ -691,6 +702,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                     comments: post.commentIds.length,
                                     isDesc: post.description.isNotEmpty,
+                                    postId: post.id,
+                                    isPostDetail: false,
                                     desc: post.description.toString(),
                                   ),
                                 ],
@@ -738,6 +751,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Visibility(
                                   visible: post.mediaData[0].type != "Video",
                                   child: CustomPostHeader(
+                                      isVerified:
+                                          post.creatorDetails.isVerified,
+                                      time: timeago.format(
+                                          DateTime.parse(post.createdAt)),
                                       onVertItemClick: () {
                                         Get.back();
 
@@ -855,6 +872,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           right: 0,
                                                           child:
                                                               CustomPostHeader(
+                                                            isVerified: post
+                                                                .creatorDetails
+                                                                .isVerified,
+                                                            time: timeago.format(
+                                                                DateTime.parse(post
+                                                                    .createdAt)),
                                                             name: post
                                                                 .creatorDetails
                                                                 .name,
@@ -920,6 +943,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 horizontal: 40,
                                                 vertical: 50,
                                               ),
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.white),
                                               child: Center(
                                                 child: Text(
                                                   post.mediaData[index].link,
@@ -966,8 +991,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         var userData = snapshot.data!.data();
                                         var userModel =
                                             UserModel.fromMap(userData!);
-                                        return GestureDetector(
-                                          onTap: () {
+                                        return IconButton(
+                                          onPressed: () {
                                             if (userModel.savedPostsIds
                                                 .contains(post.id)) {
                                               FirebaseFirestore.instance
@@ -993,7 +1018,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               });
                                             }
                                           },
-                                          child: Image.asset(
+                                          icon: Image.asset(
                                             postSave,
                                             color: userModel.savedPostsIds
                                                     .contains(post.id)
@@ -1006,6 +1031,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       }
                                     },
                                   ),
+                                  postId: post.id,
                                   ontapShare: () {
                                     Get.to(() => SharePostScreen(
                                           postModel: PostModel(
@@ -1204,7 +1230,7 @@ class CustomPostHeader extends StatelessWidget {
   final VoidCallback? ontap;
   final VoidCallback? headerOnTap;
   final bool? isVerified;
-
+  final String? time;
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
 
@@ -1216,59 +1242,67 @@ class CustomPostHeader extends StatelessWidget {
       this.isVideoPost = false,
       this.headerOnTap,
       this.isVerified = false,
-      this.onVertItemClick})
+      this.onVertItemClick,
+      this.time})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        InkWell(
-          onTap: headerOnTap,
-          child: Row(
-            children: [
-              widthBox(12.w),
-              Container(
-                height: 30.h,
-                width: 30.h,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.amber,
-                  image: DecorationImage(
-                    image: NetworkImage("$image"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              widthBox(10.w),
-              Text(
-                "$name",
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: isVideoPost! ? colorFF7 : color221),
-              ),
-              widthBox(5.w),
-              Visibility(
-                visible: isVerified!,
-                child: SvgPicture.asset(
-                  icVerifyBadge,
-                  width: 17.w,
-                  height: 17.h,
-                ),
-              )
-            ],
+    return ListTile(
+      minVerticalPadding: 0,
+      visualDensity: const VisualDensity(vertical: -2),
+      horizontalTitleGap: 10,
+      leading: InkWell(
+        onTap: headerOnTap,
+        child: Container(
+          height: 40.h,
+          width: 40.h,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.amber,
+            image: DecorationImage(
+              image: NetworkImage("$image"),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
-        IconButton(
-          onPressed: onVertItemClick,
-          icon: Icon(
-            Icons.more_vert,
-            color: isVideoPost! ? colorFF7 : color221,
-          ),
-        )
-      ],
+      ),
+      title: InkWell(
+        onTap: headerOnTap,
+        child: Row(
+          children: [
+            TextWidget(
+              text: "$name",
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: isVideoPost! ? colorFF7 : color221,
+            ),
+            widthBox(5.w),
+            Visibility(
+              visible: isVerified!,
+              child: SvgPicture.asset(
+                icVerifyBadge,
+                width: 17.w,
+                height: 17.h,
+              ),
+            )
+          ],
+        ),
+      ),
+      subtitle: TextWidget(
+        text: time,
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w400,
+        color:
+            isVideoPost! ? colorFF7.withOpacity(0.6) : const Color(0xff5f5f5f),
+      ),
+      trailing: InkWell(
+        onTap: onVertItemClick,
+        child: Icon(
+          Icons.more_vert,
+          color: isVideoPost! ? colorFF7 : const Color(0xffafafaf),
+        ),
+      ),
     );
   }
 }
@@ -1282,6 +1316,7 @@ class CustomPostFooter extends StatelessWidget {
   final VoidCallback? ontapCmnt;
   final VoidCallback? ontapShare;
   final Widget? saveBtn;
+  final String? postId;
   final bool? isDesc;
   final bool? isPostDetail;
 
@@ -1297,6 +1332,7 @@ class CustomPostFooter extends StatelessWidget {
     this.isLike = false,
     this.isPostDetail = false,
     this.saveBtn,
+    this.postId,
   }) : super(key: key);
 
   // final postController = PostCardController(postdata: postdata);
@@ -1334,12 +1370,7 @@ class CustomPostFooter extends StatelessWidget {
                 ),
               ],
             ),
-            Row(
-              children: [
-                saveBtn!,
-                widthBox(16.w),
-              ],
-            ),
+            saveBtn!,
           ],
         ),
         Visibility(
@@ -1361,25 +1392,92 @@ class CustomPostFooter extends StatelessWidget {
         ),
         Visibility(
           visible: isPostDetail!
-              ? comments != null
+              ? false
+              : comments != null
                   ? comments! > 0
-                  : false
-              : false,
+                  : false,
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-              child: InkWell(
-                onTap: ontapCmnt,
-                child: Text(
-                  "show all $comments comments",
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: color080,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection("posts")
+                  .doc(postId)
+                  .collection("comments")
+                  .orderBy("createdAt", descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var data = snapshot.data!.docs.first.data();
+                  // var cDetail =
+                  //     CreatorDetails.fromMap(data['creatorDetails']);
+                  var cmnt = Comment.fromMap(data);
+                  return ListTile(
+                    horizontalTitleGap: 10,
+                    onTap: ontapCmnt,
+                    leading: InkWell(
+                      onTap: () {
+                        Get.to(
+                          () => AppUserScreen(
+                            appUserController: Get.put(
+                              AppUserController(
+                                appUserId: cmnt.creatorId,
+                                currentUserId:
+                                    FirebaseAuth.instance.currentUser!.uid,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 40.h,
+                        width: 40.h,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.amber,
+                          image: DecorationImage(
+                            image: CachedNetworkImageProvider(
+                                cmnt.creatorDetails.imageUrl),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    title: Row(
+                      children: [
+                        TextWidget(
+                            text: cmnt.creatorDetails.name,
+                            fontSize: 14.sp,
+                            color: const Color(0xff212121),
+                            fontWeight: FontWeight.w600),
+                        widthBox(4.w),
+                        if (cmnt.creatorDetails.isVerified)
+                          SvgPicture.asset(icVerifyBadge),
+                        widthBox(8.w),
+                        Text(
+                          timeago.format(
+                            DateTime.parse(
+                              cmnt.createdAt,
+                            ),
+                          ),
+                          style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff5c5c5c)),
+                        ),
+                      ],
+                    ),
+                    subtitle: TextWidget(
+                      text: cmnt.message.isEmpty ? "---" : cmnt.message,
+                      fontSize: 12.sp,
+                      color: const Color(0xff5f5f5f),
+                      fontWeight: FontWeight.w400,
+                      textOverflow: TextOverflow.visible,
+                    ),
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
             ),
           ),
         ),

@@ -65,7 +65,7 @@ class PostCardController extends GetxController {
             title: user!.name,
             devRegToken: recieverFCMToken,
             userReqID: creatorId,
-            msg: "${user!.name} has liked your post.",
+            msg: "has liked your post.",
           );
         });
       } else {
