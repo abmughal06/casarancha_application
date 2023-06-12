@@ -85,9 +85,6 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
       GlobalSnackBar.show(
           context: context, message: "Please Enter $strUserName");
       return false;
-    } else if (_bioController.text.isEmpty) {
-      GlobalSnackBar.show(context: context, message: 'Please enter $strBio');
-      return false;
     } else if (_selectedDob == null || _selectedDob == "") {
       GlobalSnackBar.show(
           context: context, message: 'Please enter $strDateOfBirth');
@@ -133,7 +130,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                   FirebaseAuth.instance.signOut();
                   Get.offAll(() => const LoginScreen());
                 },
-                icon: Icon(Icons.logout_rounded))
+                icon: const Icon(Icons.logout_rounded))
           ]),
       body: Column(
         children: [
@@ -270,7 +267,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                   ),
                 ),
                 heightBox(10.w),
-                CustomDatePicker(
+                CustomDatePicker2(
                   getDateTime: _getDateTime,
                   showSelected: showSelectedDates,
                   dateChangedCallback: (DateTime value) {

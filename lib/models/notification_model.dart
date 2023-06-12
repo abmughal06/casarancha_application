@@ -8,11 +8,13 @@ class NotificationModel {
   String? title;
   CreatorDetails? createdDetails;
   String? msg;
+  bool? isRead;
   String? createdAt;
 
   NotificationModel({
     this.id,
     this.createdDetails,
+    this.isRead,
     this.appUserId,
     this.msg,
     this.title,
@@ -24,12 +26,14 @@ class NotificationModel {
     CreatorDetails? createdDetails,
     String? appUserId,
     dynamic msg,
+    bool? isRead,
     String? caption,
     String? title,
     String? createdAt,
   }) {
     return NotificationModel(
       id: id ?? this.id,
+      isRead: isRead ?? false,
       title: title ?? this.title,
       createdDetails: createdDetails ?? this.createdDetails,
       appUserId: appUserId ?? this.appUserId,
@@ -42,6 +46,7 @@ class NotificationModel {
     return <String, dynamic>{
       'id': id,
       'title': title,
+      'isRead': isRead,
       'createdDetails': createdDetails!.toMap(),
       'appUserId': appUserId,
       'content': msg,
@@ -53,6 +58,7 @@ class NotificationModel {
     return NotificationModel(
       id: map['id'],
       title: map['title'],
+      isRead: map['isRead'],
       createdDetails: CreatorDetails.fromMap(map['createdDetails']),
       appUserId: map['appUserId'],
       msg: map['content'] as dynamic,
@@ -67,7 +73,7 @@ class NotificationModel {
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, title: $title, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt)';
+    return 'NotificationModel(id: $id, title: $title, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt, isRead: $isRead)';
   }
 
   @override
@@ -75,6 +81,7 @@ class NotificationModel {
     if (identical(this, other)) return true;
 
     return other.id == id &&
+        other.isRead == isRead &&
         other.title == title &&
         other.createdDetails == createdDetails &&
         other.appUserId == appUserId &&
@@ -85,6 +92,7 @@ class NotificationModel {
   @override
   int get hashCode {
     return id.hashCode ^
+        isRead.hashCode ^
         createdDetails.hashCode ^
         title.hashCode ^
         appUserId.hashCode ^

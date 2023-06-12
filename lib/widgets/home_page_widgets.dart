@@ -537,7 +537,7 @@ Widget profileImgName({
     onTap: onTapOtherProfile,
     child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         imgProVerified(

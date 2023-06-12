@@ -96,7 +96,7 @@ class ChatController extends GetxController {
       final MessageDetails appUserMessageDetails = MessageDetails(
         id: appUserId,
         lastMessage: messageController.text,
-        unreadMessageCount: unreadMessages + 1,
+        unreadMessageCount: 0,
         searchCharacters: [...creatorDetails.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
           name: creatorDetails.name,
@@ -127,27 +127,27 @@ class ChatController extends GetxController {
         createdAt: DateTime.now().toIso8601String(),
       );
 
-      if (isChatExits.value) {
-        await currentUserRef
-            .collection(profileScreenController.isGhostModeOn.value
-                ? "ghostMessageList"
-                : 'messageList')
-            .doc(appUserId)
-            .set(
-              appUserMessageDetails.toMap(),
-            );
+      // if (!isChatExits.value) {
+      await currentUserRef
+          .collection(profileScreenController.isGhostModeOn.value
+              ? "ghostMessageList"
+              : 'messageList')
+          .doc(appUserId)
+          .set(
+            appUserMessageDetails.toMap(),
+          );
 
-        await appUserRef
-            .collection(profileScreenController.isGhostModeOn.value
-                ? "ghostMessageList"
-                : 'messageList')
-            .doc(currentUserId)
-            .set(
-              currentUserMessageDetails.toMap(),
-            );
+      await appUserRef
+          .collection(profileScreenController.isGhostModeOn.value
+              ? "ghostMessageList"
+              : 'messageList')
+          .doc(currentUserId)
+          .set(
+            currentUserMessageDetails.toMap(),
+          );
 
-        isChatExits.value = true;
-      }
+      isChatExits.value = true;
+      // }
 
       final Message message = Message(
         id: messageRefForCurrentUser.id,
@@ -164,6 +164,18 @@ class ChatController extends GetxController {
 
       messageRefForCurrentUser.set(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
+
+      // if (isChatExits.value) {
+      appUserRef
+          .collection(profileScreenController.isGhostModeOn.value
+              ? "ghostMessageList"
+              : 'messageList')
+          .doc(currentUserId)
+          .update(
+            currentUserMessageDetails.toMap(),
+          );
+      unreadMessages += 1;
+      // }
       var recieverRef = await FirebaseFirestore.instance
           .collection("users")
           .doc(appUserId)
@@ -185,20 +197,8 @@ class ChatController extends GetxController {
         devRegToken: recieverFCMToken,
         userReqID: appUserId,
         title: user!.name,
-        msg: "has sent you a message",
+        msg: "has sent you a $unreadMessages message",
       );
-
-      if (isChatExits.value) {
-        appUserRef
-            .collection(profileScreenController.isGhostModeOn.value
-                ? "ghostMessageList"
-                : 'messageList')
-            .doc(currentUserId)
-            .update(
-              currentUserMessageDetails.toMap(),
-            );
-        unreadMessages += 1;
-      }
 
       messageController.clear();
     } catch (e) {

@@ -52,8 +52,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   void dispose() {
     super.dispose();
-    videoPlayerController!.pause();
-    videoPlayerController!.dispose();
+    if (widget.postModel.mediaData[0].type == "Video") {
+      videoPlayerController!.pause();
+      videoPlayerController!.dispose();
+    }
   }
 
   @override
@@ -114,6 +116,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                             child: AspectRatio(
                                               aspectRatio: 2 / 3,
                                               child: CachedNetworkImage(
+                                                  progressIndicatorBuilder:
+                                                      (context, url,
+                                                              progress) =>
+                                                          Center(
+                                                            child: SizedBox(
+                                                              height: 30.h,
+                                                              child:
+                                                                  const CircularProgressIndicator(),
+                                                            ),
+                                                          ),
                                                   imageUrl: mediaData.link),
                                             ));
                                       } else if (mediaData.type == 'Video') {
@@ -450,6 +462,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             //     CreatorDetails.fromMap(data['creatorDetails']);
                             var cmnt = Comment.fromMap(data);
                             return ListTile(
+                              isThreeLine: true,
                               leading: InkWell(
                                 onTap: () {
                                   Get.to(
@@ -511,6 +524,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       ),
                                       style: TextStyle(
                                           fontSize: 12.sp,
+                                          overflow: TextOverflow.ellipsis,
                                           fontWeight: FontWeight.w400,
                                           color: const Color(0xff5c5c5c)),
                                     ),
@@ -524,6 +538,67 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 color: const Color(0xff5f5f5f),
                                 fontWeight: FontWeight.w400,
                                 textOverflow: TextOverflow.visible,
+                              ),
+                              trailing: Visibility(
+                                visible: cmnt.creatorId ==
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                child: InkWell(
+                                  onTap: () {
+                                    if (cmnt.creatorId ==
+                                        FirebaseAuth
+                                            .instance.currentUser!.uid) {
+                                      Get.bottomSheet(
+                                        Container(
+                                          decoration: const BoxDecoration(
+                                              color: Colors.red),
+                                          height: 80,
+                                          child: InkWell(
+                                            onTap: () async {
+                                              await FirebaseFirestore.instance
+                                                  .collection("posts")
+                                                  .doc(cmnt.id)
+                                                  .collection("comments")
+                                                  .doc(snapshot
+                                                      .data!.docs[index].id)
+                                                  .delete();
+
+                                              await FirebaseFirestore.instance
+                                                  .collection("posts")
+                                                  .doc(cmnt.id)
+                                                  .update({
+                                                "commentIds":
+                                                    FieldValue.arrayRemove([
+                                                  snapshot.data!.docs[index].id
+                                                ])
+                                              });
+
+                                              Get.back();
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                TextWidget(
+                                                  text: "Delete Comment",
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        isScrollControlled: true,
+                                      );
+                                    }
+                                  },
+                                  child: const Icon(
+                                    Icons.more_vert,
+                                    color: Color(0xffafafaf),
+                                  ),
+                                ),
                               ),
                             );
                           },

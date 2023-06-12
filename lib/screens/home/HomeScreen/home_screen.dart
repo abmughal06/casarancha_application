@@ -22,10 +22,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 import '../../../models/comment_model.dart';
-import '../../../models/post_creator_details.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
-import '../../../widgets/comment_screen.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../chat/share_post_screen.dart';
 import '../../dashboard/dashboard.dart';
@@ -55,6 +53,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ProfileScreenController profileScreenController =
   //     Get.put(ProfileScreenController());
+
+  Stream<int> getUnreadNotificationCount() {
+    CollectionReference notificationCollection = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("notificationlist");
+
+    var unread = notificationCollection
+        .where('isRead', isEqualTo: false)
+        .snapshots()
+        .length
+        .asStream();
+    print('------------------------- $unread');
+    return unread;
+  }
 
   @override
   void initState() {
@@ -95,12 +108,36 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Get.to(() => const NotificationScreen());
             },
-            icon: badges.Badge(
-              position: badges.BadgePosition.topEnd(end: -7, top: -6),
-              child: SvgPicture.asset(
-                icNotifyBell,
-              ),
-            ),
+            icon: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .collection("notificationlist")
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var length = snapshot.data!.docs
+                        .where((element) => element['isRead'] == false)
+                        .toList();
+                    return badges.Badge(
+                      badgeContent: TextWidget(
+                        text: length.length.toString(),
+                        color: Colors.white,
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      position: badges.BadgePosition.topEnd(top: -8, end: -8),
+                      showBadge: length.isEmpty ? false : true,
+                      child: SvgPicture.asset(
+                        icNotifyBell,
+                      ),
+                    );
+                  } else {
+                    return SvgPicture.asset(
+                      icNotifyBell,
+                    );
+                  }
+                }),
           ),
         ],
       ),
@@ -127,15 +164,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           log("======================== daldjalsdjlsdasl  ${snapshot.data}");
                           if (snapshot.hasData && snapshot.data != null) {
                             if (snapshot.data!.data() == null) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Get.to(() => AddStoryScreen());
-                                },
-                                child: SvgPicture.asset(
-                                  icProfileAdd,
-                                  height: 50.h,
-                                  width: 50.w,
-                                ),
+                              return Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => AddStoryScreen());
+                                    },
+                                    child: SvgPicture.asset(
+                                      icProfileAdd,
+                                      height: 50.h,
+                                      width: 50.w,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  const Text(
+                                    "Your Story",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 10),
+                                  )
+                                ],
                               );
                             } else {
                               log("==================== snapshot has data");
@@ -162,71 +210,96 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .subtract(const Duration(hours: 24));
                               log(" ========== $twentyFourHoursAgo");
 
-                              return Column(
-                                // mainAxisAlignment:
-                                // MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Stack(
-                                    children: [
-                                      givenDate!.isAfter(twentyFourHoursAgo)
-                                          ? InkWell(
-                                              onTap: () {
-                                                Get.to(() => StoryViewScreen(
-                                                    story: story!));
-                                              },
-                                              child: CircleAvatar(
-                                                minRadius: 25,
-                                                backgroundImage: NetworkImage(
-                                                    map!["creatorDetails"]
-                                                        ['imageUrl']),
-                                              ),
-                                            )
-                                          : InkWell(
-                                              onTap: () {
-                                                Get.to(() => AddStoryScreen());
-                                              },
-                                              child: SvgPicture.asset(
-                                                icProfileAdd,
-                                                height: 50.h,
-                                                width: 50.w,
-                                              ),
-                                            ),
-                                      givenDate.isAfter(twentyFourHoursAgo)
-                                          ? Positioned(
-                                              right: -2,
-                                              bottom: -2,
-                                              child: InkWell(
+                              if (story.mediaDetailsList.isNotEmpty) {
+                                return Column(
+                                  // mainAxisAlignment:
+                                  // MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        givenDate!.isAfter(twentyFourHoursAgo)
+                                            ? InkWell(
+                                                onTap: () {
+                                                  Get.to(() => StoryViewScreen(
+                                                      story: story!));
+                                                },
+                                                child: CircleAvatar(
+                                                  minRadius: 25,
+                                                  backgroundImage: NetworkImage(
+                                                      map!["creatorDetails"]
+                                                          ['imageUrl']),
+                                                ),
+                                              )
+                                            : InkWell(
                                                 onTap: () {
                                                   Get.to(
                                                       () => AddStoryScreen());
                                                 },
-                                                child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            2.0),
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: colorPrimaryA05,
-                                                    ),
-                                                    child: const Icon(
-                                                      Icons.add,
-                                                      color: Colors.white,
-                                                      size: 18,
-                                                    )),
-                                              ))
-                                          : Container(),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 3),
-                                  const Text(
-                                    "Your Story",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 10),
-                                  )
-                                ],
-                              );
+                                                child: SvgPicture.asset(
+                                                  icProfileAdd,
+                                                  height: 50.h,
+                                                  width: 50.w,
+                                                ),
+                                              ),
+                                        givenDate.isAfter(twentyFourHoursAgo)
+                                            ? Positioned(
+                                                right: -2,
+                                                bottom: -2,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    Get.to(
+                                                        () => AddStoryScreen());
+                                                  },
+                                                  child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              2.0),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: colorPrimaryA05,
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons.add,
+                                                        color: Colors.white,
+                                                        size: 18,
+                                                      )),
+                                                ))
+                                            : Container(),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 3),
+                                    const Text(
+                                      "Your Story",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 10),
+                                    )
+                                  ],
+                                );
+                              } else {
+                                return Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Get.to(() => AddStoryScreen());
+                                      },
+                                      child: SvgPicture.asset(
+                                        icProfileAdd,
+                                        height: 50.h,
+                                        width: 50.w,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    const Text(
+                                      "Your Story",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 10),
+                                    )
+                                  ],
+                                );
+                              }
                             }
                           } else if (snapshot.hasError) {
                             return const Text("Here");
@@ -234,15 +307,26 @@ class _HomeScreenState extends State<HomeScreen> {
                             return const Center(
                                 child: CircularProgressIndicator());
                           } else {
-                            return GestureDetector(
-                              onTap: () {
-                                Get.to(() => AddStoryScreen());
-                              },
-                              child: SvgPicture.asset(
-                                icProfileAdd,
-                                height: 50.h,
-                                width: 50.w,
-                              ),
+                            return Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.to(() => AddStoryScreen());
+                                  },
+                                  child: SvgPicture.asset(
+                                    icProfileAdd,
+                                    height: 50.h,
+                                    width: 50.w,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                const Text(
+                                  "Your Story",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10),
+                                )
+                              ],
                             );
                             // return  Text('Story');
                           }
@@ -392,7 +476,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          SizedBox(height: 10.w),
           homeScreenController.profileScreenController.isGhostModeOn.value
               ? StreamBuilder<QuerySnapshot>(
                   stream: homeScreenController.postQuerry.snapshots(),
@@ -422,6 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: Column(
                                       children: [
                                         CustomPostHeader(
+                                            showPostTime: post.showPostTime,
                                             name: post.creatorDetails.name,
                                             isVerified:
                                                 post.creatorDetails.isVerified,
@@ -526,6 +610,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             right: 0,
                                                             child:
                                                                 CustomPostHeader(
+                                                              showPostTime: post
+                                                                  .showPostTime,
                                                               isVerified: post
                                                                   .creatorDetails
                                                                   .isVerified,
@@ -560,6 +646,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomPostHeader(
+                                            showPostTime: post.showPostTime,
                                             isVerified:
                                                 post.creatorDetails.isVerified,
                                             name: post.creatorDetails.name,
@@ -751,6 +838,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Visibility(
                                   visible: post.mediaData[0].type != "Video",
                                   child: CustomPostHeader(
+                                      showPostTime: post.showPostTime,
                                       isVerified:
                                           post.creatorDetails.isVerified,
                                       time: timeago.format(
@@ -758,12 +846,50 @@ class _HomeScreenState extends State<HomeScreen> {
                                       onVertItemClick: () {
                                         Get.back();
 
-                                        Get.bottomSheet(
-                                          BottomSheetWidget(
-                                            ontapBlock: () {},
-                                          ),
-                                          isScrollControlled: true,
-                                        );
+                                        if (post.creatorId ==
+                                            FirebaseAuth
+                                                .instance.currentUser!.uid) {
+                                          Get.bottomSheet(
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.red),
+                                              height: 80,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection("posts")
+                                                      .doc(post.id)
+                                                      .delete();
+                                                  Get.back();
+                                                },
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    TextWidget(
+                                                      text: "Delete Post",
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.white,
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            isScrollControlled: true,
+                                          );
+                                        } else {
+                                          Get.bottomSheet(
+                                            BottomSheetWidget(
+                                              ontapBlock: () {},
+                                            ),
+                                            isScrollControlled: true,
+                                          );
+                                        }
                                       },
                                       name: post.creatorDetails.name,
                                       image: post.creatorDetails.imageUrl,
@@ -803,8 +929,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             post.id,
                                                             post.creatorId);
                                                   },
-                                                  child: Image.network(post
-                                                      .mediaData[index].link)),
+                                                  child: CachedNetworkImage(
+                                                      progressIndicatorBuilder:
+                                                          (context, url,
+                                                                  progress) =>
+                                                              Center(
+                                                                child: SizedBox(
+                                                                  height: 30.h,
+                                                                  child:
+                                                                      const CircularProgressIndicator(),
+                                                                ),
+                                                              ),
+                                                      imageUrl: post
+                                                          .mediaData[index]
+                                                          .link)),
                                         ),
                                       ),
                                     ],
@@ -872,6 +1010,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           right: 0,
                                                           child:
                                                               CustomPostHeader(
+                                                            showPostTime: post
+                                                                .showPostTime,
                                                             isVerified: post
                                                                 .creatorDetails
                                                                 .isVerified,
@@ -1233,6 +1373,7 @@ class CustomPostHeader extends StatelessWidget {
   final String? time;
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
+  final bool? showPostTime;
 
   const CustomPostHeader(
       {Key? key,
@@ -1243,7 +1384,8 @@ class CustomPostHeader extends StatelessWidget {
       this.headerOnTap,
       this.isVerified = false,
       this.onVertItemClick,
-      this.time})
+      this.time,
+      this.showPostTime = false})
       : super(key: key);
 
   @override
@@ -1289,12 +1431,16 @@ class CustomPostHeader extends StatelessWidget {
           ],
         ),
       ),
-      subtitle: TextWidget(
-        text: time,
-        fontSize: 11.sp,
-        fontWeight: FontWeight.w400,
-        color:
-            isVideoPost! ? colorFF7.withOpacity(0.6) : const Color(0xff5f5f5f),
+      subtitle: Visibility(
+        visible: showPostTime!,
+        child: TextWidget(
+          text: time,
+          fontSize: 11.sp,
+          fontWeight: FontWeight.w400,
+          color: isVideoPost!
+              ? colorFF7.withOpacity(0.6)
+              : const Color(0xff5f5f5f),
+        ),
       ),
       trailing: InkWell(
         onTap: onVertItemClick,

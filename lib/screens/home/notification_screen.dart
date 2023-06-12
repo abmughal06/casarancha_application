@@ -68,119 +68,102 @@ class _NotificationScreenState
                   stream: FirebaseFirestore.instance
                       .collection("users")
                       .doc(FirebaseAuth.instance.currentUser!.uid)
-                      .collection("notification")
+                      .collection("notificationlist")
                       .orderBy('createdAt', descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
+                      return Center(
+                        child: TextWidget(
+                          text: "No notifications yet",
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                          color: color221,
+                        ),
+                      );
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else {
                       return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.docs.length,
-                          physics: const BouncingScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index) {
-                            var data = snapshot.data!.docs[index].data();
-                            print("daldasldkasl;dkald;kasd $data");
-                            var notification = NotificationModel.fromMap(data);
-                            print(notification.id);
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.docs.length,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          var data = snapshot.data!.docs[index].data();
+                          print("daldasldkasl;dkald;kasd $data");
+                          var notification = NotificationModel.fromMap(data);
+                          print(notification.id);
+                          FirebaseFirestore.instance
+                              .collection("users")
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .collection("notificationlist")
+                              .doc(snapshot.data!.docs[index].id)
+                              .update({"isRead": true});
 
-                            return ListTile(
-                              leading: InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    () => AppUserScreen(
-                                      appUserController: Get.put(
-                                        AppUserController(
-                                          appUserId: notification.appUserId!,
-                                          currentUserId: FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  height: 46.h,
-                                  width: 46.h,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.amber,
-                                    image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          notification
-                                              .createdDetails!.imageUrl),
-                                      fit: BoxFit.cover,
+                          return ListTile(
+                            leading: Container(
+                              height: 46.h,
+                              width: 46.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.amber,
+                                image: DecorationImage(
+                                  image: CachedNetworkImageProvider(
+                                      notification.createdDetails!.imageUrl),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            title: RichText(
+                              text: TextSpan(
+                                text: "",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12.sp,
+                                    color: const Color(0xff5F5F5F)),
+                                children: [
+                                  TextSpan(
+                                      text: notification
+                                              .createdDetails!.isVerified
+                                          ? notification.title!
+                                          : "${notification.title!} ",
+                                      style: TextStyle(
+                                        color: const Color(0xff121F3F),
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14.sp,
+                                      )),
+                                  WidgetSpan(
+                                    child: Visibility(
+                                      visible: notification
+                                          .createdDetails!.isVerified,
+                                      child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4.0),
+                                          child:
+                                              SvgPicture.asset(icVerifyBadge)),
                                     ),
                                   ),
-                                ),
+                                  TextSpan(
+                                    text: " ${notification.msg!}",
+                                  )
+                                ],
                               ),
-                              title:
-                                  //  Row(
-                                  //   children: [
-                                  //     TextWidget(
-                                  //       text: "${notification.title!} ",
-                                  //       color: const Color(0xff121F3F),
-                                  //       fontWeight: FontWeight.w500,
-                                  //       fontSize: 14.sp,
-                                  //     ),
-                                  //     TextWidget(
-                                  //       text: notification.msg,
-                                  //       fontWeight: FontWeight.w400,
-                                  //       fontSize: 12.sp,
-                                  //       textOverflow: TextOverflow.fade,
-                                  //       color: const Color(0xff5F5F5F),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  RichText(
-                                text: TextSpan(
-                                  text: "",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12.sp,
-                                      color: const Color(0xff5F5F5F)),
-                                  children: [
-                                    TextSpan(
-                                        text: notification
-                                                .createdDetails!.isVerified
-                                            ? notification.title!
-                                            : "${notification.title!} ",
-                                        style: TextStyle(
-                                          color: const Color(0xff121F3F),
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14.sp,
-                                        )),
-                                    WidgetSpan(
-                                      child: Visibility(
-                                        visible: notification
-                                            .createdDetails!.isVerified,
-                                        child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 4.0),
-                                            child: SvgPicture.asset(
-                                                icVerifyBadge)),
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: " ${notification.msg!}",
-                                    )
-                                  ],
-                                ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: Text(
+                                timeago.format(
+                                    DateTime.parse(notification.createdAt!)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12.sp,
+                                    color: const Color(0xff5F5F5F)),
                               ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: Text(
-                                  timeago.format(
-                                      DateTime.parse(notification.createdAt!)),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12.sp,
-                                      color: const Color(0xff5F5F5F)),
-                                ),
-                              ),
-                            );
-                          });
+                            ),
+                          );
+                        },
+                      );
                     }
                   },
                 ),

@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_creator_details.dart';
-import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
@@ -57,6 +54,7 @@ class FirebaseMessagingService {
       id: userReqID,
       msg: msg,
       title: title,
+      isRead: false,
       createdDetails: CreatorDetails(
           name: creatorDetails!.name,
           imageUrl: creatorDetails.imageUrl,
@@ -67,7 +65,7 @@ class FirebaseMessagingService {
     FirebaseFirestore.instance
         .collection("users")
         .doc(userReqID)
-        .collection("notification")
+        .collection("notificationlist")
         .doc()
         .set(notification.toMap());
   }

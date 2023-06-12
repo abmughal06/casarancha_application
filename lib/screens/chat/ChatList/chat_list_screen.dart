@@ -22,6 +22,7 @@ import '../../home/HomeScreen/home_screen_controller.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../Chat one-to-one/chat_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'dart:developer';
 
 String convertDateIntoTime(String date) {
   var time = timeago.format(
@@ -294,7 +295,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                     .collection("users")
                     .doc(FirebaseAuth.instance.currentUser!.uid)
                     .collection(profileScreenController.isGhostModeOn.value
-                        ? "ghostConversation"
+                        ? "ghostMessageList"
                         : "messageList")
                     .orderBy("createdAt", descending: true)
                     .snapshots(),
@@ -311,6 +312,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                         final appUserId = doc.data!.docs[index].data()['id'];
                         final data = doc.data!.docs[index].data();
                         val1 = generateRandomString(7);
+                        print(creatorDetails);
 
                         return SizedBox(
                           child: ListTile(

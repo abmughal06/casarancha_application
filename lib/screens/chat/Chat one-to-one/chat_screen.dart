@@ -36,7 +36,7 @@ import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../ChatList/chat_list_controller.dart';
 import '../audio_call_screen.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
   final ProfileScreenController? profileScreenController;
@@ -52,11 +52,18 @@ class ChatScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  @override
   Widget build(BuildContext context) {
     final ChatController chatController = Get.put(
-      ChatController(appUserId: appUserId, creatorDetails: creatorDetails),
+      ChatController(
+          appUserId: widget.appUserId, creatorDetails: widget.creatorDetails),
     );
     final ChatListController chatListController = Get.find();
+    chatController.resetMessageCount();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -74,7 +81,7 @@ class ChatScreen extends StatelessWidget {
         title: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
             stream: FirebaseFirestore.instance
                 .collection("users")
-                .doc(appUserId)
+                .doc(widget.appUserId)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -85,7 +92,7 @@ class ChatScreen extends StatelessWidget {
                         () => AppUserScreen(
                           appUserController: Get.put(
                             AppUserController(
-                              appUserId: appUserId,
+                              appUserId: widget.appUserId,
                               currentUserId:
                                   FirebaseAuth.instance.currentUser!.uid,
                             ),
@@ -94,8 +101,8 @@ class ChatScreen extends StatelessWidget {
                       );
                     },
                     contentPadding: EdgeInsets.zero,
-                    title: profileScreenController!.isGhostModeOn.value
-                        ? Text(val.toString())
+                    title: widget.profileScreenController!.isGhostModeOn.value
+                        ? Text(widget.val.toString())
                         : Row(
                             children: [
                               Text(userModel.name),
@@ -108,13 +115,15 @@ class ChatScreen extends StatelessWidget {
                     subtitle: snapshot.hasData ? const Text('Live') : null,
                     leading: CircleAvatar(
                       backgroundImage: userModel.imageStr.isEmpty ||
-                              profileScreenController!.isGhostModeOn.value
+                              widget
+                                  .profileScreenController!.isGhostModeOn.value
                           ? null
                           : CachedNetworkImageProvider(
                               userModel.imageStr,
                             ),
                       child: userModel.imageStr.isEmpty ||
-                              profileScreenController!.isGhostModeOn.value
+                              widget
+                                  .profileScreenController!.isGhostModeOn.value
                           ? const Icon(
                               Icons.question_mark,
                             )
@@ -153,10 +162,10 @@ class ChatScreen extends StatelessWidget {
         children: [
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: chatController.currentUserRef
-                .collection(profileScreenController!.isGhostModeOn.value
+                .collection(widget.profileScreenController!.isGhostModeOn.value
                     ? "ghostMessageList"
                     : 'messageList')
-                .doc(appUserId)
+                .doc(widget.appUserId)
                 .collection(
                   'messages',
                 )
@@ -174,7 +183,7 @@ class ChatScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final Message message =
                             Message.fromMap(doc.data!.docs[index].data());
-                        final isMe = message.sentToId == appUserId;
+                        final isMe = message.sentToId == widget.appUserId;
                         final isSeen = message.isSeen;
 
                         if (message.type == "Photo" ||
@@ -192,7 +201,7 @@ class ChatScreen extends StatelessWidget {
                                 )),
                             child: ChatPostTile(
                               message: message,
-                              appUserId: appUserId,
+                              appUserId: widget.appUserId,
                               isSeen: isSeen,
                               isMe: isMe,
                             ),
@@ -203,7 +212,7 @@ class ChatScreen extends StatelessWidget {
                         } else if (message.type == "Text") {
                           return ChatTile(
                             message: message.content,
-                            appUserId: appUserId,
+                            appUserId: widget.appUserId,
                             isSeen: message.isSeen,
                             isMe: isMe,
                             date: message.createdAt,
@@ -226,7 +235,7 @@ class ChatScreen extends StatelessWidget {
                             child: ChatVideoTile(
                               aspectRatio:
                                   videoPlayerController.value.aspectRatio,
-                              appUserId: appUserId,
+                              appUserId: widget.appUserId,
                               isSeen: message.isSeen,
                               isMe: isMe,
                               date: message.createdAt,
@@ -244,7 +253,7 @@ class ChatScreen extends StatelessWidget {
                           return ChatVideoTile(
                             aspectRatio:
                                 videoPlayerController.value.aspectRatio,
-                            appUserId: appUserId,
+                            appUserId: widget.appUserId,
                             isSeen: message.isSeen,
                             isMe: isMe,
                             date: message.createdAt,
@@ -255,7 +264,7 @@ class ChatScreen extends StatelessWidget {
 
                           return ChatStoryTile(
                             message: message,
-                            appUserId: appUserId,
+                            appUserId: widget.appUserId,
                             isSeen: isSeen,
                             isMe: isMe,
                           );
