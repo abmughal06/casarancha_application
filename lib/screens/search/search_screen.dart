@@ -73,46 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
       }
     }
     // Return true if two or more characters match
-    return matchCount >= 4;
-  }
-
-  Rx<bool> follow = false.obs;
-
-  // void toggleFollow(id, yes) async {
-  //   var ref = FirebaseFirestore.instance
-  //       .collection("users")
-  //       .doc(FirebaseAuth.instance.currentUser!.uid);
-  //   if (yes) {
-  //     await ref.update({"followersIds": FieldValue.arrayUnion(id)});
-  //   } else {
-  //     await ref.update({"followersIds": FieldValue.arrayRemove(id)});
-  //   }
-  // }
-
-  Future<void> toggleFollow(String idToToggle) async {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final DocumentReference documentRef = firestore
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid);
-
-    try {
-      final DocumentSnapshot snapshot = await documentRef.get();
-      final List<dynamic> array = snapshot.get("followersIds") ?? [];
-
-      follow.value = array.contains(idToToggle);
-
-      if (follow.value) {
-        documentRef.update({
-          "followersIds": FieldValue.arrayRemove([idToToggle]),
-        });
-      } else {
-        documentRef.update({
-          "followersIds": FieldValue.arrayUnion([idToToggle]),
-        });
-      }
-    } catch (e) {
-      // Handle the error according to your application's needs.
-    }
+    return matchCount >= 2;
   }
 
   @override
@@ -148,108 +109,143 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   /*people*/
 
-                  StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                       stream: FirebaseFirestore.instance
                           .collection("users")
-                          // .orderBy("username", descending: false)
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
                           .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData && snapshot.data != null) {
-                          return ListView.builder(
-                              itemCount: snapshot.data!.docs.length,
-                              itemBuilder: (context, index) {
-                                var userSnap =
-                                    snapshot.data!.docs[index].data();
-                                // print(userSnap);
-                                // print(
-                                //     user.name.compareTo(searchController.text));
-                                if (compareStrings(
-                                    userSnap['username'].toString(),
-                                    searchController.text)) {
-                                  return InkWell(
-                                    onTap: () {
-                                      Get.to(
-                                        () => AppUserScreen(
-                                          appUserController: Get.put(
-                                            AppUserController(
-                                              appUserId: userSnap['id'],
-                                              currentUserId: FirebaseAuth
-                                                  .instance.currentUser!.uid,
+                      builder: (context, current) {
+                        if (current.hasData) {
+                          var currentUser =
+                              UserModel.fromMap(current.data!.data()!);
+                          return StreamBuilder<
+                                  QuerySnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseFirestore.instance
+                                  .collection("users")
+                                  .orderBy("username", descending: false)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData && snapshot.data != null) {
+                                  return ListView.builder(
+                                      itemCount: snapshot.data!.docs.length,
+                                      itemBuilder: (context, index) {
+                                        var userSnap = UserModel.fromMap(
+                                            snapshot.data!.docs[index].data());
+                                        // print(userSnap);
+                                        // print(
+                                        //     user.name.compareTo(searchController.text));
+
+                                        if (compareStrings(
+                                                userSnap.username.toString(),
+                                                searchController.text) &&
+                                            userSnap.id !=
+                                                FirebaseAuth.instance
+                                                    .currentUser!.uid) {
+                                          return InkWell(
+                                            onTap: () {
+                                              Get.to(
+                                                () => AppUserScreen(
+                                                  appUserController: Get.put(
+                                                    AppUserController(
+                                                      appUserId: userSnap.id,
+                                                      currentUserId:
+                                                          FirebaseAuth.instance
+                                                              .currentUser!.uid,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: ListTile(
+                                              leading: Container(
+                                                height: 50.w,
+                                                width: 50.w,
+                                                decoration: BoxDecoration(
+                                                  color: color080,
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(userSnap
+                                                        .imageStr
+                                                        .toString()),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                              title: Row(
+                                                children: [
+                                                  TextWidget(
+                                                    text: userSnap.name
+                                                        .toString(),
+                                                    fontSize: 14.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: color221,
+                                                  ),
+                                                  widthBox(5.w),
+                                                  Visibility(
+                                                    visible:
+                                                        userSnap.isVerified,
+                                                    child: SvgPicture.asset(
+                                                      icVerifyBadge,
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              subtitle: TextWidget(
+                                                text: userSnap.username
+                                                    .toString(),
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w400,
+                                                color: colorAA3,
+                                              ),
+                                              trailing: TextButton(
+                                                child: TextWidget(
+                                                  text: currentUser
+                                                          .followingsIds
+                                                          .contains(userSnap.id)
+                                                      ? "Unfollow"
+                                                      : "Follow",
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                  color:
+                                                      const Color(0xffAA0505),
+                                                ),
+                                                onPressed: () async {
+                                                  // toggleFollow(userSnap['id']);
+                                                  FirebaseFirestore.instance
+                                                      .collection("users")
+                                                      .doc(currentUser.id)
+                                                      .update({
+                                                    "followingsIds": currentUser
+                                                            .followingsIds
+                                                            .contains(
+                                                                userSnap.id)
+                                                        ? FieldValue
+                                                            .arrayRemove(
+                                                                [userSnap.id])
+                                                        : FieldValue.arrayUnion(
+                                                            [userSnap.id])
+                                                  });
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: ListTile(
-                                      leading: Container(
-                                        height: 50.w,
-                                        width: 50.w,
-                                        decoration: BoxDecoration(
-                                          color: color080,
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                            image: NetworkImage(
-                                                userSnap["imageStr"]
-                                                    .toString()),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      title: Row(
-                                        children: [
-                                          TextWidget(
-                                            text: userSnap["name"].toString(),
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: color221,
-                                          ),
-                                          widthBox(5.w),
-                                          Visibility(
-                                            visible: userSnap['isVerified'],
-                                            child: SvgPicture.asset(
-                                              icVerifyBadge,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      subtitle: TextWidget(
-                                        text: userSnap["username"].toString(),
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: colorAA3,
-                                      ),
-                                      trailing: Obx(
-                                        () => TextButton(
-                                          child: TextWidget(
-                                            text: follow.value
-                                                ? "Unfollow"
-                                                : "Follow",
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: follow.value
-                                                ? const Color(0xffAA0505)
-                                                    .withOpacity(0.5)
-                                                : const Color(0xffAA0505),
-                                          ),
-                                          onPressed: () async {
-                                            toggleFollow(userSnap['id']);
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  );
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      });
+                                } else if (snapshot.hasError ||
+                                    snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
                                 } else {
-                                  return Container();
+                                  return const Center(
+                                      child: Text("No such user found"));
                                 }
                               });
-                        } else if (snapshot.hasError ||
-                            snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
                         } else {
                           return const Center(
-                              child: Text("No such user found"));
+                              child: CircularProgressIndicator());
                         }
                       }),
 

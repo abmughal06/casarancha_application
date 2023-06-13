@@ -1,6 +1,7 @@
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -38,13 +39,9 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
 
   @override
   void initState() {
+    super.initState();
     controller = StoryController();
     commentController = TextEditingController();
-    storyItems = widget.story.mediaDetailsList
-        .where(
-            (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
-        .toList();
-    super.initState();
   }
 
   @override
@@ -62,253 +59,314 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
     controller = StoryController();
     return SafeArea(
       child: Scaffold(
-        body: Stack(
-          children: [
-            StoryView(
-                storyItems: [
-                  ...storyItems.asMap().entries.map((e) {
-                    // dateText = timeago.format(DateTime.parse(e.value.id));
-                    print("==============  ${e.value.type}");
-                    return e.value.type == "Photo"
-                        ? StoryItem.pageImage(
-                            key: ValueKey(e.key),
-                            url: e.value.link,
-                            controller: controller!,
-                          )
-                        : StoryItem.pageVideo(e.value.link,
-                            key: ValueKey(e.key),
-                            controller: controller!,
-                            duration: const Duration(seconds: 15));
-                  })
-                ],
-                controller: controller!,
-                onComplete: () {
-                  Get.back();
-                  // currentIndex.value = 0;
-                },
-                onStoryShow: (s) {
-                  currentIndex.value = int.parse(s.view.key
-                      .toString()
-                      .replaceAll("[", "")
-                      .replaceAll("]", "")
-                      .replaceAll("<", "")
-                      .replaceAll(">", ""));
+        body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection("stories")
+              .doc(widget.story.id)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var storyModel = Story.fromMap(snapshot.data!.data()!);
 
-                  print("=============================== > ${s.view.key}");
-                },
-                onVerticalSwipeComplete: (direction) {
-                  if (direction == Direction.down) {
-                    Get.back();
-                    // currentIndex.value++;
-                  }
-                }),
-            Visibility(
-              visible: widget.story.creatorId !=
-                  FirebaseAuth.instance.currentUser!.uid,
-              child: Padding(
-                padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h),
-                child: Obx(
-                  () => profileImgName(
-                    imgUserNet: widget.story.creatorDetails.imageUrl,
-                    isVerifyWithIc: widget.story.creatorDetails.isVerified,
-                    isVerifyWithName: false,
-                    idIsVerified: widget.story.creatorDetails.isVerified,
-                    dpRadius: 17.r,
-                    userName: widget.story.creatorDetails.name,
-                    userNameClr: colorWhite,
-                    userNameFontSize: 12.sp,
-                    userNameFontWeight: FontWeight.w600,
-                    subText: timeago.format(
-                        DateTime.parse(storyItems[currentIndex.value].id)),
-                    subTxtFontSize: 9.sp,
-                    subTxtClr: colorWhite.withOpacity(.5),
-                  ),
-                ),
-              ),
-            ),
-            Container(),
-            Visibility(
-              visible: widget.story.creatorId ==
-                  FirebaseAuth.instance.currentUser!.uid,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 1.5,
-                  vertical: 10.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                        onPressed: () async {
-                          var ref1 = FirebaseFirestore.instance
-                              .collection("stories")
-                              .doc(widget.story.creatorId);
-                          var ref = await ref1.get();
-
-                          List<dynamic> storyRef =
-                              ref.data()!['mediaDetailsList'];
-
-                          storyRef.removeWhere((element) =>
-                              element['id'] ==
-                              storyItems[currentIndex.value].id);
-                          await ref1.update({"mediaDetailsList": storyRef});
-                        },
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Colors.red,
-                        )),
-                  ],
-                ),
-              ),
-            ),
-            Visibility(
-              visible: widget.story.creatorId !=
-                  FirebaseAuth.instance.currentUser!.uid,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Focus(
-                    focusNode: _commentFocus,
-                    onFocusChange: (hasFocus) {
-                      hasFocus ? controller!.pause() : null;
-                    },
-                    child: TextFormField(
-                      controller: commentController,
-                      onChanged: (val) {
-                        controller!.pause();
+              storyItems = storyModel.mediaDetailsList
+                  .where((element) =>
+                      DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
+                  .toList();
+              return Stack(
+                children: [
+                  StoryView(
+                      storyItems: [
+                        ...storyItems.asMap().entries.map((e) {
+                          // dateText = timeago.format(DateTime.parse(e.value.id));
+                          print("==============  ${e.value.type}");
+                          return e.value.type == "Photo"
+                              ? StoryItem.pageImage(
+                                  key: ValueKey(e.key),
+                                  url: e.value.link,
+                                  controller: controller!,
+                                )
+                              : StoryItem.pageVideo(e.value.link,
+                                  key: ValueKey(e.key),
+                                  controller: controller!,
+                                  duration: const Duration(seconds: 15));
+                        })
+                      ],
+                      controller: controller!,
+                      onComplete: () {
+                        Get.back();
+                        // currentIndex.value = 0;
                       },
-                      style: TextStyle(
-                        color: color887,
-                        fontSize: 16.sp,
-                        fontFamily: strFontName,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: strWriteCommentHere,
-                        hintStyle: TextStyle(
-                          color: color887,
-                          fontSize: 14.sp,
-                          fontFamily: strFontName,
-                          fontWeight: FontWeight.w400,
+                      onStoryShow: (s) {
+                        currentIndex.value = int.parse(s.view.key
+                            .toString()
+                            .replaceAll("[", "")
+                            .replaceAll("]", "")
+                            .replaceAll("<", "")
+                            .replaceAll(">", ""));
+
+                        print(
+                            "=============================== > ${s.view.key}");
+                      },
+                      onVerticalSwipeComplete: (direction) {
+                        if (direction == Direction.down) {
+                          Get.back();
+                          // currentIndex.value++;
+                        }
+                      }),
+                  Visibility(
+                    visible: widget.story.creatorId !=
+                        FirebaseAuth.instance.currentUser!.uid,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h),
+                      child: Obx(
+                        () => profileImgName(
+                          imgUserNet: widget.story.creatorDetails.imageUrl,
+                          isVerifyWithIc:
+                              widget.story.creatorDetails.isVerified,
+                          isVerifyWithName: false,
+                          idIsVerified: widget.story.creatorDetails.isVerified,
+                          dpRadius: 17.r,
+                          userName: widget.story.creatorDetails.name,
+                          userNameClr: colorWhite,
+                          userNameFontSize: 12.sp,
+                          userNameFontWeight: FontWeight.w600,
+                          subText: timeago.format(DateTime.parse(
+                              storyItems[currentIndex.value].id)),
+                          subTxtFontSize: 9.sp,
+                          subTxtClr: colorWhite.withOpacity(.5),
                         ),
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: svgImgButton(
-                            svgIcon: icStoryCmtSend,
-                            onTap: () async {
-                              print("comment == ${commentController.text}");
+                      ),
+                    ),
+                  ),
+                  Container(),
+                  Visibility(
+                    visible: widget.story.creatorId ==
+                        FirebaseAuth.instance.currentUser!.uid,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 1.5,
+                        vertical: 10.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                              onPressed: () async {
+                                if (storyItems[currentIndex.value].id ==
+                                    storyItems.last.id) {
+                                  Get.back();
 
-                              final messageRefForCurrentUser = FirebaseFirestore
-                                  .instance
-                                  .collection("users")
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .collection('messageList')
-                                  .doc(widget.story.creatorId)
-                                  .collection('messages')
-                                  .doc();
+                                  print("last");
+                                  var ref1 = FirebaseFirestore.instance
+                                      .collection("stories")
+                                      .doc(widget.story.creatorId);
+                                  var ref = await ref1.get();
 
-                              final messageRefForAppUser = FirebaseFirestore
-                                  .instance
-                                  .collection("users")
-                                  .doc(widget.story.creatorId)
-                                  .collection('messageList')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .collection('messages')
-                                  .doc(
-                                    messageRefForCurrentUser.id,
-                                  );
+                                  List<dynamic> storyRef =
+                                      ref.data()!['mediaDetailsList'];
 
-                              var story = storyItems.toList();
-                              var mediaDetail =
-                                  story[currentIndex.value].toMap();
+                                  storyRef.removeWhere((element) =>
+                                      element['id'] ==
+                                      storyItems[currentIndex.value].id);
 
-                              final Message message = Message(
-                                id: messageRefForCurrentUser.id,
-                                sentToId: widget.story.creatorId,
-                                sentById:
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                content: mediaDetail,
-                                caption: commentController.text,
-                                type: "story-${story[currentIndex.value].type}",
-                                createdAt: DateTime.now().toIso8601String(),
-                                isSeen: false,
-                              );
-                              print(
-                                  "============= ------------------- ------- --= ====== ==== $message");
-                              final appUserMessage =
-                                  message.copyWith(id: messageRefForAppUser.id);
+                                  await ref1
+                                      .update({"mediaDetailsList": storyRef});
+                                } else {
+                                  var ref1 = FirebaseFirestore.instance
+                                      .collection("stories")
+                                      .doc(widget.story.creatorId);
+                                  var ref = await ref1.get();
 
-                              messageRefForCurrentUser
-                                  .set(message.toMap())
-                                  .then((value) => print(
-                                      "=========== XXXXXXXXXXXXXXXX ++++++++++ message sent success"));
-                              messageRefForAppUser.set(appUserMessage.toMap());
-                              var recieverRef = await FirebaseFirestore.instance
-                                  .collection("users")
-                                  .doc(widget.story.creatorId)
-                                  .get();
+                                  List<dynamic> storyRef =
+                                      ref.data()!['mediaDetailsList'];
 
-                              var recieverFCMToken =
-                                  recieverRef.data()!['fcmToken'];
-                              print(
-                                  "=========> reciever fcm token = $recieverFCMToken");
-                              FirebaseMessagingService().sendNotificationToUser(
-                                creatorDetails: CreatorDetails(
-                                    name: user!.name,
-                                    imageUrl: user!.imageStr,
-                                    isVerified: user!.isVerified),
-                                // createdAt: message.createdAt,
-                                // creatorDetails: creatorDetails,
-                                devRegToken: recieverFCMToken,
-                                userReqID: widget.story.creatorId,
-                                title: user!.name,
-                                msg: "has commented on your story",
-                              );
-                              _commentFocus.unfocus();
+                                  storyRef.removeWhere((element) =>
+                                      element['id'] ==
+                                      storyItems[currentIndex.value].id);
+                                  await ref1
+                                      .update({"mediaDetailsList": storyRef});
+                                  controller!.next();
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              )),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: widget.story.creatorId !=
+                        FirebaseAuth.instance.currentUser!.uid,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Focus(
+                          focusNode: _commentFocus,
+                          onFocusChange: (hasFocus) {
+                            hasFocus ? controller!.pause() : null;
+                          },
+                          child: TextFormField(
+                            controller: commentController,
+                            onChanged: (val) {
+                              controller!.pause();
+                            },
+                            style: TextStyle(
+                              color: color887,
+                              fontSize: 16.sp,
+                              fontFamily: strFontName,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: strWriteCommentHere,
+                              hintStyle: TextStyle(
+                                color: color887,
+                                fontSize: 14.sp,
+                                fontFamily: strFontName,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              suffixIcon: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                child: svgImgButton(
+                                  svgIcon: icStoryCmtSend,
+                                  onTap: () async {
+                                    print(
+                                        "comment == ${commentController.text}");
+
+                                    final messageRefForCurrentUser =
+                                        FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                            .collection('messageList')
+                                            .doc(widget.story.creatorId)
+                                            .collection('messages')
+                                            .doc();
+
+                                    final messageRefForAppUser =
+                                        FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(widget.story.creatorId)
+                                            .collection('messageList')
+                                            .doc(FirebaseAuth
+                                                .instance.currentUser!.uid)
+                                            .collection('messages')
+                                            .doc(
+                                              messageRefForCurrentUser.id,
+                                            );
+
+                                    var story = storyItems.toList();
+                                    var mediaDetail =
+                                        story[currentIndex.value].toMap();
+
+                                    final Message message = Message(
+                                      id: messageRefForCurrentUser.id,
+                                      sentToId: widget.story.creatorId,
+                                      sentById: FirebaseAuth
+                                          .instance.currentUser!.uid,
+                                      content: mediaDetail,
+                                      caption: commentController.text,
+                                      type:
+                                          "story-${story[currentIndex.value].type}",
+                                      createdAt:
+                                          DateTime.now().toIso8601String(),
+                                      isSeen: false,
+                                    );
+                                    print(
+                                        "============= ------------------- ------- --= ====== ==== $message");
+                                    final appUserMessage = message.copyWith(
+                                        id: messageRefForAppUser.id);
+
+                                    messageRefForCurrentUser
+                                        .set(message.toMap())
+                                        .then((value) => print(
+                                            "=========== XXXXXXXXXXXXXXXX ++++++++++ message sent success"));
+                                    messageRefForAppUser
+                                        .set(appUserMessage.toMap());
+                                    var recieverRef = await FirebaseFirestore
+                                        .instance
+                                        .collection("users")
+                                        .doc(widget.story.creatorId)
+                                        .get();
+
+                                    var recieverFCMToken =
+                                        recieverRef.data()!['fcmToken'];
+                                    print(
+                                        "=========> reciever fcm token = $recieverFCMToken");
+                                    FirebaseMessagingService()
+                                        .sendNotificationToUser(
+                                      creatorDetails: CreatorDetails(
+                                          name: user!.name,
+                                          imageUrl: user!.imageStr,
+                                          isVerified: user!.isVerified),
+                                      // createdAt: message.createdAt,
+                                      // creatorDetails: creatorDetails,
+                                      devRegToken: recieverFCMToken,
+                                      userReqID: widget.story.creatorId,
+                                      title: user!.name,
+                                      msg: "has commented on your story",
+                                    );
+                                    _commentFocus.unfocus();
+                                    commentController.text = "";
+                                    controller!.play();
+                                  },
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12.w, vertical: 12.h),
+                              filled: true,
+                              fillColor: Colors.transparent,
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16.0),
+                                  borderSide: BorderSide.none),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.r),
+                                borderSide: const BorderSide(
+                                  color: color887,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.r),
+                                borderSide: const BorderSide(
+                                  color: color887,
+                                  width: 1.0,
+                                ),
+                              ),
+                            ),
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (val) {
+                              FocusScope.of(context).unfocus();
+                              commentController.text = "";
+                              controller!.play();
+                            },
+                            onEditingComplete: () {
+                              FocusScope.of(context).unfocus();
                               commentController.text = "";
                               controller!.play();
                             },
                           ),
                         ),
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12.w, vertical: 12.h),
-                        filled: true,
-                        fillColor: Colors.transparent,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16.0),
-                            borderSide: BorderSide.none),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.r),
-                          borderSide: const BorderSide(
-                            color: color887,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.r),
-                          borderSide: const BorderSide(
-                            color: color887,
-                            width: 1.0,
-                          ),
-                        ),
                       ),
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (val) {
-                        FocusScope.of(context).unfocus();
-                        commentController.text = "";
-                        controller!.play();
-                      },
-                      onEditingComplete: () {
-                        FocusScope.of(context).unfocus();
-                        commentController.text = "";
-                        controller!.play();
-                      },
                     ),
                   ),
+                ],
+              );
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              return Center(
+                child: TextWidget(
+                  text: "No Stories to show",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14.sp,
+                  color: Colors.white,
                 ),
-              ),
-            ),
-          ],
+              );
+            }
+          },
         ),
       ),
     );

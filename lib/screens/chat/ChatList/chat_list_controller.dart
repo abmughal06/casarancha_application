@@ -9,11 +9,11 @@ class ChatListController extends GetxController {
       Get.find<ProfileScreenController>();
 
   TextEditingController searchController = TextEditingController();
-  var encodeName ="";
+  var encodeName = "";
   var searchQuery = ''.obs;
 
   List<String> get searchCharacters {
-    return [...searchQuery.toLowerCase().split('')];
+    return [...searchController.text.toLowerCase().split('')];
   }
 
   Query<Map<String, dynamic>> get chatListQuery {

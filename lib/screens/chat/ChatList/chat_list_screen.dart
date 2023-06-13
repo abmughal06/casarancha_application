@@ -22,7 +22,6 @@ import '../../home/HomeScreen/home_screen_controller.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../Chat one-to-one/chat_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'dart:developer';
 
 String convertDateIntoTime(String date) {
   var time = timeago.format(
@@ -174,12 +173,8 @@ class _MessageList1State extends State<MessageList1>
         heightBox(10.h),
         profileScreenController.isGhostModeOn.value
             ? Expanded(
-                child: Obx(
-                  () => ChatListWidget(
-                    query: chatListController.searchQuery.isEmpty
-                        ? chatListController.chatListQuery
-                        : chatListController.searchListQuery,
-                  ),
+                child: ChatListWidget(
+                  query: chatListController.searchCharacters,
                 ),
               )
             : const SizedBox(),
@@ -204,6 +199,7 @@ class _MessageListState extends State<MessageList>
   final ChatListController chatListController = Get.put(ChatListController());
   final homeScreenController = Get.put(HomeScreenController());
   ProfileScreenController profileScreenController = Get.find();
+  var searchUser = chatUser + noChatUser;
 
   @override
   Widget build(BuildContext context) {
@@ -223,14 +219,66 @@ class _MessageListState extends State<MessageList>
         profileScreenController.isGhostModeOn.value
             ? const SizedBox()
             : Expanded(
-                child: Obx(
-                  () => ChatListWidget(
-                    query: chatListController.searchQuery.isEmpty
-                        ? chatListController.chatListQuery
-                        : chatListController.searchListQuery,
-                  ),
+                child: ChatListWidget(
+                  query: chatListController.searchCharacters,
                 ),
-              )
+              ),
+        // Visibility(
+        //     visible: chatListController.searchController.text.isNotEmpty,
+        //     child: Expanded(
+        //       child: ListView.builder(
+        //           itemCount: searchUser.toSet().toList().length,
+        //           itemBuilder: (con, index) {
+        //             var search = searchUser.toSet().toList();
+
+        //             return ListTile(
+        //               onTap: () {
+        //                 // Get.to(
+        //                 //   () => ChatScreen(
+        //                 //     appUserId: appUserId,
+        //                 //     creatorDetails: creatorDetails,
+        //                 //     profileScreenController: profileScreenController,
+        //                 //     val: val1,
+        //                 //   ),
+        //                 // );
+        //               },
+        //               title: Row(
+        //                 children: [
+        //                   TextWidget(
+        //                     text: search[index].name,
+        //                     fontSize: 14.sp,
+        //                     fontWeight: FontWeight.w500,
+        //                     color: const Color(0xff222939),
+        //                   ),
+        //                   widthBox(5.w),
+        //                   Visibility(
+        //                       visible: search[index].isVerified,
+        //                       child: SvgPicture.asset(icVerifyBadge))
+        //                 ],
+        //               ),
+        //               subtitle: TextWidget(
+        //                 text: "data['lastMessage'].toString()",
+        //                 textOverflow: TextOverflow.ellipsis,
+        //                 fontWeight: FontWeight.w400,
+        //                 fontSize: 14.sp,
+        //                 color: const Color(0xff8a8a8a),
+        //               ),
+        //               leading: CircleAvatar(
+        //                 backgroundImage: search[index].imageUrl.isEmpty
+        //                     ? null
+        //                     : CachedNetworkImageProvider(
+        //                         search[index].imageUrl,
+        //                       ),
+        //                 child: search[index].imageUrl.isEmpty
+        //                     ? const Icon(
+        //                         Icons.question_mark,
+        //                       )
+        //                     : null,
+        //               ),
+        //               trailing: const Icon(Icons.navigate_next),
+        //             );
+        //           }),
+        //     )),
         // profileScreenController.isGhostModeOn.value
         //     ? const SizedBox()
         //     :
@@ -241,6 +289,9 @@ class _MessageListState extends State<MessageList>
   @override
   bool get wantKeepAlive => true;
 }
+
+List<CreatorDetails> chatUser = [];
+List<CreatorDetails> noChatUser = [];
 ////////////////////////////////////////////////////////////////////////////
 // class ChatListWidget extends StatefulWidget {
 //   const ChatListWidget({Key? key}) : super(key: key);
@@ -263,7 +314,7 @@ class ChatListWidget extends StatefulWidget {
     required this.query,
   }) : super(key: key);
 
-  final Query<Map<String, dynamic>> query;
+  final List<String> query;
 
   @override
   State<ChatListWidget> createState() => _ChatListWidgetState();
@@ -291,15 +342,28 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .collection(profileScreenController.isGhostModeOn.value
-                        ? "ghostMessageList"
-                        : "messageList")
-                    .orderBy("createdAt", descending: true)
-                    .snapshots(),
+                stream: widget.query.isEmpty
+                    ? FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .collection(profileScreenController.isGhostModeOn.value
+                            ? "ghostMessageList"
+                            : "messageList")
+                        .orderBy("createdAt", descending: true)
+                        .snapshots()
+                    : FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .collection(profileScreenController.isGhostModeOn.value
+                            ? "ghostMessageList"
+                            : "messageList")
+                        .where("searchCharacters",
+                            arrayContainsAny: widget.query)
+                        // .orderBy("createdAt", descending: true)s
+                        .snapshots(),
                 builder: (context, doc) {
+                  print(
+                      "------------------------------------- >>>>>>>>> ${doc.data}");
                   if (doc.hasData && doc.data != null) {
                     return ListView.builder(
                       shrinkWrap: true,
@@ -313,7 +377,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                         final data = doc.data!.docs[index].data();
                         val1 = generateRandomString(7);
                         print(creatorDetails);
-
+                        chatUser.add(creatorDetails);
                         return SizedBox(
                           child: ListTile(
                             onTap: () {
@@ -436,11 +500,13 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                         "============== <<<<<<<<<=========>>>>>>>>> user with conversation $userWhoCanMessage");
 
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: userWhoCanMessage.isNotEmpty
-                          ? FirebaseFirestore.instance
-                              .collection("users")
-                              .where("id", whereIn: userWhoCanMessage)
-                              .snapshots()
+                      stream: widget.query.isEmpty
+                          ? userWhoCanMessage.isNotEmpty
+                              ? FirebaseFirestore.instance
+                                  .collection("users")
+                                  .where("id", whereIn: userWhoCanMessage)
+                                  .snapshots()
+                              : null
                           : null,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data != null) {
@@ -475,6 +541,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                     if (d.hasData && d.data!.exists) {
                                       return Container();
                                     } else {
+                                      noChatUser.add(creatorDetails);
                                       return SizedBox(
                                         height: 70,
                                         child: ListTile(

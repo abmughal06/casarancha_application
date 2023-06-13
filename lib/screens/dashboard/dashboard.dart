@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_helper.dart';
@@ -11,6 +12,7 @@ import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -151,28 +153,73 @@ class _DashBoardState extends State<DashBoard>
                         onPressed: () {
                           dashboardController.pageController.jumpToPage(3);
                         },
-                        icon: SvgPicture.asset(
-                          dashboardController.currentIndex.value == 3
-                              ? icBottomSelChat
-                              : icBottomDeSelChat,
-                        ),
+                        icon: StreamBuilder<QuerySnapshot<Map>>(
+                            stream: FirebaseFirestore.instance
+                                .collection("users")
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .collection(
+                                    profileScreenController.isGhostModeOn.value
+                                        ? "ghostMessageList"
+                                        : "messageList")
+                                .orderBy("createdAt", descending: true)
+                                .snapshots(),
+                            builder: (context, doc) {
+                              if (doc.hasData) {
+                                int messageCount = 0;
+                                for (int i = 0;
+                                    i < doc.data!.docs.length;
+                                    i++) {
+                                  messageCount += int.parse(doc.data!.docs[i]
+                                      .data()['unreadMessageCount']
+                                      .toString());
+                                }
+                                return Badge(
+                                  label: Text(messageCount.toString()),
+                                  isLabelVisible: messageCount != 0,
+                                  child: SvgPicture.asset(
+                                    dashboardController.currentIndex.value == 3
+                                        ? icBottomSelChat
+                                        : icBottomDeSelChat,
+                                  ),
+                                );
+                              } else {
+                                return SvgPicture.asset(
+                                  dashboardController.currentIndex.value == 3
+                                      ? icBottomSelChat
+                                      : icBottomDeSelChat,
+                                );
+                              }
+                            }),
                       ),
                       IconButton(
                         onPressed: () {
                           dashboardController.pageController.jumpToPage(4);
                         },
-                        icon: profileScreenController.isGettingUserData.value
-                            ? const Center(
-                                child: CupertinoActivityIndicator(),
-                              )
-                            : CircleAvatar(
+                        icon: StreamBuilder<
+                            DocumentSnapshot<Map<String, dynamic>>>(
+                          stream: FirebaseFirestore.instance
+                              .collection("users")
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              var user =
+                                  UserModel.fromMap(snapshot.data!.data()!);
+                              return CircleAvatar(
                                 backgroundColor: Colors.red.withOpacity(
                                   0.1,
                                 ),
                                 backgroundImage: NetworkImage(
-                                  profileScreenController.user.value.imageStr,
+                                  user.imageStr,
                                 ),
-                              ),
+                              );
+                            } else {
+                              return const Center(
+                                child: CupertinoActivityIndicator(),
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ],
                   )),

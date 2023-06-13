@@ -11,7 +11,6 @@ import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
-import 'package:casarancha/widgets/asset_image_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:casarancha/widgets/video_player_Url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -119,15 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     var length = snapshot.data!.docs
                         .where((element) => element['isRead'] == false)
                         .toList();
-                    return badges.Badge(
-                      badgeContent: TextWidget(
-                        text: length.length.toString(),
-                        color: Colors.white,
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      position: badges.BadgePosition.topEnd(top: -8, end: -8),
-                      showBadge: length.isEmpty ? false : true,
+                    return Badge(
+                      label: Text(length.length.toString()),
+                      isLabelVisible: length.isNotEmpty,
                       child: SvgPicture.asset(
                         icNotifyBell,
                       ),
@@ -391,55 +384,61 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                           Story story =
                                               Story.fromMap(storyData);
-                                          DateTime? givenDate;
-                                          for (int i = 0;
-                                              i < story.mediaDetailsList.length;
-                                              i++) {
-                                            givenDate = DateTime.parse(
-                                                story.mediaDetailsList[i].id);
-                                          }
-
-                                          DateTime twentyFourHoursAgo =
-                                              DateTime.now().subtract(
-                                                  const Duration(hours: 24));
-                                          log(" ========== $twentyFourHoursAgo");
-                                          if (givenDate!
-                                              .isBefore(twentyFourHoursAgo)) {
+                                          if (story.mediaDetailsList.isEmpty) {
                                             return Container();
                                           } else {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 12),
-                                              child: Column(
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      Get.to(
-                                                        () => StoryViewScreen(
-                                                            story: story),
-                                                      );
-                                                    },
-                                                    child: CircleAvatar(
-                                                      minRadius: 25,
-                                                      backgroundImage:
-                                                          NetworkImage(story
-                                                              .creatorDetails
-                                                              .imageUrl),
+                                            DateTime? givenDate;
+                                            for (int i = 0;
+                                                i <
+                                                    story.mediaDetailsList
+                                                        .length;
+                                                i++) {
+                                              givenDate = DateTime.parse(
+                                                  story.mediaDetailsList[i].id);
+                                            }
+
+                                            DateTime twentyFourHoursAgo =
+                                                DateTime.now().subtract(
+                                                    const Duration(hours: 24));
+                                            log(" ========== $twentyFourHoursAgo");
+                                            if (givenDate!
+                                                .isBefore(twentyFourHoursAgo)) {
+                                              return Container();
+                                            } else {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 12),
+                                                child: Column(
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () {
+                                                        Get.to(
+                                                          () => StoryViewScreen(
+                                                              story: story),
+                                                        );
+                                                      },
+                                                      child: CircleAvatar(
+                                                        minRadius: 25,
+                                                        backgroundImage:
+                                                            NetworkImage(story
+                                                                .creatorDetails
+                                                                .imageUrl),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  const SizedBox(height: 3),
-                                                  Text(
-                                                    getFirstName(story
-                                                        .creatorDetails.name),
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 10,
+                                                    const SizedBox(height: 3),
+                                                    Text(
+                                                      getFirstName(story
+                                                          .creatorDetails.name),
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 10,
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
+                                                  ],
+                                                ),
+                                              );
+                                            }
                                           }
                                         }),
                                   );
@@ -930,19 +929,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             post.creatorId);
                                                   },
                                                   child: CachedNetworkImage(
-                                                      progressIndicatorBuilder:
-                                                          (context, url,
-                                                                  progress) =>
-                                                              Center(
-                                                                child: SizedBox(
-                                                                  height: 30.h,
-                                                                  child:
-                                                                      const CircularProgressIndicator(),
-                                                                ),
-                                                              ),
-                                                      imageUrl: post
-                                                          .mediaData[index]
-                                                          .link)),
+                                                    imageUrl: post
+                                                        .mediaData[index].link,
+                                                  )),
                                         ),
                                       ),
                                     ],
@@ -1158,12 +1147,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                               });
                                             }
                                           },
-                                          icon: Image.asset(
-                                            postSave,
-                                            color: userModel.savedPostsIds
+                                          icon: SvgPicture.asset(
+                                            userModel.savedPostsIds
                                                     .contains(post.id)
-                                                ? colorPrimaryA05
-                                                : null,
+                                                ? icSavedPost
+                                                : icBookMarkReg,
                                           ),
                                         );
                                       } else {
@@ -1495,24 +1483,25 @@ class CustomPostFooter extends StatelessWidget {
                 widthBox(5.w),
                 IconButton(
                   onPressed: ontapLike,
-                  icon: AssetImageWidget(
-                    imageName: isLike! ? postLikeRed : postLike,
+                  icon: Icon(
+                    isLike! ? Icons.thumb_up : Icons.thumb_up_outlined,
                     // height: 13,
+                    color:
+                        isLike! ? colorPrimaryA05 : color55F.withOpacity(0.7),
                   ),
                 ),
                 Text("$likes"),
                 IconButton(
                   onPressed: ontapCmnt,
-                  icon: const AssetImageWidget(
-                    imageName: postComment,
+                  icon: SvgPicture.asset(
+                    icCommentPost,
                   ),
                 ),
                 Text("$comments"),
                 IconButton(
                   onPressed: ontapShare,
-                  icon: const AssetImageWidget(
-                    imageName: postSend,
-                  ),
+                  icon: const Icon(Icons.share),
+                  color: color55F.withOpacity(0.7),
                 ),
               ],
             ),

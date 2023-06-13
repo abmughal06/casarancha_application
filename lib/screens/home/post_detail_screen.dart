@@ -282,12 +282,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                                 });
                                               }
                                             },
-                                            icon: Image.asset(
-                                              postSave,
-                                              color: userModel.savedPostsIds
+                                            icon: SvgPicture.asset(
+                                              userModel.savedPostsIds
                                                       .contains(post.id)
-                                                  ? Colors.red
-                                                  : null,
+                                                  ? icSavedPost
+                                                  : icBookMarkReg,
                                             ),
                                           );
                                         } else {

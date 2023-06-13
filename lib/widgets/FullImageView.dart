@@ -12,6 +12,7 @@ class FullImageView extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        actions: [],
       ),
       body: Center(
         child: CachedNetworkImage(

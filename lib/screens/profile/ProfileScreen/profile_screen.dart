@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
@@ -17,6 +20,7 @@ import 'package:casarancha/widgets/FullImageView.dart';
 import 'package:casarancha/widgets/menu_post_button.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:casarancha/widgets/video_player_Url.dart';
+import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -232,121 +236,232 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Scaffold(
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            GetBuilder<ProfileScreenController>(
-                init: Get.isRegistered<ProfileScreenController>()
-                    ? Get.find<ProfileScreenController>()
-                    : Get.put(ProfileScreenController()),
-                builder: (psCtrl) {
-                  return SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: ghostModeBtn(iconSize: 40),
-                            ),
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: IconButton(
-                                onPressed: () {
-                                  _bottomSheetProfile(context);
-                                },
-                                icon: Image.asset(
-                                  imgProfileOption,
-                                  height: 35.h,
-                                  width: 35.w,
+            SliverToBoxAdapter(
+              child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection("users")
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      var user = UserModel.fromMap(snapshot.data!.data()!);
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: ghostModeBtn(iconSize: 40),
+                              ),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: IconButton(
+                                  onPressed: () {
+                                    _bottomSheetProfile(context);
+                                  },
+                                  icon: Image.asset(
+                                    imgProfileOption,
+                                    height: 35.h,
+                                    width: 35.w,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: colorPrimaryA05, width: 1.5),
-                              shape: BoxShape.circle),
-                          height: 90.h,
-                          width: 90.h,
-                          alignment: Alignment.center,
-                          child: AspectRatio(
-                              aspectRatio: 1 / 1,
-                              child: ClipOval(
-                                  child: FadeInImage(
-                                      fit: BoxFit.cover,
-                                      placeholder:
-                                          const AssetImage(imgUserPlaceHolder),
-                                      image: NetworkImage(
-                                          psCtrl.user.value.imageStr)))),
-                        ),
-                        heightBox(15.h),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextWidget(
-                              text: psCtrl.user.value.name,
-                              color: color13F,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16.sp,
-                            ),
-                            widthBox(6.w),
-                            if (psCtrl.user.value.isVerified)
-                              SvgPicture.asset(
-                                icVerifyBadge,
-                                width: 17.w,
-                                height: 17.h,
-                              )
-                          ],
-                        ),
-                        TextWidget(
-                          text: psCtrl.user.value.username,
-                          color: colorAA3,
-                          fontSize: 12.sp,
-                        ),
-                        heightBox(12.h),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            postFollowCount(
-                                count: psCtrl.user.value.postsIds.length
-                                    .toString(),
-                                strText: strProfilePost),
-                            verticalLine(height: 24.h, horizontalMargin: 30.w),
-                            GestureDetector(
-                              onTap: () =>
-                                  Get.to(() => FollowerFollowingScreen()),
-                              child: postFollowCount(
-                                  count: psCtrl.user.value.followersIds.length
-                                      .toString(),
-                                  strText: strProfileFollowers),
-                            ),
-                            verticalLine(height: 24.h, horizontalMargin: 30.w),
-                            GestureDetector(
-                              onTap: () =>
-                                  Get.to(() => FollowerFollowingScreen()),
-                              child: postFollowCount(
-                                  count: psCtrl.user.value.followingsIds.length
-                                      .toString(),
-                                  strText: strProfileFollowing),
-                            ),
-                          ],
-                        ),
-                        heightBox(14.h),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 27.w),
-                          child: TextWidget(
-                            text: profileScreenController.user.value.bio,
-                            textAlign: TextAlign.center,
-                            color: color55F,
+                            ],
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: colorPrimaryA05, width: 1.5),
+                                shape: BoxShape.circle),
+                            height: 90.h,
+                            width: 90.h,
+                            alignment: Alignment.center,
+                            child: AspectRatio(
+                                aspectRatio: 1 / 1,
+                                child: ClipOval(
+                                    child: FadeInImage(
+                                        fit: BoxFit.cover,
+                                        placeholder: const AssetImage(
+                                            imgUserPlaceHolder),
+                                        image: NetworkImage(user.imageStr)))),
+                          ),
+                          heightBox(15.h),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextWidget(
+                                text: user.name,
+                                color: color13F,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16.sp,
+                              ),
+                              widthBox(6.w),
+                              if (user.isVerified)
+                                SvgPicture.asset(
+                                  icVerifyBadge,
+                                  width: 17.w,
+                                  height: 17.h,
+                                )
+                            ],
+                          ),
+                          TextWidget(
+                            text: user.username,
+                            color: colorAA3,
                             fontSize: 12.sp,
                           ),
-                        ),
-                        heightBox(20.h),
-                      ],
-                    ),
-                  );
-                })
+                          heightBox(12.h),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              StreamBuilder<
+                                      QuerySnapshot<Map<String, dynamic>>>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection("posts")
+                                      .where("creatorId",
+                                          isEqualTo: FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return postFollowCount(
+                                          count: snapshot.data!.docs.length
+                                              .toString(),
+                                          strText: strProfilePost);
+                                    } else {
+                                      return postFollowCount(
+                                          count: "0", strText: strProfilePost);
+                                    }
+                                  }),
+                              verticalLine(
+                                  height: 24.h, horizontalMargin: 30.w),
+                              GestureDetector(
+                                onTap: () => Get.to(
+                                    () => const FollowerFollowingScreen()),
+                                child: postFollowCount(
+                                    count: user.followersIds.length.toString(),
+                                    strText: strProfileFollowers),
+                              ),
+                              verticalLine(
+                                  height: 24.h, horizontalMargin: 30.w),
+                              GestureDetector(
+                                onTap: () => Get.to(
+                                    () => const FollowerFollowingScreen()),
+                                child: postFollowCount(
+                                    count: user.followingsIds.length.toString(),
+                                    strText: strProfileFollowing),
+                              ),
+                            ],
+                          ),
+                          heightBox(14.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 27.w),
+                            child: TextWidget(
+                              text: profileScreenController.user.value.bio,
+                              textAlign: TextAlign.center,
+                              color: color55F,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                          heightBox(20.h),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: ghostModeBtn(iconSize: 40),
+                              ),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: IconButton(
+                                  onPressed: () {
+                                    _bottomSheetProfile(context);
+                                  },
+                                  icon: Image.asset(
+                                    imgProfileOption,
+                                    height: 35.h,
+                                    width: 35.w,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: colorPrimaryA05, width: 1.5),
+                                shape: BoxShape.circle),
+                            height: 90.h,
+                            width: 90.h,
+                            alignment: Alignment.center,
+                            child: AspectRatio(
+                              aspectRatio: 1 / 1,
+                              child: Image.asset(imgUserPlaceHolder),
+                            ),
+                          ),
+                          heightBox(15.h),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextWidget(
+                                text: "-----",
+                                color: color13F,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16.sp,
+                              ),
+                              widthBox(6.w),
+                            ],
+                          ),
+                          TextWidget(
+                            text: "-----",
+                            color: colorAA3,
+                            fontSize: 12.sp,
+                          ),
+                          heightBox(12.h),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              postFollowCount(
+                                  count: "0", strText: strProfilePost),
+                              verticalLine(
+                                  height: 24.h, horizontalMargin: 30.w),
+                              GestureDetector(
+                                onTap: () => Get.to(
+                                    () => const FollowerFollowingScreen()),
+                                child: postFollowCount(
+                                    count: "0", strText: strProfileFollowers),
+                              ),
+                              verticalLine(
+                                  height: 24.h, horizontalMargin: 30.w),
+                              GestureDetector(
+                                onTap: () => Get.to(
+                                    () => const FollowerFollowingScreen()),
+                                child: postFollowCount(
+                                    count: "0", strText: strProfileFollowing),
+                              ),
+                            ],
+                          ),
+                          heightBox(14.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 27.w),
+                            child: TextWidget(
+                              text: profileScreenController.user.value.bio,
+                              textAlign: TextAlign.center,
+                              color: color55F,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                          heightBox(20.h),
+                        ],
+                      );
+                    }
+                  }),
+            )
           ],
           body: DefaultTabController(
             length: 4,
@@ -489,22 +604,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     margin: EdgeInsets.zero,
                                     color: Colors.transparent,
                                     child: GestureDetector(
-                                      onTap: () => Get.to(() => Card(
-                                            elevation: 0,
-                                            margin: EdgeInsets.zero,
-                                            color: Colors.transparent,
-                                            child: Stack(
-                                              children: [
-                                                FullImageView(
-                                                  url: quote,
-                                                ),
-                                              ],
-                                            ),
-                                          )),
-                                      child: Image.network(
-                                        quote.toString(),
+                                      onTap: () => Get.to(() => FullScreenImage(
+                                          image: quote, post: data)),
+                                      child: CachedNetworkImage(
+                                        imageUrl: quote,
                                         fit: BoxFit.cover,
-                                        // textAlign: TextAlign.center,
                                       ),
                                     ),
                                   );
@@ -569,22 +673,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection("posts")
-                            .where("creatorId", isEqualTo: user!.id)
+                            .where("creatorId",
+                                isEqualTo:
+                                    FirebaseAuth.instance.currentUser!.uid)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             var postdata = snapshot.data!.docs;
                             // var mediaDataList = [];
-                            var qoutesList = [];
+                            var videoList = [];
+                            var postid = "";
+                            var creatorId = "";
 
                             for (var i = 0; i < postdata.length; i++) {
-                              if (postdata[i].data()['mediaData'][0]['type'] ==
-                                  'Video') {
-                                qoutesList.add(postdata[i].data());
-                                // print(qoutesList);
+                              var postmodel =
+                                  PostModel.fromMap(postdata[i].data());
+
+                              for (var j = 0;
+                                  j < postmodel.mediaData.length;
+                                  j++) {
+                                if (postmodel.mediaData[j].type == 'Video') {
+                                  videoList.add(postmodel.mediaData[j]);
+                                  postid = postmodel.id;
+                                  creatorId = postmodel.creatorId;
+                                  print(videoList);
+                                }
                               }
                             }
-                            if (qoutesList.length.isEqual(0)) {
+                            if (videoList.length.isEqual(0)) {
                               return const Center(
                                 child: Text("No Vdeos to show"),
                               );
@@ -594,56 +710,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 3,
                                 ),
-                                itemCount: qoutesList.length,
+                                itemCount: videoList.length,
                                 itemBuilder: (context, index) {
-                                  final data =
-                                      PostModel.fromMap(qoutesList[index]);
-                                  final String quote = data.mediaData[0].link;
+                                  final data = videoList[index];
                                   // print(quote);
                                   VideoPlayerController videoPlayerController =
-                                      VideoPlayerController.network(quote);
+                                      VideoPlayerController.network(data.link);
+
                                   return GestureDetector(
-                                    onTap: () => Get.to(
-                                      () => Card(
-                                        elevation: 0,
-                                        margin: EdgeInsets.zero,
-                                        color: Colors.transparent,
-                                        child: Stack(
-                                          children: [
-                                            Center(
-                                              child: AspectRatio(
-                                                aspectRatio:
-                                                    videoPlayerController
-                                                        .value.aspectRatio,
-                                                child: SizedBox(
-                                                  height: 360.w,
-                                                  child: VideoPlayerWidget(
-                                                    videoUrl: quote,
-                                                    videoPlayerController:
-                                                        videoPlayerController,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 20,
-                                              right: 15,
-                                              child: menuButton(
-                                                  context,
-                                                  profileScreenController
-                                                          .getUserVideos[index]
-                                                      ['post'],
-                                                  margin: const EdgeInsets
-                                                          .symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 17),
-                                                  profileScreenController:
-                                                      profileScreenController),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                    onTap: () => Get.to(() => FullScreenVideo(
+                                          videoPlayerController:
+                                              videoPlayerController,
+                                          postId: postid,
+                                          creatorId: creatorId,
+                                        )),
                                     child: const Center(
                                       child: Icon(
                                         Icons.video_file_rounded,
@@ -758,6 +838,124 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
+class FullScreenVideo extends StatefulWidget {
+  FullScreenVideo(
+      {Key? key, this.videoPlayerController, this.postId, this.creatorId})
+      : super(key: key);
+
+  ChewieController? chewieController;
+  final VideoPlayerController? videoPlayerController;
+  final String? postId;
+  final String? creatorId;
+
+  @override
+  State<FullScreenVideo> createState() => _FullScreenVideoState();
+}
+
+class _FullScreenVideoState extends State<FullScreenVideo> {
+  @override
+  void initState() {
+    super.initState();
+    widget.chewieController = ChewieController(
+      autoPlay: true,
+      aspectRatio: 9 / 16,
+      videoPlayerController: widget.videoPlayerController!,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.chewieController!.pause();
+    widget.chewieController!.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      color: Colors.transparent,
+      child: Stack(
+        children: [
+          Center(
+            child: AspectRatio(
+              aspectRatio: 9 / 16,
+              child: Chewie(
+                controller: widget.chewieController!,
+              ),
+            ),
+          ),
+          Visibility(
+            visible: widget.creatorId == FirebaseAuth.instance.currentUser!.uid,
+            child: Positioned(
+              top: 40,
+              right: 15,
+              child: InkWell(
+                onTap: () {
+                  Get.bottomSheet(
+                    Container(
+                      decoration: const BoxDecoration(color: Colors.red),
+                      height: 80,
+                      child: InkWell(
+                        onTap: () async {
+                          await FirebaseFirestore.instance
+                              .collection("posts")
+                              .doc(widget.postId)
+                              .delete();
+                          Get.back();
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            TextWidget(
+                              text: "Delete Post",
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    isScrollControlled: true,
+                  );
+                  Get.back();
+                },
+                child: Container(
+                  height: 30.h,
+                  width: 30.h,
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  child: SvgPicture.asset(icThreeDots),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 40,
+            left: 15,
+            child: InkWell(
+              onTap: () {
+                Get.back();
+              },
+              child: Container(
+                decoration: const BoxDecoration(
+                    color: Colors.white, shape: BoxShape.circle),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                child: SvgPicture.asset(icIosBackArrow),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class FullScreenQoute extends StatelessWidget {
   const FullScreenQoute(
       {Key? key,
@@ -776,11 +974,50 @@ class FullScreenQoute extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          menuButton(context, post,
-              profileScreenController: profileScreenController),
-          const SizedBox(
-            width: 10,
-          )
+          Visibility(
+            visible: post.creatorId == FirebaseAuth.instance.currentUser!.uid,
+            child: InkWell(
+              onTap: () {
+                Get.bottomSheet(
+                  Container(
+                    decoration: const BoxDecoration(color: Colors.red),
+                    height: 80,
+                    child: InkWell(
+                      onTap: () async {
+                        await FirebaseFirestore.instance
+                            .collection("posts")
+                            .doc(post.id)
+                            .delete()
+                            .then((value) => Get.back())
+                            .whenComplete(() => Get.back());
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          TextWidget(
+                            text: "Delete Post",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  isScrollControlled: true,
+                );
+              },
+              child: Container(
+                height: 30.h,
+                width: 30.h,
+                decoration: const BoxDecoration(
+                    color: Colors.white, shape: BoxShape.circle),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+                child: SvgPicture.asset(icThreeDots),
+              ),
+            ),
+          ),
         ],
       ),
       body: Center(
@@ -792,6 +1029,80 @@ class FullScreenQoute extends StatelessWidget {
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class FullScreenImage extends StatelessWidget {
+  const FullScreenImage(
+      {Key? key,
+      required this.image,
+      required this.post,
+      this.profileScreenController})
+      : super(key: key);
+  final String image;
+  final PostModel post;
+  final ProfileScreenController? profileScreenController;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        actions: [
+          Visibility(
+            visible: post.creatorId == FirebaseAuth.instance.currentUser!.uid,
+            child: InkWell(
+              onTap: () {
+                Get.bottomSheet(
+                  Container(
+                    decoration: const BoxDecoration(color: Colors.red),
+                    height: 80,
+                    child: InkWell(
+                      onTap: () async {
+                        await FirebaseFirestore.instance
+                            .collection("posts")
+                            .doc(post.id)
+                            .delete()
+                            .then((value) => Get.back())
+                            .whenComplete(() => Get.back());
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          TextWidget(
+                            text: "Delete Post",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  isScrollControlled: true,
+                );
+              },
+              child: Container(
+                height: 30.h,
+                width: 30.h,
+                decoration: const BoxDecoration(
+                    color: Colors.white, shape: BoxShape.circle),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+                child: SvgPicture.asset(icThreeDots),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Center(
+        child: CachedNetworkImage(
+          imageUrl: image,
+          placeholder: (context, url) => const CircularProgressIndicator(),
         ),
       ),
     );
