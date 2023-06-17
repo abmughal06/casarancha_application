@@ -2,6 +2,7 @@ import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/resources/image_resources.dart';
 
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
@@ -23,8 +24,10 @@ import 'package:flutterfire_ui/firestore.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../models/post_creator_details.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/text_widget.dart';
+import '../chat/GhostMode/ghost_chat_screen.dart';
 import '../dashboard/dashboard.dart';
 import '../profile/AppUser/app_user_controller.dart';
 import '../profile/AppUser/app_user_screen.dart';
@@ -225,6 +228,25 @@ class _SearchScreenState extends State<SearchScreen> {
                                                         : FieldValue.arrayUnion(
                                                             [userSnap.id])
                                                   });
+                                                  if (!currentUser.followingsIds
+                                                      .contains(userSnap.id)) {
+                                                    FirebaseMessagingService()
+                                                        .sendNotificationToUser(
+                                                      userReqID: userSnap.id,
+                                                      devRegToken:
+                                                          userSnap.fcmToken,
+                                                      title: user!.name,
+                                                      creatorDetails:
+                                                          CreatorDetails(
+                                                              name: user!.name,
+                                                              imageUrl: user!
+                                                                  .imageStr,
+                                                              isVerified: user!
+                                                                  .isVerified),
+                                                      msg:
+                                                          "has started following you",
+                                                    );
+                                                  }
                                                 },
                                               ),
                                             ),

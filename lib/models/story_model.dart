@@ -10,9 +10,11 @@ class Story {
   String creatorId;
   String createdAt;
   List<MediaDetails> mediaDetailsList;
+  List<String> storyViews;
   CreatorDetails creatorDetails;
   Story({
     required this.id,
+    required this.storyViews,
     required this.creatorId,
     required this.createdAt,
     required this.mediaDetailsList,
@@ -23,6 +25,7 @@ class Story {
     String? id,
     String? creatorId,
     String? createdAt,
+    int? storyViews,
     List<MediaDetails>? mediaDetailsList,
     CreatorDetails? creatorDetails,
   }) {
@@ -32,12 +35,14 @@ class Story {
       createdAt: createdAt ?? this.createdAt,
       mediaDetailsList: mediaDetailsList ?? this.mediaDetailsList,
       creatorDetails: creatorDetails ?? this.creatorDetails,
+      storyViews: this.storyViews,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'storyViews': storyViews,
       'creatorId': creatorId,
       'createdAt': createdAt,
       'mediaDetailsList': mediaDetailsList.map((x) => x.toMap()).toList(),
@@ -47,6 +52,7 @@ class Story {
 
   factory Story.fromMap(Map<String, dynamic> map) {
     return Story(
+      storyViews: map['storyViews'] ?? [],
       id: map['id'] ?? '',
       creatorId: map['creatorId'] ?? '',
       createdAt: map['createdAt'] ?? '',
@@ -62,7 +68,7 @@ class Story {
 
   @override
   String toString() {
-    return 'Story(id: $id, creatorId: $creatorId, createdAt: $createdAt, mediaDetailsList: $mediaDetailsList, creatorDetails: $creatorDetails)';
+    return 'Story(id: $id,storyViews:$storyViews, creatorId: $creatorId, createdAt: $createdAt, mediaDetailsList: $mediaDetailsList, creatorDetails: $creatorDetails)';
   }
 
   @override
@@ -71,6 +77,7 @@ class Story {
 
     return other is Story &&
         other.id == id &&
+        other.storyViews == storyViews &&
         other.creatorId == creatorId &&
         other.createdAt == createdAt &&
         listEquals(other.mediaDetailsList, mediaDetailsList) &&
@@ -81,6 +88,7 @@ class Story {
   int get hashCode {
     return id.hashCode ^
         creatorId.hashCode ^
+        storyViews.hashCode ^
         createdAt.hashCode ^
         mediaDetailsList.hashCode ^
         creatorDetails.hashCode;

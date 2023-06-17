@@ -10,6 +10,7 @@ class NotificationModel {
   String? msg;
   bool? isRead;
   String? createdAt;
+  String? imageUrl;
 
   NotificationModel({
     this.id,
@@ -18,6 +19,7 @@ class NotificationModel {
     this.appUserId,
     this.msg,
     this.title,
+    this.imageUrl,
     this.createdAt,
   });
 
@@ -26,6 +28,7 @@ class NotificationModel {
     CreatorDetails? createdDetails,
     String? appUserId,
     dynamic msg,
+    String? imageUrl,
     bool? isRead,
     String? caption,
     String? title,
@@ -37,6 +40,7 @@ class NotificationModel {
       title: title ?? this.title,
       createdDetails: createdDetails ?? this.createdDetails,
       appUserId: appUserId ?? this.appUserId,
+      imageUrl: imageUrl ?? this.imageUrl,
       msg: msg ?? this.msg,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -47,6 +51,7 @@ class NotificationModel {
       'id': id,
       'title': title,
       'isRead': isRead,
+      'imageUrl': imageUrl,
       'createdDetails': createdDetails!.toMap(),
       'appUserId': appUserId,
       'content': msg,
@@ -59,6 +64,7 @@ class NotificationModel {
       id: map['id'],
       title: map['title'],
       isRead: map['isRead'],
+      imageUrl: map['imageUrl'],
       createdDetails: CreatorDetails.fromMap(map['createdDetails']),
       appUserId: map['appUserId'],
       msg: map['content'] as dynamic,
@@ -73,7 +79,7 @@ class NotificationModel {
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, title: $title, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt, isRead: $isRead)';
+    return 'NotificationModel(id: $id,imageUrl:$imageUrl, title: $title, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt, isRead: $isRead)';
   }
 
   @override
@@ -82,6 +88,7 @@ class NotificationModel {
 
     return other.id == id &&
         other.isRead == isRead &&
+        other.imageUrl == imageUrl &&
         other.title == title &&
         other.createdDetails == createdDetails &&
         other.appUserId == appUserId &&
@@ -93,6 +100,7 @@ class NotificationModel {
   int get hashCode {
     return id.hashCode ^
         isRead.hashCode ^
+        imageUrl.hashCode ^
         createdDetails.hashCode ^
         title.hashCode ^
         appUserId.hashCode ^

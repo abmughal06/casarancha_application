@@ -1,11 +1,15 @@
+import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:story_view/story_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -36,6 +40,59 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
   List<MediaDetails> storyItems = [];
   DateTime twentyFourHoursAgo =
       DateTime.now().subtract(const Duration(hours: 24));
+
+  countStoryViews() async {
+    log("story play");
+    var ref =
+        FirebaseFirestore.instance.collection("stories").doc(widget.story.id);
+    var data = await ref.get();
+    List<dynamic> array = data.data()!['mediaDetailsList'];
+    log("=========================> ${array.length}");
+
+    for (var e = 0; e < array.length; e++) {
+      var media = MediaDetails.fromMap(array[e]);
+      if (media.id == storyItems[currentIndex.value].id) {
+        if (!media.storyViews!
+            .contains(FirebaseAuth.instance.currentUser!.uid)) {
+          log("----------------- barabar");
+
+          List prevId = media.storyViews!.toList();
+          List viewid = [FirebaseAuth.instance.currentUser!.uid];
+          media = media.type == 'Photo'
+              ? MediaDetails(
+                  id: media.id,
+                  name: media.name,
+                  type: media.type,
+                  link: media.link,
+                  imageHeight: media.imageHeight,
+                  imageWidth: media.imageWidth,
+                  storyViews: prevId + viewid,
+                )
+              : media.type == 'Video'
+                  ? MediaDetails(
+                      id: media.id,
+                      name: media.name,
+                      type: media.type,
+                      link: media.link,
+                      storyViews: prevId + viewid,
+                      videoAspectRatio: media.videoAspectRatio,
+                      videoViews: media.videoViews,
+                    )
+                  : MediaDetails(
+                      id: media.id,
+                      name: media.name,
+                      type: media.type,
+                      link: media.link,
+                      storyViews: prevId + viewid,
+                    );
+          print(media);
+          array[e] = media.toMap();
+        }
+      }
+    }
+
+    ref.update({'mediaDetailsList': array});
+  }
 
   @override
   void initState() {
@@ -77,12 +134,12 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                   StoryView(
                       storyItems: [
                         ...storyItems.asMap().entries.map((e) {
-                          // dateText = timeago.format(DateTime.parse(e.value.id));
                           print("==============  ${e.value.type}");
                           return e.value.type == "Photo"
                               ? StoryItem.pageImage(
                                   key: ValueKey(e.key),
                                   url: e.value.link,
+                                  duration: const Duration(seconds: 6),
                                   controller: controller!,
                                 )
                               : StoryItem.pageVideo(e.value.link,
@@ -94,9 +151,8 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                       controller: controller!,
                       onComplete: () {
                         Get.back();
-                        // currentIndex.value = 0;
                       },
-                      onStoryShow: (s) {
+                      onStoryShow: (s) async {
                         currentIndex.value = int.parse(s.view.key
                             .toString()
                             .replaceAll("[", "")
@@ -104,8 +160,11 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                             .replaceAll("<", "")
                             .replaceAll(">", ""));
 
-                        print(
-                            "=============================== > ${s.view.key}");
+                        if (mounted) {
+                          await countStoryViews();
+                        }
+
+                        log("=============================== > ${s.view.key}");
                       },
                       onVerticalSwipeComplete: (direction) {
                         if (direction == Direction.down) {
@@ -139,7 +198,18 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                       ),
                     ),
                   ),
-                  Container(),
+                  Visibility(
+                    visible: _commentFocus.hasFocus,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: !_commentFocus.hasFocus,
+                    child: Container(),
+                  ),
                   Visibility(
                     visible: widget.story.creatorId ==
                         FirebaseAuth.instance.currentUser!.uid,
@@ -149,8 +219,154 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                         vertical: 10.0,
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          InkWell(
+                            onTap: () {
+                              controller!.pause();
+                              Get.bottomSheet(
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration:
+                                      const BoxDecoration(color: Colors.white),
+                                  child: StreamBuilder<
+                                      QuerySnapshot<Map<String, dynamic>>>(
+                                    stream: storyItems[currentIndex.value]
+                                            .storyViews!
+                                            .isEmpty
+                                        ? FirebaseFirestore.instance
+                                            .collection("users")
+                                            .where("id",
+                                                arrayContains:
+                                                    widget.story.storyViews)
+                                            .snapshots()
+                                        : FirebaseFirestore.instance
+                                            .collection("users")
+                                            .where("id",
+                                                whereIn: storyItems[
+                                                        currentIndex.value]
+                                                    .storyViews)
+                                            .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        if (snapshot.data!.docs.isNotEmpty) {
+                                          return ListView.builder(
+                                              itemCount:
+                                                  snapshot.data!.docs.length,
+                                              itemBuilder: (context, index) {
+                                                var userModel =
+                                                    UserModel.fromMap(snapshot
+                                                        .data!.docs[index]
+                                                        .data());
+                                                return ListTile(
+                                                  leading: Container(
+                                                    height: 46.h,
+                                                    width: 46.h,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.amber,
+                                                      image: DecorationImage(
+                                                        image:
+                                                            CachedNetworkImageProvider(
+                                                                userModel
+                                                                    .imageStr),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  title: RichText(
+                                                    text: TextSpan(
+                                                      text: "",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 12.sp,
+                                                          color: const Color(
+                                                              0xff5F5F5F)),
+                                                      children: [
+                                                        TextSpan(
+                                                          text: userModel
+                                                                  .isVerified
+                                                              ? userModel.name
+                                                              : "${userModel.name} ",
+                                                          style: TextStyle(
+                                                            color: const Color(
+                                                                0xff121F3F),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 14.sp,
+                                                          ),
+                                                        ),
+                                                        WidgetSpan(
+                                                          child: Visibility(
+                                                            visible: userModel
+                                                                .isVerified,
+                                                            child: Padding(
+                                                                padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        4.0),
+                                                                child: SvgPicture
+                                                                    .asset(
+                                                                        icVerifyBadge)),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  subtitle: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 5),
+                                                    child: Text(
+                                                      userModel.username,
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 12.sp,
+                                                          color: const Color(
+                                                              0xff5F5F5F)),
+                                                    ),
+                                                  ),
+                                                );
+                                              });
+                                        } else {
+                                          return const Center(
+                                            child: Text("No Views"),
+                                          );
+                                        }
+                                      } else {
+                                        return const CircularProgressIndicator();
+                                      }
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              width: 100.w,
+                              child: Row(
+                                children: [
+                                  widthBox(10.w),
+                                  const Icon(
+                                    Icons.visibility,
+                                    color: color887,
+                                  ),
+                                  widthBox(5.w),
+                                  TextWidget(
+                                    text: storyItems[currentIndex.value]
+                                        .storyViews!
+                                        .length
+                                        .toString(),
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: color887,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                           IconButton(
                               onPressed: () async {
                                 if (storyItems[currentIndex.value].id ==
@@ -207,7 +423,8 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                         child: Focus(
                           focusNode: _commentFocus,
                           onFocusChange: (hasFocus) {
-                            hasFocus ? controller!.pause() : null;
+                            hasFocus ? controller!.pause() : controller!.play();
+                            setState(() {});
                           },
                           child: TextFormField(
                             controller: commentController,
@@ -303,6 +520,11 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                                           imageUrl: user!.imageStr,
                                           isVerified: user!.isVerified),
                                       // createdAt: message.createdAt,
+                                      imageUrl: storyItems[currentIndex.value]
+                                                  .type ==
+                                              'Photo'
+                                          ? storyItems[currentIndex.value].link
+                                          : '',
                                       // creatorDetails: creatorDetails,
                                       devRegToken: recieverFCMToken,
                                       userReqID: widget.story.creatorId,

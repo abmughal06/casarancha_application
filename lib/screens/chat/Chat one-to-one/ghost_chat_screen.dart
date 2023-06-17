@@ -30,13 +30,13 @@ import '../../profile/AppUser/app_user_screen.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../ChatList/chat_list_controller.dart';
 
-class ChatScreen extends StatefulWidget {
+class GhostChatScreen2 extends StatefulWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
   final ProfileScreenController? profileScreenController;
   final String? val;
 
-  const ChatScreen({
+  const GhostChatScreen2({
     Key? key,
     required this.appUserId,
     required this.creatorDetails,
@@ -46,15 +46,11 @@ class ChatScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<GhostChatScreen2> createState() => _GhostChatScreen2State();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _GhostChatScreen2State extends State<GhostChatScreen2> {
   @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final ChatController chatController = Get.put(
@@ -63,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
     final ChatListController chatListController = Get.find();
 
-    chatController.resetMessageCount();
+    chatController.resetMessageCountGhost();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -72,7 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
             color: Colors.black,
           ),
           onPressed: () {
-            chatController.resetMessageCount();
+            chatController.resetMessageCountGhost();
             Get.back();
           },
         ),
@@ -85,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
+                // UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
                 return ListTile(
                   onTap: () {
                     Get.to(
@@ -100,47 +96,14 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     );
                   },
+                  horizontalTitleGap: 10,
                   contentPadding: EdgeInsets.zero,
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          child: RichText(
-                            text: TextSpan(
-                              children: [
-                                WidgetSpan(
-                                  child: Text(
-                                    userModel.name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                WidgetSpan(child: widthBox(5.w)),
-                                WidgetSpan(
-                                  child: Visibility(
-                                      visible: userModel.isVerified,
-                                      child: SvgPicture.asset(icVerifyBadge)),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  title: Text(widget.val.toString()),
                   subtitle: snapshot.hasData ? const Text('Live') : null,
-                  leading: CircleAvatar(
-                    backgroundImage: userModel.imageStr.isEmpty ||
-                            widget.profileScreenController!.isGhostModeOn.value
-                        ? null
-                        : CachedNetworkImageProvider(
-                            userModel.imageStr,
-                          ),
-                    child: userModel.imageStr.isEmpty ||
-                            widget.profileScreenController!.isGhostModeOn.value
-                        ? const Icon(
-                            Icons.question_mark,
-                          )
-                        : null,
+                  leading: const CircleAvatar(
+                    child: Icon(
+                      Icons.question_mark,
+                    ),
                   ),
                 );
               } else {
@@ -176,9 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: chatController.currentUserRef
-                .collection(widget.profileScreenController!.isGhostModeOn.value
-                    ? "ghostMessageList"
-                    : 'messageList')
+                .collection("ghostMessageList")
                 .doc(widget.appUserId)
                 .collection(
                   'messages',
@@ -195,26 +156,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       itemCount: doc.data!.docs.length,
                       reverse: true,
                       itemBuilder: (context, index) {
-                        // FirebaseFirestore.instance
-                        //     .collection("users")
-                        //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                        //     .collection(widget.profileScreenController!
-                        //             .isGhostModeOn.value
-                        //         ? "ghostMessageList"
-                        //         : 'messageList')
-                        //     .doc(widget.appUserId)
-                        //     .collection("messages")
-                        //     .doc(doc.data!.docs[index].id)
-                        //     .update({
-                        //   'isSeen': true,
-                        // });
                         FirebaseFirestore.instance
                             .collection("users")
                             .doc(widget.appUserId)
-                            .collection(widget.profileScreenController!
-                                    .isGhostModeOn.value
-                                ? "ghostMessageList"
-                                : 'messageList')
+                            .collection("ghostMessageList")
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .collection("messages")
                             .doc(doc.data!.docs[index].id)
@@ -367,7 +312,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               widthBox(12.w),
                               GestureDetector(
                                 onTap: () {
-                                  chatController.sentMessage();
+                                  chatController.sentMessageGhost();
                                 },
                                 child: Image.asset(
                                   imgSendComment,

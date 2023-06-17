@@ -1,6 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
+import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -136,6 +139,16 @@ class AppUserController extends GetxController {
               appUserId,
             );
         isFollowing.value = true;
+        FirebaseMessagingService().sendNotificationToUser(
+          userReqID: appUserData.value.id,
+          devRegToken: appUserData.value.fcmToken,
+          title: user!.name,
+          creatorDetails: CreatorDetails(
+              name: user!.name,
+              imageUrl: user!.imageStr,
+              isVerified: user!.isVerified),
+          msg: "has started following you",
+        );
       }
     } catch (e) {
       GlobalSnackBar.show(message: e.toString());

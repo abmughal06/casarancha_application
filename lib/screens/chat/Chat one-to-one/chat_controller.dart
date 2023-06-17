@@ -76,17 +76,13 @@ class ChatController extends GetxController {
     }
     try {
       final messageRefForCurrentUser = currentUserRef
-          .collection(profileScreenController.isGhostModeOn.value
-              ? "ghostMessageList"
-              : 'messageList')
+          .collection('messageList')
           .doc(appUserId)
           .collection('messages')
           .doc();
 
       final messageRefForAppUser = appUserRef
-          .collection(profileScreenController.isGhostModeOn.value
-              ? "ghostMessageList"
-              : 'messageList')
+          .collection('messageList')
           .doc(currentUserId)
           .collection('messages')
           .doc(
@@ -114,35 +110,19 @@ class ChatController extends GetxController {
           ...profileScreenController.user.value.name.toLowerCase().split('')
         ],
         creatorDetails: CreatorDetails(
-          name: profileScreenController.isGhostModeOn.value
-              ? 'Ghost_${Random().nextInt(10000).toString()}'
-              : profileScreenController.user.value.name,
-          imageUrl: profileScreenController.isGhostModeOn.value
-              ? ''
-              : profileScreenController.user.value.imageStr,
-          isVerified: profileScreenController.isGhostModeOn.value
-              ? false
-              : profileScreenController.user.value.isVerified,
+          name: profileScreenController.user.value.name,
+          imageUrl: profileScreenController.user.value.imageStr,
+          isVerified: profileScreenController.user.value.isVerified,
         ),
         createdAt: DateTime.now().toIso8601String(),
       );
 
       // if (!isChatExits.value) {
-      await currentUserRef
-          .collection(profileScreenController.isGhostModeOn.value
-              ? "ghostMessageList"
-              : 'messageList')
-          .doc(appUserId)
-          .set(
+      await currentUserRef.collection('messageList').doc(appUserId).set(
             appUserMessageDetails.toMap(),
           );
 
-      await appUserRef
-          .collection(profileScreenController.isGhostModeOn.value
-              ? "ghostMessageList"
-              : 'messageList')
-          .doc(currentUserId)
-          .set(
+      await appUserRef.collection('messageList').doc(currentUserId).set(
             currentUserMessageDetails.toMap(),
           );
 
@@ -166,12 +146,7 @@ class ChatController extends GetxController {
       messageRefForAppUser.set(appUserMessage.toMap());
 
       // if (isChatExits.value) {
-      appUserRef
-          .collection(profileScreenController.isGhostModeOn.value
-              ? "ghostMessageList"
-              : 'messageList')
-          .doc(currentUserId)
-          .update(
+      appUserRef.collection('messageList').doc(currentUserId).update(
             currentUserMessageDetails.toMap(),
           );
       unreadMessages += 1;
@@ -184,15 +159,114 @@ class ChatController extends GetxController {
       print("=========> reciever fcm token = $recieverFCMToken");
       FirebaseMessagingService().sendNotificationToUser(
         creatorDetails: CreatorDetails(
-          name: profileScreenController.isGhostModeOn.value
-              ? 'Ghost_${Random().nextInt(10000).toString()}'
-              : profileScreenController.user.value.name,
-          imageUrl: profileScreenController.isGhostModeOn.value
-              ? ''
-              : profileScreenController.user.value.imageStr,
-          isVerified: profileScreenController.isGhostModeOn.value
-              ? false
-              : profileScreenController.user.value.isVerified,
+          name: profileScreenController.user.value.name,
+          imageUrl: profileScreenController.user.value.imageStr,
+          isVerified: profileScreenController.user.value.isVerified,
+        ),
+        devRegToken: recieverFCMToken,
+        userReqID: appUserId,
+        title: user!.name,
+        msg: "has sent you a $unreadMessages message",
+      );
+
+      messageController.clear();
+    } catch (e) {
+      GlobalSnackBar(message: e.toString());
+    }
+  }
+
+  Future<void> sentMessageGhost() async {
+    if (messageController.text.isEmpty) {
+      return;
+    }
+    try {
+      final messageRefForCurrentUser = currentUserRef
+          .collection("ghostMessageList")
+          .doc(appUserId)
+          .collection('messages')
+          .doc();
+
+      final messageRefForAppUser = appUserRef
+          .collection("ghostMessageList")
+          .doc(currentUserId)
+          .collection('messages')
+          .doc(
+            messageRefForCurrentUser.id,
+          );
+
+      final MessageDetails appUserMessageDetails = MessageDetails(
+        id: appUserId,
+        lastMessage: messageController.text,
+        unreadMessageCount: 0,
+        searchCharacters: [...creatorDetails.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: creatorDetails.name,
+          imageUrl: creatorDetails.imageUrl,
+          isVerified: creatorDetails.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
+
+      final MessageDetails currentUserMessageDetails = MessageDetails(
+        id: currentUserId,
+        lastMessage: messageController.text,
+        unreadMessageCount: unreadMessages + 1,
+        searchCharacters: [
+          ...profileScreenController.user.value.name.toLowerCase().split('')
+        ],
+        creatorDetails: CreatorDetails(
+          name: 'Ghost_${Random().nextInt(10000).toString()}',
+          imageUrl: '',
+          isVerified: false,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
+
+      // if (!isChatExits.value) {
+      await currentUserRef.collection("ghostMessageList").doc(appUserId).set(
+            appUserMessageDetails.toMap(),
+          );
+
+      await appUserRef.collection("ghostMessageList").doc(currentUserId).set(
+            currentUserMessageDetails.toMap(),
+          );
+
+      isChatExits.value = true;
+      // }
+
+      final Message message = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUserId,
+        sentById: currentUserId,
+        content: messageController.text,
+        caption: '',
+        type: 'Text',
+        createdAt: DateTime.now().toIso8601String(),
+        isSeen: false,
+      );
+
+      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
+
+      messageRefForCurrentUser.set(message.toMap());
+      messageRefForAppUser.set(appUserMessage.toMap());
+
+      // if (isChatExits.value) {
+      appUserRef.collection("ghostMessageList").doc(currentUserId).update(
+            currentUserMessageDetails.toMap(),
+          );
+      unreadMessages += 1;
+      // }
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUserId)
+          .get();
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      print("=========> reciever fcm token = $recieverFCMToken");
+      FirebaseMessagingService().sendNotificationToUser(
+        creatorDetails: CreatorDetails(
+          name: 'Ghost_${Random().nextInt(10000).toString()}',
+          imageUrl: '',
+          isVerified: false,
         ),
         devRegToken: recieverFCMToken,
         userReqID: appUserId,
@@ -207,12 +281,13 @@ class ChatController extends GetxController {
   }
 
   Future<void> resetMessageCount() async {
-    currentUserRef
-        .collection(profileScreenController.isGhostModeOn.value
-            ? "ghostMessageList"
-            : 'messageList')
-        .doc(appUserId)
-        .update({
+    currentUserRef.collection('messageList').doc(appUserId).update({
+      'unreadMessageCount': 0,
+    });
+  }
+
+  Future<void> resetMessageCountGhost() async {
+    currentUserRef.collection("ghostMessageList").doc(appUserId).update({
       'unreadMessageCount': 0,
     });
   }

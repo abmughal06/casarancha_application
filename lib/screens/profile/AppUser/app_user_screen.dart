@@ -125,7 +125,10 @@ class AppUserScreen extends StatelessWidget {
                                   height: 24.h, horizontalMargin: 30.w),
                               GestureDetector(
                                 onTap: () =>
-                                    Get.to(() => FollowerFollowingScreen()),
+                                    Get.to(() => AppUserFollowerFollowingScreen(
+                                          appUserid: appUserController
+                                              .appUserData.value.id,
+                                        )),
                                 child: Obx(
                                   () => PostFollowCount(
                                     count: appUserController
@@ -138,7 +141,10 @@ class AppUserScreen extends StatelessWidget {
                                   height: 24.h, horizontalMargin: 30.w),
                               GestureDetector(
                                 onTap: () =>
-                                    Get.to(() => FollowerFollowingScreen()),
+                                    Get.to(() => AppUserFollowerFollowingScreen(
+                                          appUserid: appUserController
+                                              .appUserData.value.id,
+                                        )),
                                 child: PostFollowCount(
                                   count: appUserController
                                       .appUserData.value.followingsIds.length,

@@ -18,10 +18,8 @@ class FirebaseMessagingService {
       {String? devRegToken,
       String? userReqID,
       String? title,
+      String? imageUrl,
       CreatorDetails? creatorDetails,
-      String? cname,
-      String? cimg,
-      bool? cisVerified,
       String? msg}) async {
     Map<String, String> header = {
       "Content-Type": "application/json",
@@ -53,6 +51,11 @@ class FirebaseMessagingService {
     final NotificationModel notification = NotificationModel(
       id: userReqID,
       msg: msg,
+      imageUrl: imageUrl != null
+          ? imageUrl.isNotEmpty
+              ? imageUrl
+              : ''
+          : '',
       title: title,
       isRead: false,
       createdDetails: CreatorDetails(

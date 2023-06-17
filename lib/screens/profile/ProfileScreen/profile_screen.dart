@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -16,10 +15,8 @@ import 'package:casarancha/screens/profile/edit_profile_screen.dart';
 
 import 'package:casarancha/screens/profile/saved_post_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
-import 'package:casarancha/widgets/FullImageView.dart';
 import 'package:casarancha/widgets/menu_post_button.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
-import 'package:casarancha/widgets/video_player_Url.dart';
 import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -336,8 +333,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               verticalLine(
                                   height: 24.h, horizontalMargin: 30.w),
                               GestureDetector(
-                                onTap: () => Get.to(
-                                    () => const FollowerFollowingScreen()),
+                                onTap: () => Get.to(() =>
+                                    const CurruentUserFollowerFollowingScreen()),
                                 child: postFollowCount(
                                     count: user.followersIds.length.toString(),
                                     strText: strProfileFollowers),
@@ -345,8 +342,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               verticalLine(
                                   height: 24.h, horizontalMargin: 30.w),
                               GestureDetector(
-                                onTap: () => Get.to(
-                                    () => const FollowerFollowingScreen()),
+                                onTap: () => Get.to(() =>
+                                    const CurruentUserFollowerFollowingScreen()),
                                 child: postFollowCount(
                                     count: user.followingsIds.length.toString(),
                                     strText: strProfileFollowing),
@@ -431,16 +428,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               verticalLine(
                                   height: 24.h, horizontalMargin: 30.w),
                               GestureDetector(
-                                onTap: () => Get.to(
-                                    () => const FollowerFollowingScreen()),
+                                onTap: () => Get.to(() =>
+                                    const CurruentUserFollowerFollowingScreen()),
                                 child: postFollowCount(
                                     count: "0", strText: strProfileFollowers),
                               ),
                               verticalLine(
                                   height: 24.h, horizontalMargin: 30.w),
                               GestureDetector(
-                                onTap: () => Get.to(
-                                    () => const FollowerFollowingScreen()),
+                                onTap: () => Get.to(() =>
+                                    const CurruentUserFollowerFollowingScreen()),
                                 child: postFollowCount(
                                     count: "0", strText: strProfileFollowing),
                               ),

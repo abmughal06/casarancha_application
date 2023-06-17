@@ -14,8 +14,6 @@ import '../../resources/color_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../widgets/common_appbar.dart';
 import '../../widgets/common_widgets.dart';
-import '../profile/AppUser/app_user_controller.dart';
-import '../profile/AppUser/app_user_screen.dart';
 
 var notificationCount = 0.obs;
 
@@ -46,8 +44,6 @@ class _NotificationScreenState
 
   @override
   Widget buildBody(BuildContext context) {
-    // NotificationScreenViewModel notificationScreenViewModel =
-    //     Provider.of<NotificationScreenViewModel>(context);
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       return ConstrainedBox(
@@ -124,15 +120,16 @@ class _NotificationScreenState
                                     color: const Color(0xff5F5F5F)),
                                 children: [
                                   TextSpan(
-                                      text: notification
-                                              .createdDetails!.isVerified
-                                          ? notification.title!
-                                          : "${notification.title!} ",
-                                      style: TextStyle(
-                                        color: const Color(0xff121F3F),
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14.sp,
-                                      )),
+                                    text:
+                                        notification.createdDetails!.isVerified
+                                            ? notification.title!
+                                            : "${notification.title!} ",
+                                    style: TextStyle(
+                                      color: const Color(0xff121F3F),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14.sp,
+                                    ),
+                                  ),
                                   WidgetSpan(
                                     child: Visibility(
                                       visible: notification
@@ -161,6 +158,11 @@ class _NotificationScreenState
                                     color: const Color(0xff5F5F5F)),
                               ),
                             ),
+                            trailing: notification.imageUrl != null
+                                ? notification.imageUrl!.isNotEmpty
+                                    ? Image.network(notification.imageUrl!)
+                                    : const SizedBox()
+                                : const SizedBox(),
                           );
                         },
                       );

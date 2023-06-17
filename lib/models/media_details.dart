@@ -9,12 +9,14 @@ class MediaDetails {
   String? imageWidth;
   String? videoAspectRatio;
   String? videoViews;
+  List? storyViews;
   MediaDetails(
       {required this.id,
       required this.name,
       required this.type,
       required this.link,
       this.imageHeight,
+      this.storyViews,
       this.videoViews,
       this.imageWidth,
       this.videoAspectRatio});
@@ -24,6 +26,7 @@ class MediaDetails {
     String? name,
     String? type,
     String? link,
+    List? storyViews,
     String? imageHeight,
     String? imageWidth,
     String? videoAspectRatio,
@@ -31,6 +34,7 @@ class MediaDetails {
   }) {
     return MediaDetails(
       id: id ?? this.id,
+      storyViews: storyViews ?? this.storyViews,
       name: name ?? this.name,
       type: type ?? this.type,
       link: link ?? this.link,
@@ -47,6 +51,7 @@ class MediaDetails {
             'id': id,
             'name': name,
             'type': type,
+            'storyViews': storyViews,
             'link': link,
             'imageHeight': imageHeight,
             'imageWidth': imageWidth,
@@ -55,6 +60,7 @@ class MediaDetails {
             ? {
                 'id': id,
                 'name': name,
+                'storyViews': storyViews,
                 'type': type,
                 'link': link,
                 'videoAspectRatio': videoAspectRatio,
@@ -63,6 +69,7 @@ class MediaDetails {
             : {
                 'id': id,
                 'name': name,
+                'storyViews': storyViews,
                 'type': type,
                 'link': link,
               };
@@ -72,6 +79,7 @@ class MediaDetails {
     return MediaDetails(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
+      storyViews: map['storyViews'] ?? [],
       type: map['type'] ?? '',
       link: map['link'] ?? '',
       imageHeight: map['imageHeight'] ?? '',
@@ -89,11 +97,11 @@ class MediaDetails {
   @override
   String toString() {
     if (type.toLowerCase() == "photo") {
-      return 'MediaDetails(id: $id, name: $name, type: $type, link: $link, imageHeight: $imageHeight, imageWidth: $imageWidth)';
+      return 'MediaDetails(id: $id,storyViews:$storyViews, name: $name, type: $type, link: $link, imageHeight: $imageHeight, imageWidth: $imageWidth)';
     } else if (type.toLowerCase() == "video") {
-      return 'MediaDetails(id: $id, name: $name, type: $type, link: $link, videoAspectRatio: $videoAspectRatio, videoViews: $videoViews)';
+      return 'MediaDetails(id: $id,,storyViews:$storyViews,, name: $name, type: $type, link: $link, videoAspectRatio: $videoAspectRatio, videoViews: $videoViews)';
     } else {
-      return 'MediaDetails(id: $id, name: $name, type: $type, link: $link)';
+      return 'MediaDetails(id: $id,,storyViews:$storyViews,, name: $name, type: $type, link: $link)';
     }
   }
 
@@ -103,6 +111,7 @@ class MediaDetails {
     if (type.toLowerCase() == "photo") {
       return other is MediaDetails &&
           other.id == id &&
+          other.storyViews == storyViews &&
           other.name == name &&
           other.type == type &&
           other.link == link &&
@@ -112,6 +121,7 @@ class MediaDetails {
       return other is MediaDetails &&
           other.id == id &&
           other.name == name &&
+          other.storyViews == storyViews &&
           other.type == type &&
           other.link == link &&
           other.videoViews == videoViews &&
@@ -119,6 +129,7 @@ class MediaDetails {
     } else {
       return other is MediaDetails &&
           other.id == id &&
+          other.storyViews == storyViews &&
           other.name == name &&
           other.type == type &&
           other.link == link;
@@ -130,6 +141,7 @@ class MediaDetails {
     if (type.toLowerCase() == "photo") {
       return id.hashCode ^
           name.hashCode ^
+          storyViews.hashCode ^
           type.hashCode ^
           link.hashCode ^
           imageHeight.hashCode ^
@@ -138,11 +150,16 @@ class MediaDetails {
       return id.hashCode ^
           name.hashCode ^
           type.hashCode ^
+          storyViews.hashCode ^
           link.hashCode ^
           videoViews.hashCode ^
           videoAspectRatio.hashCode;
     } else {
-      return id.hashCode ^ name.hashCode ^ type.hashCode ^ link.hashCode;
+      return id.hashCode ^
+          name.hashCode ^
+          type.hashCode ^
+          link.hashCode ^
+          storyViews.hashCode;
     }
   }
 }

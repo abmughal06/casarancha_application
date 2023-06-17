@@ -172,6 +172,7 @@ class SavedPostScreen extends StatelessWidget {
                                                   child: Stack(
                                                     children: [
                                                       VideoPlayerWidget(
+                                                        postId: post.id,
                                                         videoPlayerController:
                                                             videoPlayerController,
                                                         videoUrl: post

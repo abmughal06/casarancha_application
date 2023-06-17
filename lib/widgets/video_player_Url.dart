@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:casarancha/models/media_details.dart';
 import 'package:chewie/chewie.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -144,9 +148,13 @@ class _VideoPlayerUrlState extends State<VideoPlayerUrl>
 
 class VideoPlayerWidget extends StatefulWidget {
   VideoPlayerWidget(
-      {Key? key, required this.videoUrl, this.videoPlayerController})
+      {Key? key,
+      required this.videoUrl,
+      this.videoPlayerController,
+      this.postId})
       : super(key: key);
   final String videoUrl;
+  final String? postId;
   VideoPlayerController? videoPlayerController;
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
@@ -171,6 +179,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     videoPlayerController = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((_) async {
         // Future.delayed(const Duration(seconds: 3));
+        await countVideoViews();
+
         setState(() {
           isPlaying = true;
 
@@ -198,6 +208,29 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     if (isPlaying && isVisible && isMuted) {
       videoPlayerController.setVolume(1.0); // Enable sound when visible
       isMuted = false;
+    }
+  }
+
+  countVideoViews() async {
+    var postRef =
+        FirebaseFirestore.instance.collection("posts").doc(widget.postId);
+    var data = await postRef.get();
+    if (data.data()!.containsKey("viedoViews")) {
+      List viwers = data.data()!['videoViews'];
+      if (viwers.contains(FirebaseAuth.instance.currentUser!.uid)) {
+      } else {
+        postRef.update({
+          "videoViews":
+              FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
+        });
+        log(00000000000000);
+      }
+    } else {
+      postRef.update({
+        "videoViews":
+            FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
+      });
+      log(00000000000000);
     }
   }
 

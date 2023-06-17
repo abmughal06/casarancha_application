@@ -232,6 +232,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                     likes: post.likesIds.length.toString(),
                                     isLike: post.likesIds.contains(
                                         FirebaseAuth.instance.currentUser!.uid),
+                                    isVideoPost:
+                                        post.mediaData[0].type == 'Video',
+                                    videoViews:
+                                        post.mediaData[0].type == 'Video'
+                                            ? snapshot.data!
+                                                .data()!['videoViews']
+                                                .length
+                                                .toString()
+                                            : '0',
                                     isPostDetail: true,
                                     ontapLike: () {
                                       print("clicked");
@@ -697,6 +706,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       "=========> reciever fcm token = $recieverFCMToken");
                                   FirebaseMessagingService()
                                       .sendNotificationToUser(
+                                    imageUrl:
+                                        widget.postModel.mediaData[0].type ==
+                                                'Photo'
+                                            ? widget.postModel.mediaData[0].link
+                                            : '',
                                     creatorDetails: CreatorDetails(
                                         name: cmnt.creatorDetails.name,
                                         imageUrl: cmnt.creatorDetails.imageUrl,
@@ -705,8 +719,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                     devRegToken: recieverFCMToken,
                                     userReqID: widget.postModel.creatorId,
                                     title: user!.name,
-                                    msg:
-                                        "${user!.name} has commented on your post.",
+                                    msg: "has commented on your post.",
                                   );
                                 });
                               },

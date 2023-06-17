@@ -597,6 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       child: Stack(
                                                         children: [
                                                           VideoPlayerWidget(
+                                                            postId: post.id,
                                                             videoPlayerController:
                                                                 videoPlayerController,
                                                             videoUrl: post
@@ -815,9 +816,9 @@ class _HomeScreenState extends State<HomeScreen> {
               //       textAlign: TextAlign.center,
               //     ),
               //   )
-              : StreamBuilder<QuerySnapshot>(
+              : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                   stream: homeScreenController.postQuerry.snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snap) {
+                  builder: (context, snap) {
                     if (snap.hasData) {
                       var data = snap.data!.docs;
                       return ListView.builder(
@@ -825,8 +826,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: data.length,
                         itemBuilder: (context, index) {
-                          final prePost =
-                              data[index].data() as Map<String, dynamic>;
+                          final prePost = data[index].data();
                           final post = PostModel.fromMap(prePost);
                           PostCardController postCardController =
                               PostCardController(postdata: post);
@@ -987,6 +987,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     child: Stack(
                                                       children: [
                                                         VideoPlayerWidget(
+                                                          postId: post.id,
                                                           videoPlayerController:
                                                               videoPlayerController,
                                                           videoUrl: post
@@ -1159,6 +1160,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                       }
                                     },
                                   ),
+                                  isVideoPost:
+                                      post.mediaData[0].type == 'Video',
+                                  videoViews: post.mediaData[0].type == 'Video'
+                                      ? data[index]
+                                          .data()['videoViews']
+                                          .length
+                                          .toString()
+                                      : '0',
                                   postId: post.id,
                                   ontapShare: () {
                                     Get.to(() => SharePostScreen(
@@ -1453,6 +1462,8 @@ class CustomPostFooter extends StatelessWidget {
   final String? postId;
   final bool? isDesc;
   final bool? isPostDetail;
+  final bool? isVideoPost;
+  final String? videoViews;
 
   const CustomPostFooter({
     Key? key,
@@ -1467,6 +1478,8 @@ class CustomPostFooter extends StatelessWidget {
     this.isPostDetail = false,
     this.saveBtn,
     this.postId,
+    this.isVideoPost = false,
+    this.videoViews,
   }) : super(key: key);
 
   // final postController = PostCardController(postdata: postdata);
@@ -1479,6 +1492,7 @@ class CustomPostFooter extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 widthBox(5.w),
                 IconButton(
@@ -1486,26 +1500,57 @@ class CustomPostFooter extends StatelessWidget {
                   icon: Icon(
                     isLike! ? Icons.thumb_up : Icons.thumb_up_outlined,
                     // height: 13,
-                    color:
-                        isLike! ? colorPrimaryA05 : color55F.withOpacity(0.7),
+                    color: isLike! ? colorPrimaryA05 : color887,
                   ),
                 ),
-                Text("$likes"),
+                TextWidget(
+                  text: "$likes",
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                  color: color221,
+                ),
                 IconButton(
                   onPressed: ontapCmnt,
                   icon: SvgPicture.asset(
                     icCommentPost,
+                    color: color887,
                   ),
                 ),
-                Text("$comments"),
+                TextWidget(
+                  text: "$comments",
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                  color: color221,
+                ),
                 IconButton(
                   onPressed: ontapShare,
                   icon: const Icon(Icons.share),
-                  color: color55F.withOpacity(0.7),
+                  color: color887,
                 ),
               ],
             ),
-            saveBtn!,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Visibility(
+                  visible: isVideoPost!,
+                  child: TextWidget(
+                    text: "$videoViews",
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: color221,
+                  ),
+                ),
+                widthBox(isVideoPost! ? 5.w : 0.w),
+                Visibility(
+                    visible: isVideoPost!,
+                    child: const Icon(
+                      Icons.visibility,
+                      color: colorAA3,
+                    )),
+                saveBtn!,
+              ],
+            ),
           ],
         ),
         Visibility(

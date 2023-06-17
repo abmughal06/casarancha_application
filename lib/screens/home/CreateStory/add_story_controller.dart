@@ -59,6 +59,7 @@ class AddStoryController extends GetxController {
       } else {
         final story = Story(
           id: storyId,
+          storyViews: [],
           creatorId: creatorId,
           creatorDetails: creatorDetails,
           createdAt: DateTime.now().toIso8601String(),
