@@ -1,7 +1,8 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,16 +54,24 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snap) {
                   if (snap.hasData) {
-                    print("sdlasda");
+                    log("sdlasda");
                     var currentUser = UserModel.fromMap(snap.data!.data()!);
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('users')
-                          .where(
-                            'id',
-                            whereIn: currentUser.followersIds,
-                          )
-                          .snapshots(),
+                      stream: currentUser.followersIds.isNotEmpty
+                          ? FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                whereIn: currentUser.followersIds,
+                              )
+                              .snapshots()
+                          : FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                arrayContains: currentUser.followersIds,
+                              )
+                              .snapshots(),
                       builder: (context, doc) {
                         if (doc.hasData) {
                           return ListView.builder(
@@ -218,7 +227,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                       ),
                     );
                   } else {
-                    return Text("hshha");
+                    return const Text("hshha");
                   }
                 }),
             StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -228,16 +237,24 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snap) {
                   if (snap.hasData) {
-                    print("sdlasda");
+                    log("sdlasda");
                     var currentUser = UserModel.fromMap(snap.data!.data()!);
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('users')
-                          .where(
-                            'id',
-                            whereIn: currentUser.followingsIds,
-                          )
-                          .snapshots(),
+                      stream: currentUser.followingsIds.isNotEmpty
+                          ? FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                whereIn: currentUser.followingsIds,
+                              )
+                              .snapshots()
+                          : FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                arrayContains: currentUser.followingsIds,
+                              )
+                              .snapshots(),
                       builder: (context, doc) {
                         if (doc.hasData) {
                           return ListView.builder(
@@ -441,13 +458,21 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     print("sdlasda");
                     var appuser = UserModel.fromMap(snap.data!.data()!);
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('users')
-                          .where(
-                            'id',
-                            whereIn: appuser.followersIds,
-                          )
-                          .snapshots(),
+                      stream: appuser.followersIds.isNotEmpty
+                          ? FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                whereIn: appuser.followersIds,
+                              )
+                              .snapshots()
+                          : FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                arrayContains: appuser.followersIds,
+                              )
+                              .snapshots(),
                       builder: (context, doc) {
                         if (doc.hasData) {
                           return ListView.builder(
@@ -645,13 +670,21 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     print("sdlasda");
                     var appuser = UserModel.fromMap(snap.data!.data()!);
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('users')
-                          .where(
-                            'id',
-                            whereIn: appuser.followingsIds,
-                          )
-                          .snapshots(),
+                      stream: appuser.followingsIds.isNotEmpty
+                          ? FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                whereIn: appuser.followingsIds,
+                              )
+                              .snapshots()
+                          : FirebaseFirestore.instance
+                              .collection('users')
+                              .where(
+                                'id',
+                                arrayContains: appuser.followingsIds,
+                              )
+                              .snapshots(),
                       builder: (context, doc) {
                         if (doc.hasData) {
                           return ListView.builder(

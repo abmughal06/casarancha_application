@@ -552,91 +552,99 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: FutureBuilder(
                                         future: initializedFuturePlay,
                                         builder: (context, snapshot) {
-                                          return Visibility(
-                                            child: AspectRatio(
-                                              aspectRatio: 9 / 16,
-                                              child: ListView.builder(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                shrinkWrap: true,
-                                                itemCount:
-                                                    post.mediaData.length,
-                                                itemBuilder: (context, i) {
-                                                  VideoPlayerController?
-                                                      videoPlayerController;
+                                          if (snapshot.hasData) {
+                                            return Visibility(
+                                              child: AspectRatio(
+                                                aspectRatio: 9 / 16,
+                                                child: ListView.builder(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      post.mediaData.length,
+                                                  itemBuilder: (context, i) {
+                                                    // VideoPlayerController?
+                                                    //     videoPlayerController;
 
-                                                  videoPlayerController =
-                                                      VideoPlayerController
-                                                          .network(
-                                                    post.mediaData.first.type ==
-                                                            "Video"
-                                                        ? post.mediaData[i].link
-                                                            .toString()
-                                                        : "",
-                                                  );
+                                                    // videoPlayerController =
+                                                    //     VideoPlayerController
+                                                    //         .network(
+                                                    //   post.mediaData.first
+                                                    //               .type ==
+                                                    //           "Video"
+                                                    //       ? post
+                                                    //           .mediaData[i].link
+                                                    //           .toString()
+                                                    //       : "",
+                                                    // );
 
-                                                  return InkWell(
-                                                    onTap: () => Get.to(() =>
-                                                        PostDetailScreen(
-                                                            postModel: post,
-                                                            postCardController:
-                                                                postCardController)),
-                                                    onDoubleTap: () {
-                                                      log("ghost mode clicked");
+                                                    return InkWell(
+                                                      onTap: () => Get.to(() =>
+                                                          PostDetailScreen(
+                                                              postModel: post,
+                                                              postCardController:
+                                                                  postCardController)),
+                                                      onDoubleTap: () {
+                                                        log("ghost mode clicked");
 
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(const SnackBar(
-                                                              backgroundColor:
-                                                                  colorPrimaryA05,
-                                                              content: Text(
-                                                                  'Ghost Mode Enabled!')));
-                                                    },
-                                                    child: AspectRatio(
-                                                      aspectRatio: 9 / 16,
-                                                      child: Stack(
-                                                        children: [
-                                                          VideoPlayerWidget(
-                                                            postId: post.id,
-                                                            videoPlayerController:
-                                                                videoPlayerController,
-                                                            videoUrl: post
-                                                                .mediaData[i]
-                                                                .link,
-                                                          ),
-                                                          Positioned(
-                                                            top: 12,
-                                                            left: 0,
-                                                            right: 0,
-                                                            child:
-                                                                CustomPostHeader(
-                                                              showPostTime: post
-                                                                  .showPostTime,
-                                                              isVerified: post
-                                                                  .creatorDetails
-                                                                  .isVerified,
-                                                              name: post
-                                                                  .creatorDetails
-                                                                  .name,
-                                                              image: post
-                                                                  .creatorDetails
-                                                                  .imageUrl,
-                                                              headerOnTap: () {
-                                                                postCardController
-                                                                    .gotoAppUserScreen(
-                                                                        post.creatorId);
-                                                              },
-                                                              isVideoPost: true,
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(const SnackBar(
+                                                                backgroundColor:
+                                                                    colorPrimaryA05,
+                                                                content: Text(
+                                                                    'Ghost Mode Enabled!')));
+                                                      },
+                                                      child: AspectRatio(
+                                                        aspectRatio: 9 / 16,
+                                                        child: Stack(
+                                                          children: [
+                                                            VideoPlayerWidget(
+                                                              postId: post.id,
+                                                              // videoPlayerController:
+                                                              //     videoPlayerController,
+                                                              videoUrl: post
+                                                                  .mediaData[i]
+                                                                  .link,
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Positioned(
+                                                              top: 12,
+                                                              left: 0,
+                                                              right: 0,
+                                                              child:
+                                                                  CustomPostHeader(
+                                                                showPostTime: post
+                                                                    .showPostTime,
+                                                                isVerified: post
+                                                                    .creatorDetails
+                                                                    .isVerified,
+                                                                name: post
+                                                                    .creatorDetails
+                                                                    .name,
+                                                                image: post
+                                                                    .creatorDetails
+                                                                    .imageUrl,
+                                                                headerOnTap:
+                                                                    () {
+                                                                  postCardController
+                                                                      .gotoAppUserScreen(
+                                                                          post.creatorId);
+                                                                },
+                                                                isVideoPost:
+                                                                    true,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
+                                                    );
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                          );
+                                            );
+                                          } else {
+                                            return CircularProgressIndicator();
+                                          }
                                         }),
                                   ),
                                   Visibility(
@@ -830,389 +838,410 @@ class _HomeScreenState extends State<HomeScreen> {
                           final post = PostModel.fromMap(prePost);
                           PostCardController postCardController =
                               PostCardController(postdata: post);
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 15.w),
-                            child: Column(
-                              children: [
-                                Visibility(
-                                  visible: post.mediaData[0].type != "Video",
-                                  child: CustomPostHeader(
-                                      showPostTime: post.showPostTime,
-                                      isVerified:
-                                          post.creatorDetails.isVerified,
-                                      time: timeago.format(
-                                          DateTime.parse(post.createdAt)),
-                                      onVertItemClick: () {
-                                        Get.back();
+                          if (post.mediaData.isNotEmpty) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 15.w),
+                              child: Column(
+                                children: [
+                                  Visibility(
+                                    visible: post.mediaData[0].type != "Video",
+                                    child: CustomPostHeader(
+                                        showPostTime: post.showPostTime,
+                                        isVerified:
+                                            post.creatorDetails.isVerified,
+                                        time: timeago.format(
+                                            DateTime.parse(post.createdAt)),
+                                        onVertItemClick: () {
+                                          Get.back();
 
-                                        if (post.creatorId ==
-                                            FirebaseAuth
-                                                .instance.currentUser!.uid) {
-                                          Get.bottomSheet(
-                                            Container(
-                                              decoration: const BoxDecoration(
-                                                  color: Colors.red),
-                                              height: 80,
-                                              child: InkWell(
-                                                onTap: () async {
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection("posts")
-                                                      .doc(post.id)
-                                                      .delete();
-                                                  Get.back();
+                                          if (post.creatorId ==
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid) {
+                                            Get.bottomSheet(
+                                              Container(
+                                                decoration: const BoxDecoration(
+                                                    color: Colors.red),
+                                                height: 80,
+                                                child: InkWell(
+                                                  onTap: () async {
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection("posts")
+                                                        .doc(post.id)
+                                                        .delete();
+                                                    Get.back();
+                                                  },
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      TextWidget(
+                                                        text: "Delete Post",
+                                                        fontSize: 15.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              isScrollControlled: true,
+                                            );
+                                          } else {
+                                            Get.bottomSheet(
+                                              BottomSheetWidget(
+                                                ontapBlock: () {},
+                                              ),
+                                              isScrollControlled: true,
+                                            );
+                                          }
+                                        },
+                                        name: post.creatorDetails.name,
+                                        image: post.creatorDetails.imageUrl,
+                                        ontap: () {},
+                                        headerOnTap: () {
+                                          postCardController.gotoAppUserScreen(
+                                              post.creatorId);
+                                        }),
+                                  ),
+                                  Visibility(
+                                    visible: post.mediaData[0].type == "Photo",
+                                    child: Column(
+                                      children: [
+                                        heightBox(10.h),
+                                        AspectRatio(
+                                          aspectRatio: 2 / 3,
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            shrinkWrap: true,
+                                            itemCount: post.mediaData.length,
+                                            itemBuilder: (context, index) =>
+                                                InkWell(
+                                                    onTap: () => Get.to(() =>
+                                                        PostDetailScreen(
+                                                            postModel: post,
+                                                            postCardController:
+                                                                postCardController)),
+                                                    onDoubleTap: () async {
+                                                      log("clicked");
+                                                      postCardController
+                                                              .isLiked.value =
+                                                          !post.likesIds
+                                                              .contains(
+                                                                  user!.id);
+                                                      postCardController
+                                                          .likeDisLikePost(
+                                                              user!.id,
+                                                              post.id,
+                                                              post.creatorId);
+                                                    },
+                                                    child: CachedNetworkImage(
+                                                      imageUrl: post
+                                                          .mediaData[index]
+                                                          .link,
+                                                    )),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: post.mediaData[0].type == "Video",
+                                    child: FutureBuilder(
+                                        future: initializedFuturePlay,
+                                        builder: (context, snapshot) {
+                                          // if (snapshot.connectionState ==
+                                          //     ConnectionState.done) {
+                                          return Visibility(
+                                            child: AspectRatio(
+                                              aspectRatio: 9 / 16,
+                                              child: ListView.builder(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    post.mediaData.length,
+                                                itemBuilder: (context, i) {
+                                                  // VideoPlayerController?
+                                                  //     videoPlayerController;
+                                                  // videoPlayerController =
+                                                  //     VideoPlayerController
+                                                  //         .network(
+                                                  //   post.mediaData.first.type ==
+                                                  //           "Video"
+                                                  //       ? post.mediaData[i].link
+                                                  //           .toString()
+                                                  //       : "",
+                                                  // );
+
+                                                  return InkWell(
+                                                    onTap: () => Get.to(() =>
+                                                        PostDetailScreen(
+                                                            postModel: post,
+                                                            postCardController:
+                                                                postCardController)),
+                                                    onDoubleTap: () {
+                                                      log("clicked");
+                                                      postCardController
+                                                              .isLiked.value =
+                                                          !post.likesIds
+                                                              .contains(
+                                                                  user!.id);
+                                                      postCardController
+                                                          .likeDisLikePost(
+                                                              user!.id,
+                                                              post.id,
+                                                              post.creatorId);
+                                                    },
+                                                    child: AspectRatio(
+                                                      aspectRatio: 9 / 16,
+                                                      child: Stack(
+                                                        children: [
+                                                          VideoPlayerWidget(
+                                                            postId: post.id,
+                                                            // videoPlayerController:
+                                                            //     videoPlayerController,
+                                                            videoUrl: post
+                                                                .mediaData[i]
+                                                                .link,
+                                                          ),
+                                                          Positioned(
+                                                            top: 12,
+                                                            left: 0,
+                                                            right: 0,
+                                                            child:
+                                                                CustomPostHeader(
+                                                              showPostTime: post
+                                                                  .showPostTime,
+                                                              isVerified: post
+                                                                  .creatorDetails
+                                                                  .isVerified,
+                                                              time: timeago
+                                                                  .format(DateTime
+                                                                      .parse(post
+                                                                          .createdAt)),
+                                                              name: post
+                                                                  .creatorDetails
+                                                                  .name,
+                                                              image: post
+                                                                  .creatorDetails
+                                                                  .imageUrl,
+                                                              headerOnTap: () {
+                                                                postCardController
+                                                                    .gotoAppUserScreen(
+                                                                        post.creatorId);
+                                                              },
+                                                              isVideoPost: true,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
                                                 },
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    TextWidget(
-                                                      text: "Delete Post",
-                                                      fontSize: 15.sp,
+                                              ),
+                                            ),
+                                          );
+                                          // }
+                                          // else {
+                                          //   return const CircularProgressIndicator();
+                                          // }
+                                        }),
+                                  ),
+                                  Visibility(
+                                    visible: post.mediaData[0].type == "Qoute",
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          height: 229,
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: post.mediaData.length,
+                                            itemBuilder: (context, index) =>
+                                                InkWell(
+                                              onTap: () => Get.to(() =>
+                                                  PostDetailScreen(
+                                                      postModel: post,
+                                                      postCardController:
+                                                          postCardController)),
+                                              onDoubleTap: () {
+                                                log("clicked");
+                                                postCardController
+                                                        .isLiked.value =
+                                                    !post.likesIds
+                                                        .contains(user!.id);
+                                                postCardController
+                                                    .likeDisLikePost(
+                                                        user!.id,
+                                                        post.id,
+                                                        post.creatorId);
+                                              },
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 40,
+                                                  vertical: 50,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                    color: Colors.white),
+                                                child: Center(
+                                                  child: Text(
+                                                    post.mediaData[index].link,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: Colors.white,
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            isScrollControlled: true,
-                                          );
-                                        } else {
-                                          Get.bottomSheet(
-                                            BottomSheetWidget(
-                                              ontapBlock: () {},
-                                            ),
-                                            isScrollControlled: true,
-                                          );
-                                        }
-                                      },
-                                      name: post.creatorDetails.name,
-                                      image: post.creatorDetails.imageUrl,
-                                      ontap: () {},
-                                      headerOnTap: () {
-                                        postCardController
-                                            .gotoAppUserScreen(post.creatorId);
-                                      }),
-                                ),
-                                Visibility(
-                                  visible: post.mediaData[0].type == "Photo",
-                                  child: Column(
-                                    children: [
-                                      heightBox(10.h),
-                                      AspectRatio(
-                                        aspectRatio: 2 / 3,
-                                        child: ListView.builder(
-                                          scrollDirection: Axis.horizontal,
-                                          shrinkWrap: true,
-                                          itemCount: post.mediaData.length,
-                                          itemBuilder: (context, index) =>
-                                              InkWell(
-                                                  onTap: () => Get.to(() =>
-                                                      PostDetailScreen(
-                                                          postModel: post,
-                                                          postCardController:
-                                                              postCardController)),
-                                                  onDoubleTap: () async {
-                                                    log("clicked");
-                                                    postCardController
-                                                            .isLiked.value =
-                                                        !post.likesIds
-                                                            .contains(user!.id);
-                                                    postCardController
-                                                        .likeDisLikePost(
-                                                            user!.id,
-                                                            post.id,
-                                                            post.creatorId);
-                                                  },
-                                                  child: CachedNetworkImage(
-                                                    imageUrl: post
-                                                        .mediaData[index].link,
-                                                  )),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Visibility(
-                                  visible: post.mediaData[0].type == "Video",
-                                  child: FutureBuilder(
-                                      future: initializedFuturePlay,
-                                      builder: (context, snapshot) {
-                                        // if (snapshot.connectionState ==
-                                        //     ConnectionState.done) {
-                                        return Visibility(
-                                          child: AspectRatio(
-                                            aspectRatio: 9 / 16,
-                                            child: ListView.builder(
-                                              scrollDirection: Axis.horizontal,
-                                              shrinkWrap: true,
-                                              itemCount: post.mediaData.length,
-                                              itemBuilder: (context, i) {
-                                                VideoPlayerController?
-                                                    videoPlayerController;
-                                                videoPlayerController =
-                                                    VideoPlayerController
-                                                        .network(
-                                                  post.mediaData.first.type ==
-                                                          "Video"
-                                                      ? post.mediaData[i].link
-                                                          .toString()
-                                                      : "",
-                                                );
-
-                                                return InkWell(
-                                                  onTap: () => Get.to(() =>
-                                                      PostDetailScreen(
-                                                          postModel: post,
-                                                          postCardController:
-                                                              postCardController)),
-                                                  onDoubleTap: () {
-                                                    log("clicked");
-                                                    postCardController
-                                                            .isLiked.value =
-                                                        !post.likesIds
-                                                            .contains(user!.id);
-                                                    postCardController
-                                                        .likeDisLikePost(
-                                                            user!.id,
-                                                            post.id,
-                                                            post.creatorId);
-                                                  },
-                                                  child: AspectRatio(
-                                                    aspectRatio: 9 / 16,
-                                                    child: Stack(
-                                                      children: [
-                                                        VideoPlayerWidget(
-                                                          postId: post.id,
-                                                          videoPlayerController:
-                                                              videoPlayerController,
-                                                          videoUrl: post
-                                                              .mediaData[i]
-                                                              .link,
-                                                        ),
-                                                        Positioned(
-                                                          top: 12,
-                                                          left: 0,
-                                                          right: 0,
-                                                          child:
-                                                              CustomPostHeader(
-                                                            showPostTime: post
-                                                                .showPostTime,
-                                                            isVerified: post
-                                                                .creatorDetails
-                                                                .isVerified,
-                                                            time: timeago.format(
-                                                                DateTime.parse(post
-                                                                    .createdAt)),
-                                                            name: post
-                                                                .creatorDetails
-                                                                .name,
-                                                            image: post
-                                                                .creatorDetails
-                                                                .imageUrl,
-                                                            headerOnTap: () {
-                                                              postCardController
-                                                                  .gotoAppUserScreen(
-                                                                      post.creatorId);
-                                                            },
-                                                            isVideoPost: true,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                      color: color221,
                                                     ),
                                                   ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        );
-                                        // }
-                                        // else {
-                                        //   return const CircularProgressIndicator();
-                                        // }
-                                      }),
-                                ),
-                                Visibility(
-                                  visible: post.mediaData[0].type == "Qoute",
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        height: 229,
-                                        child: ListView.builder(
-                                          shrinkWrap: true,
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: post.mediaData.length,
-                                          itemBuilder: (context, index) =>
-                                              InkWell(
-                                            onTap: () => Get.to(() =>
-                                                PostDetailScreen(
-                                                    postModel: post,
-                                                    postCardController:
-                                                        postCardController)),
-                                            onDoubleTap: () {
-                                              log("clicked");
-                                              postCardController.isLiked.value =
-                                                  !post.likesIds
-                                                      .contains(user!.id);
-                                              postCardController
-                                                  .likeDisLikePost(user!.id,
-                                                      post.id, post.creatorId);
-                                            },
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 40,
-                                                vertical: 50,
-                                              ),
-                                              decoration: const BoxDecoration(
-                                                  color: Colors.white),
-                                              child: Center(
-                                                child: Text(
-                                                  post.mediaData[index].link,
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontSize: 16.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: color221,
-                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                heightBox(10.h),
-                                CustomPostFooter(
-                                  likes: post.likesIds.length.toString(),
-                                  isLike: post.likesIds.contains(user!.id),
+                                  heightBox(10.h),
+                                  CustomPostFooter(
+                                    likes: post.likesIds.length.toString(),
+                                    isLike: post.likesIds.contains(user!.id),
 
-                                  ontapLike: () {
-                                    log("clicked");
-                                    postCardController.isLiked.value =
-                                        !post.likesIds.contains(user!.id);
-                                    postCardController.likeDisLikePost(
-                                        user!.id, post.id, post.creatorId);
-                                  },
-                                  // ontapSave: () {
-                                  //   log(user!.savedPostsIds);
-
-                                  // },
-                                  saveBtn: StreamBuilder<
-                                      DocumentSnapshot<Map<String, dynamic>>>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection("users")
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        var userData = snapshot.data!.data();
-                                        var userModel =
-                                            UserModel.fromMap(userData!);
-                                        return IconButton(
-                                          onPressed: () {
-                                            if (userModel.savedPostsIds
-                                                .contains(post.id)) {
-                                              FirebaseFirestore.instance
-                                                  .collection("users")
-                                                  .doc(userModel.id)
-                                                  .update({
-                                                'savedPostsIds':
-                                                    FieldValue.arrayRemove(
-                                                        [post.id])
-                                              });
-                                            } else if (!snapshot.hasData) {
-                                              const Center(
-                                                  child:
-                                                      CircularProgressIndicator());
-                                            } else {
-                                              FirebaseFirestore.instance
-                                                  .collection("users")
-                                                  .doc(userModel.id)
-                                                  .update({
-                                                'savedPostsIds':
-                                                    FieldValue.arrayUnion(
-                                                        [post.id])
-                                              });
-                                            }
-                                          },
-                                          icon: SvgPicture.asset(
-                                            userModel.savedPostsIds
-                                                    .contains(post.id)
-                                                ? icSavedPost
-                                                : icBookMarkReg,
-                                          ),
-                                        );
-                                      } else {
-                                        return Image.asset(postSave);
-                                      }
+                                    ontapLike: () {
+                                      log("clicked");
+                                      postCardController.isLiked.value =
+                                          !post.likesIds.contains(user!.id);
+                                      postCardController.likeDisLikePost(
+                                          user!.id, post.id, post.creatorId);
                                     },
+                                    // ontapSave: () {
+                                    //   log(user!.savedPostsIds);
+
+                                    // },
+                                    saveBtn: StreamBuilder<
+                                        DocumentSnapshot<Map<String, dynamic>>>(
+                                      stream: FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                          .snapshots(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          var userData = snapshot.data!.data();
+                                          var userModel =
+                                              UserModel.fromMap(userData!);
+                                          return IconButton(
+                                            onPressed: () {
+                                              if (userModel.savedPostsIds
+                                                  .contains(post.id)) {
+                                                FirebaseFirestore.instance
+                                                    .collection("users")
+                                                    .doc(userModel.id)
+                                                    .update({
+                                                  'savedPostsIds':
+                                                      FieldValue.arrayRemove(
+                                                          [post.id])
+                                                });
+                                              } else if (!snapshot.hasData) {
+                                                const Center(
+                                                    child:
+                                                        CircularProgressIndicator());
+                                              } else {
+                                                FirebaseFirestore.instance
+                                                    .collection("users")
+                                                    .doc(userModel.id)
+                                                    .update({
+                                                  'savedPostsIds':
+                                                      FieldValue.arrayUnion(
+                                                          [post.id])
+                                                });
+                                              }
+                                            },
+                                            icon: SvgPicture.asset(
+                                              userModel.savedPostsIds
+                                                      .contains(post.id)
+                                                  ? icSavedPost
+                                                  : icBookMarkReg,
+                                            ),
+                                          );
+                                        } else {
+                                          return Image.asset(postSave);
+                                        }
+                                      },
+                                    ),
+                                    isVideoPost:
+                                        post.mediaData[0].type == 'Video',
+                                    videoViews: post.mediaData[0].type ==
+                                            'Video'
+                                        ? data[index].data()['videoViews'] !=
+                                                null
+                                            ? data[index]
+                                                .data()['videoViews']
+                                                .length
+                                                .toString()
+                                            : "0"
+                                        : '0',
+                                    postId: post.id,
+                                    ontapShare: () {
+                                      Get.to(() => SharePostScreen(
+                                            postModel: PostModel(
+                                              id: post.id,
+                                              creatorId: post.creatorId,
+                                              creatorDetails:
+                                                  post.creatorDetails,
+                                              createdAt: post.createdAt,
+                                              description: post.description,
+                                              locationName: post.locationName,
+                                              shareLink: post.shareLink,
+                                              mediaData: post.mediaData,
+                                              tagsIds: post.tagsIds,
+                                              likesIds: post.likesIds,
+                                              showPostTime: post.showPostTime,
+                                              postBlockStatus:
+                                                  post.postBlockStatus,
+                                              commentIds: post.commentIds,
+                                            ),
+                                          ));
+                                    },
+                                    ontapCmnt: () {
+                                      // Get.to(() => CommentScreen(
+                                      //       id: post.id,
+                                      //       creatorId: post.creatorId,
+                                      //       comment: post.commentIds,
+                                      //       creatorDetails: CreatorDetails(
+                                      //           name: post.creatorDetails.name,
+                                      //           imageUrl:
+                                      //               post.creatorDetails.imageUrl,
+                                      //           isVerified: post
+                                      //               .creatorDetails.isVerified),
+                                      //     ));
+                                      Get.to(() => PostDetailScreen(
+                                          postModel: post,
+                                          postCardController:
+                                              postCardController));
+                                    },
+                                    comments: post.commentIds.length,
+                                    isDesc: post.description.isNotEmpty,
+                                    desc: post.description.toString(),
                                   ),
-                                  isVideoPost:
-                                      post.mediaData[0].type == 'Video',
-                                  videoViews: post.mediaData[0].type == 'Video'
-                                      ? data[index]
-                                          .data()['videoViews']
-                                          .length
-                                          .toString()
-                                      : '0',
-                                  postId: post.id,
-                                  ontapShare: () {
-                                    Get.to(() => SharePostScreen(
-                                          postModel: PostModel(
-                                            id: post.id,
-                                            creatorId: post.creatorId,
-                                            creatorDetails: post.creatorDetails,
-                                            createdAt: post.createdAt,
-                                            description: post.description,
-                                            locationName: post.locationName,
-                                            shareLink: post.shareLink,
-                                            mediaData: post.mediaData,
-                                            tagsIds: post.tagsIds,
-                                            likesIds: post.likesIds,
-                                            showPostTime: post.showPostTime,
-                                            postBlockStatus:
-                                                post.postBlockStatus,
-                                            commentIds: post.commentIds,
-                                          ),
-                                        ));
-                                  },
-                                  ontapCmnt: () {
-                                    // Get.to(() => CommentScreen(
-                                    //       id: post.id,
-                                    //       creatorId: post.creatorId,
-                                    //       comment: post.commentIds,
-                                    //       creatorDetails: CreatorDetails(
-                                    //           name: post.creatorDetails.name,
-                                    //           imageUrl:
-                                    //               post.creatorDetails.imageUrl,
-                                    //           isVerified: post
-                                    //               .creatorDetails.isVerified),
-                                    //     ));
-                                    Get.to(() => PostDetailScreen(
-                                        postModel: post,
-                                        postCardController:
-                                            postCardController));
-                                  },
-                                  comments: post.commentIds.length,
-                                  isDesc: post.description.isNotEmpty,
-                                  desc: post.description.toString(),
-                                ),
-                              ],
-                            ),
-                          );
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
                         },
                       );
                     } else {

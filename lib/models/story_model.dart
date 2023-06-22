@@ -10,7 +10,7 @@ class Story {
   String creatorId;
   String createdAt;
   List<MediaDetails> mediaDetailsList;
-  List<String> storyViews;
+  List storyViews;
   CreatorDetails creatorDetails;
   Story({
     required this.id,

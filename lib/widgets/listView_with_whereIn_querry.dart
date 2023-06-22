@@ -65,9 +65,10 @@ class _ListViewWithWhereInQuerryState
                         PostCardController(postdata: post),
                         tag: post.id,
                       );
-                      return NewPostCard(
-                        postCardController: postCardController,
-                      );
+                      // return NewPostCard(
+                      //   postCardController: postCardController,
+                      // );
+                      return Container();
                     },
                   ),
                 ),

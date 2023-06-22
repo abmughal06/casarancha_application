@@ -374,9 +374,9 @@ class _ShowAllPostsState extends State<ShowAllPosts> {
               tag: post.id,
             );
 
-            return NewPostCard(
-                postCardController: postCardController,
-                videoPlayerController: currentVideoController);
+            // return NewPostCard(
+            //     postCardController: postCardController,
+            //     videoPlayerController: currentVideoController);
           }
           return const SizedBox(height: 0, width: 0);
         },

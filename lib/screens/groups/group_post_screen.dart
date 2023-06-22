@@ -1,7 +1,6 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/screens/groups/group_member_screen.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
-import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:casarancha/utils/snackbar.dart';
 
@@ -15,13 +14,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutterfire_ui/firestore.dart';
 
 import 'package:get/get.dart';
 
 import '../../models/post_model.dart';
 import '../../resources/image_resources.dart';
-import '../../widgets/PostCard/postCard.dart';
 import '../../widgets/PostCard/PostCardController.dart';
 
 class GroupPostScreen extends StatefulWidget {
@@ -210,9 +207,9 @@ class ShowAllPost extends StatelessWidget {
             ),
             tag: post.id,
           );
-          return NewPostCard(
-            postCardController: postCardController,
-          );
+          // return NewPostCard(
+          //   postCardController: postCardController,
+          // );
         }
         return const SizedBox(height: 0, width: 0);
       },

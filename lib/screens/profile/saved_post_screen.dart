@@ -138,16 +138,16 @@ class SavedPostScreen extends StatelessWidget {
                                             shrinkWrap: true,
                                             itemCount: post.mediaData.length,
                                             itemBuilder: (context, i) {
-                                              VideoPlayerController?
-                                                  videoPlayerController;
-                                              videoPlayerController =
-                                                  VideoPlayerController.network(
-                                                post.mediaData.first.type ==
-                                                        "Video"
-                                                    ? post.mediaData[i].link
-                                                        .toString()
-                                                    : "",
-                                              );
+                                              // VideoPlayerController?
+                                              //     videoPlayerController;
+                                              // videoPlayerController =
+                                              //     VideoPlayerController.network(
+                                              //   post.mediaData.first.type ==
+                                              //           "Video"
+                                              //       ? post.mediaData[i].link
+                                              //           .toString()
+                                              //       : "",
+                                              // );
 
                                               return InkWell(
                                                 onTap: () => Get.to(() =>
@@ -173,8 +173,8 @@ class SavedPostScreen extends StatelessWidget {
                                                     children: [
                                                       VideoPlayerWidget(
                                                         postId: post.id,
-                                                        videoPlayerController:
-                                                            videoPlayerController,
+                                                        // videoPlayerController:
+                                                        //     videoPlayerController,
                                                         videoUrl: post
                                                             .mediaData[i].link,
                                                       ),

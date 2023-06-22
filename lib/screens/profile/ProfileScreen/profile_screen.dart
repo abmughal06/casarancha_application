@@ -6,7 +6,6 @@ import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
-import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/home/story_view_screen.dart';
 
@@ -487,7 +486,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection("posts")
-                            .where("creatorId", isEqualTo: user!.id)
+                            .where("creatorId",
+                                isEqualTo:
+                                    FirebaseAuth.instance.currentUser!.uid)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
@@ -496,15 +497,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             var qoutesList = [];
 
                             for (var i = 0; i < postdata.length; i++) {
-                              if (postdata[i].data()['mediaData'][0]['type'] ==
-                                  'Qoute') {
-                                qoutesList.add(postdata[i].data());
-                                // print(qoutesList);
+                              if (postdata[i].data()['mediaData'] != []) {
+                                if (postdata[i].data()['mediaData'][0]
+                                        ['type'] ==
+                                    'Qoute') {
+                                  qoutesList.add(postdata[i].data());
+                                  // print(qoutesList);
+                                }
                               }
                             }
                             if (qoutesList.length.isEqual(0)) {
-                              return const Center(
-                                child: Text("No Qoutes to show"),
+                              return Center(
+                                child: TextWidget(
+                                  text: "No qoutes to show",
+                                ),
                               );
                             } else {
                               return GridView.builder(
@@ -555,9 +561,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 },
                               );
                             }
-                          } else {
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return const Center(
                               child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            return Center(
+                              child: TextWidget(
+                                text: "No qoutes to show",
+                              ),
                             );
                           }
                         },
@@ -565,7 +578,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection("posts")
-                            .where("creatorId", isEqualTo: user!.id)
+                            .where("creatorId",
+                                isEqualTo:
+                                    FirebaseAuth.instance.currentUser!.uid)
                             .snapshots(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
@@ -574,10 +589,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             var qoutesList = [];
 
                             for (var i = 0; i < postdata.length; i++) {
-                              if (postdata[i].data()['mediaData'][0]['type'] ==
-                                  'Photo') {
-                                qoutesList.add(postdata[i].data());
-                                // print(qoutesList);
+                              if (postdata[i].data()['mediaData'] != []) {
+                                if (postdata[i].data()['mediaData'][0]
+                                        ['type'] ==
+                                    'Photo') {
+                                  qoutesList.add(postdata[i].data());
+                                  // print(qoutesList);
+                                }
                               }
                             }
                             if (qoutesList.length.isEqual(0)) {
@@ -689,11 +707,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               for (var j = 0;
                                   j < postmodel.mediaData.length;
                                   j++) {
-                                if (postmodel.mediaData[j].type == 'Video') {
-                                  videoList.add(postmodel.mediaData[j]);
-                                  postid = postmodel.id;
-                                  creatorId = postmodel.creatorId;
-                                  print(videoList);
+                                if (postmodel.mediaData != []) {
+                                  if (postmodel.mediaData[j].type == 'Video') {
+                                    videoList.add(postmodel.mediaData[j]);
+                                    postid = postmodel.id;
+                                    creatorId = postmodel.creatorId;
+                                    print(videoList);
+                                  }
                                 }
                               }
                             }
@@ -706,6 +726,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 3,
+                                  crossAxisSpacing: 1,
                                 ),
                                 itemCount: videoList.length,
                                 itemBuilder: (context, index) {
@@ -713,21 +734,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   // print(quote);
                                   VideoPlayerController videoPlayerController =
                                       VideoPlayerController.network(data.link);
+                                  videoPlayerController.initialize();
+                                  videoPlayerController.pause();
 
                                   return GestureDetector(
-                                    onTap: () => Get.to(() => FullScreenVideo(
-                                          videoPlayerController:
-                                              videoPlayerController,
-                                          postId: postid,
-                                          creatorId: creatorId,
-                                        )),
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.video_file_rounded,
-                                        size: 48,
-                                      ),
-                                    ),
-                                  );
+                                      onTap: () => Get.to(() => FullScreenVideo(
+                                            videoPlayerController:
+                                                videoPlayerController,
+                                            postId: postid,
+                                            creatorId: creatorId,
+                                          )),
+                                      child:
+                                          VideoPlayer(videoPlayerController));
                                 },
                               );
                             }

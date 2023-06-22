@@ -10,161 +10,155 @@ import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class VideoPlayerUrl extends StatefulWidget {
-  VideoPlayerUrl({
-    Key? key,
-    required this.mediaDetails,
-    required this.pageIndex,
-    this.videoPlayerController,
-    this.pageController,
-  }) : super(key: key);
-  final MediaDetails mediaDetails;
-  final int pageIndex;
+// class VideoPlayerUrl extends StatefulWidget {
+//   VideoPlayerUrl({
+//     Key? key,
+//     required this.mediaDetails,
+//     required this.pageIndex,
+//     this.videoPlayerController,
+//     this.pageController,
+//   }) : super(key: key);
+//   final MediaDetails mediaDetails;
+//   final int pageIndex;
 
-  PageController? pageController;
+//   PageController? pageController;
 
-  final VideoPlayerController? videoPlayerController;
+//   final VideoPlayerController? videoPlayerController;
 
-  @override
-  State<VideoPlayerUrl> createState() => _VideoPlayerUrlState();
-}
+//   @override
+//   State<VideoPlayerUrl> createState() => _VideoPlayerUrlState();
+// }
 
-class _VideoPlayerUrlState extends State<VideoPlayerUrl>
-    with AutomaticKeepAliveClientMixin {
-  late VideoPlayerController videoPlayerController;
+// class _VideoPlayerUrlState extends State<VideoPlayerUrl>
+//     with AutomaticKeepAliveClientMixin {
+//   late VideoPlayerController videoPlayerController;
 
-  late ChewieController chewieController;
-  bool isPlaying = false;
-  bool isVisible = false;
-  bool isMuted = true;
+//   late ChewieController chewieController;
+//   bool isPlaying = false;
+//   bool isVisible = false;
+//   bool isMuted = true;
 
-  @override
-  void initState() {
-    widget.pageController?.addListener(() {
-      setState(() {});
-    });
-    super.initState();
-    if (widget.videoPlayerController == null) {
-      videoPlayerController =
-          VideoPlayerController.network(widget.mediaDetails.link);
-    } else {
-      videoPlayerController = widget.videoPlayerController!;
-    }
-    videoPlayerController =
-        VideoPlayerController.network(widget.mediaDetails.link)
-          ..initialize().then((_) async {
-            // Future.delayed(const Duration(seconds: 3));
-            setState(() {
-              isPlaying = true;
+//   @override
+//   void initState() {
+//     widget.pageController?.addListener(() {
+//       setState(() {});
+//     });
+//     super.initState();
+//     if (widget.videoPlayerController == null) {
+//       videoPlayerController =
+//           VideoPlayerController.network(widget.mediaDetails.link);
+//     } else {
+//       videoPlayerController = widget.videoPlayerController!;
+//     }
+//     videoPlayerController =
+//         VideoPlayerController.network(widget.mediaDetails.link)
+//           ..initialize().then((_) async {
+//             // Future.delayed(const Duration(seconds: 3));
+//             setState(() {
+//               isPlaying = true;
 
-              videoPlayerController.setVolume(0.0); // Mute the video initially
-              videoPlayerController.addListener(_videoPlayerListener);
-            });
-          });
-    chewieController = ChewieController(
-        videoPlayerController: videoPlayerController,
-        allowMuting: true,
-        showOptions: false,
-        autoPlay: false,
-        allowPlaybackSpeedChanging: false,
-        autoInitialize: true,
-        allowFullScreen: false,
-        showControlsOnInitialize: false,
-        deviceOrientationsOnEnterFullScreen: [
-          DeviceOrientation.landscapeLeft,
-          DeviceOrientation.landscapeRight
-        ],
-        deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-        aspectRatio: 2 / 3,
-        looping: false);
-  }
+//               videoPlayerController.setVolume(0.0); // Mute the video initially
+//               videoPlayerController.addListener(_videoPlayerListener);
+//             });
+//           });
+//     chewieController = ChewieController(
+//         videoPlayerController: videoPlayerController,
+//         allowMuting: true,
+//         showOptions: false,
+//         autoPlay: false,
+//         allowPlaybackSpeedChanging: false,
+//         autoInitialize: true,
+//         allowFullScreen: false,
+//         showControlsOnInitialize: false,
+//         deviceOrientationsOnEnterFullScreen: [
+//           DeviceOrientation.landscapeLeft,
+//           DeviceOrientation.landscapeRight
+//         ],
+//         deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
+//         aspectRatio: 2 / 3,
+//         looping: false);
+//   }
 
-  void _videoPlayerListener() {
-    if (isPlaying && isVisible && isMuted) {
-      videoPlayerController.setVolume(1.0); // Enable sound when visible
-      isMuted = false;
-    }
-  }
+//   void _videoPlayerListener() {
+//     if (isPlaying && isVisible && isMuted) {
+//       videoPlayerController.setVolume(1.0); // Enable sound when visible
+//       isMuted = false;
+//     }
+//   }
 
-  @override
-  void dispose() {
-    videoPlayerController.dispose();
-    chewieController.dispose();
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     videoPlayerController.dispose();
+//     chewieController.dispose();
+//     super.dispose();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: Key(widget.mediaDetails.link),
-      onVisibilityChanged: (visibilityInfo) {
-        setState(() {
-          isVisible = visibilityInfo.visibleFraction == 1.0;
-          if (isVisible) {
-            videoPlayerController.play();
-            isPlaying = true;
-            // isMuted = false;
-            videoPlayerController.setVolume(1.0);
-          } else {
-            videoPlayerController.pause();
-            // isMuted = true;
-            isPlaying = false;
-            videoPlayerController.setVolume(0.0);
-          }
-        });
-      },
-      child: Chewie(controller: chewieController),
-    ); /* Stack(
-      children: [
-        (videoPlayerController?.value.isInitialized ?? false)
-            ? VideoPlayer(videoPlayerController!)
-            : const Center(child: CircularProgressIndicator.adaptive()),
-        if (videoPlayerController?.value.isInitialized ?? false)
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: IconButton(
-              onPressed: () async {
-                if (videoPlayerController?.value.isPlaying ?? false) {
-                  await videoPlayerController?.pause();
-                } else {
-                  await videoPlayerController?.play();
-                }
-              },
-              icon: Icon(
-                (videoPlayerController?.value.isPlaying ?? false)
-                    ? Icons.pause_circle_filled_rounded
-                    : Icons.play_circle_fill_rounded,
-              ),
-            ),
-          )
-      ],
-    ); */
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return VisibilityDetector(
+//       key: Key(widget.mediaDetails.link),
+//       onVisibilityChanged: (visibilityInfo) {
+//         setState(() {
+//           isVisible = visibilityInfo.visibleFraction == 1.0;
+//           if (isVisible) {
+//             videoPlayerController.play();
+//             isPlaying = true;
+//             // isMuted = false;
+//             videoPlayerController.setVolume(1.0);
+//           } else {
+//             videoPlayerController.pause();
+//             // isMuted = true;
+//             isPlaying = false;
+//             videoPlayerController.setVolume(0.0);
+//           }
+//         });
+//       },
+//       child: Chewie(controller: chewieController),
+//     ); /* Stack(
+//       children: [
+//         (videoPlayerController?.value.isInitialized ?? false)
+//             ? VideoPlayer(videoPlayerController!)
+//             : const Center(child: CircularProgressIndicator.adaptive()),
+//         if (videoPlayerController?.value.isInitialized ?? false)
+//           Align(
+//             alignment: Alignment.bottomLeft,
+//             child: IconButton(
+//               onPressed: () async {
+//                 if (videoPlayerController?.value.isPlaying ?? false) {
+//                   await videoPlayerController?.pause();
+//                 } else {
+//                   await videoPlayerController?.play();
+//                 }
+//               },
+//               icon: Icon(
+//                 (videoPlayerController?.value.isPlaying ?? false)
+//                     ? Icons.pause_circle_filled_rounded
+//                     : Icons.play_circle_fill_rounded,
+//               ),
+//             ),
+//           )
+//       ],
+//     ); */
+//   }
 
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
-}
+//   @override
+//   bool get wantKeepAlive => true;
+// }
 
 class VideoPlayerWidget extends StatefulWidget {
-  VideoPlayerWidget(
-      {Key? key,
-      required this.videoUrl,
-      this.videoPlayerController,
-      this.postId})
+  const VideoPlayerWidget({Key? key, required this.videoUrl, this.postId})
       : super(key: key);
   final String videoUrl;
   final String? postId;
-  VideoPlayerController? videoPlayerController;
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   late VideoPlayerController videoPlayerController;
-  bool isPlaying = false;
+  // bool isPlaying = false;
   bool isVisible = false;
-  bool isMuted = true;
+  // bool isMuted = true;s
 
   late ChewieController chewieController;
   @override
@@ -176,18 +170,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     //   videoPlayerController = widget.videoPlayerController!;
     // }
 
-    videoPlayerController = VideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((_) async {
-        // Future.delayed(const Duration(seconds: 3));
-        await countVideoViews();
+    videoPlayerController = VideoPlayerController.network(widget.videoUrl);
+    // Future.delayed(const Duration(seconds: 3));
+    countVideoViews();
 
-        setState(() {
-          isPlaying = true;
+    // setState(() {
+    // isPlaying = true;
 
-          videoPlayerController.setVolume(0.0); // Mute the video initially
-          videoPlayerController.addListener(_videoPlayerListener);
-        });
-      });
+    videoPlayerController.setVolume(0.0); // Mute the video initially
+    // videoPlayerController.addListener(_videoPlayerListener);
+    // });
 
     chewieController = ChewieController(
         // allowMuting: true,
@@ -204,12 +196,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         looping: false);
   }
 
-  void _videoPlayerListener() {
-    if (isPlaying && isVisible && isMuted) {
-      videoPlayerController.setVolume(1.0); // Enable sound when visible
-      isMuted = false;
-    }
-  }
+  // void _videoPlayerListener() {
+  //   if (isPlaying && isVisible && isMuted) {
+  //     videoPlayerController.setVolume(1.0); // Enable sound when visible
+  //     isMuted = false;
+  //   }
+  // }
 
   countVideoViews() async {
     var postRef =
@@ -250,17 +242,18 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           isVisible = visibilityInfo.visibleFraction > 0.5;
           if (isVisible) {
             videoPlayerController.play();
-            isPlaying = true;
+            // isPlaying = true;
             videoPlayerController.setVolume(1.0);
           } else {
             videoPlayerController.pause();
-            isPlaying = false;
+            // isPlaying = false;
             videoPlayerController.setVolume(0.0);
           }
         });
       },
       child: Chewie(controller: chewieController),
-    ); /* Stack(
+    );
+    /* Stack(
       children: [
         (videoPlayerController?.value.isInitialized ?? false)
             ? VideoPlayer(videoPlayerController!)
