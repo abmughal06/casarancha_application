@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -21,8 +22,6 @@ import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../../widgets/clip_pad_shadow.dart';
-import '../../widgets/comment_screen.dart';
-import '../../widgets/text_editing_widget.dart';
 import '../../widgets/text_widget.dart';
 import '../chat/GhostMode/ghost_chat_screen.dart';
 import '../chat/share_post_screen.dart';
@@ -86,7 +85,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         return Column(
                           children: [
                             AspectRatio(
-                              aspectRatio: 2 / 3,
+                              aspectRatio: post.mediaData[0].type == 'Photo'
+                                  ? 2 / 3
+                                  : post.mediaData[0].type == 'Video'
+                                      ? 9 / 16
+                                      : 1 / 1,
                               child: Stack(
                                 children: [
                                   ListView.builder(
@@ -170,19 +173,19 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                         return Container(
                                           width:
                                               MediaQuery.of(context).size.width,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 40,
-                                            vertical: 50,
+                                          padding: const EdgeInsets.only(
+                                            left: 40,
+                                            right: 40,
+                                            top: 110,
+                                            bottom: 20,
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              mediaData.link,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w500,
-                                                color: color221,
-                                              ),
+                                          child: SingleChildScrollView(
+                                            child: TextWidget(
+                                              text: mediaData.link,
+                                              textAlign: TextAlign.left,
+                                              fontSize: 15.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: color221,
                                             ),
                                           ),
                                         );
@@ -190,18 +193,19 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                     },
                                   ),
                                   Positioned(
-                                      top: 40,
-                                      left: 20,
-                                      child: CircleAvatar(
-                                        backgroundColor:
-                                            Colors.white.withOpacity(0.45),
-                                        child: InkWell(
-                                            child: const Icon(
-                                              Icons.navigate_before,
-                                              color: Colors.black,
-                                            ),
-                                            onTap: () => Get.back()),
-                                      )),
+                                    top: 60,
+                                    left: 20,
+                                    child: CircleAvatar(
+                                      backgroundColor:
+                                          Colors.grey.withOpacity(0.20),
+                                      child: InkWell(
+                                          child: const Icon(
+                                            Icons.navigate_before,
+                                            color: Colors.black,
+                                          ),
+                                          onTap: () => Get.back()),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -398,10 +402,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                                     color: Colors.black,
                                                   ),
                                                   TextWidget(
-                                                    text: timeago.format(
-                                                      DateTime.parse(
-                                                          post.createdAt),
-                                                    ),
+                                                    text: convertDateIntoTime(
+                                                        post.createdAt),
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 9.sp,
                                                     color: Colors.black,
@@ -469,146 +471,155 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             // var cDetail =
                             //     CreatorDetails.fromMap(data['creatorDetails']);
                             var cmnt = Comment.fromMap(data);
-                            return ListTile(
-                              isThreeLine: true,
-                              leading: InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    () => AppUserScreen(
-                                      appUserController: Get.put(
-                                        AppUserController(
-                                          appUserId: cmnt.creatorId,
-                                          currentUserId: FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  height: 46.h,
-                                  width: 46.h,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.amber,
-                                    image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          cmnt.creatorDetails.imageUrl),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              title: InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    () => AppUserScreen(
-                                      appUserController: Get.put(
-                                        AppUserController(
-                                          appUserId: cmnt.creatorId,
-                                          currentUserId: FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Row(
-                                  children: [
-                                    TextWidget(
-                                        text: cmnt.creatorDetails.name,
-                                        fontSize: 14.sp,
-                                        color: const Color(0xff212121),
-                                        fontWeight: FontWeight.w600),
-                                    widthBox(4.w),
-                                    if (cmnt.creatorDetails.isVerified)
-                                      SvgPicture.asset(icVerifyBadge),
-                                    widthBox(8.w),
-                                    Text(
-                                      timeago.format(
-                                        DateTime.parse(
-                                          cmnt.createdAt,
-                                        ),
-                                      ),
-                                      style: TextStyle(
-                                          fontSize: 12.sp,
-                                          overflow: TextOverflow.ellipsis,
-                                          fontWeight: FontWeight.w400,
-                                          color: const Color(0xff5c5c5c)),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              subtitle: TextWidget(
-                                text:
-                                    cmnt.message.isEmpty ? "---" : cmnt.message,
-                                fontSize: 12.sp,
-                                color: const Color(0xff5f5f5f),
-                                fontWeight: FontWeight.w400,
-                                textOverflow: TextOverflow.visible,
-                              ),
-                              trailing: Visibility(
-                                visible: cmnt.creatorId ==
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                child: InkWell(
+                            if (cmnt.creatorDetails.name.isNotEmpty) {
+                              return ListTile(
+                                isThreeLine: true,
+                                leading: InkWell(
                                   onTap: () {
-                                    if (cmnt.creatorId ==
-                                        FirebaseAuth
-                                            .instance.currentUser!.uid) {
-                                      Get.bottomSheet(
-                                        Container(
-                                          decoration: const BoxDecoration(
-                                              color: Colors.red),
-                                          height: 80,
-                                          child: InkWell(
-                                            onTap: () async {
-                                              await FirebaseFirestore.instance
-                                                  .collection("posts")
-                                                  .doc(cmnt.id)
-                                                  .collection("comments")
-                                                  .doc(snapshot
-                                                      .data!.docs[index].id)
-                                                  .delete();
-
-                                              await FirebaseFirestore.instance
-                                                  .collection("posts")
-                                                  .doc(cmnt.id)
-                                                  .update({
-                                                "commentIds":
-                                                    FieldValue.arrayRemove([
-                                                  snapshot.data!.docs[index].id
-                                                ])
-                                              });
-
-                                              Get.back();
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                TextWidget(
-                                                  text: "Delete Comment",
-                                                  fontSize: 15.sp,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.white,
-                                                )
-                                              ],
-                                            ),
+                                    Get.to(
+                                      () => AppUserScreen(
+                                        appUserController: Get.put(
+                                          AppUserController(
+                                            appUserId: cmnt.creatorId,
+                                            currentUserId: FirebaseAuth
+                                                .instance.currentUser!.uid,
                                           ),
                                         ),
-                                        isScrollControlled: true,
-                                      );
-                                    }
+                                      ),
+                                    );
                                   },
-                                  child: const Icon(
-                                    Icons.more_vert,
-                                    color: Color(0xffafafaf),
+                                  child: Container(
+                                    height: 46.h,
+                                    width: 46.h,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.amber,
+                                      image: DecorationImage(
+                                        image: CachedNetworkImageProvider(
+                                            cmnt.creatorDetails.imageUrl),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
+                                title: InkWell(
+                                  onTap: () {
+                                    Get.to(
+                                      () => AppUserScreen(
+                                        appUserController: Get.put(
+                                          AppUserController(
+                                            appUserId: cmnt.creatorId,
+                                            currentUserId: FirebaseAuth
+                                                .instance.currentUser!.uid,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text: cmnt.creatorDetails.name,
+                                      style: TextStyle(
+                                          fontSize: 14.sp,
+                                          overflow: TextOverflow.ellipsis,
+                                          color: const Color(0xff212121),
+                                          fontWeight: FontWeight.w600),
+                                      children: [
+                                        WidgetSpan(child: widthBox(4.w)),
+                                        if (cmnt.creatorDetails.isVerified)
+                                          WidgetSpan(
+                                              child: SvgPicture.asset(
+                                                  icVerifyBadge)),
+                                        WidgetSpan(child: widthBox(8.w)),
+                                        TextSpan(
+                                          text: convertDateIntoTime(
+                                              cmnt.createdAt),
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            overflow: TextOverflow.ellipsis,
+                                            fontWeight: FontWeight.w400,
+                                            color: const Color(0xff5c5c5c),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                subtitle: TextWidget(
+                                  text: cmnt.message.isEmpty
+                                      ? "---"
+                                      : cmnt.message,
+                                  fontSize: 12.sp,
+                                  color: const Color(0xff5f5f5f),
+                                  fontWeight: FontWeight.w400,
+                                  textOverflow: TextOverflow.visible,
+                                ),
+                                trailing: Visibility(
+                                  visible: cmnt.creatorId ==
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                  child: InkWell(
+                                    onTap: () {
+                                      if (cmnt.creatorId ==
+                                          FirebaseAuth
+                                              .instance.currentUser!.uid) {
+                                        Get.bottomSheet(
+                                          Container(
+                                            decoration: const BoxDecoration(
+                                                color: Colors.red),
+                                            height: 80,
+                                            child: InkWell(
+                                              onTap: () async {
+                                                await FirebaseFirestore.instance
+                                                    .collection("posts")
+                                                    .doc(cmnt.id)
+                                                    .collection("comments")
+                                                    .doc(snapshot
+                                                        .data!.docs[index].id)
+                                                    .delete();
+
+                                                await FirebaseFirestore.instance
+                                                    .collection("posts")
+                                                    .doc(cmnt.id)
+                                                    .update({
+                                                  "commentIds":
+                                                      FieldValue.arrayRemove([
+                                                    snapshot
+                                                        .data!.docs[index].id
+                                                  ])
+                                                });
+
+                                                Get.back();
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  TextWidget(
+                                                    text: "Delete Comment",
+                                                    fontSize: 15.sp,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.white,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          isScrollControlled: true,
+                                        );
+                                      }
+                                    },
+                                    child: const Icon(
+                                      Icons.more_vert,
+                                      color: Color(0xffafafaf),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Container();
+                            }
                           },
                         );
                       } else {

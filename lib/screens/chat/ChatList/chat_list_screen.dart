@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -5,6 +6,7 @@ import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_controller.dart';
+import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,14 +25,10 @@ import '../../home/HomeScreen/home_screen_controller.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../Chat one-to-one/chat_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:intl/intl.dart';
 
 String convertDateIntoTime(String date) {
-  var time = timeago.format(
-    DateTime.parse(
-      date,
-    ),
-  );
-
+  var time = DateFormat('MMMM d, h:mm a').format(DateTime.parse(date));
   return time;
 }
 
@@ -391,7 +389,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                 ),
                               ),
                             );
-                          } else {}
+                          } else {
+                            return Container();
+                          }
                         } else {
                           return SizedBox(
                             child: ListTile(
@@ -497,26 +497,28 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                     .snapshots(),
                 builder: (context, doc) {
                   if (doc.hasData && doc.data != null) {
-                    List followingIds = doc.data!.data()!['followingsIds'];
-                    List followerIds = doc.data!.data()!['followersIds'];
-                    List userWhoCanMessage = followingIds + followerIds;
+                    var currentUser = UserModel.fromMap(doc.data!.data()!);
+
+                    List userWhoCanMessage1 =
+                        currentUser.followersIds + currentUser.followingsIds;
+                    var msg = userWhoCanMessage1.toSet();
+                    List userWhoCanMessage = msg.toList();
 
                     print(
-                        "============== <<<<<<<<<=========>>>>>>>>> user with conversation $userWhoCanMessage");
+                        "============== <<<<<<<<<=========>>>>>>>>> userWhoCanMessage $userWhoCanMessage");
+                    print(
+                        "============== <<<<<<<<<=========>>>>>>>>> userWhoCanMessage1 $userWhoCanMessage1");
 
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: widget.query.isEmpty
-                          ? userWhoCanMessage.isNotEmpty
-                              ? FirebaseFirestore.instance
-                                  .collection("users")
-                                  .where("id", whereIn: userWhoCanMessage)
-                                  .snapshots()
-                              : null
+                      stream: userWhoCanMessage.isNotEmpty
+                          ? FirebaseFirestore.instance
+                              .collection("users")
+                              .snapshots()
                           : null,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data != null) {
-                          print(
-                              "========================= ======== ======= $userWhoCanMessage");
+                          dev.log(
+                              "========================= ======== ======= ${userWhoCanMessage.length}");
                           if (userWhoCanMessage.isNotEmpty) {
                             return ListView.builder(
                               shrinkWrap: true,
@@ -524,32 +526,97 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                               physics: const NeverScrollableScrollPhysics(),
                               padding: const EdgeInsets.only(bottom: 85),
                               itemBuilder: (context, index) {
-                                final UserModel userMmessage =
-                                    UserModel.fromMap(
-                                        snapshot.data!.docs[index].data());
-                                final CreatorDetails creatorDetails =
-                                    CreatorDetails.fromMap(
-                                        snapshot.data!.docs[index].data());
-                                var val11 = generateRandomString(7);
-                                return StreamBuilder<DocumentSnapshot<Map>>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection("users")
-                                      .doc(FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                      .collection("messageList")
-                                      .doc(userMmessage.id)
-                                      .snapshots(),
-                                  builder: (context, d) {
-                                    if (d.hasData && d.data!.exists) {
-                                      return Container();
-                                    } else {
-                                      // noChatUser.add(creatorDetails);
-                                      if (chatListController
-                                          .searchController.text.isNotEmpty) {
-                                        if (compareStrings(
-                                            userMmessage.name,
-                                            chatListController
-                                                .searchController.text)) {
+                                if (userWhoCanMessage.contains(
+                                    snapshot.data!.docs[index].data()['id'])) {
+                                  final UserModel userMmessage =
+                                      UserModel.fromMap(
+                                          snapshot.data!.docs[index].data());
+                                  final CreatorDetails creatorDetails =
+                                      CreatorDetails.fromMap(
+                                          snapshot.data!.docs[index].data());
+                                  var val11 = generateRandomString(7);
+
+                                  return StreamBuilder<DocumentSnapshot<Map>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection("users")
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .collection("messageList")
+                                        .doc(userMmessage.id)
+                                        .snapshots(),
+                                    builder: (context, d) {
+                                      if (d.hasData && d.data!.exists) {
+                                        dev.log("true");
+                                        return Container();
+                                      } else {
+                                        // noChatUser.add(creatorDetails);
+                                        if (chatListController
+                                            .searchController.text.isNotEmpty) {
+                                          if (compareStrings(
+                                              userMmessage.name,
+                                              chatListController
+                                                  .searchController.text)) {
+                                            return SizedBox(
+                                              height: 70,
+                                              child: ListTile(
+                                                onTap: () {
+                                                  Get.to(
+                                                    () => ChatScreen(
+                                                      appUserId:
+                                                          userMmessage.id,
+                                                      creatorDetails:
+                                                          creatorDetails,
+                                                      profileScreenController:
+                                                          profileScreenController,
+                                                      val: val11,
+                                                    ),
+                                                  );
+                                                },
+                                                title: Row(
+                                                  children: [
+                                                    TextWidget(
+                                                      text: creatorDetails.name,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: const Color(
+                                                          0xff222939),
+                                                    ),
+                                                    widthBox(5.w),
+                                                    Visibility(
+                                                        visible: creatorDetails
+                                                            .isVerified,
+                                                        child: SvgPicture.asset(
+                                                            icVerifyBadge))
+                                                  ],
+                                                ),
+                                                subtitle: TextWidget(
+                                                  text:
+                                                      'Start a conversation with ${profileScreenController.isGhostModeOn.value ? "Ghost" : userMmessage.name}',
+                                                  textOverflow:
+                                                      TextOverflow.ellipsis,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14.sp,
+                                                  color:
+                                                      const Color(0xff8a8a8a),
+                                                ),
+                                                leading: CircleAvatar(
+                                                  backgroundImage:
+                                                      CachedNetworkImageProvider(
+                                                    userMmessage.imageStr,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.question_mark,
+                                                  ),
+                                                ),
+                                                trailing: const Icon(
+                                                    Icons.navigate_next),
+                                              ),
+                                            );
+                                          } else {
+                                            return Container();
+                                          }
+                                        } else {
                                           return SizedBox(
                                             height: 70,
                                             child: ListTile(
@@ -596,73 +663,18 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                                                     CachedNetworkImageProvider(
                                                   userMmessage.imageStr,
                                                 ),
-                                                child: const Icon(
-                                                  Icons.question_mark,
-                                                ),
                                               ),
                                               trailing: const Icon(
                                                   Icons.navigate_next),
                                             ),
                                           );
-                                        } else {
-                                          return Container();
                                         }
-                                      } else {
-                                        return SizedBox(
-                                          height: 70,
-                                          child: ListTile(
-                                            onTap: () {
-                                              Get.to(
-                                                () => ChatScreen(
-                                                  appUserId: userMmessage.id,
-                                                  creatorDetails:
-                                                      creatorDetails,
-                                                  profileScreenController:
-                                                      profileScreenController,
-                                                  val: val11,
-                                                ),
-                                              );
-                                            },
-                                            title: Row(
-                                              children: [
-                                                TextWidget(
-                                                  text: creatorDetails.name,
-                                                  fontSize: 14.sp,
-                                                  fontWeight: FontWeight.w500,
-                                                  color:
-                                                      const Color(0xff222939),
-                                                ),
-                                                widthBox(5.w),
-                                                Visibility(
-                                                    visible: creatorDetails
-                                                        .isVerified,
-                                                    child: SvgPicture.asset(
-                                                        icVerifyBadge))
-                                              ],
-                                            ),
-                                            subtitle: TextWidget(
-                                              text:
-                                                  'Start a conversation with ${profileScreenController.isGhostModeOn.value ? "Ghost" : userMmessage.name}',
-                                              textOverflow:
-                                                  TextOverflow.ellipsis,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14.sp,
-                                              color: const Color(0xff8a8a8a),
-                                            ),
-                                            leading: CircleAvatar(
-                                              backgroundImage:
-                                                  CachedNetworkImageProvider(
-                                                userMmessage.imageStr,
-                                              ),
-                                            ),
-                                            trailing:
-                                                const Icon(Icons.navigate_next),
-                                          ),
-                                        );
                                       }
-                                    }
-                                  },
-                                );
+                                    },
+                                  );
+                                } else {
+                                  return Container();
+                                }
                               },
                             );
                           } else {
@@ -814,10 +826,6 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                                     Text(
                                       val1,
                                     ),
-                                    widthBox(5.w),
-                                    Visibility(
-                                        visible: creatorDetails.isVerified,
-                                        child: SvgPicture.asset(icVerifyBadge))
                                   ],
                                 ),
                                 subtitle: TextWidget(
@@ -882,7 +890,9 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                                 ),
                               ),
                             );
-                          } else {}
+                          } else {
+                            return Container();
+                          }
                         } else {
                           return SizedBox(
                             child: ListTile(
@@ -900,17 +910,13 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                               title: Row(
                                 children: [
                                   const Text(
-                                    "Ghost--------",
+                                    "Ghost----",
                                     style: TextStyle(
                                         color: colorPrimaryA05, fontSize: 12),
                                   ),
                                   Text(
                                     val1,
                                   ),
-                                  widthBox(5.w),
-                                  Visibility(
-                                      visible: creatorDetails.isVerified,
-                                      child: SvgPicture.asset(icVerifyBadge))
                                 ],
                               ),
                               subtitle: TextWidget(
@@ -990,25 +996,25 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                     .snapshots(),
                 builder: (context, doc) {
                   if (doc.hasData && doc.data != null) {
-                    List followingIds = doc.data!.data()!['followingsIds'];
-                    List followerIds = doc.data!.data()!['followersIds'];
-                    List userWhoCanMessage = followingIds + followerIds;
+                    var currentUser = UserModel.fromMap(doc.data!.data()!);
+                    List followingIds = currentUser.followingsIds;
+                    List followerIds = currentUser.followersIds;
+                    List userWhoCanMessage1 = followingIds + followerIds;
+                    var msg = userWhoCanMessage1.toSet();
+                    var userWhoCanMessage = msg.toList();
 
-                    print(
+                    dev.log(
                         "============== <<<<<<<<<=========>>>>>>>>> user with conversation $userWhoCanMessage");
 
                     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: widget.query.isEmpty
-                          ? userWhoCanMessage.isNotEmpty
-                              ? FirebaseFirestore.instance
-                                  .collection("users")
-                                  .where("id", whereIn: userWhoCanMessage)
-                                  .snapshots()
-                              : null
+                      stream: userWhoCanMessage.isNotEmpty
+                          ? FirebaseFirestore.instance
+                              .collection("users")
+                              .snapshots()
                           : null,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data != null) {
-                          print(
+                          dev.log(
                               "========================= ======== ======= $userWhoCanMessage");
                           if (userWhoCanMessage.isNotEmpty) {
                             return ListView.builder(
@@ -1017,32 +1023,93 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                               physics: const NeverScrollableScrollPhysics(),
                               padding: const EdgeInsets.only(bottom: 85),
                               itemBuilder: (context, index) {
-                                final UserModel userMmessage =
-                                    UserModel.fromMap(
-                                        snapshot.data!.docs[index].data());
-                                final CreatorDetails creatorDetails =
-                                    CreatorDetails.fromMap(
-                                        snapshot.data!.docs[index].data());
-                                var val11 = generateRandomString(7);
-                                return StreamBuilder<DocumentSnapshot<Map>>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection("users")
-                                      .doc(FirebaseAuth
-                                          .instance.currentUser!.uid)
-                                      .collection("ghostMessageList")
-                                      .doc(userMmessage.id)
-                                      .snapshots(),
-                                  builder: (context, d) {
-                                    if (d.hasData && d.data!.exists) {
-                                      return Container();
-                                    } else {
-                                      // noChatUser.add(creatorDetails);
-                                      if (chatListController
-                                          .searchController.text.isNotEmpty) {
-                                        if (compareStrings(
-                                            userMmessage.name,
-                                            chatListController
-                                                .searchController.text)) {
+                                if (userWhoCanMessage.contains(
+                                    snapshot.data!.docs[index].data()['id'])) {
+                                  final UserModel userMmessage =
+                                      UserModel.fromMap(
+                                          snapshot.data!.docs[index].data());
+                                  final CreatorDetails creatorDetails =
+                                      CreatorDetails.fromMap(
+                                          snapshot.data!.docs[index].data());
+                                  var val11 = generateRandomString(7);
+                                  return StreamBuilder<DocumentSnapshot<Map>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection("users")
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .collection("ghostMessageList")
+                                        .doc(userMmessage.id)
+                                        .snapshots(),
+                                    builder: (context, d) {
+                                      if (d.hasData && d.data!.exists) {
+                                        return Container();
+                                      } else {
+                                        // noChatUser.add(creatorDetails);
+                                        if (chatListController
+                                            .searchController.text.isNotEmpty) {
+                                          if (compareStrings(
+                                              userMmessage.name,
+                                              chatListController
+                                                  .searchController.text)) {
+                                            return SizedBox(
+                                              height: 70,
+                                              child: ListTile(
+                                                onTap: () {
+                                                  Get.to(
+                                                    () => GhostChatScreen2(
+                                                      appUserId:
+                                                          userMmessage.id,
+                                                      creatorDetails:
+                                                          creatorDetails,
+                                                      profileScreenController:
+                                                          profileScreenController,
+                                                      val: val11,
+                                                    ),
+                                                  );
+                                                },
+                                                title: Row(
+                                                  children: [
+                                                    const Text(
+                                                      "Ghost----------",
+                                                      style: TextStyle(
+                                                          color:
+                                                              colorPrimaryA05,
+                                                          fontSize: 12),
+                                                    ),
+                                                    Text(
+                                                      val11,
+                                                    ),
+                                                    widthBox(5.w),
+                                                    Visibility(
+                                                        visible: creatorDetails
+                                                            .isVerified,
+                                                        child: SvgPicture.asset(
+                                                            icVerifyBadge))
+                                                  ],
+                                                ),
+                                                subtitle: TextWidget(
+                                                  text:
+                                                      'Start a conversation with ${profileScreenController.isGhostModeOn.value ? "Ghost" : userMmessage.name}',
+                                                  textOverflow:
+                                                      TextOverflow.ellipsis,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14.sp,
+                                                  color:
+                                                      const Color(0xff8a8a8a),
+                                                ),
+                                                leading: const CircleAvatar(
+                                                  child: Icon(
+                                                    Icons.question_mark,
+                                                  ),
+                                                ),
+                                                trailing: const Icon(
+                                                    Icons.navigate_next),
+                                              ),
+                                            );
+                                          } else {
+                                            return Container();
+                                          }
+                                        } else {
                                           return SizedBox(
                                             height: 70,
                                             child: ListTile(
@@ -1061,7 +1128,7 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                                               title: Row(
                                                 children: [
                                                   const Text(
-                                                    "Ghost----------",
+                                                    "Ghost--------",
                                                     style: TextStyle(
                                                         color: colorPrimaryA05,
                                                         fontSize: 12),
@@ -1070,16 +1137,11 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                                                     val11,
                                                   ),
                                                   widthBox(5.w),
-                                                  Visibility(
-                                                      visible: creatorDetails
-                                                          .isVerified,
-                                                      child: SvgPicture.asset(
-                                                          icVerifyBadge))
                                                 ],
                                               ),
                                               subtitle: TextWidget(
                                                 text:
-                                                    'Start a conversation with ${profileScreenController.isGhostModeOn.value ? "Ghost" : userMmessage.name}',
+                                                    'Start a conversation with Ghost',
                                                 textOverflow:
                                                     TextOverflow.ellipsis,
                                                 fontWeight: FontWeight.w400,
@@ -1095,61 +1157,13 @@ class _ChatListWidgetGhostState extends State<ChatListWidgetGhost> {
                                                   Icons.navigate_next),
                                             ),
                                           );
-                                        } else {
-                                          return Container();
                                         }
-                                      } else {
-                                        return SizedBox(
-                                          height: 70,
-                                          child: ListTile(
-                                            onTap: () {
-                                              Get.to(
-                                                () => GhostChatScreen2(
-                                                  appUserId: userMmessage.id,
-                                                  creatorDetails:
-                                                      creatorDetails,
-                                                  profileScreenController:
-                                                      profileScreenController,
-                                                  val: val11,
-                                                ),
-                                              );
-                                            },
-                                            title: Row(
-                                              children: [
-                                                const Text(
-                                                  "Ghost--------",
-                                                  style: TextStyle(
-                                                      color: colorPrimaryA05,
-                                                      fontSize: 12),
-                                                ),
-                                                Text(
-                                                  val11,
-                                                ),
-                                                widthBox(5.w),
-                                              ],
-                                            ),
-                                            subtitle: TextWidget(
-                                              text:
-                                                  'Start a conversation with Ghost',
-                                              textOverflow:
-                                                  TextOverflow.ellipsis,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14.sp,
-                                              color: const Color(0xff8a8a8a),
-                                            ),
-                                            leading: const CircleAvatar(
-                                              child: Icon(
-                                                Icons.question_mark,
-                                              ),
-                                            ),
-                                            trailing:
-                                                const Icon(Icons.navigate_next),
-                                          ),
-                                        );
                                       }
-                                    }
-                                  },
-                                );
+                                    },
+                                  );
+                                } else {
+                                  return Container();
+                                }
                               },
                             );
                           } else {

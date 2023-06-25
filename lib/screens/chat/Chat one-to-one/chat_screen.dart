@@ -7,6 +7,7 @@ import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
@@ -176,9 +177,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: chatController.currentUserRef
-                .collection(widget.profileScreenController!.isGhostModeOn.value
-                    ? "ghostMessageList"
-                    : 'messageList')
+                .collection('messageList')
                 .doc(widget.appUserId)
                 .collection(
                   'messages',
@@ -468,11 +467,7 @@ class ChatTile extends StatelessWidget {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      date,
-                    ),
-                  ),
+                  text: convertDateIntoTime(date),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),
@@ -566,11 +561,7 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      widget.date,
-                    ),
-                  ),
+                  text: convertDateIntoTime(widget.date),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),
@@ -665,11 +656,7 @@ class ChatPostTile extends StatelessWidget {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      message.createdAt,
-                    ),
-                  ),
+                  text: convertDateIntoTime(message.createdAt),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),
@@ -784,11 +771,7 @@ class ChatStoryTile extends StatelessWidget {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      message.createdAt,
-                    ),
-                  ),
+                  text: convertDateIntoTime(message.createdAt),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),

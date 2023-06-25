@@ -6,6 +6,7 @@ import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_screen.dart';
@@ -19,7 +20,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:video_player/video_player.dart';
 import '../../../models/comment_model.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
@@ -31,8 +31,6 @@ import '../../profile/AppUser/app_user_screen.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../notification_screen.dart';
 import '../story_view_screen.dart';
-import 'package:badges/badges.dart' as badges;
-import 'package:timeago/timeago.dart' as timeago;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -64,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .snapshots()
         .length
         .asStream();
-    print('------------------------- $unread');
+    log('------------------------- $unread');
     return unread;
   }
 
@@ -334,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (snap.hasData && snap.data!.exists) {
                           var userData = snap.data!.data();
 
-                          if (userData!['followingsIds'] != [] &&
+                          if (userData!['followingsIds'] != null &&
                               userData['followersIds'] != null) {
                             followingIds = userData['followingsIds'] != []
                                 ? userData['followingsIds']
@@ -345,30 +343,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : [];
                             log(followingIds.toString());
                             log(followerIds.toString());
-                            List storyIds = !homeScreenController
+                            List id = homeScreenController
                                     .profileScreenController.isGhostModeOn.value
                                 ? followingIds
                                 : followerIds + followingIds;
+                            var unique = id.toSet();
+                            var storyIds = unique.toList();
 
-                            log("storyiD ===============$storyIds");
+                            log("storyiD ===============${storyIds.length}");
                             // return Container();
                             return StreamBuilder<
                                 QuerySnapshot<Map<String, dynamic>>>(
                               stream: storyIds.isEmpty
-                                  ? FirebaseFirestore.instance
-                                      .collection("stories")
-                                      .where("creatorId",
-                                          arrayContains: storyIds)
-                                      .snapshots()
+                                  ? null
                                   : FirebaseFirestore.instance
                                       .collection("stories")
-                                      .where(
-                                        "creatorId",
-                                        whereIn: storyIds,
-                                      )
                                       .snapshots(),
                               builder: (context, snapshot) {
-                                log(DateTime.now().toIso8601String());
                                 if (snapshot.hasData && snapshot.data != null) {
                                   final data = snapshot.data!.docs;
                                   // double progress =
@@ -382,63 +373,74 @@ class _HomeScreenState extends State<HomeScreen> {
                                         itemBuilder: (context, index) {
                                           var storyData = data[index].data();
 
-                                          Story story =
-                                              Story.fromMap(storyData);
-                                          if (story.mediaDetailsList.isEmpty) {
-                                            return Container();
-                                          } else {
-                                            DateTime? givenDate;
-                                            for (int i = 0;
-                                                i <
-                                                    story.mediaDetailsList
-                                                        .length;
-                                                i++) {
-                                              givenDate = DateTime.parse(
-                                                  story.mediaDetailsList[i].id);
-                                            }
-
-                                            DateTime twentyFourHoursAgo =
-                                                DateTime.now().subtract(
-                                                    const Duration(hours: 24));
-                                            log(" ========== $twentyFourHoursAgo");
-                                            if (givenDate!
-                                                .isBefore(twentyFourHoursAgo)) {
+                                          if (storyIds.contains(
+                                              storyData['creatorId'])) {
+                                            Story story =
+                                                Story.fromMap(storyData);
+                                            if (story
+                                                .mediaDetailsList.isEmpty) {
                                               return Container();
                                             } else {
-                                              return Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 12),
-                                                child: Column(
-                                                  children: [
-                                                    InkWell(
-                                                      onTap: () {
-                                                        Get.to(
-                                                          () => StoryViewScreen(
-                                                              story: story),
-                                                        );
-                                                      },
-                                                      child: CircleAvatar(
-                                                        minRadius: 25,
-                                                        backgroundImage:
-                                                            NetworkImage(story
-                                                                .creatorDetails
-                                                                .imageUrl),
+                                              DateTime? givenDate;
+                                              for (int i = 0;
+                                                  i <
+                                                      story.mediaDetailsList
+                                                          .length;
+                                                  i++) {
+                                                givenDate = DateTime.parse(story
+                                                    .mediaDetailsList[i].id);
+                                              }
+
+                                              DateTime twentyFourHoursAgo =
+                                                  DateTime.now().subtract(
+                                                      const Duration(
+                                                          hours: 24));
+                                              log(" ========== $twentyFourHoursAgo");
+                                              if (givenDate!.isBefore(
+                                                  twentyFourHoursAgo)) {
+                                                return Container();
+                                              } else {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 12),
+                                                  child: Column(
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          Get.to(
+                                                            () =>
+                                                                StoryViewScreen(
+                                                                    story:
+                                                                        story),
+                                                          );
+                                                        },
+                                                        child: CircleAvatar(
+                                                          minRadius: 25,
+                                                          backgroundImage:
+                                                              NetworkImage(story
+                                                                  .creatorDetails
+                                                                  .imageUrl),
+                                                        ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(height: 3),
-                                                    Text(
-                                                      getFirstName(story
-                                                          .creatorDetails.name),
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 10,
+                                                      const SizedBox(height: 3),
+                                                      Text(
+                                                        getFirstName(story
+                                                            .creatorDetails
+                                                            .name),
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 10,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
+                                                    ],
+                                                  ),
+                                                );
+                                              }
                                             }
+                                          } else {
+                                            return Container();
                                           }
                                         }),
                                   );
@@ -482,6 +484,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (snap.hasData) {
                       var data = snap.data!.docs;
                       return ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 110),
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: data.length,
@@ -499,22 +502,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: EdgeInsets.only(bottom: 15.w),
                               child: Column(
                                 children: [
+                                  CustomPostHeader(
+                                      showPostTime: post.showPostTime,
+                                      name: post.creatorDetails.name,
+                                      isVerified:
+                                          post.creatorDetails.isVerified,
+                                      image: post.creatorDetails.imageUrl,
+                                      headerOnTap: () {
+                                        postCardController
+                                            .gotoAppUserScreen(post.creatorId);
+                                      }),
                                   Visibility(
                                     visible: post.mediaData[0].type == "Photo",
                                     child: Column(
                                       children: [
-                                        CustomPostHeader(
-                                            showPostTime: post.showPostTime,
-                                            name: post.creatorDetails.name,
-                                            isVerified:
-                                                post.creatorDetails.isVerified,
-                                            image: post.creatorDetails.imageUrl,
-                                            headerOnTap: () {
-                                              postCardController
-                                                  .gotoAppUserScreen(
-                                                      post.creatorId);
-                                            }),
-                                        heightBox(10.h),
                                         AspectRatio(
                                           aspectRatio: 2 / 3,
                                           child: ListView.builder(
@@ -552,170 +553,112 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: FutureBuilder(
                                         future: initializedFuturePlay,
                                         builder: (context, snapshot) {
-                                          if (snapshot.hasData) {
-                                            return Visibility(
-                                              child: AspectRatio(
-                                                aspectRatio: 9 / 16,
-                                                child: ListView.builder(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  shrinkWrap: true,
-                                                  itemCount:
-                                                      post.mediaData.length,
-                                                  itemBuilder: (context, i) {
-                                                    // VideoPlayerController?
-                                                    //     videoPlayerController;
+                                          // if (snapshot.connectionState ==
+                                          //     ConnectionState.done) {
+                                          return Visibility(
+                                            child: AspectRatio(
+                                              aspectRatio: 9 / 16,
+                                              child: ListView.builder(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    post.mediaData.length,
+                                                itemBuilder: (context, i) {
+                                                  // VideoPlayerController?
+                                                  //     videoPlayerController;
+                                                  // videoPlayerController =
+                                                  //     VideoPlayerController
+                                                  //         .network(
+                                                  //   post.mediaData.first.type ==
+                                                  //           "Video"
+                                                  //       ? post.mediaData[i].link
+                                                  //           .toString()
+                                                  //       : "",
+                                                  // );
 
-                                                    // videoPlayerController =
-                                                    //     VideoPlayerController
-                                                    //         .network(
-                                                    //   post.mediaData.first
-                                                    //               .type ==
-                                                    //           "Video"
-                                                    //       ? post
-                                                    //           .mediaData[i].link
-                                                    //           .toString()
-                                                    //       : "",
-                                                    // );
-
-                                                    return InkWell(
-                                                      onTap: () => Get.to(() =>
-                                                          PostDetailScreen(
-                                                              postModel: post,
-                                                              postCardController:
-                                                                  postCardController)),
-                                                      onDoubleTap: () {
-                                                        log("ghost mode clicked");
-
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(const SnackBar(
-                                                                backgroundColor:
-                                                                    colorPrimaryA05,
-                                                                content: Text(
-                                                                    'Ghost Mode Enabled!')));
-                                                      },
-                                                      child: AspectRatio(
-                                                        aspectRatio: 9 / 16,
-                                                        child: Stack(
-                                                          children: [
-                                                            VideoPlayerWidget(
-                                                              postId: post.id,
-                                                              // videoPlayerController:
-                                                              //     videoPlayerController,
-                                                              videoUrl: post
-                                                                  .mediaData[i]
-                                                                  .link,
-                                                            ),
-                                                            Positioned(
-                                                              top: 12,
-                                                              left: 0,
-                                                              right: 0,
-                                                              child:
-                                                                  CustomPostHeader(
-                                                                showPostTime: post
-                                                                    .showPostTime,
-                                                                isVerified: post
-                                                                    .creatorDetails
-                                                                    .isVerified,
-                                                                name: post
-                                                                    .creatorDetails
-                                                                    .name,
-                                                                image: post
-                                                                    .creatorDetails
-                                                                    .imageUrl,
-                                                                headerOnTap:
-                                                                    () {
-                                                                  postCardController
-                                                                      .gotoAppUserScreen(
-                                                                          post.creatorId);
-                                                                },
-                                                                isVideoPost:
-                                                                    true,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                  return InkWell(
+                                                    onTap: () => Get.to(() =>
+                                                        PostDetailScreen(
+                                                            postModel: post,
+                                                            postCardController:
+                                                                postCardController)),
+                                                    onDoubleTap: () {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(const SnackBar(
+                                                              backgroundColor:
+                                                                  colorPrimaryA05,
+                                                              content: Text(
+                                                                  'Ghost Mode Enabled!')));
+                                                    },
+                                                    child: AspectRatio(
+                                                      aspectRatio: 9 / 16,
+                                                      child: VideoPlayerWidget(
+                                                        postId: post.id,
+                                                        // videoPlayerController:
+                                                        //     videoPlayerController,
+                                                        videoUrl: post
+                                                            .mediaData[i].link,
                                                       ),
-                                                    );
-                                                  },
-                                                ),
+                                                    ),
+                                                  );
+                                                },
                                               ),
-                                            );
-                                          } else {
-                                            return CircularProgressIndicator();
-                                          }
+                                            ),
+                                          );
+                                          // }
+                                          // else {
+                                          //   return const CircularProgressIndicator();
+                                          // }
                                         }),
                                   ),
                                   Visibility(
                                     visible: post.mediaData[0].type == "Qoute",
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CustomPostHeader(
-                                            showPostTime: post.showPostTime,
-                                            isVerified:
-                                                post.creatorDetails.isVerified,
-                                            name: post.creatorDetails.name,
-                                            image: post.creatorDetails.imageUrl,
-                                            ontap: () {},
-                                            time: timeago.format(
-                                                DateTime.parse(post.createdAt)),
-                                            headerOnTap: () {
-                                              postCardController
-                                                  .gotoAppUserScreen(
-                                                      post.creatorId);
-                                            }),
-                                        SizedBox(
-                                          height: 229,
-                                          child: ListView.builder(
-                                            // shrinkWrap: true,
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: post.mediaData.length,
-                                            itemBuilder: (context, index) =>
-                                                InkWell(
-                                              onTap: () => Get.to(() =>
-                                                  PostDetailScreen(
-                                                      postModel: post,
-                                                      postCardController:
-                                                          postCardController)),
-                                              onDoubleTap: () {
-                                                log("ghost mode clicked");
+                                    child: AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: post.mediaData.length,
+                                        itemBuilder: (context, index) =>
+                                            InkWell(
+                                          onTap: () => Get.to(() =>
+                                              PostDetailScreen(
+                                                  postModel: post,
+                                                  postCardController:
+                                                      postCardController)),
+                                          onDoubleTap: () {
+                                            log("ghost mode clicked");
 
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(const SnackBar(
-                                                        backgroundColor:
-                                                            colorPrimaryA05,
-                                                        content: Text(
-                                                            'Ghost Mode Enabled!')));
-                                              },
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 40,
-                                                  vertical: 50,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    post.mediaData[index].link,
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: color221,
-                                                    ),
-                                                  ),
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                                    backgroundColor:
+                                                        colorPrimaryA05,
+                                                    content: Text(
+                                                        'Ghost Mode Enabled!')));
+                                          },
+                                          child: AspectRatio(
+                                            aspectRatio: 16 / 9,
+                                            child: Container(
+                                              // height: 16,
+                                              padding: const EdgeInsets.all(
+                                                20,
+                                              ),
+                                              child: SingleChildScrollView(
+                                                child: TextWidget(
+                                                  text: post
+                                                      .mediaData[index].link,
+                                                  textAlign: TextAlign.left,
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: color221,
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                   heightBox(10.h),
@@ -830,6 +773,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (snap.hasData) {
                       var data = snap.data!.docs;
                       return ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 110),
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: data.length,
@@ -843,72 +787,66 @@ class _HomeScreenState extends State<HomeScreen> {
                               padding: EdgeInsets.only(bottom: 15.w),
                               child: Column(
                                 children: [
-                                  Visibility(
-                                    visible: post.mediaData[0].type != "Video",
-                                    child: CustomPostHeader(
-                                        showPostTime: post.showPostTime,
-                                        isVerified:
-                                            post.creatorDetails.isVerified,
-                                        time: timeago.format(
-                                            DateTime.parse(post.createdAt)),
-                                        onVertItemClick: () {
-                                          Get.back();
+                                  CustomPostHeader(
+                                      showPostTime: post.showPostTime,
+                                      isVerified:
+                                          post.creatorDetails.isVerified,
+                                      time: convertDateIntoTime(post.createdAt),
+                                      onVertItemClick: () {
+                                        Get.back();
 
-                                          if (post.creatorId ==
-                                              FirebaseAuth
-                                                  .instance.currentUser!.uid) {
-                                            Get.bottomSheet(
-                                              Container(
-                                                decoration: const BoxDecoration(
-                                                    color: Colors.red),
-                                                height: 80,
-                                                child: InkWell(
-                                                  onTap: () async {
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection("posts")
-                                                        .doc(post.id)
-                                                        .delete();
-                                                    Get.back();
-                                                  },
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      TextWidget(
-                                                        text: "Delete Post",
-                                                        fontSize: 15.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.white,
-                                                      )
-                                                    ],
-                                                  ),
+                                        if (post.creatorId ==
+                                            FirebaseAuth
+                                                .instance.currentUser!.uid) {
+                                          Get.bottomSheet(
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.red),
+                                              height: 80,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection("posts")
+                                                      .doc(post.id)
+                                                      .delete();
+                                                  Get.back();
+                                                },
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    TextWidget(
+                                                      text: "Delete Post",
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.white,
+                                                    )
+                                                  ],
                                                 ),
                                               ),
-                                              isScrollControlled: true,
-                                            );
-                                          } else {
-                                            Get.bottomSheet(
-                                              BottomSheetWidget(
-                                                ontapBlock: () {},
-                                              ),
-                                              isScrollControlled: true,
-                                            );
-                                          }
-                                        },
-                                        name: post.creatorDetails.name,
-                                        image: post.creatorDetails.imageUrl,
-                                        ontap: () {},
-                                        headerOnTap: () {
-                                          postCardController.gotoAppUserScreen(
-                                              post.creatorId);
-                                        }),
-                                  ),
+                                            ),
+                                            isScrollControlled: true,
+                                          );
+                                        } else {
+                                          Get.bottomSheet(
+                                            BottomSheetWidget(
+                                              ontapBlock: () {},
+                                            ),
+                                            isScrollControlled: true,
+                                          );
+                                        }
+                                      },
+                                      name: post.creatorDetails.name,
+                                      image: post.creatorDetails.imageUrl,
+                                      ontap: () {},
+                                      headerOnTap: () {
+                                        postCardController
+                                            .gotoAppUserScreen(post.creatorId);
+                                      }),
                                   Visibility(
                                     visible: post.mediaData[0].type == "Photo",
                                     child: Column(
@@ -1000,46 +938,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     },
                                                     child: AspectRatio(
                                                       aspectRatio: 9 / 16,
-                                                      child: Stack(
-                                                        children: [
-                                                          VideoPlayerWidget(
-                                                            postId: post.id,
-                                                            // videoPlayerController:
-                                                            //     videoPlayerController,
-                                                            videoUrl: post
-                                                                .mediaData[i]
-                                                                .link,
-                                                          ),
-                                                          Positioned(
-                                                            top: 12,
-                                                            left: 0,
-                                                            right: 0,
-                                                            child:
-                                                                CustomPostHeader(
-                                                              showPostTime: post
-                                                                  .showPostTime,
-                                                              isVerified: post
-                                                                  .creatorDetails
-                                                                  .isVerified,
-                                                              time: timeago
-                                                                  .format(DateTime
-                                                                      .parse(post
-                                                                          .createdAt)),
-                                                              name: post
-                                                                  .creatorDetails
-                                                                  .name,
-                                                              image: post
-                                                                  .creatorDetails
-                                                                  .imageUrl,
-                                                              headerOnTap: () {
-                                                                postCardController
-                                                                    .gotoAppUserScreen(
-                                                                        post.creatorId);
-                                                              },
-                                                              isVideoPost: true,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                      child: VideoPlayerWidget(
+                                                        postId: post.id,
+                                                        // videoPlayerController:
+                                                        //     videoPlayerController,
+                                                        videoUrl: post
+                                                            .mediaData[i].link,
                                                       ),
                                                     ),
                                                   );
@@ -1059,8 +963,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        SizedBox(
-                                          height: 229,
+                                        AspectRatio(
+                                          aspectRatio: 16 / 9,
                                           child: ListView.builder(
                                             shrinkWrap: true,
                                             scrollDirection: Axis.horizontal,
@@ -1084,23 +988,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         post.id,
                                                         post.creatorId);
                                               },
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 40,
-                                                  vertical: 50,
-                                                ),
-                                                decoration: const BoxDecoration(
-                                                    color: Colors.white),
-                                                child: Center(
-                                                  child: Text(
-                                                    post.mediaData[index].link,
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 16.sp,
+                                              child: AspectRatio(
+                                                aspectRatio: 16 / 9,
+                                                child: Container(
+                                                  // height: 16 / 9,
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  padding: const EdgeInsets.all(
+                                                    20,
+                                                  ),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                          color: Colors.white),
+                                                  child: SingleChildScrollView(
+                                                    child: TextWidget(
+                                                      text: post
+                                                          .mediaData[index]
+                                                          .link,
+                                                      textAlign: TextAlign.left,
+                                                      fontSize: 15.sp,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                       color: color221,
@@ -1663,11 +1570,7 @@ class CustomPostFooter extends StatelessWidget {
                           SvgPicture.asset(icVerifyBadge),
                         widthBox(8.w),
                         Text(
-                          timeago.format(
-                            DateTime.parse(
-                              cmnt.createdAt,
-                            ),
-                          ),
+                          convertDateIntoTime(cmnt.createdAt),
                           style: TextStyle(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w400,

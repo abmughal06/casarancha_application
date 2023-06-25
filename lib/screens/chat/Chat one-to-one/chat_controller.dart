@@ -270,8 +270,8 @@ class ChatController extends GetxController {
         ),
         devRegToken: recieverFCMToken,
         userReqID: appUserId,
-        title: user!.name,
-        msg: "has sent you a $unreadMessages message",
+        title: 'Ghost_${Random().nextInt(10000).toString()}',
+        msg: "has sent you a $unreadMessages message in ghost",
       );
 
       messageController.clear();

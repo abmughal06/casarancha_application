@@ -48,371 +48,359 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
         body: TabBarView(
           children: [
             StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .snapshots(),
-                builder: (context, snap) {
-                  if (snap.hasData) {
-                    log("sdlasda");
-                    var currentUser = UserModel.fromMap(snap.data!.data()!);
-                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: currentUser.followersIds.isNotEmpty
-                          ? FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                whereIn: currentUser.followersIds,
-                              )
-                              .snapshots()
-                          : FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                arrayContains: currentUser.followersIds,
-                              )
-                              .snapshots(),
-                      builder: (context, doc) {
-                        if (doc.hasData) {
-                          return ListView.builder(
-                            itemCount: doc.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              final UserModel appUser = UserModel.fromMap(
-                                  doc.data!.docs[index].data());
-                              print(appUser);
-                              return Card(
-                                elevation: 0.5,
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.sp)),
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 18, vertical: 4),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(15),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              Get.to(
-                                                () => AppUserScreen(
-                                                  appUserController: Get.put(
-                                                    AppUserController(
-                                                      appUserId: appUser.id,
-                                                      currentUserId:
-                                                          currentUser.id,
-                                                    ),
+              stream: FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .snapshots(),
+              builder: (context, snap) {
+                if (snap.hasData) {
+                  log("sdlasda");
+                  var currentUser = UserModel.fromMap(snap.data!.data()!);
+                  return ListView.builder(
+                    itemCount: currentUser.followersIds.length,
+                    itemBuilder: (context, index) {
+                      return StreamBuilder<
+                          DocumentSnapshot<Map<String, dynamic>>>(
+                        stream: currentUser.followersIds.isNotEmpty
+                            ? FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(currentUser.followersIds[index])
+                                .snapshots()
+                            : null,
+                        builder: (context, doc) {
+                          if (doc.hasData) {
+                            final UserModel appUser =
+                                UserModel.fromMap(doc.data!.data()!);
+                            print(appUser);
+                            return Card(
+                              elevation: 0.5,
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.sp)),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 4),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            Get.to(
+                                              () => AppUserScreen(
+                                                appUserController: Get.put(
+                                                  AppUserController(
+                                                    appUserId: appUser.id,
+                                                    currentUserId:
+                                                        currentUser.id,
                                                   ),
                                                 ),
-                                              );
-                                            },
-                                            child: Container(
-                                              height: 50.h,
-                                              width: 50.h,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.amber,
-                                                image: DecorationImage(
-                                                  image:
-                                                      CachedNetworkImageProvider(
-                                                          appUser.imageStr),
-                                                  fit: BoxFit.cover,
-                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50.h,
+                                            width: 50.h,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.amber,
+                                              image: DecorationImage(
+                                                image:
+                                                    CachedNetworkImageProvider(
+                                                        appUser.imageStr),
+                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                           ),
-                                          widthBox(12.w),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              InkWell(
-                                                onTap: () {
-                                                  Get.to(
-                                                    () => AppUserScreen(
-                                                      appUserController:
-                                                          Get.put(
-                                                        AppUserController(
-                                                          appUserId: appUser.id,
-                                                          currentUserId:
-                                                              FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser!
-                                                                  .uid,
-                                                        ),
+                                        ),
+                                        widthBox(12.w),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                Get.to(
+                                                  () => AppUserScreen(
+                                                    appUserController: Get.put(
+                                                      AppUserController(
+                                                        appUserId: appUser.id,
+                                                        currentUserId:
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
                                                       ),
                                                     ),
-                                                  );
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    TextWidget(
-                                                        text: appUser.name,
-                                                        fontSize: 14.sp,
-                                                        color: const Color(
-                                                            0xff212121),
-                                                        fontWeight:
-                                                            FontWeight.w600),
-                                                    widthBox(4.w),
-                                                    if (appUser.isVerified)
-                                                      SvgPicture.asset(
-                                                          icVerifyBadge),
-                                                  ],
-                                                ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  TextWidget(
+                                                      text: appUser.name,
+                                                      fontSize: 14.sp,
+                                                      color: const Color(
+                                                          0xff212121),
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                  widthBox(4.w),
+                                                  if (appUser.isVerified)
+                                                    SvgPicture.asset(
+                                                        icVerifyBadge),
+                                                ],
                                               ),
-                                              heightBox(2.h),
-                                              TextWidget(
-                                                text: appUser.username,
-                                                fontSize: 12.sp,
-                                                color: const Color(0xff5f5f5f),
-                                                fontWeight: FontWeight.w400,
-                                                textOverflow:
-                                                    TextOverflow.visible,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      InkWell(
-                                        onTap: () async {
-                                          await FirebaseFirestore.instance
-                                              .collection("users")
-                                              .doc(appUser.id)
-                                              .update({
-                                            "followersIds":
-                                                FieldValue.arrayRemove(
-                                                    [currentUser.id])
-                                          });
+                                            ),
+                                            heightBox(2.h),
+                                            TextWidget(
+                                              text: appUser.username,
+                                              fontSize: 12.sp,
+                                              color: const Color(0xff5f5f5f),
+                                              fontWeight: FontWeight.w400,
+                                              textOverflow:
+                                                  TextOverflow.visible,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    InkWell(
+                                      onTap: () async {
+                                        await FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(appUser.id)
+                                            .update({
+                                          "followersIds":
+                                              FieldValue.arrayRemove(
+                                                  [currentUser.id])
+                                        });
 
-                                          await FirebaseFirestore.instance
-                                              .collection("users")
-                                              .doc(currentUser.id)
-                                              .update({
-                                            "followersIds":
-                                                FieldValue.arrayRemove(
-                                                    [appUser.id])
-                                          });
-                                        },
-                                        child: TextWidget(
-                                          text: "Remove",
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14.sp,
-                                          color: colorPrimaryA05,
-                                        ),
+                                        await FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(currentUser.id)
+                                            .update({
+                                          "followersIds":
+                                              FieldValue.arrayRemove(
+                                                  [appUser.id])
+                                        });
+                                      },
+                                      child: TextWidget(
+                                        text: "Remove",
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14.sp,
+                                        color: colorPrimaryA05,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          );
-                        } else {
-                          return const SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      },
-                    );
-                  } else if (snap.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: SizedBox(
-                        height: 30.h,
-                        width: 30.h,
-                        child: const CircularProgressIndicator(),
-                      ),
-                    );
-                  } else {
-                    return const Text("hshha");
-                  }
-                }),
+                              ),
+                            );
+                          } else if (doc.data == null) {
+                            return Center(
+                              child: TextWidget(
+                                text: "You don't have any followers right now",
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      );
+                    },
+                  );
+                } else if (snap.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: SizedBox(
+                      height: 30.h,
+                      width: 30.h,
+                      child: const CircularProgressIndicator(),
+                    ),
+                  );
+                } else {
+                  return const Text("You don't have any followers right now");
+                }
+              },
+            ),
             StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .snapshots(),
-                builder: (context, snap) {
-                  if (snap.hasData) {
-                    log("sdlasda");
-                    var currentUser = UserModel.fromMap(snap.data!.data()!);
-                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: currentUser.followingsIds.isNotEmpty
-                          ? FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                whereIn: currentUser.followingsIds,
-                              )
-                              .snapshots()
-                          : FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                arrayContains: currentUser.followingsIds,
-                              )
-                              .snapshots(),
-                      builder: (context, doc) {
-                        if (doc.hasData) {
-                          return ListView.builder(
-                            itemCount: doc.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              final UserModel appUser = UserModel.fromMap(
-                                  doc.data!.docs[index].data());
-                              print(appUser);
-                              return Card(
-                                elevation: 0.5,
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.sp)),
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 18, vertical: 4),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(15),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              Get.to(
-                                                () => AppUserScreen(
-                                                  appUserController: Get.put(
-                                                    AppUserController(
-                                                      appUserId: appUser.id,
-                                                      currentUserId:
-                                                          currentUser.id,
-                                                    ),
+              stream: FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .snapshots(),
+              builder: (context, snap) {
+                if (snap.hasData) {
+                  log("sdlasda");
+                  var currentUser = UserModel.fromMap(snap.data!.data()!);
+                  return ListView.builder(
+                    itemCount: currentUser.followingsIds.length,
+                    itemBuilder: (context, index) {
+                      return StreamBuilder<
+                          DocumentSnapshot<Map<String, dynamic>>>(
+                        stream: currentUser.followingsIds.isNotEmpty
+                            ? FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(currentUser.followingsIds[index])
+                                .snapshots()
+                            : null,
+                        builder: (context, doc) {
+                          if (doc.hasData && doc.data!.exists) {
+                            final UserModel appUser =
+                                UserModel.fromMap(doc.data!.data()!);
+                            print(appUser);
+                            return Card(
+                              elevation: 0.5,
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.sp)),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 4),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            Get.to(
+                                              () => AppUserScreen(
+                                                appUserController: Get.put(
+                                                  AppUserController(
+                                                    appUserId: appUser.id,
+                                                    currentUserId:
+                                                        currentUser.id,
                                                   ),
                                                 ),
-                                              );
-                                            },
-                                            child: Container(
-                                              height: 50.h,
-                                              width: 50.h,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.amber,
-                                                image: DecorationImage(
-                                                  image:
-                                                      CachedNetworkImageProvider(
-                                                          appUser.imageStr),
-                                                  fit: BoxFit.cover,
-                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50.h,
+                                            width: 50.h,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.amber,
+                                              image: DecorationImage(
+                                                image:
+                                                    CachedNetworkImageProvider(
+                                                        appUser.imageStr),
+                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                           ),
-                                          widthBox(12.w),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              InkWell(
-                                                onTap: () {
-                                                  Get.to(
-                                                    () => AppUserScreen(
-                                                      appUserController:
-                                                          Get.put(
-                                                        AppUserController(
-                                                          appUserId: appUser.id,
-                                                          currentUserId:
-                                                              FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser!
-                                                                  .uid,
-                                                        ),
+                                        ),
+                                        widthBox(12.w),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                Get.to(
+                                                  () => AppUserScreen(
+                                                    appUserController: Get.put(
+                                                      AppUserController(
+                                                        appUserId: appUser.id,
+                                                        currentUserId:
+                                                            FirebaseAuth
+                                                                .instance
+                                                                .currentUser!
+                                                                .uid,
                                                       ),
                                                     ),
-                                                  );
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    TextWidget(
-                                                        text: appUser.name,
-                                                        fontSize: 14.sp,
-                                                        color: const Color(
-                                                            0xff212121),
-                                                        fontWeight:
-                                                            FontWeight.w600),
-                                                    widthBox(4.w),
-                                                    if (appUser.isVerified)
-                                                      SvgPicture.asset(
-                                                          icVerifyBadge),
-                                                  ],
-                                                ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  TextWidget(
+                                                      text: appUser.name,
+                                                      fontSize: 14.sp,
+                                                      color: const Color(
+                                                          0xff212121),
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                  widthBox(4.w),
+                                                  if (appUser.isVerified)
+                                                    SvgPicture.asset(
+                                                        icVerifyBadge),
+                                                ],
                                               ),
-                                              heightBox(2.h),
-                                              TextWidget(
-                                                text: appUser.username,
-                                                fontSize: 12.sp,
-                                                color: const Color(0xff5f5f5f),
-                                                fontWeight: FontWeight.w400,
-                                                textOverflow:
-                                                    TextOverflow.visible,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      InkWell(
-                                        onTap: () async {
-                                          await FirebaseFirestore.instance
-                                              .collection("users")
-                                              .doc(FirebaseAuth
-                                                  .instance.currentUser!.uid)
-                                              .update({
-                                            "followingsIds":
-                                                FieldValue.arrayRemove(
-                                                    [appUser.id])
-                                          });
-                                          await FirebaseFirestore.instance
-                                              .collection("users")
-                                              .doc(appUser.id)
-                                              .update({
-                                            "followingsIds":
-                                                FieldValue.arrayRemove(
-                                                    [currentUser.id])
-                                          });
-                                        },
-                                        child: TextWidget(
-                                          text: "Unfollow",
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14.sp,
-                                          color: colorPrimaryA05,
+                                            ),
+                                            heightBox(2.h),
+                                            TextWidget(
+                                              text: appUser.username,
+                                              fontSize: 12.sp,
+                                              color: const Color(0xff5f5f5f),
+                                              fontWeight: FontWeight.w400,
+                                              textOverflow:
+                                                  TextOverflow.visible,
+                                            ),
+                                          ],
                                         ),
+                                      ],
+                                    ),
+                                    InkWell(
+                                      onTap: () async {
+                                        await FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(appUser.id)
+                                            .update({
+                                          "followersIds":
+                                              FieldValue.arrayRemove(
+                                                  [currentUser.id])
+                                        });
+
+                                        await FirebaseFirestore.instance
+                                            .collection("users")
+                                            .doc(currentUser.id)
+                                            .update({
+                                          "followersIds":
+                                              FieldValue.arrayRemove(
+                                                  [appUser.id])
+                                        });
+                                      },
+                                      child: TextWidget(
+                                        text: "Remove",
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14.sp,
+                                        color: colorPrimaryA05,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          );
-                        } else {
-                          return const SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      },
-                    );
-                  } else if (snap.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: SizedBox(
-                        height: 30.h,
-                        width: 30.h,
-                        child: const CircularProgressIndicator(),
-                      ),
-                    );
-                  } else {
-                    return Text("hshha");
-                  }
-                }),
+                              ),
+                            );
+                          } else if (doc.data == null) {
+                            return Center(
+                              child: TextWidget(
+                                text: "You don't have any followings right now",
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      );
+                    },
+                  );
+                } else if (snap.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: SizedBox(
+                      height: 30.h,
+                      width: 30.h,
+                      child: const CircularProgressIndicator(),
+                    ),
+                  );
+                } else {
+                  return const Text("You don't have any followings right now");
+                }
+              },
+            ),
 
             //tab 2 follower
           ],
@@ -455,32 +443,27 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snap) {
                   if (snap.hasData) {
-                    print("sdlasda");
+                    log("sdlasda");
                     var appuser = UserModel.fromMap(snap.data!.data()!);
-                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: appuser.followersIds.isNotEmpty
-                          ? FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                whereIn: appuser.followersIds,
-                              )
-                              .snapshots()
-                          : FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                arrayContains: appuser.followersIds,
-                              )
-                              .snapshots(),
-                      builder: (context, doc) {
-                        if (doc.hasData) {
-                          return ListView.builder(
-                            itemCount: doc.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              final UserModel userModel = UserModel.fromMap(
-                                  doc.data!.docs[index].data());
-                              print(userModel);
+                    log("------------------------ >>>> ${appuser.followersIds.length}");
+                    return ListView.builder(
+                      itemCount: appuser.followersIds.length,
+                      itemBuilder: (context, index) {
+                        return StreamBuilder<
+                            DocumentSnapshot<Map<String, dynamic>>>(
+                          stream: appuser.followersIds.isNotEmpty
+                              ? FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(appuser.followersIds[index])
+                                  .snapshots()
+                              : null,
+                          builder: (context, doc) {
+                            if (doc.hasData &&
+                                doc.data != null &&
+                                doc.data!.exists) {
+                              final UserModel userModel =
+                                  UserModel.fromMap(doc.data!.data()!);
+                              // print(userModel);
                               return Card(
                                 elevation: 0.5,
                                 color: Colors.white,
@@ -637,15 +620,18 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                   ),
                                 ),
                               );
-                            },
-                          );
-                        } else {
-                          return const SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+                            } else if (doc.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox(
+                                height: 30,
+                                width: 30,
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        );
                       },
                     );
                   } else if (snap.connectionState == ConnectionState.waiting) {
@@ -667,32 +653,27 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snap) {
                   if (snap.hasData) {
-                    print("sdlasda");
+                    log("sdlasda");
                     var appuser = UserModel.fromMap(snap.data!.data()!);
-                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: appuser.followingsIds.isNotEmpty
-                          ? FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                whereIn: appuser.followingsIds,
-                              )
-                              .snapshots()
-                          : FirebaseFirestore.instance
-                              .collection('users')
-                              .where(
-                                'id',
-                                arrayContains: appuser.followingsIds,
-                              )
-                              .snapshots(),
-                      builder: (context, doc) {
-                        if (doc.hasData) {
-                          return ListView.builder(
-                            itemCount: doc.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              final UserModel userModel = UserModel.fromMap(
-                                  doc.data!.docs[index].data());
-                              print(userModel);
+                    log("------------------------ >>>> ${appuser.followingsIds.length}");
+                    return ListView.builder(
+                      itemCount: appuser.followingsIds.length,
+                      itemBuilder: (context, index) {
+                        return StreamBuilder<
+                            DocumentSnapshot<Map<String, dynamic>>>(
+                          stream: appuser.followingsIds.isNotEmpty
+                              ? FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(appuser.followingsIds[index])
+                                  .snapshots()
+                              : null,
+                          builder: (context, doc) {
+                            if (doc.hasData &&
+                                doc.data != null &&
+                                doc.data!.exists) {
+                              final UserModel userModel =
+                                  UserModel.fromMap(doc.data!.data()!);
+                              // print(userModel);
                               return Card(
                                 elevation: 0.5,
                                 color: Colors.white,
@@ -798,7 +779,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                               .doc(FirebaseAuth
                                                   .instance.currentUser!.uid)
                                               .update({
-                                            "followingsIds":
+                                            "followersIds":
                                                 FieldValue.arrayRemove(
                                                     [userModel.id])
                                           });
@@ -808,7 +789,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                               .doc(FirebaseAuth
                                                   .instance.currentUser!.uid)
                                               .update({
-                                            "followingsIds":
+                                            "followersIds":
                                                 FieldValue.arrayRemove(
                                                     [userModel.id])
                                           });
@@ -849,15 +830,18 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                   ),
                                 ),
                               );
-                            },
-                          );
-                        } else {
-                          return const SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+                            } else if (doc.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox(
+                                height: 30,
+                                width: 30,
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        );
                       },
                     );
                   } else if (snap.connectionState == ConnectionState.waiting) {

@@ -917,8 +917,9 @@ class _FullScreenVideoState extends State<FullScreenVideo> {
                           await FirebaseFirestore.instance
                               .collection("posts")
                               .doc(widget.postId)
-                              .delete();
-                          Get.back();
+                              .delete()
+                              .then((value) => Get.back())
+                              .whenComplete(() => Get.back());
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -936,7 +937,7 @@ class _FullScreenVideoState extends State<FullScreenVideo> {
                     ),
                     isScrollControlled: true,
                   );
-                  Get.back();
+                  // Get.back();
                 },
                 child: Container(
                   height: 30.h,

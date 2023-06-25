@@ -6,9 +6,7 @@ import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/resources/image_resources.dart';
 
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
-import 'package:casarancha/widgets/PostCard/postCard.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
-import 'package:casarancha/widgets/app_user_tile.dart';
 import 'package:casarancha/widgets/custome_firebase_list_view.dart';
 import 'package:casarancha/widgets/group_tile.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
@@ -130,6 +128,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData && snapshot.data != null) {
                                   return ListView.builder(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 110),
                                       itemCount: snapshot.data!.docs.length,
                                       itemBuilder: (context, index) {
                                         var userSnap = UserModel.fromMap(

@@ -7,6 +7,7 @@ import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
@@ -84,21 +85,26 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                 // UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
                 return ListTile(
                   onTap: () {
-                    Get.to(
-                      () => AppUserScreen(
-                        appUserController: Get.put(
-                          AppUserController(
-                            appUserId: widget.appUserId,
-                            currentUserId:
-                                FirebaseAuth.instance.currentUser!.uid,
-                          ),
-                        ),
-                      ),
+                    // Get.to(
+                    //   () => AppUserScreen(
+                    //     appUserController: Get.put(
+                    //       AppUserController(
+                    //         appUserId: widget.appUserId,
+                    //         currentUserId:
+                    //             FirebaseAuth.instance.currentUser!.uid,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // );
+                    GlobalSnackBar.show(
+                      message: "you can't see sender profile in ghost messages",
                     );
                   },
                   horizontalTitleGap: 10,
                   contentPadding: EdgeInsets.zero,
-                  title: Text(widget.val.toString()),
+                  title: widget.val!.isEmpty
+                      ? TextWidget(text: generateRandomString(7))
+                      : TextWidget(text: widget.val.toString()),
                   subtitle: snapshot.hasData ? const Text('Live') : null,
                   leading: const CircleAvatar(
                     child: Icon(
@@ -312,7 +318,14 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                               widthBox(12.w),
                               GestureDetector(
                                 onTap: () {
-                                  chatController.sentMessageGhost();
+                                  if (chatListController.profileScreenController
+                                      .isGhostModeOn.value) {
+                                    chatController.sentMessageGhost();
+                                  } else {
+                                    GlobalSnackBar.show(
+                                        message:
+                                            "You need to enable ghost mode to send message, you can only receive messages when the ghost mode is disabled");
+                                  }
                                 },
                                 child: Image.asset(
                                   imgSendComment,
@@ -413,11 +426,7 @@ class ChatTile extends StatelessWidget {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      date,
-                    ),
-                  ),
+                  text: convertDateIntoTime(date),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),
@@ -511,11 +520,7 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      widget.date,
-                    ),
-                  ),
+                  text: convertDateIntoTime(widget.date),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),
@@ -610,11 +615,7 @@ class ChatPostTile extends StatelessWidget {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      message.createdAt,
-                    ),
-                  ),
+                  text: convertDateIntoTime(message.createdAt),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),
@@ -729,11 +730,7 @@ class ChatStoryTile extends StatelessWidget {
                       )
                     : Container(),
                 TextWidget(
-                  text: timeago.format(
-                    DateTime.parse(
-                      message.createdAt,
-                    ),
-                  ),
+                  text: convertDateIntoTime(message.createdAt),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),

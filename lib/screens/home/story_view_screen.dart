@@ -4,6 +4,7 @@ import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:story_view/story_view.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import '../../models/message.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/firebase_cloud_messaging.dart';
@@ -190,8 +190,8 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                           userNameClr: colorWhite,
                           userNameFontSize: 12.sp,
                           userNameFontWeight: FontWeight.w600,
-                          subText: timeago.format(DateTime.parse(
-                              storyItems[currentIndex.value].id)),
+                          subText: convertDateIntoTime(
+                              storyItems[currentIndex.value].id),
                           subTxtFontSize: 9.sp,
                           subTxtClr: colorWhite.withOpacity(.5),
                         ),
