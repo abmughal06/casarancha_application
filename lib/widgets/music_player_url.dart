@@ -7,7 +7,7 @@ import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/route_manager.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class MusicPlayerUrl extends StatefulWidget {
   const MusicPlayerUrl(
@@ -50,6 +50,7 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
 
   @override
   void dispose() {
+    audioPlayer.pause();
     audioPlayer.dispose();
     super.dispose();
   }
@@ -71,96 +72,125 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
     audioPlayer.setSourceUrl(widget.musicDetails.link);
   }
 
+  bool isVisible = false;
+
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        await audioPlayer.pause();
-        widget.ontap;
+    return VisibilityDetector(
+      key: Key(widget.musicDetails.link),
+      onVisibilityChanged: (visibilityInfo) {
+        setState(() {
+          isVisible = visibilityInfo.visibleFraction > 0.5;
+          if (isVisible) {
+            audioPlayer.pause();
+            // isPlaying = true;
+            audioPlayer.setVolume(0.0);
+          } else {
+            audioPlayer.pause();
+            // isPlaying = false;
+            audioPlayer.setVolume(0.0);
+          }
+        });
       },
-      child: AspectRatio(
-        aspectRatio: 13 / 9,
-        child: Container(
-          decoration: BoxDecoration(
-            // borderRadius: BorderRadius.circular(
-            //   10.r,
-            // ),
-            image: DecorationImage(
-              image: AssetImage(
-                musicImgUrl,
+      child: InkWell(
+        onTap: () async {
+          await audioPlayer.pause();
+          widget.ontap;
+        },
+        child: AspectRatio(
+          aspectRatio: 13 / 9,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      musicImgUrl,
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  decoration:
+                      BoxDecoration(color: Colors.black.withOpacity(0.3)),
+                ),
               ),
-              fit: BoxFit.cover,
-            ),
-          ),
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: EdgeInsets.all(
-              15.w,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (isPlaying) {
-                      audioPlayer.pause();
-                    } else {
-                      audioPlayer.resume();
-                    }
-                  },
-                  child: SvgPicture.asset(
-                    isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
-                    width: 35,
-                    height: 35,
-                  ),
-                ),
-                widthBox(
-                  5.w,
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SliderTheme(
-                        data: SliderThemeData(
-                          overlayShape: SliderComponentShape.noOverlay,
-                        ),
-                        child: Slider.adaptive(
-                          thumbColor: Colors.yellow,
-                          activeColor: Colors.yellow,
-                          min: 0,
-                          max: duration.inSeconds.toDouble(),
-                          value: position.inSeconds.toDouble(),
-                          onChanged: (value) async {
-                            final position = Duration(seconds: value.toInt());
-                            await audioPlayer.seek(position);
-                          },
-                        ),
+              Positioned(
+                left: 15,
+                right: 15,
+                bottom: 15,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (isPlaying) {
+                          audioPlayer.pause();
+                          audioPlayer.setVolume(0.0);
+                        } else {
+                          audioPlayer.resume();
+                          audioPlayer.setVolume(1.0);
+                        }
+                      },
+                      child: SvgPicture.asset(
+                        isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
+                        width: 35,
+                        height: 35,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              formatTime(
-                                position,
-                              ),
+                    ),
+                    widthBox(
+                      5.w,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          SliderTheme(
+                            data: SliderThemeData(
+                              overlayShape: SliderComponentShape.noOverlay,
                             ),
-                            Text(
-                              formatTime(
-                                duration,
-                              ),
+                            child: Slider.adaptive(
+                              thumbColor: Colors.yellow,
+                              activeColor: Colors.yellow,
+                              min: 0.0,
+                              max: duration.inSeconds.toDouble() + 1.0,
+                              value: position.inSeconds.toDouble() + 1.0,
+                              onChanged: (value) async {
+                                final position =
+                                    Duration(seconds: value.toInt());
+                                await audioPlayer.seek(position);
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  formatTime(
+                                    position,
+                                  ),
+                                ),
+                                Text(
+                                  formatTime(
+                                    duration,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

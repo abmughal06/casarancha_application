@@ -24,7 +24,7 @@ import '../../dashboard/dashboard.dart';
 import '../../home/HomeScreen/home_screen_controller.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../Chat one-to-one/chat_screen.dart';
-import 'package:timeago/timeago.dart' as timeago;
+
 import 'package:intl/intl.dart';
 
 String convertDateIntoTime(String date) {

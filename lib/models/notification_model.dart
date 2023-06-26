@@ -5,7 +5,6 @@ import 'package:casarancha/models/post_creator_details.dart';
 class NotificationModel {
   String? id;
   String? appUserId;
-  String? title;
   CreatorDetails? createdDetails;
   String? msg;
   bool? isRead;
@@ -18,7 +17,6 @@ class NotificationModel {
     this.isRead,
     this.appUserId,
     this.msg,
-    this.title,
     this.imageUrl,
     this.createdAt,
   });
@@ -30,14 +28,11 @@ class NotificationModel {
     dynamic msg,
     String? imageUrl,
     bool? isRead,
-    String? caption,
-    String? title,
     String? createdAt,
   }) {
     return NotificationModel(
       id: id ?? this.id,
       isRead: isRead ?? false,
-      title: title ?? this.title,
       createdDetails: createdDetails ?? this.createdDetails,
       appUserId: appUserId ?? this.appUserId,
       imageUrl: imageUrl ?? this.imageUrl,
@@ -49,7 +44,6 @@ class NotificationModel {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'title': title,
       'isRead': isRead,
       'imageUrl': imageUrl,
       'createdDetails': createdDetails!.toMap(),
@@ -62,7 +56,6 @@ class NotificationModel {
   factory NotificationModel.fromMap(Map<String, dynamic> map) {
     return NotificationModel(
       id: map['id'],
-      title: map['title'],
       isRead: map['isRead'],
       imageUrl: map['imageUrl'],
       createdDetails: CreatorDetails.fromMap(map['createdDetails']),
@@ -79,7 +72,7 @@ class NotificationModel {
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id,imageUrl:$imageUrl, title: $title, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt, isRead: $isRead)';
+    return 'NotificationModel(id: $id,imageUrl:$imageUrl, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt, isRead: $isRead)';
   }
 
   @override
@@ -89,7 +82,6 @@ class NotificationModel {
     return other.id == id &&
         other.isRead == isRead &&
         other.imageUrl == imageUrl &&
-        other.title == title &&
         other.createdDetails == createdDetails &&
         other.appUserId == appUserId &&
         other.msg == msg &&
@@ -102,7 +94,6 @@ class NotificationModel {
         isRead.hashCode ^
         imageUrl.hashCode ^
         createdDetails.hashCode ^
-        title.hashCode ^
         appUserId.hashCode ^
         msg.hashCode ^
         createdAt.hashCode;

@@ -13,7 +13,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../screens/chat/GhostMode/ghost_chat_screen.dart';
 
 class PostCardController extends GetxController {
   PostCardController({required this.postdata});
@@ -58,13 +57,8 @@ class PostCardController extends GetxController {
               .get();
           var recieverFCMToken = recieverRef.data()!['fcmToken'];
           FirebaseMessagingService().sendNotificationToUser(
-            creatorDetails: CreatorDetails(
-                name: postdata.creatorDetails.name,
-                imageUrl: postdata.creatorDetails.imageUrl,
-                isVerified: postdata.creatorDetails.isVerified),
-            title: user!.name,
             devRegToken: recieverFCMToken,
-            userReqID: creatorId,
+            appUserId: creatorId,
             msg: "has liked your post.",
           );
         });

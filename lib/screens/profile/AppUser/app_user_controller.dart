@@ -140,13 +140,8 @@ class AppUserController extends GetxController {
             );
         isFollowing.value = true;
         FirebaseMessagingService().sendNotificationToUser(
-          userReqID: appUserData.value.id,
+          appUserId: appUserRef.id,
           devRegToken: appUserData.value.fcmToken,
-          title: user!.name,
-          creatorDetails: CreatorDetails(
-              name: user!.name,
-              imageUrl: user!.imageStr,
-              isVerified: user!.isVerified),
           msg: "has started following you",
         );
       }

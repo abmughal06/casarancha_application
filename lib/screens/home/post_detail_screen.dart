@@ -4,7 +4,7 @@ import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
-import 'package:chewie/chewie.dart';
+import 'package:casarancha/widgets/music_player_url.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +23,9 @@ import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../../widgets/clip_pad_shadow.dart';
 import '../../widgets/text_widget.dart';
+import '../../widgets/video_player_Url.dart';
 import '../chat/GhostMode/ghost_chat_screen.dart';
 import '../chat/share_post_screen.dart';
-
-import 'package:timeago/timeago.dart' as timeago;
 
 import '../profile/AppUser/app_user_controller.dart';
 import '../profile/AppUser/app_user_screen.dart';
@@ -89,7 +88,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   ? 2 / 3
                                   : post.mediaData[0].type == 'Video'
                                       ? 9 / 16
-                                      : 1 / 1,
+                                      : post.mediaData[0].type == 'Music'
+                                          ? 13 / 9
+                                          : 1 / 1,
                               child: Stack(
                                 children: [
                                   ListView.builder(
@@ -134,41 +135,34 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       } else if (mediaData.type == 'Video') {
                                         print("============ ${mediaData.link}");
                                         return FutureBuilder(
-                                            future: iniializedFuturePlay,
-                                            builder: (context, snap) {
-                                              videoPlayerController =
-                                                  VideoPlayerController.network(
-                                                      mediaData.link);
-                                              // videoPlayerController
-                                              //     .initialize();
-                                              print(mediaData.link);
-                                              // videoPlayerController!.play();
-                                              var chweieController =
-                                                  ChewieController(
-                                                videoPlayerController:
-                                                    videoPlayerController!,
+                                          future: iniializedFuturePlay,
+                                          builder: (context, snap) {
+                                            return InkWell(
+                                              onLongPress: () {
+                                                videoPlayerController!.pause();
+                                              },
+                                              onTap: () {
+                                                videoPlayerController!.play();
+                                              },
+                                              child: AspectRatio(
                                                 aspectRatio: 9 / 16,
-                                                looping: true,
-                                                autoPlay: true,
-                                                zoomAndPan: true,
-                                              );
-
-                                              return InkWell(
-                                                onLongPress: () {
-                                                  videoPlayerController!
-                                                      .pause();
-                                                },
-                                                onTap: () {
-                                                  videoPlayerController!.play();
-                                                },
-                                                child: AspectRatio(
-                                                    aspectRatio: 2 / 3,
-                                                    child: Chewie(
-                                                      controller:
-                                                          chweieController,
-                                                    )),
-                                              );
-                                            });
+                                                child: VideoPlayerWidget(
+                                                  videoUrl: mediaData.link,
+                                                  postId: widget.postModel.id,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      } else if (mediaData.type == 'Music') {
+                                        print("============ ${mediaData.link}");
+                                        return AspectRatio(
+                                          aspectRatio: 13 / 9,
+                                          child: MusicPlayerUrl(
+                                            musicDetails: mediaData,
+                                            ontap: () {},
+                                          ),
+                                        );
                                       } else {
                                         return Container(
                                           width:
@@ -717,19 +711,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       "=========> reciever fcm token = $recieverFCMToken");
                                   FirebaseMessagingService()
                                       .sendNotificationToUser(
+                                    appUserId: recieverRef.id,
                                     imageUrl:
                                         widget.postModel.mediaData[0].type ==
                                                 'Photo'
                                             ? widget.postModel.mediaData[0].link
                                             : '',
-                                    creatorDetails: CreatorDetails(
-                                        name: cmnt.creatorDetails.name,
-                                        imageUrl: cmnt.creatorDetails.imageUrl,
-                                        isVerified:
-                                            cmnt.creatorDetails.isVerified),
                                     devRegToken: recieverFCMToken,
-                                    userReqID: widget.postModel.creatorId,
-                                    title: user!.name,
                                     msg: "has commented on your post.",
                                   );
                                 });

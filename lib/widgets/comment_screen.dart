@@ -1,15 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_creator_details.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_screen.dart';
-import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
-import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
-import 'package:casarancha/widgets/text_editing_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 import '../models/comment_model.dart';
 import '../resources/color_resources.dart';
@@ -103,10 +99,8 @@ class CommentScreen extends StatelessWidget {
                               trailing: Padding(
                                 padding: const EdgeInsets.only(left: 12),
                                 child: Text(
-                                  timeago.format(
-                                    DateTime.parse(
-                                      cmnt.createdAt,
-                                    ),
+                                  convertDateIntoTime(
+                                    cmnt.createdAt,
                                   ),
                                   style: TextStyle(
                                       fontSize: 11.sp, color: Colors.black45),
@@ -295,14 +289,8 @@ class CommentScreen extends StatelessWidget {
                                     "=========>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> reciever fcm token = $recieverFCMToken");
                                 await FirebaseMessagingService()
                                     .sendNotificationToUser(
-                                  creatorDetails: CreatorDetails(
-                                      name: cmnt.creatorDetails.name,
-                                      imageUrl: cmnt.creatorDetails.imageUrl,
-                                      isVerified:
-                                          cmnt.creatorDetails.isVerified),
+                                  appUserId: recieverRef.id,
                                   devRegToken: recieverFCMToken,
-                                  userReqID: creatorId,
-                                  title: user!.name,
                                   msg: "has commented on your post.",
                                 );
                               });

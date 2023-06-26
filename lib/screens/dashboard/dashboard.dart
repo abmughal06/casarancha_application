@@ -157,37 +157,103 @@ class _DashBoardState extends State<DashBoard>
                             stream: FirebaseFirestore.instance
                                 .collection("users")
                                 .doc(FirebaseAuth.instance.currentUser!.uid)
-                                .collection(
-                                    profileScreenController.isGhostModeOn.value
-                                        ? "ghostMessageList"
-                                        : "messageList")
+                                .collection("ghostMessageList")
                                 .orderBy("createdAt", descending: true)
                                 .snapshots(),
-                            builder: (context, doc) {
-                              if (doc.hasData) {
-                                int messageCount = 0;
+                            builder: (context, ghost) {
+                              if (ghost.hasData) {
+                                int messageCount1 = 0;
                                 for (int i = 0;
-                                    i < doc.data!.docs.length;
+                                    i < ghost.data!.docs.length;
                                     i++) {
-                                  messageCount += int.parse(doc.data!.docs[i]
+                                  messageCount1 += int.parse(ghost.data!.docs[i]
                                       .data()['unreadMessageCount']
                                       .toString());
                                 }
-                                return Badge(
-                                  label: Text(messageCount.toString()),
-                                  isLabelVisible: messageCount != 0,
-                                  child: SvgPicture.asset(
-                                    dashboardController.currentIndex.value == 3
-                                        ? icBottomSelChat
-                                        : icBottomDeSelChat,
-                                  ),
-                                );
+                                return StreamBuilder<QuerySnapshot<Map>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection("users")
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .collection("messageList")
+                                        .orderBy("createdAt", descending: true)
+                                        .snapshots(),
+                                    builder: (context, doc) {
+                                      if (doc.hasData) {
+                                        int messageCount = 0;
+                                        for (int i = 0;
+                                            i < doc.data!.docs.length;
+                                            i++) {
+                                          messageCount += int.parse(doc
+                                              .data!.docs[i]
+                                              .data()['unreadMessageCount']
+                                              .toString());
+                                        }
+                                        var count =
+                                            messageCount + messageCount1;
+                                        return Badge(
+                                          label: Text(count.toString()),
+                                          isLabelVisible: count != 0,
+                                          child: SvgPicture.asset(
+                                            dashboardController
+                                                        .currentIndex.value ==
+                                                    3
+                                                ? icBottomSelChat
+                                                : icBottomDeSelChat,
+                                          ),
+                                        );
+                                      } else {
+                                        return SvgPicture.asset(
+                                          dashboardController
+                                                      .currentIndex.value ==
+                                                  3
+                                              ? icBottomSelChat
+                                              : icBottomDeSelChat,
+                                        );
+                                      }
+                                    });
                               } else {
-                                return SvgPicture.asset(
-                                  dashboardController.currentIndex.value == 3
-                                      ? icBottomSelChat
-                                      : icBottomDeSelChat,
-                                );
+                                return StreamBuilder<QuerySnapshot<Map>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection("users")
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .collection("messageList")
+                                        .orderBy("createdAt", descending: true)
+                                        .snapshots(),
+                                    builder: (context, doc) {
+                                      if (doc.hasData) {
+                                        int messageCount = 0;
+                                        for (int i = 0;
+                                            i < doc.data!.docs.length;
+                                            i++) {
+                                          messageCount += int.parse(doc
+                                              .data!.docs[i]
+                                              .data()['unreadMessageCount']
+                                              .toString());
+                                        }
+                                        var count = messageCount;
+                                        return Badge(
+                                          label: Text(count.toString()),
+                                          isLabelVisible: count != 0,
+                                          child: SvgPicture.asset(
+                                            dashboardController
+                                                        .currentIndex.value ==
+                                                    3
+                                                ? icBottomSelChat
+                                                : icBottomDeSelChat,
+                                          ),
+                                        );
+                                      } else {
+                                        return SvgPicture.asset(
+                                          dashboardController
+                                                      .currentIndex.value ==
+                                                  3
+                                              ? icBottomSelChat
+                                              : icBottomDeSelChat,
+                                        );
+                                      }
+                                    });
                               }
                             }),
                       ),

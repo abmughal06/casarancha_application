@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/localization_text_strings.dart';
 
-import '../../utils/app_constants.dart';
 import '../../utils/snackbar.dart';
 
 import '../../widgets/common_button.dart';

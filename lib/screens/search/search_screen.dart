@@ -232,17 +232,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                                       .contains(userSnap.id)) {
                                                     FirebaseMessagingService()
                                                         .sendNotificationToUser(
-                                                      userReqID: userSnap.id,
+                                                      appUserId: userSnap.id,
                                                       devRegToken:
                                                           userSnap.fcmToken,
-                                                      title: user!.name,
-                                                      creatorDetails:
-                                                          CreatorDetails(
-                                                              name: user!.name,
-                                                              imageUrl: user!
-                                                                  .imageStr,
-                                                              isVerified: user!
-                                                                  .isVerified),
                                                       msg:
                                                           "has started following you",
                                                     );

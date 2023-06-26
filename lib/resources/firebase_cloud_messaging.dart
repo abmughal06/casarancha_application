@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_creator_details.dart';
+import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/profile/ProfileScreen/profile_screen_controller.dart';
 
@@ -14,25 +19,44 @@ class FirebaseMessagingService {
   ProfileScreenController? profileScreenController;
   FirebaseMessaging fcmMessage = FirebaseMessaging.instance;
 
+  Future<UserModel> getCurrentUserDetails() async {
+    var ref = FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+    var getData = await ref.get();
+    var data = getData.data();
+    var model = UserModel.fromMap(data!);
+    return model;
+  }
+
+  Future<bool> ghostModeOn() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getBool('isGhostEnable') ?? false;
+  }
+
   sendNotificationToUser(
       {String? devRegToken,
-      String? userReqID,
-      String? title,
       String? imageUrl,
-      CreatorDetails? creatorDetails,
-      String? msg}) async {
+      String? msg,
+      required String appUserId}) async {
     Map<String, String> header = {
       "Content-Type": "application/json",
       "Authorization": serverKey,
     };
 
-    Map bodyNotification = {"title": title, "body": msg};
+    var model = await getCurrentUserDetails();
+    var ghostmode = await ghostModeOn();
+
+    Map bodyNotification = {
+      "title": ghostmode ? "Ghost----${generateRandomString(7)}" : model.name,
+      "body": msg
+    };
 
     Map dataMap = {
       "click_action": "FLUTTER_NOTIFICATION_CLICK",
       "id": "1",
       "status": "done",
-      "userRequestId": userReqID,
+      "userRequestId": appUserId,
     };
 
     Map officialBodyFormat = {
@@ -49,25 +73,25 @@ class FirebaseMessagingService {
     );
 
     final NotificationModel notification = NotificationModel(
-      id: userReqID,
+      id: appUserId,
+      appUserId: FirebaseAuth.instance.currentUser!.uid,
       msg: msg,
       imageUrl: imageUrl != null
           ? imageUrl.isNotEmpty
               ? imageUrl
               : ''
           : '',
-      title: title,
       isRead: false,
       createdDetails: CreatorDetails(
-          name: creatorDetails!.name,
-          imageUrl: creatorDetails.imageUrl,
-          isVerified: creatorDetails.isVerified),
+          name: ghostmode ? "Ghost----${generateRandomString(7)}" : model.name,
+          imageUrl: ghostmode ? "" : model.imageStr,
+          isVerified: model.isVerified),
       createdAt: DateTime.now().toIso8601String(),
     );
-    print("===============>>>>>>>>$notification");
+    log("===============>>>>>>>>$notification");
     FirebaseFirestore.instance
         .collection("users")
-        .doc(userReqID)
+        .doc(appUserId)
         .collection("notificationlist")
         .doc()
         .set(notification.toMap());

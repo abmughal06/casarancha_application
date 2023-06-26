@@ -199,11 +199,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                               ),
                             );
                           } else if (doc.data == null) {
-                            return Center(
-                              child: TextWidget(
-                                text: "You don't have any followers right now",
-                              ),
-                            );
+                            return Container();
                           } else {
                             return Container();
                           }

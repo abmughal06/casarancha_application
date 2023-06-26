@@ -5,14 +5,12 @@ import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
-import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,8 +24,6 @@ import '../../../resources/strings.dart';
 import '../../../widgets/clip_pad_shadow.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/text_widget.dart';
-import '../../profile/AppUser/app_user_controller.dart';
-import '../../profile/AppUser/app_user_screen.dart';
 import '../../profile/ProfileScreen/profile_screen_controller.dart';
 import '../ChatList/chat_list_controller.dart';
 
@@ -51,7 +47,6 @@ class GhostChatScreen2 extends StatefulWidget {
 }
 
 class _GhostChatScreen2State extends State<GhostChatScreen2> {
-  @override
   @override
   Widget build(BuildContext context) {
     final ChatController chatController = Get.put(

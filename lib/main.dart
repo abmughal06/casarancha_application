@@ -1,13 +1,9 @@
-import 'package:casarancha/resources/firebase_cloud_messaging.dart';
-import 'package:casarancha/resources/local_notification_service.dart';
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
-import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

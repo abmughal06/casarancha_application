@@ -11,8 +11,8 @@ import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/PostCard/PostCardController.dart';
+import 'package:casarancha/widgets/music_player_url.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -282,6 +282,27 @@ class _ChatScreenState extends State<ChatScreen> {
                               isMe: isMe,
                               date: message.createdAt,
                               videoPlayerController: videoPlayerController,
+                            ),
+                          );
+                        } else if (message.type == "Music") {
+                          final prePost = doc.data!.docs[index].data();
+                          print(prePost);
+                          final postModel =
+                              PostModel.fromMap(prePost['content']);
+                          print(postModel);
+
+                          return InkWell(
+                            onTap: () => Get.to(() => PostDetailScreen(
+                                postModel: postModel,
+                                postCardController:
+                                    PostCardController(postdata: postModel))),
+                            child: ChatMusicTile(
+                              aspectRatio: 13 / 9,
+                              appUserId: widget.appUserId,
+                              isSeen: message.isSeen,
+                              isMe: isMe,
+                              date: message.createdAt,
+                              media: postModel.mediaData[0],
                             ),
                           );
                         } else if (message.type == "story-Video") {
@@ -562,6 +583,86 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                     : Container(),
                 TextWidget(
                   text: convertDateIntoTime(widget.date),
+                  color: colorAA3,
+                  fontSize: 11.sp,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ChatMusicTile extends StatelessWidget {
+  const ChatMusicTile({
+    Key? key,
+    required this.appUserId,
+    required this.isMe,
+    required this.isSeen,
+    required this.date,
+    required this.media,
+    required this.aspectRatio,
+  }) : super(key: key);
+
+  final bool isMe;
+  final bool isSeen;
+  final String appUserId;
+  final String date;
+  final MediaDetails media;
+  final double aspectRatio;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: isMe ? 70 : 0, right: isMe ? 0 : 70),
+            child: Align(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              child: AspectRatio(
+                aspectRatio: aspectRatio,
+                child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16.r),
+                          topRight: Radius.circular(16.r),
+                          bottomLeft: Radius.circular(
+                            isMe ? 16.r : 0,
+                          ),
+                          bottomRight: Radius.circular(
+                            isMe ? 0 : 16.r,
+                          )),
+                      color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                    child: MusicPlayerUrl(
+                      musicDetails: media,
+                      ontap: () {},
+                    )),
+              ),
+            ),
+          ),
+          Align(
+            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                isMe
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 3.w),
+                        child: isSeen ? SvgPicture.asset(icChatMsgSend) : null,
+                      )
+                    : Container(),
+                TextWidget(
+                  text: convertDateIntoTime(date),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),

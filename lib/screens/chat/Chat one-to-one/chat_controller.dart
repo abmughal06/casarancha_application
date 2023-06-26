@@ -158,14 +158,8 @@ class ChatController extends GetxController {
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       print("=========> reciever fcm token = $recieverFCMToken");
       FirebaseMessagingService().sendNotificationToUser(
-        creatorDetails: CreatorDetails(
-          name: profileScreenController.user.value.name,
-          imageUrl: profileScreenController.user.value.imageStr,
-          isVerified: profileScreenController.user.value.isVerified,
-        ),
+        appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
-        userReqID: appUserId,
-        title: user!.name,
         msg: "has sent you a $unreadMessages message",
       );
 
@@ -263,14 +257,8 @@ class ChatController extends GetxController {
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       print("=========> reciever fcm token = $recieverFCMToken");
       FirebaseMessagingService().sendNotificationToUser(
-        creatorDetails: CreatorDetails(
-          name: 'Ghost_${Random().nextInt(10000).toString()}',
-          imageUrl: '',
-          isVerified: false,
-        ),
+        appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
-        userReqID: appUserId,
-        title: 'Ghost_${Random().nextInt(10000).toString()}',
         msg: "has sent you a $unreadMessages message in ghost",
       );
 
