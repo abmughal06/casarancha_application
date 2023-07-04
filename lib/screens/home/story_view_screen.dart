@@ -181,8 +181,6 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                       child: Obx(
                         () => profileImgName(
                           imgUserNet: widget.story.creatorDetails.imageUrl,
-                          isVerifyWithIc:
-                              widget.story.creatorDetails.isVerified,
                           isVerifyWithName: false,
                           idIsVerified: widget.story.creatorDetails.isVerified,
                           dpRadius: 17.r,

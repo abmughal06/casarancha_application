@@ -529,7 +529,6 @@ Widget profileImgName({
   bool? needDot,
   GestureTapCallback? onTapOtherProfile,
   required String? imgUserNet,
-  required bool isVerifyWithIc,
   required bool isVerifyWithName,
   required bool idIsVerified,
 }) {
@@ -542,7 +541,7 @@ Widget profileImgName({
       children: [
         imgProVerified(
             profileImg: imgUserNet,
-            idIsVerified: idIsVerified && isVerifyWithIc,
+            idIsVerified: idIsVerified,
             imgRadius: dpRadius ?? 20.r,
             positionBottom: positionBottom,
             positionRight: positionRight),

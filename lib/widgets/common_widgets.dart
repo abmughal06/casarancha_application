@@ -240,7 +240,6 @@ Widget profileAcceptDecline(
                   onTapOtherProfile: onTapOtherProfile,
                   imgUserNet: imgUserNet,
                   isVerifyWithName: true,
-                  isVerifyWithIc: false,
                   idIsVerified: true,
                   userName: userName,
                   userNameFontWeight: FontWeight.w600,

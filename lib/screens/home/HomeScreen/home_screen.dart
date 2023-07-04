@@ -501,22 +501,73 @@ class _HomeScreenState extends State<HomeScreen> {
                           log("creator id==================");
                           log(postCardController.postdata.creatorId);
                           if (post.mediaData.isNotEmpty) {
-                            if (followingIds.contains(
+                            var postsIds = followerIds +
+                                [FirebaseAuth.instance.currentUser!.uid];
+                            if (postsIds.contains(
                                 postCardController.postdata.creatorId)) {
                               return Padding(
                                 padding: EdgeInsets.only(bottom: 15.w),
                                 child: Column(
                                   children: [
                                     CustomPostHeader(
-                                        showPostTime: post.showPostTime,
-                                        name: post.creatorDetails.name,
-                                        isVerified:
-                                            post.creatorDetails.isVerified,
-                                        image: post.creatorDetails.imageUrl,
-                                        headerOnTap: () {
-                                          postCardController.gotoAppUserScreen(
-                                              post.creatorId);
-                                        }),
+                                      showPostTime: post.showPostTime,
+                                      name: post.creatorDetails.name,
+                                      onVertItemClick: () {
+                                        Get.back();
+
+                                        if (post.creatorId ==
+                                            FirebaseAuth
+                                                .instance.currentUser!.uid) {
+                                          Get.bottomSheet(
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  color: Colors.red),
+                                              height: 80,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection("posts")
+                                                      .doc(post.id)
+                                                      .delete();
+                                                  Get.back();
+                                                },
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    TextWidget(
+                                                      text: "Delete Post",
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.white,
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            isScrollControlled: true,
+                                          );
+                                        } else {
+                                          Get.bottomSheet(
+                                            BottomSheetWidget(
+                                              ontapBlock: () {},
+                                            ),
+                                            isScrollControlled: true,
+                                          );
+                                        }
+                                      },
+                                      isVerified:
+                                          post.creatorDetails.isVerified,
+                                      image: post.creatorDetails.imageUrl,
+                                      headerOnTap: () {
+                                        postCardController
+                                            .gotoAppUserScreen(post.creatorId);
+                                      },
+                                    ),
                                     Visibility(
                                       visible:
                                           post.mediaData[0].type == "Photo",

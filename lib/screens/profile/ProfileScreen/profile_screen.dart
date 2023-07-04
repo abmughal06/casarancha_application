@@ -483,6 +483,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Expanded(
                   child: TabBarView(
                     children: [
+                      //qoute
                       StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection("posts")
@@ -575,6 +576,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           }
                         },
                       ),
+                      //photo
                       StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection("posts")
@@ -637,54 +639,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           }
                         },
                       ),
-                      // Obx(
-                      //   () => GridView.builder(
-                      //     gridDelegate:
-                      //         const SliverGridDelegateWithFixedCrossAxisCount(
-                      //       crossAxisCount: 3,
-                      //     ),
-                      //     itemCount:
-                      //         profileScreenController.getUserImages.length,
-                      //     itemBuilder: (context, index) {
-                      //       final String imageUrl = profileScreenController
-                      //           .getUserImages[index]['link'];
-                      //       return GestureDetector(
-                      //         onTap: () => Get.to(
-                      //           () => Card(
-                      //             elevation: 0,
-                      //             margin: EdgeInsets.zero,
-                      //             color: Colors.transparent,
-                      //             child: Stack(
-                      //               children: [
-                      //                 FullImageView(
-                      //                   url: imageUrl,
-                      //                 ),
-                      //                 Positioned(
-                      //                   top: 20,
-                      //                   right: 15,
-                      //                   child: menuButton(
-                      //                       context,
-                      //                       profileScreenController
-                      //                           .getUserImages[index]['post'],
-                      //                       margin: const EdgeInsets.symmetric(
-                      //                           vertical: 10, horizontal: 17),
-                      //                       profileScreenController:
-                      //                           profileScreenController),
-                      //                 )
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         child: FadeInImage(
-                      //           image: NetworkImage(imageUrl),
-                      //           fit: BoxFit.cover,
-                      //           placeholder:
-                      //               const AssetImage(imgImagePlaceHolder),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
+                      //video
                       StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection("posts")
@@ -756,89 +711,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           }
                         },
                       ),
-                      // Obx(
-                      //   () => GridView.builder(
-                      //     gridDelegate:
-                      //         const SliverGridDelegateWithFixedCrossAxisCount(
-                      //       crossAxisCount: 3,
-                      //     ),
-                      //     itemCount:
-                      //         profileScreenController.getUserVideos.length,
-                      //     itemBuilder: (context, index) {
-                      //       final String videoUrl = profileScreenController
-                      //           .getUserVideos[index]['link'];
-                      //       VideoPlayerController videoPlayerController =
-                      //           VideoPlayerController.network(videoUrl);
-                      //       return GestureDetector(
-                      //         onTap: () => Get.to(
-                      //           () => Card(
-                      //             elevation: 0,
-                      //             margin: EdgeInsets.zero,
-                      //             color: Colors.transparent,
-                      //             child: Stack(
-                      //               children: [
-                      //                 Center(
-                      //                   child: AspectRatio(
-                      //                     aspectRatio: videoPlayerController
-                      //                         .value.aspectRatio,
-                      //                     child: SizedBox(
-                      //                       height: 360.w,
-                      //                       child: VideoPlayerWidget(
-                      //                         videoUrl: videoUrl,
-                      //                         videoPlayerController:
-                      //                             videoPlayerController,
-                      //                       ),
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //                 Positioned(
-                      //                   top: 20,
-                      //                   right: 15,
-                      //                   child: menuButton(
-                      //                       context,
-                      //                       profileScreenController
-                      //                           .getUserVideos[index]['post'],
-                      //                       margin: const EdgeInsets.symmetric(
-                      //                           vertical: 10, horizontal: 17),
-                      //                       profileScreenController:
-                      //                           profileScreenController),
-                      //                 )
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         child: const Center(
-                      //           child: Icon(
-                      //             Icons.video_file_rounded,
-                      //             size: 48,
-                      //           ),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
-                      GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                        ),
-                        itemCount: profileScreenController.userStories.length,
-                        itemBuilder: (context, index) {
-                          final Story story =
-                              profileScreenController.userStories[index];
-                          return GestureDetector(
-                            onTap: () => Get.to(
-                              () => StoryViewScreen(
-                                story: story,
-                              ),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.perm_media_rounded,
-                                size: 48,
-                              ),
-                            ),
-                          );
+                      //story
+                      StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection("stories")
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          log("======================== daldjalsdjlsdasl  ${snapshot.data}");
+                          if (snapshot.hasData && snapshot.data != null) {
+                            if (snapshot.data!.data() == null) {
+                              return Center(
+                                child: TextWidget(
+                                  text: "No Stories are available to show",
+                                ),
+                              );
+                            } else {
+                              log("==================== snapshot has data");
+                              // var listofData = snapshot.data!.docs;
+                              // log(snapshot.data!.data());
+                              dynamic map;
+                              Story? story;
+
+                              // var data = snapshot.data!.data();
+                              // if (snapshot.data!.docs.isNotEmpty) {
+
+                              map = snapshot.data!.data();
+                              story = Story.fromMap(map);
+
+                              DateTime? givenDate;
+                              for (int i = 0;
+                                  i < story.mediaDetailsList.length;
+                                  i++) {
+                                givenDate = DateTime.parse(
+                                    story.mediaDetailsList[i].id);
+                              }
+
+                              DateTime twentyFourHoursAgo = DateTime.now()
+                                  .subtract(const Duration(hours: 24));
+                              log(" ========== $twentyFourHoursAgo");
+
+                              if (story.mediaDetailsList.isNotEmpty) {
+                                return Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        givenDate!.isAfter(twentyFourHoursAgo)
+                                            ? GridView.builder(
+                                                gridDelegate:
+                                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 3,
+                                                ),
+                                                itemCount:
+                                                    profileScreenController
+                                                        .userStories.length,
+                                                itemBuilder: (context, index) {
+                                                  final Story story =
+                                                      profileScreenController
+                                                          .userStories[index];
+                                                  return GestureDetector(
+                                                    onTap: () => Get.to(
+                                                      () => StoryViewScreen(
+                                                        story: story,
+                                                      ),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons
+                                                            .perm_media_rounded,
+                                                        size: 48,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              )
+                                            : Center(
+                                                child: TextWidget(
+                                                  text:
+                                                      "No Stories are available to show",
+                                                ),
+                                              ),
+                                        givenDate.isAfter(twentyFourHoursAgo)
+                                            ? GridView.builder(
+                                                gridDelegate:
+                                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 3,
+                                                ),
+                                                itemCount:
+                                                    profileScreenController
+                                                        .userStories.length,
+                                                itemBuilder: (context, index) {
+                                                  final Story story =
+                                                      profileScreenController
+                                                          .userStories[index];
+                                                  return GestureDetector(
+                                                    onTap: () => Get.to(
+                                                      () => StoryViewScreen(
+                                                        story: story,
+                                                      ),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons
+                                                            .perm_media_rounded,
+                                                        size: 48,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              )
+                                            : Container(),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return Center(
+                                  child: TextWidget(
+                                    text: "No Stories are available to show",
+                                  ),
+                                );
+                              }
+                            }
+                          } else if (snapshot.hasError) {
+                            return const Text("Here");
+                          } else if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else {
+                            return TextWidget(
+                              text: "No Stories are available to show",
+                            );
+                            // return  Text('Story');
+                          }
                         },
                       ),
                     ],
