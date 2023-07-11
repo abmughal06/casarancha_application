@@ -1,6 +1,5 @@
-import 'dart:math';
+// ignore_for_file: file_names
 
-import 'package:casarancha/models/media_details.dart';
 import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,14 +60,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           "videoViews":
               FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
         });
-        log(00000000000000);
       }
     } else {
       postRef.update({
         "videoViews":
             FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
       });
-      log(00000000000000);
     }
   }
 
@@ -84,18 +81,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     return VisibilityDetector(
       key: Key(widget.videoUrl),
       onVisibilityChanged: (visibilityInfo) {
-        setState(() {
-          isVisible = visibilityInfo.visibleFraction > 0.5;
-          if (isVisible) {
-            videoPlayerController.play();
-            // isPlaying = true;
-            videoPlayerController.setVolume(1.0);
-          } else {
-            videoPlayerController.pause();
-            // isPlaying = false;
-            videoPlayerController.setVolume(0.0);
-          }
-        });
+        isVisible = visibilityInfo.visibleFraction > 0.5;
+        if (isVisible) {
+          videoPlayerController.play();
+          // isPlaying = true;
+          videoPlayerController.setVolume(1.0);
+        } else {
+          videoPlayerController.pause();
+          // isPlaying = false;
+          videoPlayerController.setVolume(0.0);
+        }
       },
       child: Chewie(controller: chewieController),
     );

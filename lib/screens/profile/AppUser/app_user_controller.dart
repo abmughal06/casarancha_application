@@ -135,9 +135,9 @@ class AppUserController extends GetxController {
           },
         );
         appUserData.value.followersIds.add(currentUserId);
-        Get.find<ProfileScreenController>().user.value.followingsIds.add(
-              appUserId,
-            );
+        // Get.find<ProfileScreenController>().user.value.followingsIds.add(
+        //       appUserId,
+        //     );
         isFollowing.value = true;
         FirebaseMessagingService().sendNotificationToUser(
           appUserId: appUserRef.id,

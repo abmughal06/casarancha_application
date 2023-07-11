@@ -41,13 +41,13 @@ class GroupTile extends StatelessWidget {
       shape: cardShape,
       child: ListTile(
         shape: cardShape,
-        onTap: () {
-          Get.to(
-            () => GroupPostScreen(
-              group: group,
-            ),
-          );
-        },
+        // onTap: () {
+        //   Get.to(
+        //     () => GroupPostScreen(
+        //       group: group,
+        //     ),
+        //   );
+        // },
         title: TextWidget(
           text: group.name,
           color: color221,

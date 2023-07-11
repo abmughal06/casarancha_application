@@ -16,7 +16,7 @@ var serverKey =
     "key=AAAAYo5xlRE:APA91bHxh2fiJpTazsOCH0k_iqbz9e-Ccg9EaQsXyJna163xViTcwevm04LvlIv7DUBWIboSvKFFsCQdJ9YQUEZHJVxM25zXaO9dash0eGp9dUGeBJu3-va9-zQ0S6LikRBskcdK5HDq";
 
 class FirebaseMessagingService {
-  ProfileScreenController? profileScreenController;
+  // ProfileScreenController? profileScreenController;
   FirebaseMessaging fcmMessage = FirebaseMessaging.instance;
 
   Future<UserModel> getCurrentUserDetails() async {
@@ -48,7 +48,7 @@ class FirebaseMessagingService {
     var ghostmode = await ghostModeOn();
 
     Map bodyNotification = {
-      "title": ghostmode ? "Ghost----${generateRandomString(7)}" : model.name,
+      "title": ghostmode ? "Ghost----" : model.name,
       "body": msg
     };
 
@@ -83,7 +83,7 @@ class FirebaseMessagingService {
           : '',
       isRead: false,
       createdDetails: CreatorDetails(
-          name: ghostmode ? "Ghost----${generateRandomString(7)}" : model.name,
+          name: ghostmode ? "Ghost----" : model.name,
           imageUrl: ghostmode ? "" : model.imageStr,
           isVerified: model.isVerified),
       createdAt: DateTime.now().toIso8601String(),

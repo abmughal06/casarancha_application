@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../resources/color_resources.dart';
 import '../resources/strings.dart';
 
-class TextWidget extends StatefulWidget {
+class TextWidget extends StatelessWidget {
   final String? text;
   final Color? color;
   final double? fontSize;
@@ -20,7 +20,7 @@ class TextWidget extends StatefulWidget {
   final TextDecoration? decoration;
   final List<Shadow>? shadow;
 
-  TextWidget(
+  const TextWidget(
       {Key? key,
       this.text,
       this.color = colorBlack,
@@ -39,31 +39,26 @@ class TextWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _TextWidgetState createState() => _TextWidgetState();
-}
-
-class _TextWidgetState extends State<TextWidget> {
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Text(
-        widget.text ?? "",
-        textAlign: widget.textAlign,
-        maxLines: widget.maxLines,
+        text ?? "",
+        textAlign: textAlign,
+        maxLines: maxLines,
         softWrap: true,
-        overflow: widget.textOverflow,
-        style: widget.textStyle ??
+        overflow: textOverflow,
+        style: textStyle ??
             TextStyle(
-              shadows: widget.shadow,
-              color: widget.color,
-              height: widget.textHeight,
-              fontSize: widget.fontSize ?? 14.sp,
-              letterSpacing: widget.letterSpacing,
-              decoration: widget.decoration,
-              fontFamily: widget.fontFamily ?? strFontName,
-              fontWeight: widget.fontWeight,
+              shadows: shadow,
+              color: color,
+              height: textHeight,
+              fontSize: fontSize ?? 14.sp,
+              letterSpacing: letterSpacing,
+              decoration: decoration,
+              fontFamily: fontFamily ?? strFontName,
+              fontWeight: fontWeight,
             ),
       ),
     );

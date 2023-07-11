@@ -1,12 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_chat_helper.dart';
 import 'package:casarancha/screens/chat/GhostMode/ghost_message_controller.dart';
 import 'package:casarancha/screens/dashboard/dashboard_controller.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/groups/my_groups_screen.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
@@ -19,321 +21,581 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../resources/color_resources.dart';
 import '../home/HomeScreen/home_screen_controller.dart';
 
-class DashBoard extends StatefulWidget {
+// class DashBoard extends StatefulWidget {
+//   const DashBoard({Key? key}) : super(key: key);
+
+//   @override
+//   State<DashBoard> createState() => _DashBoardState();
+// }
+
+// class _DashBoardState extends State<DashBoard>
+//     with AutomaticKeepAliveClientMixin {
+//   ProfileScreenController profileScreenController =
+//       Get.put(ProfileScreenController());
+
+//   late DashboardController dashboardController;
+
+//   @override
+//   void initState() {
+//     dashboardController = Get.isRegistered<DashboardController>()
+//         ? Get.find<DashboardController>()
+//         : Get.put(DashboardController());
+
+//     Future.delayed(Duration.zero, () {
+//       GhostMessageController gmCtrl = GhostChatHelper.shared.gMessageCtrl;
+//       gmCtrl.createConversationStreamSubscription(
+//           FirebaseAuth.instance.currentUser?.uid ?? "");
+//     });
+
+//     getPrefData();
+//     super.initState();
+//   }
+
+//   getPrefData() async {
+//     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+//     Future.delayed(const Duration(seconds: 0)).then((value) {
+//       var getVal = sharedPreferences.getBool('isGhostEnable') ?? false;
+//       log("000000000000000000000");
+//       if (getVal == true) {
+//         profileScreenController.toggleGhostMode();
+//       } else {
+//         log('no val preference');
+//       }
+//       log(getVal.toString());
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     super.build(context);
+//     return Obx(
+//       () => SafeArea(
+//         top: profileScreenController.isGhostModeOn.value,
+//         bottom: profileScreenController.isGhostModeOn.value,
+//         child: Scaffold(
+//           body: Container(
+//             decoration: profileScreenController.isGhostModeOn.value
+//                 ? BoxDecoration(
+//                     border: Border.all(
+//                       width: 2.5,
+//                       color: Colors.red,
+//                     ),
+//                   )
+//                 : null,
+//             child: PageView(
+//               controller: dashboardController.pageController,
+//               onPageChanged: (value) {},
+//               children: [
+//                 const HomeScreen(),
+//                 const SearchScreen(),
+//                 const MyGroupsScreen(),
+//                 ChatListScreen(),
+//                 const ProfileScreen(),
+//               ],
+//             ),
+//           ),
+//           floatingActionButtonLocation:
+//               FloatingActionButtonLocation.centerDocked,
+//           floatingActionButton: Card(
+//             margin: EdgeInsets.symmetric(
+//               horizontal: 20.w,
+//               vertical: Platform.isAndroid ||
+//                       profileScreenController.isGhostModeOn.value
+//                   ? 10.w
+//                   : 0.w,
+//             ),
+//             shape: RoundedRectangleBorder(
+//               borderRadius: BorderRadius.circular(
+//                 50,
+//               ),
+//             ),
+//             // elevation: 2,
+//             child: Padding(
+//               padding: EdgeInsets.symmetric(vertical: 5.w),
+//               child: Obx(() => Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                     children: [
+//                       IconButton(
+//                         onPressed: () {
+//                           dashboardController.pageController.jumpToPage(0);
+//                         },
+//                         icon: SvgPicture.asset(
+//                           dashboardController.currentIndex.value == 0
+//                               ? icBottomSelHome
+//                               : icBottomDeSelHome,
+//                         ),
+//                       ),
+//                       IconButton(
+//                         onPressed: () {
+//                           dashboardController.pageController.jumpToPage(1);
+//                         },
+//                         icon: SvgPicture.asset(
+//                           dashboardController.currentIndex.value == 1
+//                               ? icBottomSelSearch
+//                               : icBottomDeSelSearch,
+//                         ),
+//                       ),
+//                       IconButton(
+//                         onPressed: () {
+//                           dashboardController.pageController.jumpToPage(2);
+//                         },
+//                         icon: SvgPicture.asset(
+//                           dashboardController.currentIndex.value == 2
+//                               ? icBottomSelGrp
+//                               : icBottomDeSelGrp,
+//                         ),
+//                       ),
+//                       IconButton(
+//                         onPressed: () {
+//                           dashboardController.pageController.jumpToPage(3);
+//                         },
+//                         icon: StreamBuilder<QuerySnapshot<Map>>(
+//                             stream: FirebaseFirestore.instance
+//                                 .collection("users")
+//                                 .doc(FirebaseAuth.instance.currentUser!.uid)
+//                                 .collection("ghostMessageList")
+//                                 .orderBy("createdAt", descending: true)
+//                                 .snapshots(),
+//                             builder: (context, ghost) {
+//                               if (ghost.hasData) {
+//                                 int messageCount1 = 0;
+//                                 for (int i = 0;
+//                                     i < ghost.data!.docs.length;
+//                                     i++) {
+//                                   messageCount1 += int.parse(ghost.data!.docs[i]
+//                                       .data()['unreadMessageCount']
+//                                       .toString());
+//                                 }
+//                                 return StreamBuilder<QuerySnapshot<Map>>(
+//                                     stream: FirebaseFirestore.instance
+//                                         .collection("users")
+//                                         .doc(FirebaseAuth
+//                                             .instance.currentUser!.uid)
+//                                         .collection("messageList")
+//                                         .orderBy("createdAt", descending: true)
+//                                         .snapshots(),
+//                                     builder: (context, doc) {
+//                                       if (doc.hasData) {
+//                                         int messageCount = 0;
+//                                         for (int i = 0;
+//                                             i < doc.data!.docs.length;
+//                                             i++) {
+//                                           messageCount += int.parse(doc
+//                                               .data!.docs[i]
+//                                               .data()['unreadMessageCount']
+//                                               .toString());
+//                                         }
+//                                         var count =
+//                                             messageCount + messageCount1;
+//                                         return Badge(
+//                                           label: Text(count.toString()),
+//                                           isLabelVisible: count != 0,
+//                                           child: SvgPicture.asset(
+//                                             dashboardController
+//                                                         .currentIndex.value ==
+//                                                     3
+//                                                 ? icBottomSelChat
+//                                                 : icBottomDeSelChat,
+//                                           ),
+//                                         );
+//                                       } else {
+//                                         return SvgPicture.asset(
+//                                           dashboardController
+//                                                       .currentIndex.value ==
+//                                                   3
+//                                               ? icBottomSelChat
+//                                               : icBottomDeSelChat,
+//                                         );
+//                                       }
+//                                     });
+//                               } else {
+//                                 return StreamBuilder<QuerySnapshot<Map>>(
+//                                     stream: FirebaseFirestore.instance
+//                                         .collection("users")
+//                                         .doc(FirebaseAuth
+//                                             .instance.currentUser!.uid)
+//                                         .collection("messageList")
+//                                         .orderBy("createdAt", descending: true)
+//                                         .snapshots(),
+//                                     builder: (context, doc) {
+//                                       if (doc.hasData) {
+//                                         int messageCount = 0;
+//                                         for (int i = 0;
+//                                             i < doc.data!.docs.length;
+//                                             i++) {
+//                                           messageCount += int.parse(doc
+//                                               .data!.docs[i]
+//                                               .data()['unreadMessageCount']
+//                                               .toString());
+//                                         }
+//                                         var count = messageCount;
+//                                         return Badge(
+//                                           label: Text(count.toString()),
+//                                           isLabelVisible: count != 0,
+//                                           child: SvgPicture.asset(
+//                                             dashboardController
+//                                                         .currentIndex.value ==
+//                                                     3
+//                                                 ? icBottomSelChat
+//                                                 : icBottomDeSelChat,
+//                                           ),
+//                                         );
+//                                       } else {
+//                                         return SvgPicture.asset(
+//                                           dashboardController
+//                                                       .currentIndex.value ==
+//                                                   3
+//                                               ? icBottomSelChat
+//                                               : icBottomDeSelChat,
+//                                         );
+//                                       }
+//                                     });
+//                               }
+//                             }),
+//                       ),
+//                       IconButton(
+//                         onPressed: () {
+//                           dashboardController.pageController.jumpToPage(4);
+//                         },
+//                         icon: StreamBuilder<
+//                             DocumentSnapshot<Map<String, dynamic>>>(
+//                           stream: FirebaseFirestore.instance
+//                               .collection("users")
+//                               .doc(FirebaseAuth.instance.currentUser!.uid)
+//                               .snapshots(),
+//                           builder: (context, snapshot) {
+//                             if (snapshot.hasData) {
+//                               var user =
+//                                   UserModel.fromMap(snapshot.data!.data()!);
+//                               return CircleAvatar(
+//                                 backgroundColor: Colors.red.withOpacity(
+//                                   0.1,
+//                                 ),
+//                                 backgroundImage: NetworkImage(
+//                                   user.imageStr,
+//                                 ),
+//                               );
+//                             } else {
+//                               return const Center(
+//                                 child: CupertinoActivityIndicator(),
+//                               );
+//                             }
+//                           },
+//                         ),
+//                       ),
+//                     ],
+//                   )),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   @override
+//   bool get wantKeepAlive => true;
+// }
+
+// IconButton ghostModeBtn({HomeScreenController? homeCtrl, double? iconSize}) {
+//   HomeScreenController homeScreenController =
+//       homeCtrl ?? Get.put(HomeScreenController());
+
+//   return IconButton(
+//     iconSize: iconSize,
+//     onPressed: () async {
+//       // setState(() {});
+//       // SharedPreferences sharedPreferences =
+//       //     await SharedPreferences.getInstance();
+
+//       // sharedPreferences.getBool('isGhostEnable') == false
+//       //     ? null
+//       //     : await sharedPreferences.setBool('isGhostEnable',
+//       //         homeScreenController.profileScreenController.isGhostModeOn.value);
+
+//       // await appPreferencesController.getString('isGhostEnable') == true
+//       //     ? null
+//       //     : await appPreferencesController.setString(
+//       //         'isGhostEnable',
+//       //         homeScreenController.profileScreenController.isGhostModeOn.value
+//       //             .toString());
+//       homeScreenController.profileScreenController.toggleGhostMode();
+//       //     await appPreferencesController.setString(
+//       //         'isGhostEnable',homeScreenController.profileScreenController.isGhostModeOn.value
+//       //             .toString());
+//       //              var getVal = await appPreferencesController.getString('isGhostEnable');
+//       //   log("0-0--------------------");
+//       //   log(getVal.toString());
+//       //     print(appPreferencesController.getString('isGhostEnable'));
+//     },
+//     icon: SvgPicture.asset(icGhostMode,
+//         color: homeScreenController.profileScreenController.isGhostModeOn.value
+//             ? colorPrimaryA05
+//             : null),
+//   );
+// }
+
+class DashBoard extends StatelessWidget {
   const DashBoard({Key? key}) : super(key: key);
 
   @override
-  State<DashBoard> createState() => _DashBoardState();
-}
-
-class _DashBoardState extends State<DashBoard>
-    with AutomaticKeepAliveClientMixin {
-  ProfileScreenController profileScreenController =
-      Get.put(ProfileScreenController());
-
-  late DashboardController dashboardController;
-
-  @override
-  void initState() {
-    dashboardController = Get.isRegistered<DashboardController>()
-        ? Get.find<DashboardController>()
-        : Get.put(DashboardController());
-
-    Future.delayed(Duration.zero, () {
-      GhostMessageController gmCtrl = GhostChatHelper.shared.gMessageCtrl;
-      gmCtrl.createConversationStreamSubscription(
-          FirebaseAuth.instance.currentUser?.uid ?? "");
-    });
-
-    getPrefData();
-    super.initState();
-  }
-
-  getPrefData() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    Future.delayed(const Duration(seconds: 0)).then((value) {
-      var getVal = sharedPreferences.getBool('isGhostEnable') ?? false;
-      log("000000000000000000000");
-      if (getVal == true) {
-        profileScreenController.toggleGhostMode();
-      } else {
-        log('no val preference');
-      }
-      log(getVal.toString());
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return Obx(
-      () => SafeArea(
-        top: profileScreenController.isGhostModeOn.value,
-        bottom: profileScreenController.isGhostModeOn.value,
-        child: Scaffold(
-          body: Container(
-            decoration: profileScreenController.isGhostModeOn.value
-                ? BoxDecoration(
-                    border: Border.all(
-                      width: 2.5,
-                      color: Colors.red,
-                    ),
-                  )
-                : null,
-            child: PageView(
-              controller: dashboardController.pageController,
-              onPageChanged: (value) {},
-              children: [
-                const HomeScreen(),
-                const SearchScreen(),
-                const MyGroupsScreen(),
-                ChatListScreen(),
-                const ProfileScreen(),
-              ],
-            ),
+    final currentUser = context.watch<UserModel?>();
+    final dashboardProvider = context.watch<DashboardProvider>();
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: Scaffold(
+        body: Container(
+          // decoration: profileScreenController.isGhostModeOn.value
+          //     ? BoxDecoration(
+          //         border: Border.all(
+          //           width: 2.5,
+          //           color: Colors.red,
+          //         ),
+          //       )
+          //     : null,
+          child: PageView(
+            controller: dashboardProvider.pageController,
+            onPageChanged: (value) {},
+            children: [
+              const HomeScreen(),
+              const SearchScreen(),
+              const Scaffold(),
+              ChatListScreen(),
+              const ProfileScreen(),
+            ],
           ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: Card(
-            margin: EdgeInsets.symmetric(
-              horizontal: 20.w,
-              vertical: Platform.isAndroid ||
-                      profileScreenController.isGhostModeOn.value
-                  ? 10.w
-                  : 0.w,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                50,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Consumer<DashboardProvider>(
+          builder: (context, provider, b) {
+            return Card(
+              margin: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: Platform.isAndroid ? 10.w : 0.w,
               ),
-            ),
-            // elevation: 2,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.w),
-              child: Obx(() => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          dashboardController.pageController.jumpToPage(0);
-                        },
-                        icon: SvgPicture.asset(
-                          dashboardController.currentIndex.value == 0
-                              ? icBottomSelHome
-                              : icBottomDeSelHome,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  50,
+                ),
+              ),
+              // elevation: 2,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 5.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        provider.changePage(0);
+                      },
+                      icon: SvgPicture.asset(
+                        provider.currentIndex == 0
+                            ? icBottomSelHome
+                            : icBottomDeSelHome,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        provider.changePage(1);
+                      },
+                      icon: SvgPicture.asset(
+                        provider.currentIndex == 1
+                            ? icBottomSelSearch
+                            : icBottomDeSelSearch,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        provider.changePage(2);
+                      },
+                      icon: SvgPicture.asset(
+                        provider.currentIndex == 2
+                            ? icBottomSelGrp
+                            : icBottomDeSelGrp,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        provider.changePage(3);
+                      },
+                      icon: SvgPicture.asset(
+                        provider.currentIndex == 3
+                            ? icBottomSelChat
+                            : icBottomDeSelChat,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        provider.changePage(4);
+                      },
+                      icon: CircleAvatar(
+                        backgroundColor: Colors.red.withOpacity(
+                          0.1,
                         ),
+                        backgroundImage: currentUser == null
+                            ? null
+                            : CachedNetworkImageProvider(
+                                currentUser.imageStr,
+                              ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          dashboardController.pageController.jumpToPage(1);
-                        },
-                        icon: SvgPicture.asset(
-                          dashboardController.currentIndex.value == 1
-                              ? icBottomSelSearch
-                              : icBottomDeSelSearch,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          dashboardController.pageController.jumpToPage(2);
-                        },
-                        icon: SvgPicture.asset(
-                          dashboardController.currentIndex.value == 2
-                              ? icBottomSelGrp
-                              : icBottomDeSelGrp,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          dashboardController.pageController.jumpToPage(3);
-                        },
-                        icon: StreamBuilder<QuerySnapshot<Map>>(
-                            stream: FirebaseFirestore.instance
-                                .collection("users")
-                                .doc(FirebaseAuth.instance.currentUser!.uid)
-                                .collection("ghostMessageList")
-                                .orderBy("createdAt", descending: true)
-                                .snapshots(),
-                            builder: (context, ghost) {
-                              if (ghost.hasData) {
-                                int messageCount1 = 0;
-                                for (int i = 0;
-                                    i < ghost.data!.docs.length;
-                                    i++) {
-                                  messageCount1 += int.parse(ghost.data!.docs[i]
-                                      .data()['unreadMessageCount']
-                                      .toString());
-                                }
-                                return StreamBuilder<QuerySnapshot<Map>>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection("users")
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .collection("messageList")
-                                        .orderBy("createdAt", descending: true)
-                                        .snapshots(),
-                                    builder: (context, doc) {
-                                      if (doc.hasData) {
-                                        int messageCount = 0;
-                                        for (int i = 0;
-                                            i < doc.data!.docs.length;
-                                            i++) {
-                                          messageCount += int.parse(doc
-                                              .data!.docs[i]
-                                              .data()['unreadMessageCount']
-                                              .toString());
-                                        }
-                                        var count =
-                                            messageCount + messageCount1;
-                                        return Badge(
-                                          label: Text(count.toString()),
-                                          isLabelVisible: count != 0,
-                                          child: SvgPicture.asset(
-                                            dashboardController
-                                                        .currentIndex.value ==
-                                                    3
-                                                ? icBottomSelChat
-                                                : icBottomDeSelChat,
-                                          ),
-                                        );
-                                      } else {
-                                        return SvgPicture.asset(
-                                          dashboardController
-                                                      .currentIndex.value ==
-                                                  3
-                                              ? icBottomSelChat
-                                              : icBottomDeSelChat,
-                                        );
-                                      }
-                                    });
-                              } else {
-                                return StreamBuilder<QuerySnapshot<Map>>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection("users")
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .collection("messageList")
-                                        .orderBy("createdAt", descending: true)
-                                        .snapshots(),
-                                    builder: (context, doc) {
-                                      if (doc.hasData) {
-                                        int messageCount = 0;
-                                        for (int i = 0;
-                                            i < doc.data!.docs.length;
-                                            i++) {
-                                          messageCount += int.parse(doc
-                                              .data!.docs[i]
-                                              .data()['unreadMessageCount']
-                                              .toString());
-                                        }
-                                        var count = messageCount;
-                                        return Badge(
-                                          label: Text(count.toString()),
-                                          isLabelVisible: count != 0,
-                                          child: SvgPicture.asset(
-                                            dashboardController
-                                                        .currentIndex.value ==
-                                                    3
-                                                ? icBottomSelChat
-                                                : icBottomDeSelChat,
-                                          ),
-                                        );
-                                      } else {
-                                        return SvgPicture.asset(
-                                          dashboardController
-                                                      .currentIndex.value ==
-                                                  3
-                                              ? icBottomSelChat
-                                              : icBottomDeSelChat,
-                                        );
-                                      }
-                                    });
-                              }
-                            }),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          dashboardController.pageController.jumpToPage(4);
-                        },
-                        icon: StreamBuilder<
-                            DocumentSnapshot<Map<String, dynamic>>>(
-                          stream: FirebaseFirestore.instance
-                              .collection("users")
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .snapshots(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              var user =
-                                  UserModel.fromMap(snapshot.data!.data()!);
-                              return CircleAvatar(
-                                backgroundColor: Colors.red.withOpacity(
-                                  0.1,
-                                ),
-                                backgroundImage: NetworkImage(
-                                  user.imageStr,
-                                ),
-                              );
-                            } else {
-                              return const Center(
-                                child: CupertinoActivityIndicator(),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  )),
-            ),
-          ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
-IconButton ghostModeBtn({HomeScreenController? homeCtrl, double? iconSize}) {
-  HomeScreenController homeScreenController =
-      homeCtrl ?? Get.put(HomeScreenController());
+// IconButton ghostModeBtn({HomeScreenController? homeCtrl, double? iconSize}) {
+//   HomeScreenController homeScreenController =
+//       homeCtrl ?? Get.put(HomeScreenController());
 
-  return IconButton(
-    iconSize: iconSize,
-    onPressed: () async {
-      // setState(() {});
-      // SharedPreferences sharedPreferences =
-      //     await SharedPreferences.getInstance();
+//   return IconButton(
+//     iconSize: iconSize,
+//     onPressed: () async {
+//       // setState(() {});
+//       // SharedPreferences sharedPreferences =
+//       //     await SharedPreferences.getInstance();
 
-      // sharedPreferences.getBool('isGhostEnable') == false
-      //     ? null
-      //     : await sharedPreferences.setBool('isGhostEnable',
-      //         homeScreenController.profileScreenController.isGhostModeOn.value);
+//       // sharedPreferences.getBool('isGhostEnable') == false
+//       //     ? null
+//       //     : await sharedPreferences.setBool('isGhostEnable',
+//       //         homeScreenController.profileScreenController.isGhostModeOn.value);
 
-      // await appPreferencesController.getString('isGhostEnable') == true
-      //     ? null
-      //     : await appPreferencesController.setString(
-      //         'isGhostEnable',
-      //         homeScreenController.profileScreenController.isGhostModeOn.value
-      //             .toString());
-      homeScreenController.profileScreenController.toggleGhostMode();
-      //     await appPreferencesController.setString(
-      //         'isGhostEnable',homeScreenController.profileScreenController.isGhostModeOn.value
-      //             .toString());
-      //              var getVal = await appPreferencesController.getString('isGhostEnable');
-      //   log("0-0--------------------");
-      //   log(getVal.toString());
-      //     print(appPreferencesController.getString('isGhostEnable'));
-    },
-    icon: SvgPicture.asset(icGhostMode,
-        color: homeScreenController.profileScreenController.isGhostModeOn.value
-            ? colorPrimaryA05
-            : null),
-  );
-}
+//       // await appPreferencesController.getString('isGhostEnable') == true
+//       //     ? null
+//       //     : await appPreferencesController.setString(
+//       //         'isGhostEnable',
+//       //         homeScreenController.profileScreenController.isGhostModeOn.value
+//       //             .toString());
+//       homeScreenController.profileScreenController.toggleGhostMode();
+//       //     await appPreferencesController.setString(
+//       //         'isGhostEnable',homeScreenController.profileScreenController.isGhostModeOn.value
+//       //             .toString());
+//       //              var getVal = await appPreferencesController.getString('isGhostEnable');
+//       //   log("0-0--------------------");
+//       //   log(getVal.toString());
+//       //     print(appPreferencesController.getString('isGhostEnable'));
+//     },
+//     icon: SvgPicture.asset(icGhostMode,
+//         color: homeScreenController.profileScreenController.isGhostModeOn.value
+//             ? colorPrimaryA05
+//             : null),
+//   );
+// }
+
+// StreamBuilder<QuerySnapshot<Map>>(
+//                                 stream: FirebaseFirestore.instance
+//                                     .collection("users")
+//                                     .doc(FirebaseAuth.instance.currentUser!.uid)
+//                                     .collection("ghostMessageList")
+//                                     .orderBy("createdAt", descending: true)
+//                                     .snapshots(),
+//                                 builder: (context, ghost) {
+//                                   if (ghost.hasData) {
+//                                     int messageCount1 = 0;
+//                                     for (int i = 0;
+//                                         i < ghost.data!.docs.length;
+//                                         i++) {
+//                                       messageCount1 += int.parse(ghost.data!.docs[i]
+//                                           .data()['unreadMessageCount']
+//                                           .toString());
+//                                     }
+//                                     return StreamBuilder<QuerySnapshot<Map>>(
+//                                         stream: FirebaseFirestore.instance
+//                                             .collection("users")
+//                                             .doc(FirebaseAuth
+//                                                 .instance.currentUser!.uid)
+//                                             .collection("messageList")
+//                                             .orderBy("createdAt", descending: true)
+//                                             .snapshots(),
+//                                         builder: (context, doc) {
+//                                           if (doc.hasData) {
+//                                             int messageCount = 0;
+//                                             for (int i = 0;
+//                                                 i < doc.data!.docs.length;
+//                                                 i++) {
+//                                               messageCount += int.parse(doc
+//                                                   .data!.docs[i]
+//                                                   .data()['unreadMessageCount']
+//                                                   .toString());
+//                                             }
+//                                             var count =
+//                                                 messageCount + messageCount1;
+//                                             return Badge(
+//                                               label: Text(count.toString()),
+//                                               isLabelVisible: count != 0,
+//                                               child: SvgPicture.asset(
+//                                                 dashboardController
+//                                                             .currentIndex ==
+//                                                         3
+//                                                     ? icBottomSelChat
+//                                                     : icBottomDeSelChat,
+//                                               ),
+//                                             );
+//                                           } else {
+//                                             return SvgPicture.asset(
+//                                               dashboardController
+//                                                           .currentIndex ==
+//                                                       3
+//                                                   ? icBottomSelChat
+//                                                   : icBottomDeSelChat,
+//                                             );
+//                                           }
+//                                         });
+//                                   } else {
+//                                     return StreamBuilder<QuerySnapshot<Map>>(
+//                                         stream: FirebaseFirestore.instance
+//                                             .collection("users")
+//                                             .doc(FirebaseAuth
+//                                                 .instance.currentUser!.uid)
+//                                             .collection("messageList")
+//                                             .orderBy("createdAt", descending: true)
+//                                             .snapshots(),
+//                                         builder: (context, doc) {
+//                                           if (doc.hasData) {
+//                                             int messageCount = 0;
+//                                             for (int i = 0;
+//                                                 i < doc.data!.docs.length;
+//                                                 i++) {
+//                                               messageCount += int.parse(doc
+//                                                   .data!.docs[i]
+//                                                   .data()['unreadMessageCount']
+//                                                   .toString());
+//                                             }
+//                                             var count = messageCount;
+//                                             return Badge(
+//                                               label: Text(count.toString()),
+//                                               isLabelVisible: count != 0,
+//                                               child: SvgPicture.asset(
+//                                                 dashboardController
+//                                                             .currentIndex.value ==
+//                                                         3
+//                                                     ? icBottomSelChat
+//                                                     : icBottomDeSelChat,
+//                                               ),
+//                                             );
+//                                           } else {
+//                                             return SvgPicture.asset(
+//                                               dashboardController
+//                                                           .currentIndex.value ==
+//                                                       3
+//                                                   ? icBottomSelChat
+//                                                   : icBottomDeSelChat,
+//                                             );
+//                                           }
+//                                         });
+//                                   }
+//                                 }),

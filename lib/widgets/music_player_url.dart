@@ -32,19 +32,13 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
     audioPlayer = AudioPlayer();
     setAudio();
     audioPlayer.onPlayerStateChanged.listen((event) {
-      setState(() {
-        isPlaying = event == PlayerState.playing;
-      });
+      isPlaying = event == PlayerState.playing;
     });
     audioPlayer.onDurationChanged.listen((event) {
-      setState(() {
-        duration = event;
-      });
+      duration = event;
     });
     audioPlayer.onPositionChanged.listen((event) {
-      setState(() {
-        position = event;
-      });
+      position = event;
     });
   }
 

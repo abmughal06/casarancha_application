@@ -45,12 +45,12 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
 
   late TextEditingController searchController;
-  late ProfileScreenController profilescreenController;
+  // late ProfileScreenController profilescreenController;
 
   @override
   void initState() {
     searchController = TextEditingController();
-    profilescreenController = Get.find<ProfileScreenController>();
+    // profilescreenController = Get.find<ProfileScreenController>();
     super.initState();
   }
 
@@ -83,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: primaryAppbar(
         title: 'Search',
         elevation: 0,
-        leading: ghostModeBtn(),
+        // leading: ghostModeBtn(),
       ),
       body: DefaultTabController(
         length: _myTabs.length,
@@ -146,18 +146,18 @@ class _SearchScreenState extends State<SearchScreen> {
                                                     .currentUser!.uid) {
                                           return InkWell(
                                             onTap: () {
-                                              Get.to(
-                                                () => AppUserScreen(
-                                                  appUserController: Get.put(
-                                                    AppUserController(
-                                                      appUserId: userSnap.id,
-                                                      currentUserId:
-                                                          FirebaseAuth.instance
-                                                              .currentUser!.uid,
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
+                                              // Get.to(
+                                              //   () => AppUserScreen(
+                                              //     appUserController: Get.put(
+                                              //       AppUserController(
+                                              //         appUserId: userSnap.id,
+                                              //         currentUserId:
+                                              //             FirebaseAuth.instance
+                                              //                 .currentUser!.uid,
+                                              //       ),
+                                              //     ),
+                                              //   ),
+                                              // );
                                             },
                                             child: ListTile(
                                               leading: Container(
@@ -277,7 +277,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       final group = GroupModel.fromMap(doc.data());
                       return GroupTile(
                         group: group,
-                        currentUserId: profilescreenController.user.value.id,
+                        currentUserId: FirebaseAuth.instance.currentUser!.uid,
                       );
                     },
                   ),
@@ -361,10 +361,10 @@ class _ShowAllPostsState extends State<ShowAllPosts> {
 
           if ((post.reportCount ?? 0) <= 10 &&
               (post.postBlockStatus != "Blocked")) {
-            final postCardController = Get.put(
-              PostCardController(postdata: post),
-              tag: post.id,
-            );
+            // final postCardController = Get.put(
+            //   PostCardController(postdata: post),
+            //   tag: post.id,
+            // );
 
             // return NewPostCard(
             //     postCardController: postCardController,

@@ -34,14 +34,14 @@ import '../ChatList/chat_list_controller.dart';
 class ChatScreen extends StatefulWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
-  final ProfileScreenController? profileScreenController;
+  // final ProfileScreenController? profileScreenController;
   final String? val;
 
   const ChatScreen({
     Key? key,
     required this.appUserId,
     required this.creatorDetails,
-    this.profileScreenController,
+    // this.profileScreenController,
     this.val,
     //required this.indexId
   }) : super(key: key);
@@ -58,13 +58,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatController chatController = Get.put(
-      ChatController(
-          appUserId: widget.appUserId, creatorDetails: widget.creatorDetails),
-    );
-    final ChatListController chatListController = Get.find();
+    // final ChatController chatController = Get.put(
+    //   ChatController(
+    //       appUserId: widget.appUserId, creatorDetails: widget.creatorDetails),
+    // );
+    // final ChatListController chatListController = Get.find();
 
-    chatController.resetMessageCount();
+    // chatController.resetMessageCount();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -73,7 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
             color: Colors.black,
           ),
           onPressed: () {
-            chatController.resetMessageCount();
+            // chatController.resetMessageCount();
             Get.back();
           },
         ),
@@ -85,21 +85,21 @@ class _ChatScreenState extends State<ChatScreen> {
                 .doc(widget.appUserId)
                 .snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.hasData && snapshot.data != null) {
                 UserModel userModel = UserModel.fromMap(snapshot.data!.data()!);
                 return ListTile(
                   onTap: () {
-                    Get.to(
-                      () => AppUserScreen(
-                        appUserController: Get.put(
-                          AppUserController(
-                            appUserId: widget.appUserId,
-                            currentUserId:
-                                FirebaseAuth.instance.currentUser!.uid,
-                          ),
-                        ),
-                      ),
-                    );
+                    // Get.to(
+                    //   () => AppUserScreen(
+                    //     appUserController: Get.put(
+                    //       AppUserController(
+                    //         appUserId: widget.appUserId,
+                    //         currentUserId:
+                    //             FirebaseAuth.instance.currentUser!.uid,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // );
                   },
                   contentPadding: EdgeInsets.zero,
                   title: Row(
@@ -129,20 +129,20 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   ),
                   subtitle: snapshot.hasData ? const Text('Live') : null,
-                  leading: CircleAvatar(
-                    backgroundImage: userModel.imageStr.isEmpty ||
-                            widget.profileScreenController!.isGhostModeOn.value
-                        ? null
-                        : CachedNetworkImageProvider(
-                            userModel.imageStr,
-                          ),
-                    child: userModel.imageStr.isEmpty ||
-                            widget.profileScreenController!.isGhostModeOn.value
-                        ? const Icon(
-                            Icons.question_mark,
-                          )
-                        : null,
-                  ),
+                  // leading: CircleAvatar(
+                  //   backgroundImage: userModel.imageStr.isEmpty ||
+                  //           widget.profileScreenController!.isGhostModeOn.value
+                  //       ? null
+                  //       : CachedNetworkImageProvider(
+                  //           userModel.imageStr,
+                  //         ),
+                  //   child: userModel.imageStr.isEmpty ||
+                  //           widget.profileScreenController!.isGhostModeOn.value
+                  //       ? const Icon(
+                  //           Icons.question_mark,
+                  //         )
+                  //       : null,
+                  // ),
                 );
               } else {
                 return const Text("...");
@@ -176,7 +176,9 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: chatController.currentUserRef
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .doc(FirebaseAuth.instance.currentUser!.uid)
                 .collection('messageList')
                 .doc(widget.appUserId)
                 .collection(
@@ -210,10 +212,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         FirebaseFirestore.instance
                             .collection("users")
                             .doc(widget.appUserId)
-                            .collection(widget.profileScreenController!
-                                    .isGhostModeOn.value
-                                ? "ghostMessageList"
-                                : 'messageList')
+                            .collection('messageList')
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .collection("messages")
                             .doc(doc.data!.docs[index].id)
@@ -236,11 +235,11 @@ class _ChatScreenState extends State<ChatScreen> {
                               PostModel.fromMap(prePost['content']);
                           print(postModel);
                           return InkWell(
-                            onTap: () => Get.to(() => PostDetailScreen(
-                                  postModel: postModel,
-                                  postCardController:
-                                      PostCardController(postdata: postModel),
-                                )),
+                            // onTap: () => Get.to(() => PostDetailScreen(
+                            //       postModel: postModel,
+                            //       postCardController:
+                            //           PostCardController(postdata: postModel),
+                            //     )),
                             child: ChatPostTile(
                               message: message,
                               appUserId: widget.appUserId,
@@ -270,10 +269,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               postModel.mediaData[0].link);
                           // videoPlayerController.initialize();
                           return InkWell(
-                            onTap: () => Get.to(() => PostDetailScreen(
-                                postModel: postModel,
-                                postCardController:
-                                    PostCardController(postdata: postModel))),
+                            // onTap: () => Get.to(() => PostDetailScreen(
+                            //     postModel: postModel,
+                            //     postCardController:
+                            //         PostCardController(postdata: postModel))),
                             child: ChatVideoTile(
                               aspectRatio:
                                   videoPlayerController.value.aspectRatio,
@@ -292,10 +291,10 @@ class _ChatScreenState extends State<ChatScreen> {
                           print(postModel);
 
                           return InkWell(
-                            onTap: () => Get.to(() => PostDetailScreen(
-                                postModel: postModel,
-                                postCardController:
-                                    PostCardController(postdata: postModel))),
+                            // onTap: () => Get.to(() => PostDetailScreen(
+                            //     postModel: postModel,
+                            //     postCardController:
+                            //         PostCardController(postdata: postModel))),
                             child: ChatMusicTile(
                               aspectRatio: 13 / 9,
                               appUserId: widget.appUserId,
@@ -360,7 +359,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: TextField(
                     minLines: 1,
                     maxLines: 3,
-                    controller: chatController.messageController,
+                    controller: TextEditingController(),
                     style: TextStyle(
                       color: color239,
                       fontSize: 16.sp,
@@ -387,7 +386,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               widthBox(12.w),
                               GestureDetector(
                                 onTap: () {
-                                  chatController.sentMessage();
+                                  // chatController.sentMessage();
                                 },
                                 child: Image.asset(
                                   imgSendComment,
