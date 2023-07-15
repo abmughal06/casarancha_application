@@ -6,6 +6,7 @@ class UserModel {
   String id;
   String email;
   String username;
+  String ghostName;
   String dob;
   String name;
   String createdAt;
@@ -27,6 +28,7 @@ class UserModel {
     required this.id,
     required this.email,
     required this.username,
+    required this.ghostName,
     required this.dob,
     required this.name,
     required this.createdAt,
@@ -50,6 +52,7 @@ class UserModel {
     String? id,
     String? email,
     String? username,
+    String? ghostName,
     String? dob,
     String? name,
     String? createdAt,
@@ -72,6 +75,7 @@ class UserModel {
       id: id ?? this.id,
       email: email ?? this.email,
       username: username ?? this.username,
+      ghostName: ghostName ?? this.ghostName,
       dob: dob ?? this.dob,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
@@ -101,6 +105,7 @@ class UserModel {
       'id': id,
       'email': email,
       'username': username,
+      'ghostName': ghostName,
       'dob': dob,
       'name': name,
       'createdAt': createdAt,
@@ -126,6 +131,7 @@ class UserModel {
       id: map['id'] ?? '',
       email: map['email'] ?? '',
       username: map['username'] ?? '',
+      ghostName: map['ghostName'] ?? '',
       dob: map['dob'] ?? '',
       name: map['name'] ?? '',
       createdAt: map['createdAt'] ?? '',
@@ -153,7 +159,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, username: $username, dob: $dob, name: $name, createdAt: $createdAt, bio: $bio, imageStr: $imageStr, postsIds: $postsIds, storiesIds: $storiesIds, followersIds: $followersIds, followingsIds: $followingsIds, savedPostsIds: $savedPostsIds, groupIds: $groupIds, isOnline: $isOnline, isdobShown: $isdobShown, isEmailShown: $isEmailShown, isVerified: $isVerified,reportCount: $reportCount,fcmToken: $fcmToken )';
+    return 'UserModel(id: $id, email: $email, username: $username, ghosName : $ghostName,dob: $dob, name: $name, createdAt: $createdAt, bio: $bio, imageStr: $imageStr, postsIds: $postsIds, storiesIds: $storiesIds, followersIds: $followersIds, followingsIds: $followingsIds, savedPostsIds: $savedPostsIds, groupIds: $groupIds, isOnline: $isOnline, isdobShown: $isdobShown, isEmailShown: $isEmailShown, isVerified: $isVerified,reportCount: $reportCount,fcmToken: $fcmToken )';
   }
 
   @override
@@ -163,6 +169,7 @@ class UserModel {
     return other is UserModel &&
         other.id == id &&
         other.email == email &&
+        other.ghostName == ghostName &&
         other.username == username &&
         other.dob == dob &&
         other.name == name &&
@@ -188,6 +195,7 @@ class UserModel {
     return id.hashCode ^
         email.hashCode ^
         username.hashCode ^
+        ghostName.hashCode ^
         dob.hashCode ^
         name.hashCode ^
         createdAt.hashCode ^

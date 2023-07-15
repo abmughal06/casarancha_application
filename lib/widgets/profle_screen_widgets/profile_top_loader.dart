@@ -8,12 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
+import '../../screens/profile/follower_following_screen.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
@@ -201,10 +203,6 @@ class ProfileTopLoader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Align(
-              alignment: Alignment.topLeft,
-              // child: ghostModeBtn(iconSize: 40),
-            ),
-            Align(
               alignment: Alignment.topRight,
               child: IconButton(
                 onPressed: () {
@@ -256,17 +254,9 @@ class ProfileTopLoader extends StatelessWidget {
           children: [
             postFollowCount(count: "0", strText: strProfilePost),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
-            GestureDetector(
-              // onTap: () =>
-              // Get.to(() => const CurruentUserFollowerFollowingScreen()),
-              child: postFollowCount(count: '0', strText: strProfileFollowers),
-            ),
+            postFollowCount(count: '0', strText: strProfileFollowers),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
-            GestureDetector(
-              // onTap: () =>
-              //     Get.to(() => const CurruentUserFollowerFollowingScreen()),
-              child: postFollowCount(count: '0', strText: strProfileFollowing),
-            ),
+            postFollowCount(count: '0', strText: strProfileFollowing),
           ],
         ),
         heightBox(14.h),
@@ -294,6 +284,7 @@ class ProfileTop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appUsers = context.watch<List<UserModel>?>();
     return Column(
       children: [
         Row(
@@ -368,18 +359,32 @@ class ProfileTop extends StatelessWidget {
                 count: postFollowCout.toString(), strText: strProfilePost),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             GestureDetector(
-              // onTap: () =>
-              //     Get.to(() => const CurruentUserFollowerFollowingScreen()),
+              onTap: () =>
+                  Get.to(() => const CurruentUserFollowerFollowingScreen(
+                        follow: true,
+                      )),
               child: postFollowCount(
-                  count: user!.followersIds.length.toString(),
+                  count: appUsers == null
+                      ? "0"
+                      : appUsers
+                          .where((element) =>
+                              user!.followersIds.contains(element.id))
+                          .length
+                          .toString(),
                   strText: strProfileFollowers),
             ),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             GestureDetector(
-              // onTap: () =>
-              //     Get.to(() => const CurruentUserFollowerFollowingScreen()),
+              onTap: () =>
+                  Get.to(() => const CurruentUserFollowerFollowingScreen()),
               child: postFollowCount(
-                  count: user!.followingsIds.length.toString(),
+                  count: appUsers == null
+                      ? "0"
+                      : appUsers
+                          .where((element) =>
+                              user!.followingsIds.contains(element.id))
+                          .length
+                          .toString(),
                   strText: strProfileFollowing),
             ),
           ],

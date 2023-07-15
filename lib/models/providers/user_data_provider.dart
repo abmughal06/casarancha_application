@@ -1,3 +1,4 @@
+import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,6 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../comment_model.dart';
+import '../ghost_message_details.dart';
+import '../message_details.dart';
 import '../post_model.dart';
 import '../user_model.dart';
 
@@ -33,9 +37,14 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<PostModel>?> get posts {
-    return FirebaseFirestore.instance.collection("posts").snapshots().map(
-        (event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+    return FirebaseFirestore.instance
+        .collection("posts")
+        .orderBy("createdAt", descending: true)
+        .snapshots()
+        .map((event) => event.docs
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data()['mediaData'].isNotEmpty)
             .map((e) => PostModel.fromMap(e.data()))
             .toList());
   }
@@ -62,5 +71,60 @@ class DataProvider extends ChangeNotifier {
     } else {
       return null;
     }
+  }
+
+  Future<List<Comment>>? comment(postId) {
+    return FirebaseFirestore.instance
+        .collection("posts")
+        .doc(postId)
+        .collection("comments")
+        .get()
+        .then((event) => event.docs
+            .where((element) => element.data().isNotEmpty)
+            .map((e) => Comment.fromMap(e.data()))
+            .toList());
+  }
+
+  Stream<List<MessageDetails>?>? get chatListUsers {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("messageList")
+        .orderBy("createdAt", descending: true)
+        .snapshots()
+        .map((event) => event.docs
+            .where((element) => element.data().isNotEmpty)
+            .map((e) => MessageDetails.fromMap(e.data()))
+            .toList());
+  }
+
+  Stream<List<GhostMessageDetails>?>? get ghostChatListUsers {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("ghostMessageList")
+        .orderBy("createdAt", descending: true)
+        .snapshots()
+        .map((event) => event.docs
+            .where((element) => element.data().isNotEmpty)
+            .map((e) => GhostMessageDetails.fromMap(e.data()))
+            .toList());
+  }
+
+  Stream<List<Message>?>? messages(userId) {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("messageList")
+        .doc(userId)
+        .collection("messages")
+        .orderBy("createdAt", descending: true)
+        .snapshots()
+        .map((event) => event.docs
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data()['content'].isNotEmpty)
+            .map((e) => Message.fromMap(e.data()))
+            .toList());
   }
 }

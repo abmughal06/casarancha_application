@@ -16,7 +16,8 @@ class ImageGridView extends StatelessWidget {
     return Stack(
       children: [
         Visibility(
-          visible: imageList!.isNotEmpty,
+          visible: imageList!.isNotEmpty &&
+              imageList!.map((e) => e.mediaData).isNotEmpty,
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
@@ -43,7 +44,8 @@ class ImageGridView extends StatelessWidget {
           ),
         ),
         Visibility(
-          visible: imageList!.isEmpty,
+          visible:
+              imageList!.isEmpty && imageList!.map((e) => e.mediaData).isEmpty,
           child: const Center(
             child: TextWidget(
               text: "No Images are available to show",

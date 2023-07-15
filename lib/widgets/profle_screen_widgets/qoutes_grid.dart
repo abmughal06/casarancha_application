@@ -15,7 +15,8 @@ class QoutesGridView extends StatelessWidget {
     return Stack(
       children: [
         Visibility(
-          visible: qoutesList!.isNotEmpty,
+          visible: qoutesList!.isNotEmpty &&
+              qoutesList!.map((e) => e.mediaData).isNotEmpty,
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
@@ -61,7 +62,8 @@ class QoutesGridView extends StatelessWidget {
           ),
         ),
         Visibility(
-          visible: qoutesList!.isEmpty,
+          visible: qoutesList!.isEmpty &&
+              qoutesList!.map((e) => e.mediaData).isEmpty,
           child: const Center(
             child: TextWidget(
               text: "No Quotes are available to show",

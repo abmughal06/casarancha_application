@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/story_model.dart';
@@ -15,6 +14,7 @@ import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/home_screen_widgets/post_card.dart';
 import '../../../widgets/home_screen_widgets/story_widget.dart';
+import '../../dashboard/ghost_mode_btn.dart';
 import '../notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,18 +25,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // @override
-  // void didUpdateWidget(covariant oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   // if (oldWidget.durationInSeconds != widget.durationInSeconds) {
-  //   //   _controller.duration = Duration(seconds: widget.durationInSeconds);
-  //   //   _controller.repeat(reverse: true);
-  //   // }
-  // }
-
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
+    final users = context.watch<List<UserModel>?>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -51,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         elevation: 0,
-        // leading: ghostModeBtn(homeCtrl: homeScreenController),
+        leading: const GhostModeBtn(),
         actions: [
           IconButton(
             onPressed: () {
@@ -102,12 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Consumer<List<Story>?>(
               builder: (context, provider, b) {
                 if (provider == null) {
-                  return const CircularProgressIndicator();
+                  return Container();
                 } else {
                   var filterList = provider
                       .where((element) => element.creatorId != currentUser!.id)
                       .toList();
-                  log("${provider.where((element) => element.creatorId == currentUser!.id).toList().isNotEmpty}");
+                  log("${provider.where((element) => element.creatorId == currentUser!.id).isNotEmpty}");
                   return Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
@@ -178,18 +170,25 @@ class _HomeScreenState extends State<HomeScreen> {
               if (posts == null) {
                 return Container();
               } else {
+                var post = posts
+                    .where((element) => element.mediaData.isNotEmpty)
+                    .toList();
+                List<PostModel> filterList = [];
+                for (var p in post) {
+                  for (var u in users!) {
+                    if (p.creatorId == u.id) {
+                      filterList.add(p);
+                    }
+                  }
+                }
+
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: posts
-                      .where((element) => element.mediaData.isNotEmpty)
-                      .toList()
-                      .length,
+                  itemCount: filterList.length,
                   itemBuilder: (context, index) {
                     return PostCard(
-                      post: posts
-                          .where((element) => element.mediaData.isNotEmpty)
-                          .toList()[index],
+                      post: filterList[index],
                     );
                   },
                 );

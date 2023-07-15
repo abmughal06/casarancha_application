@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
 import 'package:casarancha/widgets/home_screen_widgets/report_sheet.dart';
@@ -15,6 +16,7 @@ import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
+import '../../screens/home/post_detail_screen.dart';
 import '../common_widgets.dart';
 import '../music_player_url.dart';
 import '../text_widget.dart';
@@ -83,7 +85,9 @@ class PostCard extends StatelessWidget {
             image: post.creatorDetails.imageUrl,
             ontap: () {},
             headerOnTap: () {
-              // postCardController.gotoAppUserScreen(post.creatorId);
+              Get.to(() => AppUserScreen(
+                  appUserId: post.creatorId,
+                  appUserName: post.creatorDetails.name));
             },
           ),
           showPostAccordingToItsType(post: post)!,
@@ -146,8 +150,9 @@ class PostCard extends StatelessWidget {
               //           isVerified: post
               //               .creatorDetails.isVerified),
               //     ));
-              // Get.to(() => PostDetailScreen(
-              //     postModel: post, postCardController: postCardController));
+              Get.to(() => PostDetailScreen(
+                    postModel: post,
+                  ));
             },
             comments: post.commentIds.length,
             isDesc: post.description.isNotEmpty,
@@ -286,32 +291,32 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
           },
         );
 
-      case "Music":
-        return Column(
-          children: [
-            AspectRatio(
-              aspectRatio: 13 / 9,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: post.mediaData.length,
-                itemBuilder: (context, index) => InkWell(
-                    // onTap: () => Get.to(() => PostDetailScreen(
-                    //     postModel: post,
-                    //     postCardController: postCardController)),
-                    onDoubleTap: () async {
-                      log("ghost mode clicked");
+      // case "Music":
+      //   return Column(
+      //     children: [
+      //       AspectRatio(
+      //         aspectRatio: 13 / 9,
+      //         child: ListView.builder(
+      //           scrollDirection: Axis.horizontal,
+      //           shrinkWrap: true,
+      //           itemCount: post.mediaData.length,
+      //           itemBuilder: (context, index) => InkWell(
+      //               // onTap: () => Get.to(() => PostDetailScreen(
+      //               //     postModel: post,
+      //               //     postCardController: postCardController)),
+      //               onDoubleTap: () async {
+      //                 log("ghost mode clicked");
 
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          backgroundColor: colorPrimaryA05,
-                          content: Text('Ghost Mode Enabled!')));
-                    },
-                    child: MusicPlayerUrl(
-                        musicDetails: post.mediaData[index], ontap: () {})),
-              ),
-            ),
-          ],
-        );
+      //                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      //                     backgroundColor: colorPrimaryA05,
+      //                     content: Text('Ghost Mode Enabled!')));
+      //               },
+      //               child: MusicPlayerUrl(
+      //                   musicDetails: post.mediaData[index], ontap: () {})),
+      //         ),
+      //       ),
+      //     ],
+      //   );
 
       default:
         return Container();
