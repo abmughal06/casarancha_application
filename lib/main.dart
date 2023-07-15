@@ -25,19 +25,20 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (BuildContext context, Widget? child) {
         return StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              return ProviderApp(
-                app: GetMaterialApp(
-                  navigatorKey: rootNavigatorKey,
-                  debugShowCheckedModeBanner: false,
-                  theme: ThemeData(
-                    primarySwatch: Colors.red,
-                  ),
-                  home: const Authenticate(),
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            return ProviderApp(
+              app: GetMaterialApp(
+                navigatorKey: rootNavigatorKey,
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  primarySwatch: Colors.red,
                 ),
-              );
-            });
+                home: const Authenticate(),
+              ),
+            );
+          },
+        );
       },
     );
   }

@@ -208,10 +208,11 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
 
       TwitterLogin login = TwitterLogin(
-          apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
-          apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
-          redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler");
-      AuthResult authResult = await login.login();
+        apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
+        apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
+        redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler",
+      );
+      AuthResult authResult = await login.loginV2();
       if (authResult.authToken != null && authResult.authTokenSecret != null) {
         AuthCredential credential = TwitterAuthProvider.credential(
             accessToken: authResult.authToken!,

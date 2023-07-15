@@ -58,19 +58,18 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<NotificationModel>?>? get notifications {
-    if (FirebaseAuth.instance.currentUser?.uid != null) {
-      return FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection("notificationlist")
-          .snapshots()
-          .map((event) => event.docs
-              .where((element) => element.data().isNotEmpty)
-              .map((e) => NotificationModel.fromMap(e.data()))
-              .toList());
-    } else {
+    if (FirebaseAuth.instance.currentUser?.uid == null) {
       return null;
     }
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("notificationlist")
+        .snapshots()
+        .map((event) => event.docs
+            .where((element) => element.data().isNotEmpty)
+            .map((e) => NotificationModel.fromMap(e.data()))
+            .toList());
   }
 
   Future<List<Comment>>? comment(postId) {
@@ -86,6 +85,9 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<MessageDetails>?>? get chatListUsers {
+    if (FirebaseAuth.instance.currentUser?.uid == null) {
+      return null;
+    }
     return FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -99,6 +101,9 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<GhostMessageDetails>?>? get ghostChatListUsers {
+    if (FirebaseAuth.instance.currentUser?.uid == null) {
+      return null;
+    }
     return FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -112,6 +117,9 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<Message>?>? messages(userId) {
+    if (FirebaseAuth.instance.currentUser?.uid == null) {
+      return null;
+    }
     return FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
