@@ -37,19 +37,19 @@ class AppUserTile extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        onTap: appUser.id == currentUser.id
-            ? () => const GlobalSnackBar(message: 'Open from profile page')
-            : () => Get.to(
-                  () => AppUserScreen(
-                    appUserController: Get.put(
-                      AppUserController(
-                        appUser: appUser,
-                        appUserId: appUser.id,
-                        currentUserId: currentUser.id,
-                      ),
-                    ),
-                  ),
-                ),
+        // onTap: appUser.id == currentUser.id
+        //     ? () => const GlobalSnackBar(message: 'Open from profile page')
+        //     : () => Get.to(
+        //           // () => AppUserScreen(
+        //           //   appUserController: Get.put(
+        //           //     AppUserController(
+        //           //       appUser: appUser,
+        //           //       appUserId: appUser.id,
+        //           //       currentUserId: currentUser.id,
+        //           //     ),
+        //           //   ),
+        //           // ),
+        //         ),
         title: Row(
           children: [
             Text(appUser.name),

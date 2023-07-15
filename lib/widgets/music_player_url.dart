@@ -21,30 +21,31 @@ class MusicPlayerUrl extends StatefulWidget {
 }
 
 class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
-  late AudioPlayer audioPlayer;
+  AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
   @override
   void initState() {
+    initAudio();
+
     super.initState();
-    audioPlayer = AudioPlayer();
+  }
+
+  initAudio() {
     setAudio();
     audioPlayer.onPlayerStateChanged.listen((event) {
-      setState(() {
-        isPlaying = event == PlayerState.playing;
-      });
+      isPlaying = event == PlayerState.playing;
+      setState(() {});
     });
     audioPlayer.onDurationChanged.listen((event) {
-      setState(() {
-        duration = event;
-      });
+      duration = event;
+      setState(() {});
     });
     audioPlayer.onPositionChanged.listen((event) {
-      setState(() {
-        position = event;
-      });
+      position = event;
+      setState(() {});
     });
   }
 
@@ -83,11 +84,9 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
           isVisible = visibilityInfo.visibleFraction > 0.5;
           if (isVisible) {
             audioPlayer.pause();
-            // isPlaying = true;
             audioPlayer.setVolume(0.0);
           } else {
             audioPlayer.pause();
-            // isPlaying = false;
             audioPlayer.setVolume(0.0);
           }
         });

@@ -322,7 +322,7 @@ packages:
     source: hosted
     version: "4.0.6"
   email_validator:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: email_validator
       sha256: e9a90f27ab2b915a27d7f9c2a7ddda5dd752d6942616ee83529b686fc086221b
@@ -1086,7 +1086,7 @@ packages:
     source: hosted
     version: "4.2.4"
   provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: provider
       sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
@@ -1182,7 +1182,7 @@ packages:
     source: hosted
     version: "2.0.0"
   sign_in_with_apple:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: sign_in_with_apple
       sha256: "54791280a9b4c233c3a85027c936690f77e2406fd0ffd6e1e0ac92338448d6b5"

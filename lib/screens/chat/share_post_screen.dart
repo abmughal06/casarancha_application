@@ -297,7 +297,7 @@ class SharePostScreen extends StatelessWidget {
                         final data = doc.data!.docs[index].data();
                         var isSent = false.obs;
                         print(creatorDetails);
-                        chatUser.add(creatorDetails);
+                        // chatUser.add(creatorDetails);
                         return SizedBox(
                           height: 70,
                           child: ListTile(
@@ -497,7 +497,7 @@ class SharePostScreen extends StatelessWidget {
                                 final CreatorDetails creatorDetails =
                                     CreatorDetails.fromMap(
                                         snapshot.data!.docs[index].data());
-                                var val11 = generateRandomString(7);
+                                // var val11 = generateRandomString(7);
 
                                 return StreamBuilder<DocumentSnapshot<Map>>(
                                   stream: FirebaseFirestore.instance
