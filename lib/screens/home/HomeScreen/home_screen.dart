@@ -5,6 +5,7 @@ import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
     final users = context.watch<List<UserModel>?>();
+    final ghostProvider = context.watch<DashboardProvider>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -97,9 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Container();
                 } else {
                   var filterList = provider
-                      .where((element) => element.creatorId != currentUser!.id)
+                      .where((element) =>
+                          currentUser!.followersIds.contains(element.id) ||
+                          currentUser.followingsIds.contains(element.id))
                       .toList();
-                  log("${provider.where((element) => element.creatorId == currentUser!.id).isNotEmpty}");
                   return Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
@@ -170,9 +173,14 @@ class _HomeScreenState extends State<HomeScreen> {
               if (posts == null) {
                 return Container();
               } else {
-                var post = posts
-                    .where((element) => element.mediaData.isNotEmpty)
-                    .toList();
+                var post = ghostProvider.checkGhostMode
+                    ? posts.where((element) => (currentUser!.followersIds
+                            .contains(element.creatorId) ||
+                        currentUser.followingsIds.contains(element.creatorId) &&
+                            element.mediaData.isNotEmpty))
+                    : posts
+                        .where((element) => element.mediaData.isNotEmpty)
+                        .toList();
                 List<PostModel> filterList = [];
                 for (var p in post) {
                   for (var u in users!) {
@@ -184,6 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 return ListView.builder(
                   shrinkWrap: true,
+                  padding: EdgeInsets.only(bottom: 80.h),
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filterList.length,
                   itemBuilder: (context, index) {

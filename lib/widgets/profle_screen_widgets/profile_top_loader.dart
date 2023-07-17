@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
+import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -290,9 +291,9 @@ class ProfileTop extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Align(
+            const Align(
               alignment: Alignment.topLeft,
-              // child: ghostModeBtn(iconSize: 40),
+              child: GhostModeBtn(),
             ),
             Align(
               alignment: Alignment.topRight,

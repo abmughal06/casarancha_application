@@ -1,4 +1,4 @@
-import 'package:casarancha/screens/dashboard/provider/ghost_porvider.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,7 +29,7 @@ class ChatListScreen extends StatelessWidget {
         leading: const GhostModeBtn(),
         actions: [IconButton(onPressed: () {}, icon: Image.asset(imgAddPost))],
       ),
-      body: Consumer<GhostProvider>(builder: (context, ghost, b) {
+      body: Consumer<DashboardProvider>(builder: (context, ghost, b) {
         return DefaultTabController(
           length: 2,
           initialIndex: ghost.checkGhostMode ? 1 : 0,

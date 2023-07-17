@@ -21,7 +21,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
         return Card(
           margin: EdgeInsets.symmetric(
             horizontal: 20.w,
-            vertical: Platform.isAndroid ? 10.w : 0.w,
+            vertical:
+                provider.checkGhostMode || Platform.isAndroid ? 10.w : 0.w,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(

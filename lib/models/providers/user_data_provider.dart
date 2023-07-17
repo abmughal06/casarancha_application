@@ -65,6 +65,7 @@ class DataProvider extends ChangeNotifier {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection("notificationlist")
+        .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
             .where((element) => element.data().isNotEmpty)
@@ -72,13 +73,13 @@ class DataProvider extends ChangeNotifier {
             .toList());
   }
 
-  Future<List<Comment>>? comment(postId) {
+  Stream<List<Comment>>? comment(id) {
     return FirebaseFirestore.instance
         .collection("posts")
-        .doc(postId)
+        .doc(id)
         .collection("comments")
-        .get()
-        .then((event) => event.docs
+        .snapshots()
+        .map((event) => event.docs
             .where((element) => element.data().isNotEmpty)
             .map((e) => Comment.fromMap(e.data()))
             .toList());

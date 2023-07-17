@@ -16,6 +16,7 @@ import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
+import '../../screens/chat/share_post_screen.dart';
 import '../../screens/home/post_detail_screen.dart';
 import '../common_widgets.dart';
 import '../music_player_url.dart';
@@ -120,23 +121,9 @@ class PostCard extends StatelessWidget {
             videoViews: '0',
             postId: post.id,
             ontapShare: () {
-              // Get.to(() => SharePostScreen(
-              //       postModel: PostModel(
-              //         id: post.id,
-              //         creatorId: post.creatorId,
-              //         creatorDetails: post.creatorDetails,
-              //         createdAt: post.createdAt,
-              //         description: post.description,
-              //         locationName: post.locationName,
-              //         shareLink: post.shareLink,
-              //         mediaData: post.mediaData,
-              //         tagsIds: post.tagsIds,
-              //         likesIds: post.likesIds,
-              //         showPostTime: post.showPostTime,
-              //         postBlockStatus: post.postBlockStatus,
-              //         commentIds: post.commentIds,
-              //       ),
-              //     ));
+              Get.to(
+                () => SharePostScreen(postModel: post),
+              );
             },
             ontapCmnt: () {
               // Get.to(() => CommentScreen(
@@ -291,32 +278,21 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
           },
         );
 
-      // case "Music":
-      //   return Column(
-      //     children: [
-      //       AspectRatio(
-      //         aspectRatio: 13 / 9,
-      //         child: ListView.builder(
-      //           scrollDirection: Axis.horizontal,
-      //           shrinkWrap: true,
-      //           itemCount: post.mediaData.length,
-      //           itemBuilder: (context, index) => InkWell(
-      //               // onTap: () => Get.to(() => PostDetailScreen(
-      //               //     postModel: post,
-      //               //     postCardController: postCardController)),
-      //               onDoubleTap: () async {
-      //                 log("ghost mode clicked");
-
-      //                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      //                     backgroundColor: colorPrimaryA05,
-      //                     content: Text('Ghost Mode Enabled!')));
-      //               },
-      //               child: MusicPlayerUrl(
-      //                   musicDetails: post.mediaData[index], ontap: () {})),
-      //         ),
-      //       ),
-      //     ],
-      //   );
+      case "Music":
+        return Column(
+          children: [
+            AspectRatio(
+              aspectRatio: 13 / 9,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: post.mediaData.length,
+                itemBuilder: (context, index) => MusicPlayerUrl(
+                    musicDetails: post.mediaData[index], ontap: () {}),
+              ),
+            ),
+          ],
+        );
 
       default:
         return Container();

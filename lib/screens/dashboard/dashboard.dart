@@ -1,6 +1,5 @@
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
-import 'package:casarancha/screens/dashboard/provider/ghost_porvider.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
@@ -15,13 +14,12 @@ class DashBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dashboardProvider = context.watch<DashboardProvider>();
-    final ghost = context.watch<GhostProvider>();
     return SafeArea(
-      top: ghost.checkGhostMode,
-      bottom: ghost.checkGhostMode,
+      top: dashboardProvider.checkGhostMode,
+      bottom: dashboardProvider.checkGhostMode,
       child: Scaffold(
           body: Container(
-            decoration: ghost.checkGhostMode
+            decoration: dashboardProvider.checkGhostMode
                 ? BoxDecoration(
                     border: Border.all(
                       width: 2.5,
