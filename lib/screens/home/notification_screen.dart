@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/widgets/text_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,12 +13,34 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../resources/color_resources.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
 
   @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  void unreadNotification() async {
+    var ref = FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("notificationlist");
+    var docs = await ref.get();
+    for (var d in docs.docs) {
+      ref.doc(d.id).update({"isRead": true});
+      log(d.id);
+    }
+  }
+
+  @override
+  void initState() {
+    unreadNotification();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // final notifications = context.watch<List<NotificationModel>?>();
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -59,18 +84,11 @@ class NotificationScreen extends StatelessWidget {
                       itemCount: notifications.length,
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {
-                        // var data = snapshot.data!.docs[index].data();
                         var notification = notifications[index];
-                        // FirebaseFirestore.instance
-                        //     .collection("users")
-                        //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                        //     .collection("notificationlist")
-                        //     .doc(snapshot.data!.docs[index].id)
-                        //     .update({"isRead": true});
+
                         if (notification.appUserId != null) {
                           if (notification.appUserId !=
                               FirebaseAuth.instance.currentUser!.uid) {
-                            // log("daldasldkasl;dkald;kasd $data");
                             return ListTile(
                               leading: Container(
                                 height: 46.h,

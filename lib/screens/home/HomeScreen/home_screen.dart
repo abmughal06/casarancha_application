@@ -16,6 +16,8 @@ import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/home_screen_widgets/post_card.dart';
 import '../../../widgets/home_screen_widgets/story_widget.dart';
 import '../../dashboard/ghost_mode_btn.dart';
+import '../CreatePost/create_post_screen.dart';
+import '../CreateStory/add_story_screen.dart';
 import '../notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -49,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // Get.to(() => CreatePostScreen());
+              Get.to(() => const CreatePostScreen());
             },
             icon: Image.asset(
               imgAddPost,
@@ -122,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               )
                             : GestureDetector(
                                 onTap: () {
-                                  // Get.to(() => AddStoryScreen());
+                                  Get.to(() => const AddStoryScreen());
                                 },
                                 child: SvgPicture.asset(
                                   icProfileAdd,

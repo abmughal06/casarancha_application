@@ -1,318 +1,366 @@
-// import 'dart:io';
-// import 'package:casarancha/models/user_model.dart';
-// import 'package:image_cropper/image_cropper.dart';
-// import 'package:path/path.dart';
-// import 'package:casarancha/models/media_details.dart';
-// import 'package:casarancha/models/post_creator_details.dart';
-// import 'package:casarancha/models/post_model.dart';
+import 'dart:developer';
+import 'dart:io';
+import 'package:casarancha/models/user_model.dart';
+import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:path/path.dart';
+import 'package:casarancha/models/media_details.dart';
+import 'package:casarancha/models/post_creator_details.dart';
+import 'package:casarancha/models/post_model.dart';
 
-// import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
-// import 'package:casarancha/utils/snackbar.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:file_picker/file_picker.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
+import 'package:casarancha/utils/snackbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 // import 'package:get/get.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:video_player/video_player.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
-// class CreatePostController extends GetxController {
-//   late TextEditingController quoteTextController;
-//   late TextEditingController captionController;
-//   late TextEditingController tagsController;
-//   late TextEditingController locationController;
+class CreatePostMethods extends ChangeNotifier {
+  late TextEditingController quoteTextController;
+  late TextEditingController captionController;
+  late TextEditingController tagsController;
+  late TextEditingController locationController;
 
-//   late ProfileScreenController profileScreenController;
+  CreatePostMethods() {
+    quoteTextController = TextEditingController();
+    captionController = TextEditingController();
+    tagsController = TextEditingController();
+    locationController = TextEditingController();
+  }
 
-//   final fbinstance = FirebaseFirestore.instance;
+  final fbinstance = FirebaseFirestore.instance;
 
-//   //Obserables
-//   var photosList = <File>[].obs;
-//   var videosList = <File>[].obs;
-//   var musicList = <File>[].obs;
-//   var qouteList = <String>[].obs;
+  //Obserables
+  var photosList = <File>[];
+  var videosList = <File>[];
+  var musicList = <File>[];
+  var qouteList = <String>[];
+  var mediaUploadTasks = <UploadTask>[];
+  var mediaData = <MediaDetails>[];
+  var isSharingPost = false;
 
-//   var mediaUploadTasks = <UploadTask>[].obs;
+  //Methods
 
-//   var mediaData = <MediaDetails>[].obs;
+  void clearLists() {
+    photosList.clear();
+    videosList.clear();
+    musicList.clear();
+    quoteTextController.clear();
+    mediaUploadTasks.clear();
+    mediaData.clear();
+    captionController.clear();
+    tagsController.clear();
+    locationController.clear();
+  }
 
-//   var isSharingPost = false.obs;
+  Future<void> sharePost(
+      {String? groupId, bool showPostTime = true, UserModel? user}) async {
+    isSharingPost = true;
+    notifyListeners();
+    final postRef = groupId != null
+        ? fbinstance.collection('groups').doc(groupId).collection('posts').doc()
+        : fbinstance.collection('posts').doc();
+    final userRef = fbinstance.collection('users').doc(user!.id);
+    await postRef.set({});
+    final postId = postRef.id;
+    final creatorId = user.id;
+    final creatorDetails = CreatorDetails(
+      name: user.name,
+      imageUrl: user.imageStr,
+      isVerified: user.isVerified,
+    );
+    try {
+      await uploadMediaFiles(postId: postId);
+      final post = PostModel(
+        id: postId,
+        creatorId: creatorId,
+        creatorDetails: creatorDetails,
+        createdAt: DateTime.now().toUtc().toIso8601String(),
+        description: captionController.text.trim(),
+        locationName: locationController.text.trim(),
+        shareLink: '',
+        showPostTime: showPostTime,
+        mediaData: mediaData,
+      );
 
-//   //Methods
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
+      UserModel userModel = UserModel.fromMap(userSnapshot.data() ?? {});
+      userModel.postsIds.add(postId);
+      await userRef.update({"postsIds": userModel.postsIds});
 
-//   Future<void> sharePost({String? groupId, bool showPostTime = true}) async {
-//     isSharingPost.value = true;
-//     final postRef = groupId != null
-//         ? fbinstance.collection('groups').doc(groupId).collection('posts').doc()
-//         : fbinstance.collection('posts').doc();
-//     final userRef = fbinstance
-//         .collection('users')
-//         .doc(profileScreenController.user.value.id);
-//     await postRef.set({});
-//     final postId = postRef.id;
-//     final creatorId = profileScreenController.user.value.id;
-//     final creatorDetails = CreatorDetails(
-//       name: profileScreenController.user.value.name,
-//       imageUrl: profileScreenController.user.value.imageStr,
-//       isVerified: profileScreenController.user.value.isVerified,
-//     );
-//     try {
-//       await uploadMediaFiles(postId: postId);
-//       final post = PostModel(
-//         id: postId,
-//         creatorId: creatorId,
-//         creatorDetails: creatorDetails,
-//         createdAt: DateTime.now().toUtc().toIso8601String(),
-//         description: captionController.text.trim(),
-//         locationName: locationController.text.trim(),
-//         shareLink: '',
-//         showPostTime: showPostTime,
-//         mediaData: mediaData,
-//       );
+      // profileScreenController.user.value = userModel;
 
-//       DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
-//       UserModel userModel = UserModel.fromMap(userSnapshot.data() ?? {});
-//       userModel.postsIds.add(postId);
-//       await userRef.update({"postsIds": userModel.postsIds});
+      await postRef.set(post.toMap());
+      Get.back();
+      Get.back();
+    } catch (e) {
+      isSharingPost = false;
+      notifyListeners();
+      GlobalSnackBar(message: e.toString());
+    } finally {
+      isSharingPost = false;
+      notifyListeners();
+    }
+  }
 
-//       profileScreenController.user.value = userModel;
+  Future<void> uploadMediaFiles({required String postId}) async {
+    final qouteText = quoteTextController.text.trim();
 
-//       await postRef.set(post.toMap());
-//       Get.back();
-//       Get.back();
-//     } catch (e) {
-//       GlobalSnackBar(message: e.toString());
-//     }
-//     isSharingPost.value = false;
-//   }
+    if (qouteText.isNotEmpty) {
+      mediaData.add(
+        MediaDetails(
+          id: DateTime.now().toUtc().toIso8601String(),
+          name: 'Nothing',
+          type: 'Qoute',
+          link: qouteText,
+        ),
+      );
+    }
 
-//   Future<void> uploadMediaFiles({required String postId}) async {
-//     final qouteText = quoteTextController.text.trim();
+    final allMediaFiles = [...photosList, ...videosList, ...musicList];
 
-//     if (qouteText.isNotEmpty) {
-//       mediaData.add(
-//         MediaDetails(
-//           id: DateTime.now().toUtc().toIso8601String(),
-//           name: 'Nothing',
-//           type: 'Qoute',
-//           link: qouteText,
-//         ),
-//       );
-//     }
+    final storageRef = FirebaseStorage.instance.ref();
 
-//     final allMediaFiles = [...photosList, ...videosList, ...musicList];
+    try {
+      for (var element in allMediaFiles) {
+        final String fileType;
+        log("check 1");
+        final String fileName = basename(element.path);
+        Size? imageSize;
+        double? videoAspectRatio;
 
-//     final storageRef = FirebaseStorage.instance.ref();
+        if (photosList.contains(element)) {
+          fileType = 'Photo';
+          imageSize = await getImageSize(element);
+        } else if (videosList.contains(element)) {
+          fileType = 'Video';
+          videoAspectRatio = await getVideoAspectRatio(element);
+        } else {
+          fileType = 'Music';
+        }
+/* 
+File image = new File('image.png'); // Or any other way to get a File instance.
+var decodedImage = await decodeImageFromList(image.readAsBytesSync());
+print(decodedImage.width);
+print(decodedImage.height);
+ */
+        log("check 2");
 
-//     try {
-//       for (var element in allMediaFiles) {
-//         final String fileType;
-//         final String fileName = basename(element.path);
-//         Size? imageSize;
-//         double? videoAspectRatio;
+        final storageFileRef = storageRef.child('Posts/$postId/$fileName');
+        log("check 3");
 
-//         if (photosList.contains(element)) {
-//           fileType = 'Photo';
-//           imageSize = await getImageSize(element);
-//         } else if (videosList.contains(element)) {
-//           fileType = 'Video';
-//           videoAspectRatio = await getVideoAspectRatio(element);
-//         } else {
-//           fileType = 'Music';
-//         }
-// /* 
-// File image = new File('image.png'); // Or any other way to get a File instance.
-// var decodedImage = await decodeImageFromList(image.readAsBytesSync());
-// print(decodedImage.width);
-// print(decodedImage.height);
-//  */
-//         final storageFileRef = storageRef.child('Posts/$postId/$fileName');
+        storageFileRef.putFile(element);
 
-//         final uploadTask = storageFileRef.putFile(element);
-//         mediaUploadTasks.add(uploadTask);
-//         final mediaRef = await uploadTask.whenComplete(() {});
-//         final fileUrl = await mediaRef.ref.getDownloadURL();
-//         final MediaDetails mediaDetails;
-//         if (fileType == 'Photo') {
-//           mediaDetails = MediaDetails(
-//               id: DateTime.now().toUtc().toIso8601String(),
-//               name: fileName,
-//               type: fileType,
-//               link: fileUrl,
-//               imageHeight: imageSize?.height.toString(),
-//               imageWidth: imageSize?.width.toString());
-//         } else if (fileType == 'Video') {
-//           mediaDetails = MediaDetails(
-//               id: DateTime.now().toUtc().toIso8601String(),
-//               name: fileName,
-//               type: fileType,
-//               link: fileUrl,
-//               videoAspectRatio: videoAspectRatio?.toString());
-//         } else {
-//           mediaDetails = MediaDetails(
-//             id: DateTime.now().toUtc().toIso8601String(),
-//             name: fileName,
-//             type: fileType,
-//             link: fileUrl,
-//           );
-//         }
-//         mediaData.add(mediaDetails);
-//       }
-//     } catch (e) {
-//       GlobalSnackBar.show(message: e.toString());
-//     }
-//   }
+        final uploadTask = storageFileRef.putData(await element.readAsBytes());
+        log("check 4");
 
-//   Future<void> getPhoto() async {
-//     try {
-//       final pickedPhoto =
-//           await ImagePicker().pickImage(source: ImageSource.gallery);
+        mediaUploadTasks.add(uploadTask);
+        notifyListeners();
+        log("check 5");
 
-//       if (pickedPhoto != null) {
-//         CroppedFile? croppedImage = await ImageCropper().cropImage(
-//             sourcePath: pickedPhoto.path,
-//             aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
-//         var image = File(croppedImage!.path);
+        final mediaRef = await uploadTask.whenComplete(() {});
+        log("check 6");
 
-//         photosList.add(image);
-//       }
-//     } catch (e) {
-//       GlobalSnackBar.show(message: 'Operation Cancelled');
-//     }
-//   }
+        final fileUrl = await mediaRef.ref.getDownloadURL();
+        log("check 7");
 
-//   void removePhotoFile(File photoFile) {
-//     photosList.remove(photoFile);
-//   }
+        final MediaDetails mediaDetails;
+        log("check 8");
 
-//   Future<void> getVideo() async {
-//     final File videoFileHelper;
-//     try {
-//       final pickedVideo = await ImagePicker().pickVideo(
-//         source: ImageSource.gallery,
-//       );
-//       videoFileHelper = File(pickedVideo!.path);
-//       videosList.add(videoFileHelper);
-//     } catch (e) {
-//       GlobalSnackBar.show(message: 'Operation Cancelled');
-//     }
-//   }
+        if (fileType == 'Photo') {
+          log("check 9");
 
-//   void removeVideoFile(File videoFile) {
-//     videosList.remove(videoFile);
-//   }
+          mediaDetails = MediaDetails(
+              id: DateTime.now().toUtc().toIso8601String(),
+              name: fileName,
+              type: fileType,
+              link: fileUrl,
+              imageHeight: imageSize?.height.toString(),
+              imageWidth: imageSize?.width.toString());
+        } else if (fileType == 'Video') {
+          mediaDetails = MediaDetails(
+              id: DateTime.now().toUtc().toIso8601String(),
+              name: fileName,
+              type: fileType,
+              link: fileUrl,
+              videoAspectRatio: videoAspectRatio?.toString());
+        } else {
+          mediaDetails = MediaDetails(
+            id: DateTime.now().toUtc().toIso8601String(),
+            name: fileName,
+            type: fileType,
+            link: fileUrl,
+          );
+        }
+        log("check 10");
 
-//   Future<void> getMusic() async {
-//     final List<File> musiciFilesHelper = [];
-//     try {
-//       final result = await FilePicker.platform.pickFiles(
-//         allowMultiple: true,
-//         type: FileType.audio,
-//       );
-//       for (var element in result!.files) {
-//         musiciFilesHelper.add(File(element.path ?? ''));
-//       }
+        mediaData.add(mediaDetails);
+      }
+    } on FirebaseException catch (e) {
+      log("error 1  ${e.message}");
 
-//       musicList.assignAll(musiciFilesHelper);
-//     } catch (e) {
-//       GlobalSnackBar.show(message: 'Operation Cancelled');
-//     }
-//   }
+      GlobalSnackBar.show(message: e.toString());
+    }
+  }
 
-//   void removeMusicFile(File musicFile) {
-//     musicList.remove(musicFile);
-//   }
+  Future<void> getPhoto() async {
+    try {
+      final pickedPhoto =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
 
-//   //OverRides
-//   @override
-//   void onInit() {
-//     quoteTextController = TextEditingController();
-//     captionController = TextEditingController();
-//     tagsController = TextEditingController();
-//     locationController = TextEditingController();
+      if (pickedPhoto != null) {
+        CroppedFile? croppedImage = await ImageCropper().cropImage(
+            sourcePath: pickedPhoto.path,
+            aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
+        var image = File(croppedImage!.path);
 
-//     profileScreenController = Get.find<ProfileScreenController>();
-//     super.onInit();
-//   }
+        photosList.add(image);
+        notifyListeners();
+      }
+    } catch (e) {
+      GlobalSnackBar.show(message: 'Operation Cancelled');
+    }
+  }
 
-//   @override
-//   void dispose() {
-//     // quoteTextController.dispose();
-//     captionController.dispose();
-//     tagsController.dispose();
-//     locationController.dispose();
-//     super.dispose();
-//   }
-// }
+  void removePhotoFile(File photoFile) {
+    photosList.remove(photoFile);
+    notifyListeners();
+  }
 
-// Future<Size> getImageSize(File image) async {
-//   var decodedImage = await decodeImageFromList(image.readAsBytesSync());
-//   return Size(decodedImage.width.toDouble(), decodedImage.height.toDouble());
-// }
+  Future<void> getVideo() async {
+    final File videoFileHelper;
+    try {
+      final pickedVideo = await ImagePicker().pickVideo(
+        source: ImageSource.gallery,
+      );
+      videoFileHelper = File(pickedVideo!.path);
+      videosList.add(videoFileHelper);
+    } catch (e) {
+      GlobalSnackBar.show(message: 'Operation Cancelled');
+    }
+    notifyListeners();
+  }
 
-// Future<double> getVideoAspectRatio(File video) async {
-//   VideoPlayerController videoPlayerController =
-//       VideoPlayerController.file(video);
-//   await videoPlayerController.initialize();
-//   return videoPlayerController.value.aspectRatio;
-// }
+  void removeVideoFile(File videoFile) {
+    videosList.remove(videoFile);
+    notifyListeners();
+  }
 
-// Future<File?> profileCropImage(String path) async {
-//   CroppedFile? croppedFile = await ImageCropper().cropImage(
-//     sourcePath: path,
-//     aspectRatioPresets: [
-//       CropAspectRatioPreset.ratio16x9,
-//       CropAspectRatioPreset.ratio3x2,
-//       CropAspectRatioPreset.ratio4x3,
-//       CropAspectRatioPreset.ratio5x3,
-//       CropAspectRatioPreset.ratio5x4,
-//       CropAspectRatioPreset.ratio7x5,
-//       CropAspectRatioPreset.square,
-//       CropAspectRatioPreset.original,
-//     ],
-//     uiSettings: [
-//       AndroidUiSettings(
-//         toolbarTitle: 'Cropper',
-//         toolbarColor: Colors.red,
-//         toolbarWidgetColor: Colors.white,
-//       ),
-//       IOSUiSettings(
-//         title: 'Cropper',
-//         resetAspectRatioEnabled: true,
-//       ),
-//     ],
-//   );
-//   if (croppedFile != null) {
-//     return File(croppedFile.path);
-//   } else {
-//     return null;
-//   }
-// }
+  Future<void> getMusic() async {
+    final List<File> musiciFilesHelper = [];
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.audio,
+      );
+      for (var element in result!.files) {
+        musiciFilesHelper.add(File(element.path ?? ''));
+      }
 
-// Future<File?> cropImage(String path) async {
-//   CroppedFile? croppedFile = await ImageCropper().cropImage(
-//     sourcePath: path,
-//     aspectRatioPresets: [
-//       CropAspectRatioPreset.square,
-//       CropAspectRatioPreset.original
-//     ],
-//     uiSettings: [
-//       AndroidUiSettings(
-//         toolbarTitle: 'Cropper',
-//         toolbarColor: Colors.red,
-//         toolbarWidgetColor: Colors.white,
-//         initAspectRatio: CropAspectRatioPreset.square,
-//       ),
-//       IOSUiSettings(
-//           title: 'Cropper',
-//           resetAspectRatioEnabled: true,
-//           aspectRatioLockEnabled: true),
-//     ],
-//   );
-//   if (croppedFile != null) {
-//     return File(croppedFile.path);
-//   } else {
-//     return null;
-//   }
-// }
+      musicList.assignAll(musiciFilesHelper);
+    } catch (e) {
+      GlobalSnackBar.show(message: 'Operation Cancelled');
+    }
+    notifyListeners();
+  }
+
+  void removeMusicFile(File musicFile) {
+    musicList.remove(musicFile);
+    notifyListeners();
+  }
+
+  // //OverRides
+  // @override
+  // void onInit() {
+
+  //   profileScreenController = Get.find<ProfileScreenController>();
+  //   super.onInit();
+  // }
+
+  @override
+  void dispose() {
+    quoteTextController.dispose();
+    captionController.dispose();
+    tagsController.dispose();
+    locationController.dispose();
+    photosList.clear();
+    mediaData.clear();
+    videosList.clear();
+    musicList.clear();
+    super.dispose();
+  }
+}
+
+Future<Size> getImageSize(File image) async {
+  var decodedImage = await decodeImageFromList(image.readAsBytesSync());
+  return Size(decodedImage.width.toDouble(), decodedImage.height.toDouble());
+}
+
+Future<double> getVideoAspectRatio(File video) async {
+  VideoPlayerController videoPlayerController =
+      VideoPlayerController.file(video);
+  await videoPlayerController.initialize();
+  return videoPlayerController.value.aspectRatio;
+}
+
+Future<File?> profileCropImage(String path) async {
+  CroppedFile? croppedFile = await ImageCropper().cropImage(
+    sourcePath: path,
+    aspectRatioPresets: [
+      CropAspectRatioPreset.ratio16x9,
+      CropAspectRatioPreset.ratio3x2,
+      CropAspectRatioPreset.ratio4x3,
+      CropAspectRatioPreset.ratio5x3,
+      CropAspectRatioPreset.ratio5x4,
+      CropAspectRatioPreset.ratio7x5,
+      CropAspectRatioPreset.square,
+      CropAspectRatioPreset.original,
+    ],
+    uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: 'Cropper',
+        toolbarColor: Colors.red,
+        toolbarWidgetColor: Colors.white,
+      ),
+      IOSUiSettings(
+        title: 'Cropper',
+        resetAspectRatioEnabled: true,
+      ),
+    ],
+  );
+  if (croppedFile != null) {
+    return File(croppedFile.path);
+  } else {
+    return null;
+  }
+}
+
+Future<File?> cropImage(String path) async {
+  CroppedFile? croppedFile = await ImageCropper().cropImage(
+    sourcePath: path,
+    aspectRatioPresets: [
+      CropAspectRatioPreset.square,
+      CropAspectRatioPreset.original
+    ],
+    uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: 'Cropper',
+        toolbarColor: Colors.red,
+        toolbarWidgetColor: Colors.white,
+        initAspectRatio: CropAspectRatioPreset.square,
+      ),
+      IOSUiSettings(
+          title: 'Cropper',
+          resetAspectRatioEnabled: true,
+          aspectRatioLockEnabled: true),
+    ],
+  );
+  if (croppedFile != null) {
+    return File(croppedFile.path);
+  } else {
+    return null;
+  }
+}

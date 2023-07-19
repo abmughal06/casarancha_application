@@ -1,145 +1,141 @@
-// import 'dart:io';
+import 'dart:io';
 
-// import 'package:casarancha/models/post_creator_details.dart';
-// import 'package:casarancha/models/story_model.dart';
-// import 'package:path/path.dart';
+import 'package:casarancha/models/post_creator_details.dart';
+import 'package:casarancha/models/story_model.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:path/path.dart';
 
-// import 'package:casarancha/models/media_details.dart';
-// import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
-// import 'package:casarancha/utils/snackbar.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
+import 'package:casarancha/models/media_details.dart';
+import 'package:casarancha/utils/snackbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:get/get.dart';
-// import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
-// class AddStoryController extends GetxController {
-//   late ProfileScreenController profileScreenController;
+import '../../../models/user_model.dart';
 
-//   final fbinstance = FirebaseFirestore.instance;
+class AddStoryProvider extends ChangeNotifier {
+  // late ProfileScreenController profileScreenController;
 
-//   //Obserables
+  final fbinstance = FirebaseFirestore.instance;
 
-//   var mediaUploadTasks = Rxn<UploadTask>();
-//   var mediaFile = Rxn<File>();
+  //Obserables
 
-//   var mediaData = MediaDetails(id: '', name: '', type: '', link: '').obs;
+  UploadTask? mediaUploadTasks;
+  File? mediaFile;
 
-//   var isSharingStory = false.obs;
+  var mediaData = MediaDetails(id: '', name: '', type: '', link: '');
 
-//   //Methods
+  var isSharingStory = false;
 
-//   Future<void> shareStory() async {
-//     if (mediaFile.value == null) {
-//       GlobalSnackBar.show(message: 'Please add a Photo or Video');
-//       return;
-//     }
-//     isSharingStory.value = true;
-//     final creatorId = profileScreenController.user.value.id;
+  //Methods
 
-//     final storyRef = fbinstance.collection('stories').doc(creatorId);
-//     final userRef = fbinstance.collection('users').doc(creatorId);
-//     final storyId = storyRef.id;
+  Future<void> shareStory({UserModel? user}) async {
+    if (mediaFile == null) {
+      GlobalSnackBar.show(message: 'Please add a Photo or Video');
+      return;
+    }
+    isSharingStory = true;
+    notifyListeners();
+    final creatorId = user!.id;
 
-//     final creatorDetails = CreatorDetails(
-//       name: profileScreenController.user.value.name,
-//       imageUrl: profileScreenController.user.value.imageStr,
-//       isVerified: profileScreenController.user.value.isVerified,
-//     );
-//     try {
-//       await uploadMediaFiles(storyId: storyId);
+    final storyRef = fbinstance.collection('stories').doc(creatorId);
+    final userRef = fbinstance.collection('users').doc(creatorId);
+    final storyId = storyRef.id;
 
-//       final storyData = await storyRef.get();
+    final creatorDetails = CreatorDetails(
+      name: user.name,
+      imageUrl: user.imageStr,
+      isVerified: user.isVerified,
+    );
+    try {
+      await uploadMediaFiles(storyId: storyId);
 
-//       if (storyData.exists) {
-//         await storyRef.update({
-//           'mediaDetailsList': FieldValue.arrayUnion([
-//             mediaData.value.toMap(),
-//           ])
-//         });
-//       } else {
-//         final story = Story(
-//           id: storyId,
-//           storyViews: [],
-//           creatorId: creatorId,
-//           creatorDetails: creatorDetails,
-//           createdAt: DateTime.now().toIso8601String(),
-//           mediaDetailsList: [mediaData.value],
-//         );
+      final storyData = await storyRef.get();
 
-//         await userRef.update({
-//           'storiesIds': FieldValue.arrayUnion([storyId])
-//         });
+      if (storyData.exists) {
+        await storyRef.update({
+          'mediaDetailsList': FieldValue.arrayUnion([
+            mediaData.toMap(),
+          ])
+        });
+      } else {
+        final story = Story(
+          id: storyId,
+          storyViews: [],
+          creatorId: creatorId,
+          creatorDetails: creatorDetails,
+          createdAt: DateTime.now().toIso8601String(),
+          mediaDetailsList: [mediaData],
+        );
 
-//         profileScreenController.user.update((val) {
-//           val!.storiesIds.add(storyId);
-//         });
+        await userRef.update({
+          'storiesIds': FieldValue.arrayUnion([storyId])
+        });
 
-//         await storyRef.set(story.toMap());
-//       }
+        await storyRef.set(story.toMap());
+      }
 
-//       Get.back();
-//     } catch (e) {
-//       GlobalSnackBar(message: e.toString());
-//     }
-//     isSharingStory.value = false;
-//   }
+      Get.back();
+    } catch (e) {
+      GlobalSnackBar(message: e.toString());
+    }
+    isSharingStory = false;
+    notifyListeners();
+  }
 
-//   Future<void> uploadMediaFiles({required String storyId}) async {
-//     final storageRef = FirebaseStorage.instance.ref();
+  Future<void> uploadMediaFiles({required String storyId}) async {
+    final storageRef = FirebaseStorage.instance.ref();
 
-//     try {
-//       final String fileType = mediaData.value.type;
-//       final String fileName = basename(mediaFile.value!.path);
-//       final storageFileRef = storageRef.child('stories/$storyId/$fileName');
-//       final uploadTask = storageFileRef.putFile(mediaFile.value!);
-//       mediaUploadTasks.value = uploadTask;
-//       final mediaRef = await uploadTask.whenComplete(() {});
-//       final fileUrl = await mediaRef.ref.getDownloadURL();
-//       final mediaDetails = MediaDetails(
-//         id: DateTime.now().toIso8601String(),
-//         name: fileName,
-//         type: fileType,
-//         link: fileUrl,
-//       );
-//       mediaData.value = mediaDetails;
-//     } catch (e) {
-//       GlobalSnackBar.show(message: e.toString());
-//     }
-//   }
+    try {
+      final String fileType = mediaData.type;
+      final String fileName = basename(mediaFile!.path);
+      final storageFileRef = storageRef.child('stories/$storyId/$fileName');
+      final uploadTask = storageFileRef.putData(await mediaFile!.readAsBytes());
+      mediaUploadTasks = uploadTask;
+      final mediaRef = await uploadTask.whenComplete(() {});
+      final fileUrl = await mediaRef.ref.getDownloadURL();
+      final mediaDetails = MediaDetails(
+        id: DateTime.now().toIso8601String(),
+        name: fileName,
+        type: fileType,
+        link: fileUrl,
+      );
+      mediaData = mediaDetails;
+    } catch (e) {
+      GlobalSnackBar.show(message: e.toString());
+    }
+  }
 
-//   Future<void> getMedia({required String type}) async {
-//     try {
-//       if (type == 'Photo') {
-//         final pickedmedia = await ImagePicker().pickImage(
-//           source: ImageSource.gallery,
-//         );
-//         mediaData.update((val) {
-//           val!.type = type;
-//         });
+  Future<void> getMedia({required String type}) async {
+    try {
+      if (type == 'Photo') {
+        final pickedmedia = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+        );
+        mediaData.type = type;
 
-//         mediaFile.value = File(pickedmedia!.path);
-//       } else {
-//         final pickedmedia = await ImagePicker().pickVideo(
-//           source: ImageSource.gallery,
-//         );
-//         mediaData.update((val) {
-//           val!.type = type;
-//         });
-//         mediaFile.value = File(pickedmedia!.path);
-//       }
-//     } catch (e) {
-//       GlobalSnackBar.show(message: 'Operation Cancelled');
-//     }
-//   }
+        mediaFile = File(pickedmedia!.path);
+      } else {
+        final pickedmedia = await ImagePicker().pickVideo(
+          source: ImageSource.gallery,
+        );
+        mediaData.type = type;
+        mediaFile = File(pickedmedia!.path);
+      }
+    } catch (e) {
+      GlobalSnackBar.show(message: 'Operation Cancelled');
+    }
+    notifyListeners();
+  }
 
-//   void removeMedia() {
-//     mediaFile.value = null;
-//   }
+  void removeMedia() {
+    mediaFile = null;
+    notifyListeners();
+  }
 
-//   //OverRides
-//   @override
-//   void onInit() {
-//     profileScreenController = Get.find<ProfileScreenController>();
-//     super.onInit();
-//   }
-// }
+  void disposeMedia() {
+    mediaFile = null;
+  }
+}

@@ -4,6 +4,8 @@ import 'package:casarancha/screens/auth/providers/login_provider.dart';
 import 'package:casarancha/screens/auth/providers/register_privder.dart';
 import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
+import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/home/providers/story_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
@@ -69,6 +71,10 @@ class ProviderApp extends StatelessWidget {
             create: (_) => ProfileProvider()),
         ChangeNotifierProvider<StoryProvider>(create: (_) => StoryProvider()),
         ChangeNotifierProvider<PostProvider>(create: (_) => PostProvider()),
+        ChangeNotifierProvider<CreatePostMethods>(
+            create: (_) => CreatePostMethods()),
+        ChangeNotifierProvider<AddStoryProvider>(
+            create: (_) => AddStoryProvider()),
       ],
       builder: (context, prov) {
         return app;

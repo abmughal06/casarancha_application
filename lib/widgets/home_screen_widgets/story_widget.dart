@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../models/story_model.dart';
 import '../../resources/image_resources.dart';
+import '../../screens/home/CreateStory/add_story_screen.dart';
 import '../../screens/home/story_view_screen.dart';
 
 class MyStoryWidget extends StatelessWidget {
@@ -17,7 +18,7 @@ class MyStoryWidget extends StatelessWidget {
     if (stories!.mediaDetailsList.isEmpty || stories == null) {
       return GestureDetector(
         onTap: () {
-          // Get.to(() => AddStoryScreen());
+          Get.to(() => const AddStoryScreen());
         },
         child: SvgPicture.asset(
           icProfileAdd,
@@ -50,7 +51,7 @@ class MyStoryWidget extends StatelessWidget {
               bottom: 0,
               child: InkWell(
                 onTap: () {
-                  // Get.to(() => AddStoryScreen());
+                  Get.to(() => const AddStoryScreen());
                 },
                 child: SvgPicture.asset(
                   icProfileAdd,
@@ -64,7 +65,7 @@ class MyStoryWidget extends StatelessWidget {
       } else {
         return InkWell(
           onTap: () {
-            // Get.to(() => AddStoryScreen());
+            Get.to(() => const AddStoryScreen());
           },
           child: SvgPicture.asset(
             icProfileAdd,

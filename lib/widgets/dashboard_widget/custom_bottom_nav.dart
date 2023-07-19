@@ -1,3 +1,4 @@
+import 'package:casarancha/models/message_details.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -69,11 +70,33 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   onPressed: () {
                     provider.changePage(3);
                   },
-                  icon: SvgPicture.asset(
-                    provider.currentIndex == 3
-                        ? icBottomSelChat
-                        : icBottomDeSelChat,
-                  ),
+                  icon: Consumer<List<MessageDetails>?>(
+                      builder: (context, msg, b) {
+                    if (msg == null) {
+                      return SvgPicture.asset(
+                        provider.currentIndex == 3
+                            ? icBottomSelChat
+                            : icBottomDeSelChat,
+                      );
+                    }
+                    var filterList = msg
+                        .where((element) => element.unreadMessageCount > 0)
+                        .toList();
+
+                    int count = 0;
+                    for (var i in filterList) {
+                      count += i.unreadMessageCount;
+                    }
+                    return Badge(
+                      label: Text(count.toString()),
+                      isLabelVisible: count > 0,
+                      child: SvgPicture.asset(
+                        provider.currentIndex == 3
+                            ? icBottomSelChat
+                            : icBottomDeSelChat,
+                      ),
+                    );
+                  }),
                 ),
                 IconButton(
                   onPressed: () {

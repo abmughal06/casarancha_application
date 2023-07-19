@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,9 +16,33 @@ class VideoGridView extends StatefulWidget {
 }
 
 class _VideoGridViewState extends State<VideoGridView> {
+  late VideoPlayerController videoPlayerController;
+
+  @override
+  initState() {
+    initVideo();
+    super.initState();
+  }
+
+  initVideo() {
+    widget.videoList!.map((e) {
+      videoPlayerController = VideoPlayerController.network(e.mediaData[0].link)
+        ..initialize().then((value) {
+          setState(() {});
+          videoPlayerController.play();
+          videoPlayerController.setVolume(0);
+        });
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    videoPlayerController.pause();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final provider = context.watch<ProfileProvider>();
     return Stack(
       children: [
         Visibility(
@@ -33,15 +55,15 @@ class _VideoGridViewState extends State<VideoGridView> {
             ),
             itemCount: widget.videoList!.length,
             itemBuilder: (context, index) {
-              final data = widget.videoList![index].mediaData[0];
+              // final data = widget.videoList![index].mediaData[0];
               // print(quote);
-              VideoPlayerController videoPlayerController =
-                  VideoPlayerController.network(data.link);
-              videoPlayerController.initialize().whenComplete(() {
-                log("video is initialized");
-                // provider.initializeVideoPlayer();
-              });
-              videoPlayerController.pause();
+              // VideoPlayerController videoPlayerController =
+              //     VideoPlayerController.network(data.link);
+              // videoPlayerController.initialize().whenComplete(() {
+              //   log("video is initialized");
+              //   // provider.initializeVideoPlayer();
+              // });
+              // videoPlayerController.pause();
 
               return GestureDetector(
                   onTap: () => Get.to(() => FullScreenVideo(
@@ -49,7 +71,11 @@ class _VideoGridViewState extends State<VideoGridView> {
                         postId: widget.videoList![index].id,
                         creatorId: widget.videoList![index].creatorId,
                       )),
-                  child: VideoPlayer(videoPlayerController));
+                  child: videoPlayerController.value.isInitialized
+                      ? VideoPlayer(videoPlayerController)
+                      : Container(
+                          decoration:
+                              BoxDecoration(color: Colors.grey.shade200)));
             },
           ),
         ),
