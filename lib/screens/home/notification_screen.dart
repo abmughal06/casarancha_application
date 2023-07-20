@@ -29,7 +29,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     var docs = await ref.get();
     for (var d in docs.docs) {
       ref.doc(d.id).update({"isRead": true});
-      log(d.id);
     }
   }
 

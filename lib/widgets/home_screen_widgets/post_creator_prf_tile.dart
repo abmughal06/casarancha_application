@@ -136,12 +136,13 @@ class PostCreatorProfileTile extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    Get.to(
-                      () => AppUserScreen(
-                        appUserId: post.creatorId,
-                        appUserName: post.creatorDetails.name,
-                      ),
-                    );
+                    // Get.to(
+                    //   () => AppUserScreen(
+                    //     appUserId: post.creatorId,
+                    //     appUserName: post.creatorDetails.name,
+                    //   ),
+                    // );
+                    navigateToAppUserScreen(post.creatorId, context);
                   },
                   child: Row(
                     children: [

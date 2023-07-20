@@ -1,9 +1,12 @@
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/profile_top_loader.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/qoutes_grid.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -23,38 +26,36 @@ import '../../../widgets/profle_screen_widgets/video_grid.dart';
 import '../../../widgets/text_widget.dart';
 import '../follower_following_screen.dart';
 
+void navigateToAppUserScreen(userId, context) {
+  if (userId != FirebaseAuth.instance.currentUser!.uid) {
+    Get.to(() => AppUserScreen(appUserId: userId));
+  } else {
+    final dasboardController =
+        Provider.of<DashboardProvider>(context, listen: false);
+    dasboardController.changePage(4);
+  }
+}
+
 class AppUserScreen extends StatefulWidget {
   const AppUserScreen({
     Key? key,
     required this.appUserId,
-    required this.appUserName,
+    // required this.appUserName,
   }) : super(key: key);
 
   final String appUserId;
-  final String appUserName;
+  // final String appUserName;
 
   @override
   State<AppUserScreen> createState() => _AppUserScreenState();
 }
 
 class _AppUserScreenState extends State<AppUserScreen> {
-  // RxBool isGhostModeOn = false.obs;
-
-  // @override
-  // void initState() {
-  //   getGhostValue();
-  //   super.initState();
-  // }
-
-  // void getGhostValue() async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //   isGhostModeOn.value = sharedPreferences.getBool('isGhostEnable')!;
-  //   log("======== $isGhostModeOn");
-  // }
-
   @override
   Widget build(BuildContext context) {
     final post = context.watch<List<PostModel>?>();
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     return SafeArea(
         top: false,
         child: Scaffold(
@@ -80,7 +81,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                 menuUserButton(
                                   context,
                                   widget.appUserId,
-                                  widget.appUserName,
+                                  "",
                                 )
                               ],
                             ),
@@ -94,6 +95,12 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                     .where((element) =>
                                         element.id == widget.appUserId)
                                     .toList();
+
+                                var currentUser = appUser
+                                    .where((element) =>
+                                        element.id ==
+                                        FirebaseAuth.instance.currentUser!.uid)
+                                    .first;
                                 UserModel? user =
                                     userList.isNotEmpty ? userList.first : null;
                                 if (user == null) {
@@ -219,18 +226,31 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 20.w),
                                         child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             Expanded(
                                               child: GestureDetector(
-                                                // onTap: () =>
-                                                //     widget.appUserController.toggleFollowUser(),
+                                                onTap: () => profileProvider
+                                                    .toggleFollowBtn(
+                                                        userModel: currentUser,
+                                                        appUserId: user.id),
                                                 child: Container(
                                                   height: 45.h,
                                                   decoration: BoxDecoration(
-                                                    color: colorWhite,
+                                                    color: currentUser
+                                                            .followingsIds
+                                                            .contains(user.id)
+                                                        ? colorWhite
+                                                        : colorF03,
                                                     border: Border.all(
-                                                        width: 1.w,
-                                                        color: color221),
+                                                      width: 1.w,
+                                                      color: currentUser
+                                                              .followingsIds
+                                                              .contains(user.id)
+                                                          ? color221
+                                                          : Colors.transparent,
+                                                    ),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             12.r),
@@ -255,7 +275,11 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                   ),
                                                   child: Center(
                                                     child: TextWidget(
-                                                      text: strUnFollow,
+                                                      text: currentUser
+                                                              .followingsIds
+                                                              .contains(user.id)
+                                                          ? strUnFollow
+                                                          : strSrcFollow,
                                                       color: color13F,
                                                       fontSize: 18.sp,
                                                       fontWeight:
@@ -265,39 +289,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                 ),
                                               ),
                                             ),
-                                            widthBox(10.w),
+                                            widthBox(8.w),
                                             GestureDetector(
-                                              // onTap: () => Get.to(() => isGhostModeOn.value
-                                              //     ? GhostChatScreen2(
-                                              //         appUserId: widget
-                                              //             .appUserController.appUserId,
-                                              //         creatorDetails: CreatorDetails(
-                                              //           name: widget.appUserController
-                                              //               .appUserData.value.name,
-                                              //           imageUrl: widget.appUserController
-                                              //               .appUserData.value.imageStr,
-                                              //           isVerified: widget.appUserController
-                                              //               .appUserData.value.isVerified,
-                                              //         ),
-                                              //         profileScreenController:
-                                              //             ProfileScreenController(),
-                                              //         val: "",
-                                              //       )
-                                              //     : ChatScreen(
-                                              //         appUserId: widget
-                                              //             .appUserController.appUserId,
-                                              //         creatorDetails: CreatorDetails(
-                                              //           name: widget.appUserController
-                                              //               .appUserData.value.name,
-                                              //           imageUrl: widget.appUserController
-                                              //               .appUserData.value.imageStr,
-                                              //           isVerified: widget.appUserController
-                                              //               .appUserData.value.isVerified,
-                                              //         ),
-                                              //         profileScreenController:
-                                              //             ProfileScreenController(),
-                                              //         val: "",
-                                              //       )),
                                               onTap: () {
                                                 Get.to(
                                                   () => ChatScreen(

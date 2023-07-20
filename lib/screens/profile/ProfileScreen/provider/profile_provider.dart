@@ -1,33 +1,40 @@
-import 'package:chewie/chewie.dart';
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:video_player/video_player.dart';
+
+import '../../../../models/user_model.dart';
 
 class ProfileProvider extends ChangeNotifier {
-  VideoPlayerController? videoPlayerController;
-  String? postId;
-  String? creatorId;
-  ChewieController? chewieController;
+  final postRef = FirebaseFirestore.instance.collection("posts");
+  final currentUserRef = FirebaseFirestore.instance
+      .collection("users")
+      .doc(FirebaseAuth.instance.currentUser!.uid);
 
-  ProfileProvider({this.videoPlayerController, this.postId, this.creatorId}) {
-    initializeChewieController();
-  }
-
-  void initializeChewieController() {
-    chewieController = ChewieController(
-      autoPlay: true,
-      aspectRatio: 9 / 16,
-      videoPlayerController: videoPlayerController!,
-    );
-  }
-
-  void deletePost() async {
-    await FirebaseFirestore.instance
-        .collection("posts")
+  void deletePost(postId) async {
+    await postRef
         .doc(postId)
         .delete()
         .then((value) => Get.back())
         .whenComplete(() => Get.back());
+  }
+
+  void toggleFollowBtn({UserModel? userModel, String? appUserId}) async {
+    try {
+      if (userModel!.followingsIds.contains(appUserId)) {
+        await currentUserRef.update({
+          "followingsIds": FieldValue.arrayRemove([appUserId])
+        });
+        log(userModel.name);
+      } else {
+        await currentUserRef.update({
+          "followingsIds": FieldValue.arrayUnion([appUserId])
+        });
+      }
+    } catch (e) {
+      log('$e');
+    }
   }
 }

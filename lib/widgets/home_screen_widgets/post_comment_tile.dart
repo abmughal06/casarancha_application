@@ -22,12 +22,13 @@ class PostCommentTile extends StatelessWidget {
       isThreeLine: true,
       leading: InkWell(
         onTap: () {
-          Get.to(
-            () => AppUserScreen(
-              appUserId: cmnt.creatorId,
-              appUserName: cmnt.creatorDetails.name,
-            ),
-          );
+          // Get.to(
+          //   () => AppUserScreen(
+          //     appUserId: cmnt.creatorId,
+          //     appUserName: cmnt.creatorDetails.name,
+          //   ),
+          // );
+          navigateToAppUserScreen(cmnt.creatorId, context);
         },
         child: Container(
           height: 46.h,
@@ -44,12 +45,13 @@ class PostCommentTile extends StatelessWidget {
       ),
       title: InkWell(
         onTap: () {
-          Get.to(
-            () => AppUserScreen(
-              appUserId: cmnt.creatorId,
-              appUserName: cmnt.creatorDetails.name,
-            ),
-          );
+          // Get.to(
+          //   () => AppUserScreen(
+          //     appUserId: cmnt.creatorId,
+          //     appUserName: cmnt.creatorDetails.name,
+          //   ),
+          // );
+          navigateToAppUserScreen(cmnt.creatorId, context);
         },
         child: RichText(
           text: TextSpan(

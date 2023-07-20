@@ -1,22 +1,17 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../screens/profile/ProfileScreen/profile_screen_controller.dart';
-
 var serverKey =
     "key=AAAAYo5xlRE:APA91bHxh2fiJpTazsOCH0k_iqbz9e-Ccg9EaQsXyJna163xViTcwevm04LvlIv7DUBWIboSvKFFsCQdJ9YQUEZHJVxM25zXaO9dash0eGp9dUGeBJu3-va9-zQ0S6LikRBskcdK5HDq";
 
 class FirebaseMessagingService {
-  // ProfileScreenController? profileScreenController;
   FirebaseMessaging fcmMessage = FirebaseMessaging.instance;
 
   Future<UserModel> getCurrentUserDetails() async {
@@ -88,7 +83,7 @@ class FirebaseMessagingService {
           isVerified: model.isVerified),
       createdAt: DateTime.now().toIso8601String(),
     );
-    log("===============>>>>>>>>$notification");
+    // log("===============>>>>>>>>$notification");
     FirebaseFirestore.instance
         .collection("users")
         .doc(appUserId)

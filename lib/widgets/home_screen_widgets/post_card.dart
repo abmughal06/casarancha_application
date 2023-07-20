@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
@@ -33,6 +32,8 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final curruentUser = context.watch<UserModel?>();
+    final postPorvider = Provider.of<PostProvider>(context, listen: false);
+
     return Padding(
       padding: EdgeInsets.only(bottom: 15.w),
       child: Column(
@@ -50,13 +51,7 @@ class PostCard extends StatelessWidget {
                     decoration: const BoxDecoration(color: Colors.red),
                     height: 80,
                     child: InkWell(
-                      onTap: () async {
-                        // await FirebaseFirestore.instance
-                        //     .collection("posts")
-                        //     .doc(post.id)
-                        //     .delete();
-                        // Get.back();
-                      },
+                      onTap: () => postPorvider.deletePost(postModel: post),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,37 +81,36 @@ class PostCard extends StatelessWidget {
             image: post.creatorDetails.imageUrl,
             ontap: () {},
             headerOnTap: () {
-              Get.to(() => AppUserScreen(
-                  appUserId: post.creatorId,
-                  appUserName: post.creatorDetails.name));
+              navigateToAppUserScreen(post.creatorId, context);
             },
           ),
-          showPostAccordingToItsType(post: post)!,
+          showPostAccordingToItsType(
+              post: post,
+              onDoubletap: () {
+                postPorvider.toggleLikeDislike(
+                    postModel: post, uid: curruentUser!.id);
+              })!,
           heightBox(10.h),
           CustomPostFooter(
             likes: post.likesIds.length.toString(),
             isLike: post.likesIds.contains(curruentUser!.id),
-
             ontapLike: () {
-              log("clicked");
-              // postCardController.isLiked.value =
-              //     !post.likesIds.contains(user!.id);
-              // postCardController.likeDisLikePost(
-              // user!.id, post.id, post.creatorId);
+              postPorvider.toggleLikeDislike(
+                postModel: post,
+                uid: curruentUser.id,
+              );
             },
-            // ontapSave: () {
-            //   log(user!.savedPostsIds);
-
-            // },
             saveBtn: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                postPorvider.onTapSave(
+                    userModel: curruentUser, postId: post.id);
+              },
               icon: SvgPicture.asset(
                 curruentUser.savedPostsIds.contains(post.id)
                     ? icSavedPost
                     : icBookMarkReg,
               ),
             ),
-
             isVideoPost: post.mediaData[0].type == 'Video',
             videoViews: '0',
             postId: post.id,
@@ -126,17 +120,6 @@ class PostCard extends StatelessWidget {
               );
             },
             ontapCmnt: () {
-              // Get.to(() => CommentScreen(
-              //       id: post.id,
-              //       creatorId: post.creatorId,
-              //       comment: post.commentIds,
-              //       creatorDetails: CreatorDetails(
-              //           name: post.creatorDetails.name,
-              //           imageUrl:
-              //               post.creatorDetails.imageUrl,
-              //           isVerified: post
-              //               .creatorDetails.isVerified),
-              //     ));
               Get.to(() => PostDetailScreen(
                     postModel: post,
                   ));
@@ -151,7 +134,8 @@ class PostCard extends StatelessWidget {
   }
 }
 
-Widget? showPostAccordingToItsType({PostModel? post}) {
+Widget? showPostAccordingToItsType(
+    {PostModel? post, VoidCallback? onDoubletap}) {
   Future<void>? initializedFuturePlay;
   for (var element in post!.mediaData) {
     switch (element.type) {
@@ -163,16 +147,10 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
             shrinkWrap: true,
             itemCount: post.mediaData.length,
             itemBuilder: (context, index) => InkWell(
-                // onTap: () => Get.to(() => PostDetailScreen(
-                //     postModel: post,
-                //     postCardController: postCardController)),
-                onDoubleTap: () async {
-                  log("clicked");
-                  // postCardController.isLiked.value =
-                  //     !post.likesIds.contains(user!.id);
-                  // postCardController.likeDisLikePost(
-                  //     user!.id, post.id, post.creatorId);
-                },
+                onTap: () => Get.to(() => PostDetailScreen(
+                      postModel: post,
+                    )),
+                onDoubleTap: onDoubletap,
                 child: CachedNetworkImage(
                   imageUrl: post.mediaData[index].link,
                 )),
@@ -187,16 +165,10 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
             scrollDirection: Axis.horizontal,
             itemCount: post.mediaData.length,
             itemBuilder: (context, index) => InkWell(
-              // onTap: () => Get.to(() => PostDetailScreen(
-              //     postModel: post,
-              //     postCardController: postCardController)),
-              onDoubleTap: () {
-                log("clicked");
-                // postCardController.isLiked.value =
-                //     !post.likesIds.contains(user!.id);
-                // postCardController.likeDisLikePost(
-                //     user!.id, post.id, post.creatorId);
-              },
+              onTap: () => Get.to(() => PostDetailScreen(
+                    postModel: post,
+                  )),
+              onDoubleTap: onDoubletap,
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: Container(
@@ -224,8 +196,6 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
         return FutureBuilder(
           future: initializedFuturePlay,
           builder: (context, snapshot) {
-            // if (snapshot.connectionState ==
-            //     ConnectionState.done) {
             return Visibility(
               child: AspectRatio(
                 aspectRatio: 9 / 16,
@@ -234,35 +204,15 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
                   shrinkWrap: true,
                   itemCount: post.mediaData.length,
                   itemBuilder: (context, i) {
-                    // VideoPlayerController?
-                    //     videoPlayerController;
-                    // videoPlayerController =
-                    //     VideoPlayerController
-                    //         .network(
-                    //   post.mediaData.first.type ==
-                    //           "Video"
-                    //       ? post.mediaData[i].link
-                    //           .toString()
-                    //       : "",
-                    // );
-
                     return InkWell(
-                      // onTap: () => Get.to(() => PostDetailScreen(
-                      //     postModel: post,
-                      //     postCardController: postCardController)),
-                      onDoubleTap: () {
-                        log("clicked");
-                        // postCardController.isLiked.value =
-                        //     !post.likesIds.contains(user!.id);
-                        // postCardController.likeDisLikePost(
-                        //     user!.id, post.id, post.creatorId);
-                      },
+                      onTap: () => Get.to(() => PostDetailScreen(
+                            postModel: post,
+                          )),
+                      onDoubleTap: onDoubletap,
                       child: AspectRatio(
                         aspectRatio: 9 / 16,
                         child: VideoPlayerWidget(
                           postId: post.id,
-                          // videoPlayerController:
-                          //     videoPlayerController,
                           videoUrl: post.mediaData[i].link,
                         ),
                       ),
@@ -271,10 +221,6 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
                 ),
               ),
             );
-            // }
-            // else {
-            //   return const CircularProgressIndicator();
-            // }
           },
         );
 
@@ -287,8 +233,11 @@ Widget? showPostAccordingToItsType({PostModel? post}) {
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 itemCount: post.mediaData.length,
-                itemBuilder: (context, index) => MusicPlayerUrl(
-                    musicDetails: post.mediaData[index], ontap: () {}),
+                itemBuilder: (context, index) => InkWell(
+                  onDoubleTap: onDoubletap,
+                  child: MusicPlayerUrl(
+                      musicDetails: post.mediaData[index], ontap: () {}),
+                ),
               ),
             ),
           ],

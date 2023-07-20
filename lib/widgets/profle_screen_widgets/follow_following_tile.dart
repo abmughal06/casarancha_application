@@ -38,12 +38,13 @@ class FollowFollowingTile extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    Get.to(
-                      () => AppUserScreen(
-                        appUserId: user.id,
-                        appUserName: user.name,
-                      ),
-                    );
+                    // Get.to(
+                    //   () => AppUserScreen(
+                    //     appUserId: user.id,
+                    //     appUserName: user.name,
+                    //   ),
+                    // );
+                    navigateToAppUserScreen(user.id, context);
                   },
                   child: Container(
                     height: 50.h,
@@ -64,12 +65,13 @@ class FollowFollowingTile extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        Get.to(
-                          () => AppUserScreen(
-                            appUserId: user.id,
-                            appUserName: user.name,
-                          ),
-                        );
+                        // Get.to(
+                        //   () => AppUserScreen(
+                        //     appUserId: user.id,
+                        //     appUserName: user.name,
+                        //   ),
+                        // );
+                        navigateToAppUserScreen(user.id, context);
                       },
                       child: Row(
                         children: [

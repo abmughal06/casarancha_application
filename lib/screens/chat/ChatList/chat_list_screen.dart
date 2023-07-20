@@ -12,7 +12,10 @@ import '../../../widgets/chat_screen_widgets/ghost_chat_list.dart';
 import '../../dashboard/ghost_mode_btn.dart';
 
 String convertDateIntoTime(String date) {
-  var time = DateFormat('MMMM d, h:mm a').format(DateTime.parse(date));
+  final twentyFourHours = DateTime.now().subtract(const Duration(hours: 12));
+  var time = DateTime.parse(date).isAfter(twentyFourHours)
+      ? DateFormat('h:mm a').format(DateTime.parse(date))
+      : DateFormat('MMMM d, h:mm a').format(DateTime.parse(date));
   return time;
 }
 

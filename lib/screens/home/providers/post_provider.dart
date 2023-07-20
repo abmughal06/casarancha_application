@@ -1,59 +1,114 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'dart:developer';
+
+import 'package:casarancha/models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class PostProvider with ChangeNotifier {
-  AudioPlayer audioPlayer = AudioPlayer();
-  PlayerState _audioState = PlayerState.stopped;
-  Duration _position = Duration.zero;
-  Duration _duration = Duration.zero;
-  String musicUrl = '';
+import '../../../models/comment_model.dart';
+import '../../../models/post_creator_details.dart';
+import '../../../models/post_model.dart';
+import '../../../resources/firebase_cloud_messaging.dart';
 
-  PostProvider() {
-    audioPlayer.onPlayerStateChanged.listen((state) {
-      _audioState = state;
-      notifyListeners();
-    });
+class PostProvider extends ChangeNotifier {
+  final firestore = FirebaseFirestore.instance;
+  final fauth = FirebaseAuth.instance;
+  final currentUserRef = FirebaseFirestore.instance
+      .collection("users")
+      .doc(FirebaseAuth.instance.currentUser!.uid);
 
-    audioPlayer.onPositionChanged.listen((position) {
-      _position = position;
-      notifyListeners();
-    });
+  final postRef = FirebaseFirestore.instance.collection("posts");
 
-    audioPlayer.onDurationChanged.listen((duration) {
-      _duration = duration;
-      notifyListeners();
-    });
-  }
-
-  PlayerState get audioState => _audioState;
-  Duration get position => _position;
-  Duration get duration => _duration;
-
-  void play(String url) async {
-    await audioPlayer.setSourceUrl(url);
-  }
-
-  void resume() async {
-    await audioPlayer.resume();
-    notifyListeners();
-  }
-
-  void pause() async {
-    await audioPlayer.pause();
-    notifyListeners();
-  }
-
-  void stop() async {
-    await audioPlayer.stop();
-    notifyListeners();
-  }
-
-  void listenToFrameChange(isVisible) {
-    if (isVisible) {
-      resume();
-    } else {
-      pause();
+  void toggleLikeDislike({PostModel? postModel, String? uid}) async {
+    try {
+      if (postModel!.likesIds.contains(uid)) {
+        await postRef.doc(postModel.id).update({
+          'likesIds': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        await postRef.doc(postModel.id).update({
+          'likesIds': FieldValue.arrayUnion([uid])
+        });
+      }
+    } catch (e) {
+      log("$e");
     }
-    notifyListeners();
+  }
+
+  void onTapSave({UserModel? userModel, String? postId}) async {
+    try {
+      if (userModel!.savedPostsIds.contains(postId)) {
+        await currentUserRef.update({
+          "savedPostsIds": FieldValue.arrayRemove([postId])
+        });
+      } else {
+        await currentUserRef.update({
+          "savedPostsIds": FieldValue.arrayUnion([postId])
+        });
+      }
+    } catch (e) {
+      log('$e');
+    }
+  }
+
+  void deletePost({PostModel? postModel}) async {
+    try {
+      await postRef.doc(postModel!.id).delete().then((value) => Get.back());
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+  void postComment({PostModel? postModel, UserModel? user, String? comment}) {
+    var cmnt = Comment(
+      id: postModel!.id,
+      creatorId: FirebaseAuth.instance.currentUser!.uid,
+      creatorDetails: CreatorDetails(
+          name: user!.name,
+          imageUrl: user.imageStr,
+          isVerified: user.isVerified),
+      createdAt: DateTime.now().toIso8601String(),
+      message: comment!,
+    );
+
+    FirebaseFirestore.instance
+        .collection("posts")
+        .doc(postModel.id)
+        .collection("comments")
+        .doc()
+        .set(cmnt.toMap(), SetOptions(merge: true))
+        .then((value) async {
+      var cmntId = await FirebaseFirestore.instance
+          .collection("posts")
+          .doc(postModel.id)
+          .collection("comments")
+          .get();
+
+      List listOfCommentsId = [];
+      for (var i in cmntId.docs) {
+        listOfCommentsId.add(i.id);
+      }
+
+      FirebaseFirestore.instance
+          .collection("posts")
+          .doc(postModel.id)
+          .set({"commentIds": listOfCommentsId}, SetOptions(merge: true));
+
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(postModel.creatorId)
+          .get();
+
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: recieverRef.id,
+        imageUrl: postModel.mediaData[0].type == 'Photo'
+            ? postModel.mediaData[0].link
+            : '',
+        devRegToken: recieverFCMToken,
+        msg: "has commented on your post.",
+      );
+    });
   }
 }

@@ -25,8 +25,6 @@ class PostDetailScreen extends StatefulWidget {
 class _PostDetailScreenState extends State<PostDetailScreen> {
   final coommenController = TextEditingController();
 
-  DataProvider dataProvider = DataProvider();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,6 +129,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               ],
             ),
             PostCommentField(
+              postModel: widget.postModel,
               commentController: coommenController,
             )
           ],
