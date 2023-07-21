@@ -63,6 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
         title: ChatScreenUserAppBar(
           creatorDetails: widget.creatorDetails,
+          appUserId: widget.appUserId,
         ),
         actions: [
           Padding(
@@ -84,9 +85,10 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.max,
         children: [
           StreamProvider.value(
-            value: DataProvider().messages(widget.appUserId),
+            value: DataProvider().messages(widget.appUserId, false),
             initialData: null,
             child: Consumer<List<Message>?>(
               builder: (context, messages, b) {
@@ -101,8 +103,11 @@ class _ChatScreenState extends State<ChatScreen> {
                       final message = messages[index];
 
                       final isMe = message.sentToId == widget.appUserId;
-                      chatProvider.resetMessageCount(
-                          currentUserId: currentUser.id, appUserId: appUser.id);
+                      if (messages.isNotEmpty) {
+                        chatProvider.resetMessageCount(
+                            currentUserId: currentUser.id,
+                            appUserId: appUser.id);
+                      }
 
                       return MessageTiles(
                         isMe: isMe,

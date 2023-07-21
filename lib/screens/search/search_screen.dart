@@ -1,4 +1,5 @@
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     return Scaffold(
       appBar: primaryAppbar(
         title: 'Search',
@@ -108,7 +111,11 @@ class _SearchScreenState extends State<SearchScreen> {
                               .first;
                           return FollowFollowingTile(
                             user: userSnap,
-                            ontapToggleFollow: () {},
+                            ontapToggleFollow: () =>
+                                profileProvider.toggleFollowBtn(
+                              userModel: currentUser,
+                              appUserId: userSnap.id,
+                            ),
                             btnName:
                                 currentUser.followingsIds.contains(userSnap.id)
                                     ? "Unfollow"

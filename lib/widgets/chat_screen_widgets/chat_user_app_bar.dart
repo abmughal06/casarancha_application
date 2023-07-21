@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_creator_details.dart';
+import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,14 +9,16 @@ import '../../resources/image_resources.dart';
 import '../common_widgets.dart';
 
 class ChatScreenUserAppBar extends StatelessWidget {
-  const ChatScreenUserAppBar({Key? key, required this.creatorDetails})
+  const ChatScreenUserAppBar(
+      {Key? key, required this.creatorDetails, this.appUserId})
       : super(key: key);
   final CreatorDetails creatorDetails;
+  final String? appUserId;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {},
+      onTap: () => navigateToAppUserScreen(appUserId, context),
       contentPadding: EdgeInsets.zero,
       title: Row(
         children: [

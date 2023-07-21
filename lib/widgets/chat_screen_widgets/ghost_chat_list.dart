@@ -1,11 +1,15 @@
 import 'dart:math';
 
+import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_user_list_tile.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/ghost_message_details.dart';
@@ -59,8 +63,30 @@ class GhostChatList extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
-                  return GhostChatUserListTile(
-                      messageDetails: messages[index], ontapTile: () {});
+                  return messages[index].firstMessage ==
+                          FirebaseAuth.instance.currentUser!.uid
+                      ? GhostChatListTile(
+                          messageDetails: messages[index],
+                          ontapTile: () => Get.to(
+                            () => GhostChatScreen2(
+                              firstMessagebyMe: messages[index].firstMessage ==
+                                  FirebaseAuth.instance.currentUser!.uid,
+                              appUserId: messages[index].id,
+                              creatorDetails: messages[index].creatorDetails,
+                            ),
+                          ),
+                        )
+                      : GhostChatUserListTile(
+                          messageDetails: messages[index],
+                          ontapTile: () => Get.to(
+                            () => GhostChatScreen2(
+                              firstMessagebyMe: messages[index].firstMessage ==
+                                  FirebaseAuth.instance.currentUser!.uid,
+                              appUserId: messages[index].id,
+                              creatorDetails: messages[index].creatorDetails,
+                            ),
+                          ),
+                        );
                 },
               );
             }
@@ -93,7 +119,17 @@ class GhostChatList extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return ChatUserListTileForNoChat(
                     userModel: filterList[index],
-                    ontapTile: () {},
+                    ontapTile: () => Get.to(
+                      () => GhostChatScreen2(
+                        firstMessagebyMe: true,
+                        appUserId: filterList[index].id,
+                        creatorDetails: CreatorDetails(
+                          name: filterList[index].username,
+                          imageUrl: filterList[index].imageStr,
+                          isVerified: filterList[index].isVerified,
+                        ),
+                      ),
+                    ),
                   );
                 },
               );

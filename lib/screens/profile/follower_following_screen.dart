@@ -1,8 +1,10 @@
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/primary_Appbar.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
 import 'package:casarancha/widgets/text_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +24,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     return DefaultTabController(
       length: _myTabs.length,
       initialIndex: follow! ? 0 : 1,
@@ -61,7 +65,10 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                           currentUser!.followingsIds.contains(user.id);
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: user,
+                                appUserId: filterList[index].id),
                         btnName: isFriend ? "Friends" : "Follow",
                       );
                     },
@@ -92,7 +99,10 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                       final user = filterList[index];
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: user,
+                                appUserId: filterList[index].id),
                         btnName: "Remove",
                       );
                     },
@@ -121,6 +131,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     return DefaultTabController(
       length: _myTabs.length,
       initialIndex: follow! ? 0 : 1,
@@ -145,6 +157,10 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                       .where((element) =>
                           appUser.followersIds.contains(element.id))
                       .toList();
+                  var currentUser = users
+                      .where((element) =>
+                          element.id == FirebaseAuth.instance.currentUser!.uid)
+                      .first;
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
@@ -156,11 +172,19 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     itemCount: filterList.length,
                     itemBuilder: (context, index) {
                       final user = filterList[index];
-                      final isFriend = appUser.followingsIds.contains(user.id);
+                      final isFriend =
+                          currentUser.followingsIds.contains(user.id);
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
-                        btnName: isFriend ? "Friends" : "Follow",
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: user,
+                                appUserId: filterList[index].id),
+                        btnName: user.id == currentUser.id
+                            ? ""
+                            : isFriend
+                                ? "Friends"
+                                : "Follow",
                       );
                     },
                   );
@@ -175,6 +199,11 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                 } else {
                   var appUser =
                       users.where((element) => element.id == appUserid).first;
+                  var currentUser = users
+                      .where((element) =>
+                          element.id == FirebaseAuth.instance.currentUser!.uid)
+                      .first;
+                  users.where((element) => element.id == appUserid).first;
                   var filterList = users
                       .where((element) =>
                           appUser.followingsIds.contains(element.id))
@@ -190,10 +219,19 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     itemCount: filterList.length,
                     itemBuilder: (context, index) {
                       final user = filterList[index];
+                      final isFriend =
+                          currentUser.followingsIds.contains(user.id);
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
-                        btnName: "Remove",
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: user,
+                                appUserId: filterList[index].id),
+                        btnName: user.id == currentUser.id
+                            ? ""
+                            : !isFriend
+                                ? "Follow"
+                                : "Friends",
                       );
                     },
                   );

@@ -12,8 +12,10 @@ class GhostMessageDetails {
   CreatorDetails creatorDetails;
   String createdAt;
   List<String> searchCharacters;
+  String firstMessage;
   GhostMessageDetails({
     required this.id,
+    required this.firstMessage,
     required this.lastMessage,
     required this.unreadMessageCount,
     required this.creatorDetails,
@@ -23,6 +25,7 @@ class GhostMessageDetails {
 
   GhostMessageDetails copyWith({
     String? id,
+    String? firstMessage,
     String? lastMessage,
     int? unreadMessageCount,
     CreatorDetails? creatorDetails,
@@ -30,6 +33,7 @@ class GhostMessageDetails {
     List<String>? searchCharacters,
   }) {
     return GhostMessageDetails(
+      firstMessage: firstMessage ?? this.firstMessage,
       id: id ?? this.id,
       lastMessage: lastMessage ?? this.lastMessage,
       unreadMessageCount: unreadMessageCount ?? this.unreadMessageCount,
@@ -42,6 +46,7 @@ class GhostMessageDetails {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
+      'firstMessage': firstMessage,
       'lastMessage': lastMessage,
       'unreadMessageCount': unreadMessageCount,
       'creatorDetails': creatorDetails.toMap(),
@@ -53,6 +58,7 @@ class GhostMessageDetails {
   factory GhostMessageDetails.fromMap(map) {
     return GhostMessageDetails(
       id: map['id'] as String,
+      firstMessage: map['firstMessage'] as String,
       lastMessage: map['lastMessage'] as String,
       unreadMessageCount: map['unreadMessageCount'] as int,
       creatorDetails:
@@ -69,7 +75,7 @@ class GhostMessageDetails {
 
   @override
   String toString() {
-    return 'GhostMessageDetails(id: $id, lastMessage: $lastMessage, unreadMessageCount: $unreadMessageCount, creatorDetails: $creatorDetails, createdAt: $createdAt, searchCharacters: $searchCharacters)';
+    return 'GhostMessageDetails(id: $id, firstMessage:$firstMessage, lastMessage: $lastMessage, unreadMessageCount: $unreadMessageCount, creatorDetails: $creatorDetails, createdAt: $createdAt, searchCharacters: $searchCharacters)';
   }
 
   @override
@@ -77,6 +83,7 @@ class GhostMessageDetails {
     if (identical(this, other)) return true;
 
     return other.id == id &&
+        other.firstMessage == firstMessage &&
         other.lastMessage == lastMessage &&
         other.unreadMessageCount == unreadMessageCount &&
         other.creatorDetails == creatorDetails &&
@@ -87,6 +94,7 @@ class GhostMessageDetails {
   @override
   int get hashCode {
     return id.hashCode ^
+        firstMessage.hashCode ^
         lastMessage.hashCode ^
         unreadMessageCount.hashCode ^
         creatorDetails.hashCode ^

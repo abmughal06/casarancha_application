@@ -13,32 +13,21 @@ class CheckMediaAndShowPost extends StatelessWidget {
       {Key? key,
       required this.mediaData,
       required this.postId,
-      this.iniializedFuturePlay})
+      this.iniializedFuturePlay,
+      required this.ondoubleTap})
       : super(key: key);
 
   final MediaDetails mediaData;
   final Future<void>? iniializedFuturePlay;
   final String postId;
+  final VoidCallback ondoubleTap;
 
   @override
   Widget build(BuildContext context) {
     switch (mediaData.type) {
       case "Photo":
         return InkWell(
-            onDoubleTap: () {
-              // print("clicked");
-              // widget.postCardController!.isLiked
-              //         .value =
-              //     !post.likesIds.contains(
-              //         FirebaseAuth.instance
-              //             .currentUser!.uid);
-              // widget.postCardController!
-              //     .likeDisLikePost(
-              //         FirebaseAuth.instance
-              //             .currentUser!.uid,
-              //         post.id,
-              //         post.creatorId);
-            },
+            onDoubleTap: ondoubleTap,
             child: AspectRatio(
               aspectRatio: 2 / 3,
               child: CachedNetworkImage(

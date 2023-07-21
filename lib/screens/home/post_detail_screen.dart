@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_creator_prf_tile.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -50,6 +53,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           .where((element) => element.id == widget.postModel.id)
                           .first;
                       return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           AspectRatio(
                             aspectRatio: post.mediaData[0].type == 'Photo'
@@ -68,6 +72,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   itemBuilder: (context, index) {
                                     var mediaData = post.mediaData[index];
                                     return CheckMediaAndShowPost(
+                                      ondoubleTap: () => postProvider
+                                          .toggleLikeDislike(postModel: post),
                                       mediaData: mediaData,
                                       postId: widget.postModel.id,
                                     );

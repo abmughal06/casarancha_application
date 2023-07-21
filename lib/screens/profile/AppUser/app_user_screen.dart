@@ -56,36 +56,34 @@ class _AppUserScreenState extends State<AppUserScreen> {
     final post = context.watch<List<PostModel>?>();
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
-    return SafeArea(
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        bottom: false,
         top: false,
         child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.grey[50],
+            elevation: 0,
+            leading: IconButton(
+              onPressed: () => Get.back(),
+              color: Colors.black,
+              icon: const Icon(Icons.keyboard_arrow_left_rounded),
+            ),
+            actions: [
+              menuUserButton(
+                context,
+                widget.appUserId,
+                "",
+              ),
+              widthBox(15.w),
+            ],
+          ),
           body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                     SliverToBoxAdapter(
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 5, right: 10, top: 40),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    Get.back();
-                                  },
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_left_rounded,
-                                  ),
-                                ),
-                                menuUserButton(
-                                  context,
-                                  widget.appUserId,
-                                  "",
-                                )
-                              ],
-                            ),
-                          ),
                           Consumer<List<UserModel>?>(
                             builder: (context, appUser, b) {
                               if (appUser == null) {
@@ -221,7 +219,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                           fontSize: 12.sp,
                                         ),
                                       ),
-                                      heightBox(20.h),
+                                      heightBox(user.bio.isEmpty ? 0 : 20.h),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 20.w),
@@ -319,7 +317,6 @@ class _AppUserScreenState extends State<AppUserScreen> {
                               }
                             },
                           ),
-                          heightBox(15.h),
                         ],
                       ),
                     )
@@ -360,6 +357,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                               ),
                             ],
                           ),
+                          heightBox(10.w),
                           Expanded(
                             child: TabBarView(
                               children: [
@@ -411,7 +409,9 @@ class _AppUserScreenState extends State<AppUserScreen> {
                   }
                 }
               })),
-        ));
+        ),
+      ),
+    );
   }
 }
 

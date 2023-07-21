@@ -20,8 +20,9 @@ class PostProvider extends ChangeNotifier {
 
   final postRef = FirebaseFirestore.instance.collection("posts");
 
-  void toggleLikeDislike({PostModel? postModel, String? uid}) async {
+  void toggleLikeDislike({PostModel? postModel}) async {
     try {
+      var uid = fauth.currentUser!.uid;
       if (postModel!.likesIds.contains(uid)) {
         await postRef.doc(postModel.id).update({
           'likesIds': FieldValue.arrayRemove([uid])

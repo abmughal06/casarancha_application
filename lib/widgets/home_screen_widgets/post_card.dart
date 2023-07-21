@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
 import 'package:casarancha/widgets/home_screen_widgets/report_sheet.dart';
@@ -16,6 +17,7 @@ import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../../screens/chat/share_post_screen.dart';
+import '../../screens/dashboard/provider/dashboard_provider.dart';
 import '../../screens/home/post_detail_screen.dart';
 import '../common_widgets.dart';
 import '../music_player_url.dart';
@@ -33,6 +35,7 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final curruentUser = context.watch<UserModel?>();
     final postPorvider = Provider.of<PostProvider>(context, listen: false);
+    final ghostProvider = context.watch<DashboardProvider>();
 
     return Padding(
       padding: EdgeInsets.only(bottom: 15.w),
@@ -87,23 +90,29 @@ class PostCard extends StatelessWidget {
           showPostAccordingToItsType(
               post: post,
               onDoubletap: () {
-                postPorvider.toggleLikeDislike(
-                    postModel: post, uid: curruentUser!.id);
+                ghostProvider.checkGhostMode
+                    ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                    : postPorvider.toggleLikeDislike(
+                        postModel: post,
+                      );
               })!,
           heightBox(10.h),
           CustomPostFooter(
             likes: post.likesIds.length.toString(),
             isLike: post.likesIds.contains(curruentUser!.id),
             ontapLike: () {
-              postPorvider.toggleLikeDislike(
-                postModel: post,
-                uid: curruentUser.id,
-              );
+              ghostProvider.checkGhostMode
+                  ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                  : postPorvider.toggleLikeDislike(
+                      postModel: post,
+                    );
             },
             saveBtn: IconButton(
               onPressed: () {
-                postPorvider.onTapSave(
-                    userModel: curruentUser, postId: post.id);
+                ghostProvider.checkGhostMode
+                    ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                    : postPorvider.onTapSave(
+                        userModel: curruentUser, postId: post.id);
               },
               icon: SvgPicture.asset(
                 curruentUser.savedPostsIds.contains(post.id)
