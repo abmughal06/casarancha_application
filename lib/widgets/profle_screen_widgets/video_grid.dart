@@ -16,31 +16,6 @@ class VideoGridView extends StatefulWidget {
 }
 
 class _VideoGridViewState extends State<VideoGridView> {
-  late VideoPlayerController videoPlayerController;
-
-  @override
-  initState() {
-    initVideo();
-    super.initState();
-  }
-
-  initVideo() {
-    widget.videoList!.map((e) {
-      videoPlayerController = VideoPlayerController.network(e.mediaData[0].link)
-        ..initialize().then((value) {
-          setState(() {});
-          videoPlayerController.play();
-          videoPlayerController.setVolume(0);
-        });
-    }).toList();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    videoPlayerController.pause();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -55,27 +30,33 @@ class _VideoGridViewState extends State<VideoGridView> {
             ),
             itemCount: widget.videoList!.length,
             itemBuilder: (context, index) {
-              // final data = widget.videoList![index].mediaData[0];
-              // print(quote);
-              // VideoPlayerController videoPlayerController =
-              //     VideoPlayerController.network(data.link);
-              // videoPlayerController.initialize().whenComplete(() {
-              //   log("video is initialized");
-              //   // provider.initializeVideoPlayer();
-              // });
-              // videoPlayerController.pause();
+              final data = widget.videoList![index].mediaData[0];
+              VideoPlayerController videoPlayerController =
+                  VideoPlayerController.network(data.link);
 
               return GestureDetector(
-                  onTap: () => Get.to(() => FullScreenVideo(
-                        videoPlayerController: videoPlayerController,
-                        postId: widget.videoList![index].id,
-                        creatorId: widget.videoList![index].creatorId,
-                      )),
-                  child: videoPlayerController.value.isInitialized
-                      ? VideoPlayer(videoPlayerController)
-                      : Container(
-                          decoration:
-                              BoxDecoration(color: Colors.grey.shade200)));
+                onTap: () => Get.to(() => FullScreenVideo(
+                      videoPlayerController: videoPlayerController,
+                      postId: widget.videoList![index].id,
+                      creatorId: widget.videoList![index].creatorId,
+                    )),
+                child: FutureBuilder(
+                  future: videoPlayerController.initialize(),
+                  builder: (context, snap) {
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        decoration: BoxDecoration(color: Colors.grey.shade200),
+                      );
+                    } else if (videoPlayerController.value.isInitialized) {
+                      videoPlayerController
+                          .play()
+                          .then((value) => videoPlayerController.setVolume(0));
+                      return VideoPlayer(videoPlayerController);
+                    }
+                    return VideoPlayer(videoPlayerController);
+                  },
+                ),
+              );
             },
           ),
         ),

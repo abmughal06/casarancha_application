@@ -112,19 +112,21 @@ class DataProvider extends ChangeNotifier {
         .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+            .where((element) =>
+                element.data().containsKey('firstMessage') &&
+                element.data().isNotEmpty)
             .map((e) => GhostMessageDetails.fromMap(e.data()))
             .toList());
   }
 
-  Stream<List<Message>?>? messages(userId) {
+  Stream<List<Message>?>? messages(userId, isGhost) {
     if (FirebaseAuth.instance.currentUser?.uid == null) {
       return null;
     }
     return FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("messageList")
+        .collection(isGhost ? "ghostMessageList" : "messageList")
         .doc(userId)
         .collection("messages")
         .orderBy("createdAt", descending: true)

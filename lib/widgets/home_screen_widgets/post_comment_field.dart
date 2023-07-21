@@ -1,6 +1,10 @@
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
+import '../../models/post_model.dart';
+import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
@@ -8,13 +12,20 @@ import '../../resources/strings.dart';
 import '../clip_pad_shadow.dart';
 
 class PostCommentField extends StatelessWidget {
-  const PostCommentField({Key? key, required this.commentController})
-      : super(key: key);
+  const PostCommentField({
+    Key? key,
+    required this.commentController,
+    required this.postModel,
+  }) : super(key: key);
 
   final TextEditingController commentController;
+  final PostModel postModel;
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
+    final user = context.watch<UserModel>();
+
     return Align(
       alignment: Alignment.bottomCenter,
       child: ClipRect(
@@ -50,67 +61,13 @@ class PostCommentField extends StatelessWidget {
                   padding: const EdgeInsets.all(15.0),
                   child: GestureDetector(
                       onTap: () {
-                        // var cmnt = Comment(
-                        //   id: widget.postModel.id,
-                        //   creatorId:
-                        //       FirebaseAuth.instance.currentUser!.uid,
-                        //   creatorDetails: CreatorDetails(
-                        //       name: user!.name,
-                        //       imageUrl: user!.imageStr,
-                        //       isVerified: user!.isVerified),
-                        //   createdAt: DateTime.now().toIso8601String(),
-                        //   message: coommenController.text,
-                        // );
+                        postProvider.postComment(
+                          postModel: postModel,
+                          comment: commentController.text,
+                          user: user,
+                        );
 
-                        // FirebaseFirestore.instance
-                        //     .collection("posts")
-                        //     .doc(widget.postModel.id)
-                        //     .collection("comments")
-                        //     .doc()
-                        //     .set(cmnt.toMap(), SetOptions(merge: true))
-                        //     .then((value) async {
-                        //   coommenController.clear();
-                        //   var cmntId = await FirebaseFirestore.instance
-                        //       .collection("posts")
-                        //       .doc(widget.postModel.id)
-                        //       .collection("comments")
-                        //       .get();
-
-                        //   List listOfCommentsId = [];
-                        //   for (var i in cmntId.docs) {
-                        //     listOfCommentsId.add(i.id);
-                        //   }
-
-                        //   print(
-                        //       "+++========+++++++++============+++++++++ $listOfCommentsId ");
-                        //   FirebaseFirestore.instance
-                        //       .collection("posts")
-                        //       .doc(widget.postModel.id)
-                        //       .set({"commentIds": listOfCommentsId},
-                        //           SetOptions(merge: true));
-
-                        //   var recieverRef = await FirebaseFirestore
-                        //       .instance
-                        //       .collection("users")
-                        //       .doc(widget.postModel.creatorId)
-                        //       .get();
-
-                        //   var recieverFCMToken =
-                        //       recieverRef.data()!['fcmToken'];
-                        //   print(
-                        //       "=========> reciever fcm token = $recieverFCMToken");
-                        //   FirebaseMessagingService()
-                        //       .sendNotificationToUser(
-                        //     appUserId: recieverRef.id,
-                        //     imageUrl:
-                        //         widget.postModel.mediaData[0].type ==
-                        //                 'Photo'
-                        //             ? widget.postModel.mediaData[0].link
-                        //             : '',
-                        //     devRegToken: recieverFCMToken,
-                        //     msg: "has commented on your post.",
-                        //   );
-                        // });
+                        commentController.clear();
                       },
                       child: Image.asset(
                         imgSendComment,

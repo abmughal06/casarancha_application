@@ -60,6 +60,11 @@ class AuthenticationProvider extends ChangeNotifier {
     if (data.exists) {
       var token = await message.getFirebaseToken();
       await ref.set({"fcmToken": token}, SetOptions(merge: true));
+
+      if (!data.data()!.containsKey("ghostName")) {
+        ref.set({"ghostName": "Ghost---- ${Random().nextInt(6)}"},
+            SetOptions(merge: true));
+      }
       Get.offAll(() => const DashBoard());
     } else {
       Get.offAll(() => const SetupProfileScreen());

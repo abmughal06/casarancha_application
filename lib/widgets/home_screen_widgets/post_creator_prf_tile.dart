@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +19,15 @@ import '../common_widgets.dart';
 import '../text_widget.dart';
 
 class PostCreatorProfileTile extends StatelessWidget {
-  const PostCreatorProfileTile({Key? key, required this.post})
-      : super(key: key);
+  const PostCreatorProfileTile({
+    Key? key,
+    required this.post,
+  }) : super(key: key);
   final PostModel post;
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
     return Container(
       padding: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -53,20 +57,7 @@ class PostCreatorProfileTile extends StatelessWidget {
             isVideoPost: post.mediaData[0].type == 'Video',
             videoViews: '0',
             isPostDetail: true,
-            ontapLike: () {
-              // print("clicked");
-
-              // widget.postCardController!.isLiked.value =
-              //     !post.likesIds.contains(FirebaseAuth
-              //         .instance.currentUser!.uid);
-              // widget.postCardController!
-              //     .likeDisLikePost(
-              //         FirebaseAuth
-              //             .instance.currentUser!.uid,
-              //         post.id,
-              //         post.creatorId);
-              // Get.back();
-            },
+            ontapLike: () => postProvider.toggleLikeDislike(postModel: post),
             saveBtn: Consumer<UserModel?>(
               builder: (context, user, b) {
                 if (user == null) {
@@ -75,28 +66,8 @@ class PostCreatorProfileTile extends StatelessWidget {
                   );
                 } else {
                   return IconButton(
-                    onPressed: () {
-                      // if (userModel.savedPostsIds
-                      //     .contains(post.id)) {
-                      //   FirebaseFirestore.instance
-                      //       .collection("users")
-                      //       .doc(userModel.id)
-                      //       .update({
-                      //     'savedPostsIds':
-                      //         FieldValue.arrayRemove(
-                      //             [post.id])
-                      //   });
-                      // } else {
-                      //   FirebaseFirestore.instance
-                      //       .collection("users")
-                      //       .doc(userModel.id)
-                      //       .update({
-                      //     'savedPostsIds':
-                      //         FieldValue.arrayUnion(
-                      //             [post.id])
-                      //   });
-                      // }
-                    },
+                    onPressed: () => postProvider.onTapSave(
+                        userModel: user, postId: post.id),
                     icon: SvgPicture.asset(
                       user.savedPostsIds.contains(post.id)
                           ? icSavedPost
@@ -136,12 +107,13 @@ class PostCreatorProfileTile extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    Get.to(
-                      () => AppUserScreen(
-                        appUserId: post.creatorId,
-                        appUserName: post.creatorDetails.name,
-                      ),
-                    );
+                    // Get.to(
+                    //   () => AppUserScreen(
+                    //     appUserId: post.creatorId,
+                    //     appUserName: post.creatorDetails.name,
+                    //   ),
+                    // );
+                    navigateToAppUserScreen(post.creatorId, context);
                   },
                   child: Row(
                     children: [

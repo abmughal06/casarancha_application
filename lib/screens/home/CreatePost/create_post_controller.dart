@@ -78,7 +78,7 @@ class CreatePostMethods extends ChangeNotifier {
         id: postId,
         creatorId: creatorId,
         creatorDetails: creatorDetails,
-        createdAt: DateTime.now().toUtc().toIso8601String(),
+        createdAt: DateTime.now().toIso8601String(),
         description: captionController.text.trim(),
         locationName: locationController.text.trim(),
         shareLink: '',
@@ -112,7 +112,7 @@ class CreatePostMethods extends ChangeNotifier {
     if (qouteText.isNotEmpty) {
       mediaData.add(
         MediaDetails(
-          id: DateTime.now().toUtc().toIso8601String(),
+          id: DateTime.now().toIso8601String(),
           name: 'Nothing',
           type: 'Qoute',
           link: qouteText,
@@ -174,7 +174,7 @@ print(decodedImage.height);
           log("check 9");
 
           mediaDetails = MediaDetails(
-              id: DateTime.now().toUtc().toIso8601String(),
+              id: DateTime.now().toIso8601String(),
               name: fileName,
               type: fileType,
               link: fileUrl,
@@ -182,14 +182,14 @@ print(decodedImage.height);
               imageWidth: imageSize?.width.toString());
         } else if (fileType == 'Video') {
           mediaDetails = MediaDetails(
-              id: DateTime.now().toUtc().toIso8601String(),
+              id: DateTime.now().toIso8601String(),
               name: fileName,
               type: fileType,
               link: fileUrl,
               videoAspectRatio: videoAspectRatio?.toString());
         } else {
           mediaDetails = MediaDetails(
-            id: DateTime.now().toUtc().toIso8601String(),
+            id: DateTime.now().toIso8601String(),
             name: fileName,
             type: fileType,
             link: fileUrl,

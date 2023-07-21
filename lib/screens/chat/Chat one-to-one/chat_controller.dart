@@ -1,296 +1,275 @@
-// // ignore_for_file: public_member_api_docs, sort_constructors_first
-// import 'dart:math';
+import 'package:casarancha/models/message.dart';
+import 'package:casarancha/models/message_details.dart';
+import 'package:casarancha/models/post_creator_details.dart';
+import 'package:casarancha/utils/snackbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-// import 'package:casarancha/models/message.dart';
-// import 'package:casarancha/models/message_details.dart';
-// import 'package:casarancha/models/post_creator_details.dart';
-// import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
-// import 'package:casarancha/utils/snackbar.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
+import '../../../models/ghost_message_details.dart';
+import '../../../models/user_model.dart';
+import '../../../resources/firebase_cloud_messaging.dart';
 
-// import '../../../resources/firebase_cloud_messaging.dart';
+class ChatProvider extends ChangeNotifier {
+//variables
 
-// import '../GhostMode/ghost_chat_screen.dart';
+  late TextEditingController messageController;
+  ChatProvider() {
+    messageController = TextEditingController();
+  }
 
-// class ChatController extends GetxController {
-//   String appUserId;
-//   CreatorDetails creatorDetails;
-//   ChatController({
-//     required this.appUserId,
-//     required this.creatorDetails,
-//   });
-// //variables
-//   ProfileScreenController profileScreenController =
-//       Get.find<ProfileScreenController>();
+//Observablaes
+  var isChatExits = false;
+  var isChecking = false;
 
-//   late TextEditingController messageController;
+  int unreadMessages = 0;
 
-// //Observablaes
-//   var isChatExits = false.obs;
-//   var isChecking = false.obs;
+  final userRef = FirebaseFirestore.instance.collection("users");
 
-//   int unreadMessages = 0;
+  Future<void> sentMessage({UserModel? currentUser, UserModel? appUser}) async {
+    if (messageController.text.isEmpty) {
+      return;
+    }
+    try {
+      final messageRefForCurrentUser = userRef
+          .doc(currentUser!.id)
+          .collection('messageList')
+          .doc(appUser!.id)
+          .collection('messages')
+          .doc();
 
-// //Getters
+      final messageRefForAppUser = userRef
+          .doc(appUser.id)
+          .collection('messageList')
+          .doc(currentUser.id)
+          .collection('messages')
+          .doc(
+            messageRefForCurrentUser.id,
+          );
 
-//   String get currentUserId {
-//     return profileScreenController.user.value.id;
-//   }
+      final MessageDetails appUserMessageDetails = MessageDetails(
+        id: appUser.id,
+        lastMessage: messageController.text,
+        unreadMessageCount: 0,
+        searchCharacters: [...appUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: appUser.name,
+          imageUrl: appUser.imageStr,
+          isVerified: appUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
 
-//   DocumentReference<Map<String, dynamic>> get appUserRef {
-//     return FirebaseFirestore.instance.collection('users').doc(appUserId);
-//   }
+      final MessageDetails currentUserMessageDetails = MessageDetails(
+        id: currentUser.id,
+        lastMessage: messageController.text,
+        unreadMessageCount: unreadMessages + 1,
+        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
 
-//   DocumentReference<Map<String, dynamic>> get currentUserRef {
-//     return FirebaseFirestore.instance.collection('users').doc(currentUserId);
-//   }
+      // if (!isChatExits.value) {
+      await userRef
+          .doc(currentUser.id)
+          .collection('messageList')
+          .doc(appUser.id)
+          .set(
+            appUserMessageDetails.toMap(),
+          );
 
-// //Methods
-//   Future<void> checkChatExistenceStatus() async {
-//     isChecking.value = true;
+      await userRef
+          .doc(appUser.id)
+          .collection('messageList')
+          .doc(currentUser.id)
+          .set(
+            currentUserMessageDetails.toMap(),
+          );
 
-//     try {
-//       final result = await FirebaseFirestore.instance
-//           .collection('users')
-//           .doc(profileScreenController.user.value.id)
-//           .collection('messageList')
-//           .doc(appUserId)
-//           .get();
-//       if (result.exists) {
-//         isChatExits.value = true;
-//       } else {
-//         isChatExits.value = false;
-//       }
-//     } catch (e) {
-//       GlobalSnackBar.show(message: e.toString());
-//     }
+      // }
 
-//     isChecking.value = false;
-//   }
+      final Message message = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: messageController.text,
+        caption: '',
+        type: 'Text',
+        createdAt: DateTime.now().toIso8601String(),
+        isSeen: false,
+      );
 
-//   Future<void> sentMessage() async {
-//     if (messageController.text.isEmpty) {
-//       return;
-//     }
-//     try {
-//       final messageRefForCurrentUser = currentUserRef
-//           .collection('messageList')
-//           .doc(appUserId)
-//           .collection('messages')
-//           .doc();
+      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-//       final messageRefForAppUser = appUserRef
-//           .collection('messageList')
-//           .doc(currentUserId)
-//           .collection('messages')
-//           .doc(
-//             messageRefForCurrentUser.id,
-//           );
+      messageRefForCurrentUser.set(message.toMap());
+      messageRefForAppUser.set(appUserMessage.toMap());
 
-//       final MessageDetails appUserMessageDetails = MessageDetails(
-//         id: appUserId,
-//         lastMessage: messageController.text,
-//         unreadMessageCount: 0,
-//         searchCharacters: [...creatorDetails.name.toLowerCase().split('')],
-//         creatorDetails: CreatorDetails(
-//           name: creatorDetails.name,
-//           imageUrl: creatorDetails.imageUrl,
-//           isVerified: creatorDetails.isVerified,
-//         ),
-//         createdAt: DateTime.now().toIso8601String(),
-//       );
+      // if (isChatExits.value) {
+      userRef
+          .doc(appUser.id)
+          .collection('messageList')
+          .doc(currentUser.id)
+          .update(
+            currentUserMessageDetails.toMap(),
+          );
+      unreadMessages += 1;
+      // }
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUser.id)
+          .get();
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: recieverRef.id,
+        devRegToken: recieverFCMToken,
+        msg: "has sent you a $unreadMessages message",
+      );
 
-//       final MessageDetails currentUserMessageDetails = MessageDetails(
-//         id: currentUserId,
-//         lastMessage: messageController.text,
-//         unreadMessageCount: unreadMessages + 1,
-//         searchCharacters: [
-//           ...profileScreenController.user.value.name.toLowerCase().split('')
-//         ],
-//         creatorDetails: CreatorDetails(
-//           name: profileScreenController.user.value.name,
-//           imageUrl: profileScreenController.user.value.imageStr,
-//           isVerified: profileScreenController.user.value.isVerified,
-//         ),
-//         createdAt: DateTime.now().toIso8601String(),
-//       );
+      messageController.clear();
+    } catch (e) {
+      GlobalSnackBar(message: e.toString());
+    }
+  }
 
-//       // if (!isChatExits.value) {
-//       await currentUserRef.collection('messageList').doc(appUserId).set(
-//             appUserMessageDetails.toMap(),
-//           );
+  Future<void> sentMessageGhost(
+      {UserModel? currentUser,
+      UserModel? appUser,
+      bool? firstMessageByMe}) async {
+    if (messageController.text.isEmpty) {
+      return;
+    }
+    try {
+      final messageRefForCurrentUser = userRef
+          .doc(currentUser!.id)
+          .collection('ghostMessageList')
+          .doc(appUser!.id)
+          .collection('messages')
+          .doc();
 
-//       await appUserRef.collection('messageList').doc(currentUserId).set(
-//             currentUserMessageDetails.toMap(),
-//           );
+      final messageRefForAppUser = userRef
+          .doc(appUser.id)
+          .collection('ghostMessageList')
+          .doc(currentUser.id)
+          .collection('messages')
+          .doc(
+            messageRefForCurrentUser.id,
+          );
 
-//       isChatExits.value = true;
-//       // }
+      final GhostMessageDetails appUserMessageDetails = GhostMessageDetails(
+        id: appUser.id,
+        lastMessage: messageController.text,
+        firstMessage: firstMessageByMe! ? currentUser.id : appUser.id,
+        unreadMessageCount: 0,
+        searchCharacters: [...appUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: appUser.name,
+          imageUrl: appUser.imageStr,
+          isVerified: appUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
 
-//       final Message message = Message(
-//         id: messageRefForCurrentUser.id,
-//         sentToId: appUserId,
-//         sentById: currentUserId,
-//         content: messageController.text,
-//         caption: '',
-//         type: 'Text',
-//         createdAt: DateTime.now().toIso8601String(),
-//         isSeen: false,
-//       );
+      final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
+        id: currentUser.id,
+        lastMessage: messageController.text,
+        firstMessage: firstMessageByMe ? currentUser.id : appUser.id,
+        unreadMessageCount: unreadMessages + 1,
+        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
 
-//       final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
+      // if (!isChatExits.value) {
+      await userRef
+          .doc(currentUser.id)
+          .collection('ghostMessageList')
+          .doc(appUser.id)
+          .set(
+            appUserMessageDetails.toMap(),
+          );
 
-//       messageRefForCurrentUser.set(message.toMap());
-//       messageRefForAppUser.set(appUserMessage.toMap());
+      await userRef
+          .doc(appUser.id)
+          .collection('ghostMessageList')
+          .doc(currentUser.id)
+          .set(
+            currentUserMessageDetails.toMap(),
+          );
 
-//       // if (isChatExits.value) {
-//       appUserRef.collection('messageList').doc(currentUserId).update(
-//             currentUserMessageDetails.toMap(),
-//           );
-//       unreadMessages += 1;
-//       // }
-//       var recieverRef = await FirebaseFirestore.instance
-//           .collection("users")
-//           .doc(appUserId)
-//           .get();
-//       var recieverFCMToken = recieverRef.data()!['fcmToken'];
-//       print("=========> reciever fcm token = $recieverFCMToken");
-//       FirebaseMessagingService().sendNotificationToUser(
-//         appUserId: recieverRef.id,
-//         devRegToken: recieverFCMToken,
-//         msg: "has sent you a $unreadMessages message",
-//       );
+      // }
 
-//       messageController.clear();
-//     } catch (e) {
-//       GlobalSnackBar(message: e.toString());
-//     }
-//   }
+      final Message message = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: messageController.text,
+        caption: '',
+        type: 'Text',
+        createdAt: DateTime.now().toIso8601String(),
+        isSeen: false,
+      );
 
-//   Future<void> sentMessageGhost() async {
-//     if (messageController.text.isEmpty) {
-//       return;
-//     }
-//     try {
-//       final messageRefForCurrentUser = currentUserRef
-//           .collection("ghostMessageList")
-//           .doc(appUserId)
-//           .collection('messages')
-//           .doc();
+      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-//       final messageRefForAppUser = appUserRef
-//           .collection("ghostMessageList")
-//           .doc(currentUserId)
-//           .collection('messages')
-//           .doc(
-//             messageRefForCurrentUser.id,
-//           );
+      messageRefForCurrentUser.set(message.toMap());
+      messageRefForAppUser.set(appUserMessage.toMap());
 
-//       final MessageDetails appUserMessageDetails = MessageDetails(
-//         id: appUserId,
-//         lastMessage: messageController.text,
-//         unreadMessageCount: 0,
-//         searchCharacters: [...creatorDetails.name.toLowerCase().split('')],
-//         creatorDetails: CreatorDetails(
-//           name: creatorDetails.name,
-//           imageUrl: creatorDetails.imageUrl,
-//           isVerified: creatorDetails.isVerified,
-//         ),
-//         createdAt: DateTime.now().toIso8601String(),
-//       );
+      // if (isChatExits.value) {
+      userRef
+          .doc(appUser.id)
+          .collection('ghostMessageList')
+          .doc(currentUser.id)
+          .update(
+            currentUserMessageDetails.toMap(),
+          );
+      unreadMessages += 1;
+      // }
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUser.id)
+          .get();
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: recieverRef.id,
+        devRegToken: recieverFCMToken,
+        msg: "has sent you a $unreadMessages message in ghost",
+      );
 
-//       final MessageDetails currentUserMessageDetails = MessageDetails(
-//         id: currentUserId,
-//         lastMessage: messageController.text,
-//         unreadMessageCount: unreadMessages + 1,
-//         searchCharacters: [
-//           ...profileScreenController.user.value.name.toLowerCase().split('')
-//         ],
-//         creatorDetails: CreatorDetails(
-//           name: 'Ghost_${Random().nextInt(10000).toString()}',
-//           imageUrl: '',
-//           isVerified: false,
-//         ),
-//         createdAt: DateTime.now().toIso8601String(),
-//       );
+      messageController.clear();
+    } catch (e) {
+      GlobalSnackBar(message: e.toString());
+    }
+  }
 
-//       // if (!isChatExits.value) {
-//       await currentUserRef.collection("ghostMessageList").doc(appUserId).set(
-//             appUserMessageDetails.toMap(),
-//           );
+  Future<void> resetMessageCount({currentUserId, appUserId}) async {
+    await userRef
+        .doc(currentUserId)
+        .collection('messageList')
+        .doc(appUserId)
+        .update({
+      'unreadMessageCount': 0,
+    });
+  }
 
-//       await appUserRef.collection("ghostMessageList").doc(currentUserId).set(
-//             currentUserMessageDetails.toMap(),
-//           );
+  Future<void> resetMessageCountGhost({currentUserId, appUserId}) async {
+    userRef
+        .doc(currentUserId)
+        .collection("ghostMessageList")
+        .doc(appUserId)
+        .update({
+      'unreadMessageCount': 0,
+    });
+  }
 
-//       isChatExits.value = true;
-//       // }
-
-//       final Message message = Message(
-//         id: messageRefForCurrentUser.id,
-//         sentToId: appUserId,
-//         sentById: currentUserId,
-//         content: messageController.text,
-//         caption: '',
-//         type: 'Text',
-//         createdAt: DateTime.now().toIso8601String(),
-//         isSeen: false,
-//       );
-
-//       final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
-
-//       messageRefForCurrentUser.set(message.toMap());
-//       messageRefForAppUser.set(appUserMessage.toMap());
-
-//       // if (isChatExits.value) {
-//       appUserRef.collection("ghostMessageList").doc(currentUserId).update(
-//             currentUserMessageDetails.toMap(),
-//           );
-//       unreadMessages += 1;
-//       // }
-//       var recieverRef = await FirebaseFirestore.instance
-//           .collection("users")
-//           .doc(appUserId)
-//           .get();
-//       var recieverFCMToken = recieverRef.data()!['fcmToken'];
-//       print("=========> reciever fcm token = $recieverFCMToken");
-//       FirebaseMessagingService().sendNotificationToUser(
-//         appUserId: recieverRef.id,
-//         devRegToken: recieverFCMToken,
-//         msg: "has sent you a $unreadMessages message in ghost",
-//       );
-
-//       messageController.clear();
-//     } catch (e) {
-//       GlobalSnackBar(message: e.toString());
-//     }
-//   }
-
-//   Future<void> resetMessageCount() async {
-//     currentUserRef.collection('messageList').doc(appUserId).update({
-//       'unreadMessageCount': 0,
-//     });
-//   }
-
-//   Future<void> resetMessageCountGhost() async {
-//     currentUserRef.collection("ghostMessageList").doc(appUserId).update({
-//       'unreadMessageCount': 0,
-//     });
-//   }
-
-//   @override
-//   void onInit() {
-//     messageController = TextEditingController();
-//     checkChatExistenceStatus();
-
-//     super.onInit();
-//   }
-
-//   @override
-//   void dispose() {
-//     messageController.dispose();
-//     super.dispose();
-//   }
-// }
+  void clearMessageController() {
+    messageController.clear();
+    unreadMessages = 0;
+  }
+}

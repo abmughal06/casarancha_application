@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-
+import 'package:provider/provider.dart';
 import '../../models/ghost_message_details.dart';
 import '../../models/message_details.dart';
 import '../../models/user_model.dart';
@@ -93,8 +93,8 @@ class ChatUserListTile extends StatelessWidget {
   }
 }
 
-class GhostChatUserListTile extends StatelessWidget {
-  const GhostChatUserListTile(
+class GhostChatListTile extends StatelessWidget {
+  const GhostChatListTile(
       {Key? key, required this.messageDetails, required this.ontapTile})
       : super(key: key);
   final GhostMessageDetails messageDetails;
@@ -142,6 +142,83 @@ class GhostChatUserListTile extends StatelessWidget {
                   Icons.question_mark,
                 )
               : null,
+        ),
+        trailing: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextWidget(
+              text: convertDateIntoTime(messageDetails.createdAt),
+              fontWeight: FontWeight.w400,
+              fontSize: 12.sp,
+              color: const Color(0xff878787),
+            ),
+            SizedBox(height: 5.h),
+            messageDetails.unreadMessageCount == 0
+                ? const Icon(Icons.navigate_next)
+                : Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                        color: Color(0xff7BC246), shape: BoxShape.circle),
+                    child: Text(
+                      messageDetails.unreadMessageCount.toString(),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GhostChatUserListTile extends StatelessWidget {
+  const GhostChatUserListTile(
+      {Key? key, required this.messageDetails, required this.ontapTile})
+      : super(key: key);
+  final GhostMessageDetails messageDetails;
+
+  final VoidCallback ontapTile;
+
+  @override
+  Widget build(BuildContext context) {
+    final users = context.watch<List<UserModel>?>();
+    final user = users!
+        .where((element) => element.id == messageDetails.firstMessage)
+        .first;
+    return SizedBox(
+      child: ListTile(
+        onTap: ontapTile,
+        title: Row(
+          children: [
+            TextWidget(
+              text: user.ghostName,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xff222939),
+            ),
+          ],
+        ),
+        subtitle: TextWidget(
+          text: messageDetails.lastMessage,
+          textOverflow: TextOverflow.ellipsis,
+          fontWeight: messageDetails.unreadMessageCount == 0
+              ? FontWeight.w400
+              : FontWeight.w700,
+          fontSize: 14.sp,
+          color: messageDetails.unreadMessageCount == 0
+              ? const Color(0xff8a8a8a)
+              : const Color(0xff000000),
+        ),
+        leading: CircleAvatar(
+          child: SvgPicture.asset(
+            icGhostMode,
+            color: Colors.white,
+            height: 20,
+          ),
         ),
         trailing: Column(
           crossAxisAlignment: CrossAxisAlignment.end,

@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/resources/image_resources.dart';
-import 'package:casarancha/screens/home/providers/post_provider.dart';
+import 'package:casarancha/screens/home/providers/music_provider.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 
@@ -38,7 +38,7 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PostProvider>(builder: (context, provider, b) {
+    return Consumer<MusicProvider>(builder: (context, provider, b) {
       provider.play(widget.musicDetails.link);
 
       return VisibilityDetector(
