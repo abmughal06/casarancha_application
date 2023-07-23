@@ -16,6 +16,7 @@ import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
+import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/follower_following_screen.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/snackbar.dart';
@@ -120,9 +121,7 @@ _bottomSheetProfile(context) {
 _onTapSheetItem({required int index}) async {
   switch (index) {
     case 0:
-      // Get.to(() => EditProfileScreen(
-      //       currentUser: profileScreenController.user.value,
-      //     ));
+      Get.to(() => const EditProfileScreen());
       break;
     case 1:
       // Get.to(() => SavedPostScreen());

@@ -1,16 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/group_model.dart';
-import 'package:casarancha/screens/groups/group_post_screen.dart';
 
-import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
 import '../resources/color_resources.dart';
 

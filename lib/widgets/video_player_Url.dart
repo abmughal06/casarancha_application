@@ -1,12 +1,8 @@
-// ignore_for_file: file_names
-
-import 'package:casarancha/widgets/text_widget.dart';
 import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -22,9 +18,7 @@ class VideoPlayerWidget extends StatefulWidget {
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   late VideoPlayerController videoPlayerController;
-  // bool isPlaying = false;
   bool isVisible = false;
-  // bool isMuted = true;s
 
   late ChewieController chewieController;
   @override
@@ -32,22 +26,25 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.initState();
 
     videoPlayerController = VideoPlayerController.network(widget.videoUrl);
-    countVideoViews();
+    // countVideoViews();
 
     videoPlayerController.setVolume(0.0); // Mute the video initially
 
     chewieController = ChewieController(
-        videoPlayerController: videoPlayerController,
-        showOptions: false,
-        autoPlay: false,
-        allowPlaybackSpeedChanging: true,
-        autoInitialize: true,
-        showControlsOnInitialize: true,
-        allowFullScreen: true,
-        deviceOrientationsOnEnterFullScreen: [DeviceOrientation.portraitUp],
-        deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-        aspectRatio: 9 / 16,
-        looping: false);
+      videoPlayerController: videoPlayerController,
+      showOptions: false,
+      autoPlay: false,
+      allowPlaybackSpeedChanging: true,
+      autoInitialize: true,
+      showControlsOnInitialize: true,
+      allowFullScreen: true,
+      deviceOrientationsOnEnterFullScreen: [DeviceOrientation.portraitUp],
+      deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
+      aspectRatio: 9 / 16,
+      looping: false,
+      allowMuting: true,
+      showControls: true,
+    );
   }
 
   countVideoViews() async {
@@ -72,13 +69,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   @override
-  void dispose() {
-    // videoPlayerController.dispose();
-    // chewieController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
       key: Key(widget.videoUrl),
@@ -86,14 +76,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         isVisible = visibilityInfo.visibleFraction > 0.6;
         if (isVisible) {
           videoPlayerController.play();
-          // chewieController.play();
-          // isPlaying = true;
-          videoPlayerController.setVolume(1.0);
+          videoPlayerController.setVolume(0.0);
         } else {
           videoPlayerController.pause();
-          // chewieController.pause();
-
-          // isPlaying = false;
           videoPlayerController.setVolume(0.0);
         }
       },

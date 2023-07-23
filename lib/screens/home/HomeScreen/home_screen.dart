@@ -1,7 +1,5 @@
-import 'dart:developer';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_model.dart';
-import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
@@ -11,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import '../../../models/story_model.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/home_screen_widgets/post_card.dart';
@@ -35,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final ghostProvider = context.watch<DashboardProvider>();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey.shade50,
         centerTitle: true,
         title: Text(
           strCasaRanch,
@@ -91,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: ListView(
-        shrinkWrap: true,
+        // shrinkWrap: true,
         children: [
           SizedBox(
             height: 77.h,

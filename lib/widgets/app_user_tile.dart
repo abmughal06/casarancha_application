@@ -2,15 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
-import 'package:casarancha/screens/profile/AppUser/app_user_controller.dart';
-import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
-import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 
 class AppUserTile extends StatelessWidget {
   const AppUserTile({
@@ -37,19 +33,6 @@ class AppUserTile extends StatelessWidget {
         ),
       ),
       child: ListTile(
-        // onTap: appUser.id == currentUser.id
-        //     ? () => const GlobalSnackBar(message: 'Open from profile page')
-        //     : () => Get.to(
-        //           // () => AppUserScreen(
-        //           //   appUserController: Get.put(
-        //           //     AppUserController(
-        //           //       appUser: appUser,
-        //           //       appUserId: appUser.id,
-        //           //       currentUserId: currentUser.id,
-        //           //     ),
-        //           //   ),
-        //           // ),
-        //         ),
         title: Row(
           children: [
             Text(appUser.name),

@@ -5,7 +5,7 @@ import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/utils/snackbar.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -197,7 +197,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             ),
           ),
           heightBox(20.w),
-          TextWidget(
+          const TextWidget(
             text: strKeepInGrp,
             fontWeight: FontWeight.w500,
             color: color221,

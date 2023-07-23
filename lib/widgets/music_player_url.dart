@@ -13,10 +13,14 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 class MusicPlayerUrl extends StatefulWidget {
   const MusicPlayerUrl(
-      {Key? key, required this.musicDetails, required this.ontap})
+      {Key? key,
+      required this.musicDetails,
+      required this.ontap,
+      required this.border})
       : super(key: key);
   final MediaDetails musicDetails;
   final Function ontap;
+  final double border;
 
   @override
   State<MusicPlayerUrl> createState() => _MusicPlayerWithFileState();
@@ -47,102 +51,100 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
             var isVisible = visibilityInfo.visibleFraction > 0.5;
             provider.listenToFrameChange(isVisible);
           },
-          child: AspectRatio(
-            aspectRatio: 13 / 9,
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        musicImgUrl,
-                      ),
-                      fit: BoxFit.cover,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(widget.border),
+                  image: DecorationImage(
+                    image: AssetImage(
+                      musicImgUrl,
                     ),
-                  ),
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    decoration:
-                        BoxDecoration(color: Colors.black.withOpacity(0.3)),
+                    fit: BoxFit.cover,
                   ),
                 ),
-                Positioned(
-                  left: 15,
-                  right: 15,
-                  bottom: 15,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          provider.audioState == PlayerState.playing
-                              ? provider.pause()
-                              : provider.resume();
-                        },
-                        child: SvgPicture.asset(
-                          provider.audioState == PlayerState.playing
-                              ? icMusicPauseBtn
-                              : icMusicPlayBtn,
-                          width: 35,
-                          height: 35,
-                        ),
-                      ),
-                      widthBox(
-                        5.w,
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            SliderTheme(
-                              data: SliderThemeData(
-                                overlayShape: SliderComponentShape.noOverlay,
-                              ),
-                              child: Slider.adaptive(
-                                thumbColor: Colors.yellow,
-                                activeColor: Colors.yellow,
-                                min: 0.0,
-                                max: provider.duration.inSeconds.toDouble() +
-                                    1.0,
-                                value: provider.position.inSeconds.toDouble() +
-                                    1.0,
-                                onChanged: (value) async {
-                                  final position =
-                                      Duration(seconds: value.toInt());
-                                  await provider.audioPlayer.seek(position);
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.w),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    formatTime(
-                                      provider.position,
-                                    ),
-                                  ),
-                                  Text(
-                                    formatTime(
-                                      provider.duration,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(widget.border),
+                    color: Colors.black.withOpacity(0.2),
                   ),
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                left: 15,
+                right: 15,
+                bottom: 15,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        provider.audioState == PlayerState.playing
+                            ? provider.pause()
+                            : provider.resume();
+                      },
+                      child: SvgPicture.asset(
+                        provider.audioState == PlayerState.playing
+                            ? icMusicPauseBtn
+                            : icMusicPlayBtn,
+                        width: 35,
+                        height: 35,
+                      ),
+                    ),
+                    widthBox(
+                      5.w,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          SliderTheme(
+                            data: SliderThemeData(
+                              overlayShape: SliderComponentShape.noOverlay,
+                            ),
+                            child: Slider.adaptive(
+                              thumbColor: Colors.yellow,
+                              activeColor: Colors.yellow,
+                              min: 0.0,
+                              max: provider.duration.inSeconds.toDouble() + 1.0,
+                              value:
+                                  provider.position.inSeconds.toDouble() + 1.0,
+                              onChanged: (value) async {
+                                final position =
+                                    Duration(seconds: value.toInt());
+                                await provider.audioPlayer.seek(position);
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  formatTime(
+                                    provider.position,
+                                  ),
+                                ),
+                                Text(
+                                  formatTime(
+                                    provider.duration,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
           ));
     });
   }

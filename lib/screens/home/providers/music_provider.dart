@@ -50,7 +50,7 @@ class MusicProvider with ChangeNotifier {
 
   void listenToFrameChange(isVisible) {
     if (isVisible) {
-      resume();
+      pause();
     } else {
       pause();
     }

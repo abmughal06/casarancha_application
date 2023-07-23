@@ -12,7 +12,7 @@ AppBar primaryAppbar({
   List<Widget>? actions,
 }) {
   return AppBar(
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.grey.shade50,
     centerTitle: true,
     leading: leading,
     iconTheme: const IconThemeData(

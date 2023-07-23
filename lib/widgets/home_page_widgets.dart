@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/resources/color_resources.dart';
 
-import 'package:casarancha/widgets/primary_textButton.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

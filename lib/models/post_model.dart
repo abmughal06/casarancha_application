@@ -21,6 +21,8 @@ class PostModel {
   bool isQuotaExpanded = false;
   int? reportCount;
   String? postBlockStatus;
+  List<dynamic> videoViews;
+
   PostModel({
     required this.id,
     required this.creatorId,
@@ -29,6 +31,7 @@ class PostModel {
     required this.description,
     required this.locationName,
     required this.shareLink,
+    this.videoViews = const [],
     this.mediaData = const [],
     this.likesIds = const [],
     this.isQuotaExpanded = false,
@@ -47,6 +50,7 @@ class PostModel {
       String? description,
       String? locationName,
       String? shareLink,
+      List<dynamic>? videoViews,
       List<MediaDetails>? mediaData,
       List<String>? likesIds,
       List<String>? commentIds,
@@ -55,6 +59,7 @@ class PostModel {
       int? reportCount,
       String? postBlockStatus}) {
     return PostModel(
+        videoViews: videoViews ?? this.videoViews,
         id: id ?? this.id,
         creatorId: creatorId ?? this.creatorId,
         creatorDetails: creatorDetails ?? this.creatorDetails,
@@ -75,6 +80,7 @@ class PostModel {
     return {
       'id': id,
       'creatorId': creatorId,
+      'videoViews': videoViews,
       'creatorDetails': creatorDetails.toMap(),
       'createdAt': createdAt,
       'description': description,
@@ -93,6 +99,7 @@ class PostModel {
   factory PostModel.fromMap(Map<String, dynamic> map) {
     return PostModel(
         id: map['id'] ?? '',
+        videoViews: map['videoViews'] ?? [],
         creatorId: map['creatorId'] ?? '',
         creatorDetails: CreatorDetails.fromMap(map['creatorDetails']),
         createdAt: map['createdAt'] ?? '',
@@ -116,7 +123,7 @@ class PostModel {
 
   @override
   String toString() {
-    return 'PostModel(id: $id, creatorId: $creatorId, creatorDetails: $creatorDetails, createdAt: $createdAt, description: $description, locationName: $locationName, shareLink: $shareLink, mediaData: $mediaData, likesIds: $likesIds, commentIds: $commentIds, tagsIds: $tagsIds,reportCount: $reportCount,postBlockStatus: $postBlockStatus)';
+    return 'PostModel(id: $id,videoViews:$videoViews, creatorId: $creatorId, creatorDetails: $creatorDetails, createdAt: $createdAt, description: $description, locationName: $locationName, shareLink: $shareLink, mediaData: $mediaData, likesIds: $likesIds, commentIds: $commentIds, tagsIds: $tagsIds,reportCount: $reportCount,postBlockStatus: $postBlockStatus)';
   }
 
   @override
@@ -125,6 +132,7 @@ class PostModel {
 
     return other is PostModel &&
         other.id == id &&
+        other.videoViews == videoViews &&
         other.creatorId == creatorId &&
         other.creatorDetails == creatorDetails &&
         other.createdAt == createdAt &&
@@ -143,6 +151,7 @@ class PostModel {
   int get hashCode {
     return id.hashCode ^
         creatorId.hashCode ^
+        videoViews.hashCode ^
         creatorDetails.hashCode ^
         createdAt.hashCode ^
         description.hashCode ^

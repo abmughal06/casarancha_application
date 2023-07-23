@@ -12,14 +12,14 @@ import '../widgets/text_widget.dart';
 enum PickerDateComponent { day, month, year }
 
 class CustomDatePicker extends StatefulWidget {
-  List<bool> showSelected = [];
-  Function dateChangedCallback;
-  DateTime? getDateTime;
+  final List<bool> showSelected;
+  final Function dateChangedCallback;
+  final DateTime? getDateTime;
   final String? userDateTime;
-  CustomDatePicker(
+  const CustomDatePicker(
       {Key? key,
       required this.dateChangedCallback,
-      required this.showSelected,
+      this.showSelected = const [],
       this.getDateTime,
       this.userDateTime})
       : super(key: key);
@@ -262,13 +262,13 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 }
 
 class CustomDatePicker2 extends StatefulWidget {
-  List<bool> showSelected = [];
-  Function dateChangedCallback;
-  DateTime? getDateTime;
-  CustomDatePicker2(
+  final List<bool> showSelected;
+  final Function dateChangedCallback;
+  final DateTime? getDateTime;
+  const CustomDatePicker2(
       {Key? key,
       required this.dateChangedCallback,
-      required this.showSelected,
+      this.showSelected = const [],
       this.getDateTime})
       : super(key: key);
 
@@ -304,7 +304,6 @@ class _CustomDatePicker2State extends State<CustomDatePicker2> {
 
       widget.dateChangedCallback(currentDate);
     }
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
   }
 

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../models/comment_model.dart';
+import '../../../models/message.dart';
+import '../../../models/message_details.dart';
 import '../../../models/post_creator_details.dart';
 import '../../../models/post_model.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
@@ -111,5 +113,108 @@ class PostProvider extends ChangeNotifier {
         msg: "has commented on your post.",
       );
     });
+  }
+
+  var isSent = false;
+  var unreadMessages = 0;
+
+  void sharePostData(
+      {UserModel? currentUser,
+      UserModel? appUser,
+      PostModel? postModel}) async {
+    final messageRefForCurrentUser = FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('messageList')
+        .doc(appUser!.id)
+        .collection('messages')
+        .doc();
+
+    final messageRefForAppUser = FirebaseFirestore.instance
+        .collection("users")
+        .doc(currentUser!.id)
+        .collection('messageList')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('messages')
+        .doc(
+          messageRefForCurrentUser.id,
+        );
+
+    var post = postModel!.toMap();
+
+    final MessageDetails appUserMessageDetails = MessageDetails(
+      id: appUser.id,
+      lastMessage: "Post",
+      unreadMessageCount: 0,
+      searchCharacters: [...appUser.name.toLowerCase().split('')],
+      creatorDetails: CreatorDetails(
+        name: appUser.name,
+        imageUrl: appUser.imageStr,
+        isVerified: appUser.isVerified,
+      ),
+      createdAt: DateTime.now().toIso8601String(),
+    );
+
+    final MessageDetails currentUserMessageDetails = MessageDetails(
+      id: currentUser.id,
+      lastMessage: "Post",
+      unreadMessageCount: unreadMessages + 1,
+      searchCharacters: [...currentUser.name.toLowerCase().split('')],
+      creatorDetails: CreatorDetails(
+        name: currentUser.name,
+        imageUrl: currentUser.imageStr,
+        isVerified: currentUser.isVerified,
+      ),
+      createdAt: DateTime.now().toIso8601String(),
+    );
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.id)
+        .collection('messageList')
+        .doc(appUser.id)
+        .set(
+          appUserMessageDetails.toMap(),
+        );
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(appUser.id)
+        .collection('messageList')
+        .doc(currentUser.id)
+        .set(
+          currentUserMessageDetails.toMap(),
+        );
+
+    final Message message = Message(
+      id: messageRefForCurrentUser.id,
+      sentToId: appUser.id,
+      sentById: FirebaseAuth.instance.currentUser!.uid,
+      content: post,
+      caption: '',
+      type: postModel.mediaData[0].type,
+      createdAt: DateTime.now().toIso8601String(),
+      isSeen: false,
+    );
+    final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
+
+    messageRefForCurrentUser.set(message.toMap());
+    messageRefForAppUser.set(appUserMessage.toMap());
+    isSent = true;
+    notifyListeners();
+
+    var recieverFCMToken = appUser.fcmToken;
+    FirebaseMessagingService().sendNotificationToUser(
+      appUserId: appUser.id,
+      devRegToken: recieverFCMToken,
+      msg: "has sent you a post",
+      imageUrl: postModel.mediaData[0].type != 'Video'
+          ? postModel.mediaData[0].link
+          : "",
+    );
+  }
+
+  void disposeSendButton() {
+    isSent = false;
   }
 }

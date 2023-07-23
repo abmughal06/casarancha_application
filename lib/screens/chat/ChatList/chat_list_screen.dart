@@ -1,5 +1,5 @@
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +25,7 @@ class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade50,
       appBar: primaryAppbar(
         title: 'Messages',
         elevation: 0,

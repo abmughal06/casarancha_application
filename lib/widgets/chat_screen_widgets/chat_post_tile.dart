@@ -37,8 +37,14 @@ class ChatVideoTile extends StatefulWidget {
 class _ChatVideoTileState extends State<ChatVideoTile> {
   @override
   void initState() {
+    initVideo();
     super.initState();
-    widget.videoPlayerController.initialize();
+  }
+
+  void initVideo() {
+    widget.videoPlayerController.initialize().then((value) {
+      setState(() {});
+    });
   }
 
   @override
@@ -49,28 +55,22 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
         children: [
           Padding(
             padding: EdgeInsets.only(
-                left: widget.isMe ? 70 : 0, right: widget.isMe ? 0 : 70),
+                left: widget.isMe ? 120 : 0, right: widget.isMe ? 0 : 120),
             child: Align(
               alignment: widget.isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
-                aspectRatio: widget.aspectRatio,
+                aspectRatio: 9 / 13,
                 child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16.r),
-                          topRight: Radius.circular(16.r),
-                          bottomLeft: Radius.circular(
-                            widget.isMe ? 16.r : 0,
-                          ),
-                          bottomRight: Radius.circular(
-                            widget.isMe ? 0 : 16.r,
-                          )),
-                      color:
-                          (widget.isMe ? colorF03.withOpacity(0.6) : colorFF4),
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                    child: VideoPlayer(widget.videoPlayerController)),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey,
+                  ),
+                  child: widget.videoPlayerController.value.isInitialized
+                      ? VideoPlayer(widget.videoPlayerController)
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                ),
               ),
             ),
           ),
@@ -130,30 +130,17 @@ class ChatMusicTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(left: isMe ? 70 : 0, right: isMe ? 0 : 70),
+            padding:
+                EdgeInsets.only(left: isMe ? 120 : 0, right: isMe ? 0 : 120),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
                 aspectRatio: aspectRatio,
-                child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16.r),
-                          topRight: Radius.circular(16.r),
-                          bottomLeft: Radius.circular(
-                            isMe ? 16.r : 0,
-                          ),
-                          bottomRight: Radius.circular(
-                            isMe ? 0 : 16.r,
-                          )),
-                      color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                    child: MusicPlayerUrl(
-                      musicDetails: media,
-                      ontap: () {},
-                    )),
+                child: MusicPlayerUrl(
+                  border: 15,
+                  musicDetails: media,
+                  ontap: () {},
+                ),
               ),
             ),
           ),
@@ -206,48 +193,24 @@ class ChatPostTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(left: isMe ? 70 : 0, right: isMe ? 0 : 70),
+            padding:
+                EdgeInsets.only(left: isMe ? 120 : 0, right: isMe ? 0 : 120),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: Container(
+              child: AspectRatio(
+                aspectRatio: 9 / 13,
+                child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16.r),
-                        topRight: Radius.circular(16.r),
-                        bottomLeft: Radius.circular(
-                          isMe ? 16.r : 0,
-                        ),
-                        bottomRight: Radius.circular(
-                          isMe ? 0 : 16.r,
-                        )),
-                    color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
+                    borderRadius: BorderRadius.circular(15),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: CachedNetworkImageProvider(
+                        message.content['mediaData'][0]['link'],
+                      ),
+                    ),
                   ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                  child: message.type == "Photo"
-                      ? CachedNetworkImage(
-                          imageUrl: message.content['mediaData'][0]['link'],
-                          // color: isMe ? color13F : color55F,
-                          // fontWeight: FontWeight.w500,
-                        )
-                      : Container(
-                          width: MediaQuery.of(context).size.width,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 50,
-                          ),
-                          child: Center(
-                            child: Text(
-                              message.content['mediaData'][0]['link'],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
-                                color: color221,
-                              ),
-                            ),
-                          ),
-                        )),
+                ),
+              ),
             ),
           ),
           Align(

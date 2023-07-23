@@ -1,7 +1,7 @@
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

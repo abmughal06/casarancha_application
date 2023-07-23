@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 
 import '../../resources/color_resources.dart';
 import '../../screens/auth/login_screen.dart';
-import '../../screens/profile/ProfileScreen/profile_screen.dart';
 
 deleteAccountDialog(context) {
   TextButton cancelBtn = TextButton(
