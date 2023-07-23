@@ -10,6 +10,7 @@ import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
 import 'package:casarancha/screens/home/providers/music_provider.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/home/providers/story_provider.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/utils/providers/date_picker_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -79,6 +80,8 @@ class ProviderApp extends StatelessWidget {
         ChangeNotifierProvider<AddStoryProvider>(
             create: (_) => AddStoryProvider()),
         ChangeNotifierProvider<ChatProvider>(create: (_) => ChatProvider()),
+        ChangeNotifierProvider<EditProfileProvider>(
+            create: (_) => EditProfileProvider()),
       ],
       builder: (context, prov) {
         return app;

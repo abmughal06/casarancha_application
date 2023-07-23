@@ -5,8 +5,11 @@ import '../resources/color_resources.dart';
 
 class MyTooltip extends StatelessWidget {
   final String message;
-  Color backGndColor = colorBlack.withOpacity(0.7);
-  MyTooltip({required this.message,});
+  final Color backGndColor = colorBlack.withOpacity(0.7);
+  MyTooltip({
+    Key? key,
+    required this.message,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,30 +21,27 @@ class MyTooltip extends StatelessWidget {
           painter: TrianglePainter(color: backGndColor),
         ),
         Container(
-          padding : const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: backGndColor,
-                borderRadius: BorderRadius.all(Radius.circular(10.r)),
-              ),
+              color: backGndColor,
+              borderRadius: BorderRadius.all(Radius.circular(10.r)),
+            ),
             child: Text(
               message,
-              style:
-              TextStyle(
-                  fontSize: 12.sp, color: colorWhite, fontWeight: FontWeight.w600),
-            )) ,
-
+              style: TextStyle(
+                  fontSize: 12.sp,
+                  color: colorWhite,
+                  fontWeight: FontWeight.w600),
+            )),
       ],
     );
-
   }
-
-
 }
 
 class ToolTipCustomShape extends ShapeBorder {
   final bool usePadding;
 
-  ToolTipCustomShape({this.usePadding = true});
+  const ToolTipCustomShape({this.usePadding = true});
 
   @override
   EdgeInsetsGeometry get dimensions =>
@@ -72,15 +72,15 @@ class ToolTipCustomShape extends ShapeBorder {
 
 class TrianglePainter extends CustomPainter {
   bool isDownArrow = false;
-  Color color = colorBlack.withOpacity(0.7) ;
+  Color color = colorBlack.withOpacity(0.7);
 
   TrianglePainter({required Color color});
 
   /// Draws the triangle of specific [size] on [canvas]
   @override
   void paint(Canvas canvas, Size size) {
-    Path path =  Path();
-    Paint paint =  Paint();
+    Path path = Path();
+    Paint paint = Paint();
     paint.strokeWidth = 2.0;
     paint.color = color;
     paint.style = PaintingStyle.fill;

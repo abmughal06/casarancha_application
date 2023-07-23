@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
 import '../../../resources/localization_text_strings.dart';
+import '../../../utils/app_utils.dart';
 import '../../../utils/snackbar.dart';
 import '../../../view_models/profile_vm/edit_profie_view_model.dart';
 import '../../dashboard/dashboard.dart';
@@ -134,7 +134,7 @@ class SetupProfileProvider extends ChangeNotifier {
         final userModel = UserModel(
           id: userId,
           email: userEmail,
-          ghostName: "Ghost---- ${Random().nextInt(6)}",
+          ghostName: "Ghost---- ${AppUtils.instance.generateRandomNumber()}",
           username: username!,
           dob: selectedDob.toString(),
           fcmToken: token,

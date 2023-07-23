@@ -21,7 +21,7 @@ class StoryProvider extends ChangeNotifier {
     if (storyItems[currentIndex].id == storyItems.last.id) {
       Get.back();
 
-      print("last");
+      // print("last");
       var ref1 = FirebaseFirestore.instance.collection("stories").doc(storyId);
       var ref = await ref1.get();
 

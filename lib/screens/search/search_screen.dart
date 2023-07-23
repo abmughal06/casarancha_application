@@ -1,6 +1,7 @@
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -62,7 +63,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: primaryAppbar(
         title: 'Search',
         elevation: 0,
-        // leading: ghostModeBtn(),
+        leading: const GhostModeBtn(),
       ),
       body: DefaultTabController(
         length: _myTabs.length,

@@ -3,7 +3,7 @@ import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/cupertino.dart';

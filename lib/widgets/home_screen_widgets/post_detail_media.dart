@@ -6,7 +6,7 @@ import '../../models/media_details.dart';
 import '../../resources/color_resources.dart';
 import '../music_player_url.dart';
 import '../text_widget.dart';
-import '../video_player_Url.dart';
+import '../video_player_url.dart';
 
 class CheckMediaAndShowPost extends StatelessWidget {
   const CheckMediaAndShowPost(
@@ -59,6 +59,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
         return AspectRatio(
           aspectRatio: 13 / 9,
           child: MusicPlayerUrl(
+            border: 0,
             musicDetails: mediaData,
             ontap: () {},
           ),

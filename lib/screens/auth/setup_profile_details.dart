@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

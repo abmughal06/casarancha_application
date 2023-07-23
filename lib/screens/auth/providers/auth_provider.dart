@@ -5,6 +5,7 @@ import 'dart:developer' as dev;
 import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:email_validator/email_validator.dart';
@@ -62,8 +63,9 @@ class AuthenticationProvider extends ChangeNotifier {
       await ref.set({"fcmToken": token}, SetOptions(merge: true));
 
       if (!data.data()!.containsKey("ghostName")) {
-        ref.set({"ghostName": "Ghost---- ${Random().nextInt(6)}"},
-            SetOptions(merge: true));
+        ref.set({
+          "ghostName": "Ghost---- ${AppUtils.instance.generateRandomNumber()}"
+        }, SetOptions(merge: true));
       }
       Get.offAll(() => const DashBoard());
     } else {

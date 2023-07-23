@@ -83,7 +83,7 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
             StoryView(
                 storyItems: [
                   ...storyItems.asMap().entries.map((e) {
-                    print("==============  ${e.value.type}");
+                    // print("==============  ${e.value.type}");
                     return e.value.type == "Photo"
                         ? StoryItem.pageImage(
                             key: ValueKey(e.key),
@@ -183,7 +183,7 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                         child: svgImgButton(
                           svgIcon: icStoryCmtSend,
                           onTap: () async {
-                            print("comment == ${commentController.text}");
+                            // print("comment == ${commentController.text}");
 
                             final messageRefForCurrentUser = FirebaseFirestore
                                 .instance
@@ -218,14 +218,12 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                               createdAt: DateTime.now().toIso8601String(),
                               isSeen: false,
                             );
-                            print(
-                                "============= ------------------- ------- --= ====== ==== $message");
+                            // print(
+                            //     "============= ------------------- ------- --= ====== ==== $message");
                             final appUserMessage =
                                 message.copyWith(id: messageRefForAppUser.id);
 
-                            messageRefForCurrentUser.set(message.toMap()).then(
-                                (value) => print(
-                                    "=========== XXXXXXXXXXXXXXXX ++++++++++ message sent success"));
+                            messageRefForCurrentUser.set(message.toMap());
                             messageRefForAppUser.set(appUserMessage.toMap());
                             var recieverRef = await FirebaseFirestore.instance
                                 .collection("users")
@@ -234,8 +232,8 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
 
                             var recieverFCMToken =
                                 recieverRef.data()!['fcmToken'];
-                            print(
-                                "=========> reciever fcm token = $recieverFCMToken");
+                            // print(
+                            //     "=========> reciever fcm token = $recieverFCMToken");
                             FirebaseMessagingService().sendNotificationToUser(
                               appUserId: recieverRef.id,
                               imageUrl:
@@ -345,7 +343,7 @@ class _MyStoryViewScreenState extends State<MyStoryViewScreen> {
             StoryView(
               storyItems: [
                 ...storyItems.asMap().entries.map((e) {
-                  print("==============  ${e.value.type}");
+                  // print("==============  ${e.value.type}");
                   return e.value.type == "Photo"
                       ? StoryItem.pageImage(
                           key: ValueKey(e.key),
@@ -432,7 +430,7 @@ class _MyStoryViewScreenState extends State<MyStoryViewScreen> {
                           storyItems.last.id) {
                         Get.back();
 
-                        print("last");
+                        // print("last");
                         var ref1 = FirebaseFirestore.instance
                             .collection("stories")
                             .doc(widget.story.creatorId);

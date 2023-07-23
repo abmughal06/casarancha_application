@@ -55,8 +55,7 @@ class MessageTiles extends StatelessWidget {
         VideoPlayerController videoPlayerController;
         videoPlayerController =
             VideoPlayerController.network(postModel.mediaData[0].link);
-        videoPlayerController.initialize();
-        videoPlayerController.pause();
+
         return InkWell(
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,

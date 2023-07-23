@@ -103,12 +103,11 @@ class _ChatScreenState extends State<ChatScreen> {
                       final message = messages[index];
 
                       final isMe = message.sentToId == widget.appUserId;
-                      if (messages.isNotEmpty) {
+                      if (messages.isNotEmpty && message.type == 'Text') {
                         chatProvider.resetMessageCount(
                             currentUserId: currentUser.id,
                             appUserId: appUser.id);
                       }
-
                       return MessageTiles(
                         isMe: isMe,
                         message: message,

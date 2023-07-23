@@ -1,3 +1,4 @@
+import 'package:casarancha/models/ghost_message_details.dart';
 import 'package:casarancha/models/message_details.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -16,6 +17,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
+    final ghostMessage = context.watch<List<GhostMessageDetails>?>();
 
     return Consumer<DashboardProvider>(
       builder: (context, provider, b) {
@@ -72,19 +74,25 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   },
                   icon: Consumer<List<MessageDetails>?>(
                       builder: (context, msg, b) {
-                    if (msg == null) {
+                    if (msg == null && ghostMessage == null) {
                       return SvgPicture.asset(
                         provider.currentIndex == 3
                             ? icBottomSelChat
                             : icBottomDeSelChat,
                       );
                     }
-                    var filterList = msg
+                    var filterList = msg!
+                        .where((element) => element.unreadMessageCount > 0)
+                        .toList();
+                    var ghostFilter = ghostMessage!
                         .where((element) => element.unreadMessageCount > 0)
                         .toList();
 
                     int count = 0;
                     for (var i in filterList) {
+                      count += i.unreadMessageCount;
+                    }
+                    for (var i in ghostFilter) {
                       count += i.unreadMessageCount;
                     }
                     return Badge(

@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
@@ -13,8 +13,8 @@ import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
-import '../../screens/chat/share_post_screen.dart';
 import '../../screens/profile/AppUser/app_user_screen.dart';
+import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
 
@@ -28,6 +28,9 @@ class PostCreatorProfileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context, listen: false);
+    final curruentUser = context.watch<UserModel?>();
+    final ghostProvider = Provider.of<DashboardProvider>(context);
+
     return Container(
       padding: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -51,70 +54,26 @@ class PostCreatorProfileTile extends StatelessWidget {
       child: Column(
         children: [
           CustomPostFooter(
-            likes: post.likesIds.length.toString(),
             isLike:
                 post.likesIds.contains(FirebaseAuth.instance.currentUser!.uid),
             isVideoPost: post.mediaData[0].type == 'Video',
-            videoViews: '0',
             isPostDetail: true,
             ontapLike: () => postProvider.toggleLikeDislike(postModel: post),
-            saveBtn: Consumer<UserModel?>(
-              builder: (context, user, b) {
-                if (user == null) {
-                  return SvgPicture.asset(
-                    icBookMarkReg,
-                  );
-                } else {
-                  return IconButton(
-                    onPressed: () => postProvider.onTapSave(
-                        userModel: user, postId: post.id),
-                    icon: SvgPicture.asset(
-                      user.savedPostsIds.contains(post.id)
-                          ? icSavedPost
-                          : icBookMarkReg,
-                    ),
-                  );
-                }
-              },
-            ),
-            ontapShare: () {
-              Get.to(() => SharePostScreen(
-                    postModel: PostModel(
-                      id: post.id,
-                      creatorId: post.creatorId,
-                      creatorDetails: post.creatorDetails,
-                      createdAt: post.createdAt,
-                      description: post.description,
-                      locationName: post.locationName,
-                      shareLink: post.shareLink,
-                      mediaData: post.mediaData,
-                      tagsIds: post.tagsIds,
-                      likesIds: post.likesIds,
-                      showPostTime: post.showPostTime,
-                      postBlockStatus: post.postBlockStatus,
-                      commentIds: post.commentIds,
-                    ),
-                  ));
+            ontapSave: () {
+              ghostProvider.checkGhostMode
+                  ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                  : postProvider.onTapSave(
+                      userModel: curruentUser, postId: post.id);
             },
-            ontapCmnt: () {
-              // print("dsald");
-            },
-            comments: post.commentIds.length,
+            postModel: post,
+            savepostIds: curruentUser!.savedPostsIds,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 InkWell(
-                  onTap: () {
-                    // Get.to(
-                    //   () => AppUserScreen(
-                    //     appUserId: post.creatorId,
-                    //     appUserName: post.creatorDetails.name,
-                    //   ),
-                    // );
-                    navigateToAppUserScreen(post.creatorId, context);
-                  },
+                  onTap: () => navigateToAppUserScreen(post.creatorId, context),
                   child: Row(
                     children: [
                       SizedBox(

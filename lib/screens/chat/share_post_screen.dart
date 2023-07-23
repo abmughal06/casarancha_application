@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/message_details.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,6 +21,8 @@ class SharePostScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.watch<UserModel>();
+
     List<String> messageUserIds = [];
     return Scaffold(
       body: ListView(
@@ -61,9 +64,11 @@ class SharePostScreen extends StatelessWidget {
                 itemCount: msg.length,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  var isSent = false.obs;
                   return SharePostTile(
-                      messageDetails: msg[index], isSent: isSent);
+                    messageDetails: msg[index],
+                    currentUser: currentUser,
+                    postModel: postModel,
+                  );
                 },
               );
             },
@@ -88,15 +93,16 @@ class SharePostScreen extends StatelessWidget {
                     .where((element) => !messageUserIds.contains(element.id))
                     .toList();
 
-                var isSent = false.obs;
-
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filterList.length,
                   itemBuilder: (context, index) {
                     return SharePostTileForNewFreind(
-                        userModel: filterList[index], isSent: isSent);
+                      userModel: filterList[index],
+                      postModel: postModel,
+                      currentUser: currentUser,
+                    );
                   },
                 );
               }
@@ -117,120 +123,79 @@ class SharePostScreen extends StatelessWidget {
   }
 }
 
-class SharePostTile extends StatelessWidget {
-  const SharePostTile(
-      {Key? key, required this.messageDetails, required this.isSent})
-      : super(key: key);
+class SharePostTile extends StatefulWidget {
+  const SharePostTile({
+    Key? key,
+    required this.messageDetails,
+    required this.postModel,
+    required this.currentUser,
+  }) : super(key: key);
   final MessageDetails messageDetails;
-  final Rx<bool> isSent;
+  final PostModel postModel;
+  final UserModel currentUser;
+
+  @override
+  State<SharePostTile> createState() => _SharePostTileState();
+}
+
+class _SharePostTileState extends State<SharePostTile> {
+  late PostProvider postProvider;
+
+  @override
+  void dispose() {
+    postProvider.disposeSendButton();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    postProvider = Provider.of<PostProvider>(context, listen: false);
+    final users = context.watch<List<UserModel>>();
+    final appUser = users
+        .where(
+          (element) => element.id == widget.messageDetails.id,
+        )
+        .first;
     return SizedBox(
       height: 70,
       child: ListTile(
-        title: Text(messageDetails.creatorDetails.name),
+        title: Text(widget.messageDetails.creatorDetails.name),
         subtitle: Text(
-          messageDetails.lastMessage,
+          widget.messageDetails.lastMessage,
           overflow: TextOverflow.ellipsis,
         ),
         leading: CircleAvatar(
-          backgroundImage: messageDetails.creatorDetails.imageUrl.isEmpty
+          backgroundImage: widget.messageDetails.creatorDetails.imageUrl.isEmpty
               ? null
               : CachedNetworkImageProvider(
-                  messageDetails.creatorDetails.imageUrl,
+                  widget.messageDetails.creatorDetails.imageUrl,
                 ),
-          child: messageDetails.creatorDetails.imageUrl.isEmpty
+          child: widget.messageDetails.creatorDetails.imageUrl.isEmpty
               ? const Icon(
                   Icons.question_mark,
                 )
               : null,
         ),
-        trailing: Obx(
-          () => Container(
-            decoration: BoxDecoration(
-              color: isSent.value ? Colors.red.shade300 : Colors.red.shade900,
-              borderRadius: BorderRadius.circular(30),
+        trailing: Container(
+          decoration: BoxDecoration(
+            color:
+                postProvider.isSent ? Colors.red.shade300 : Colors.red.shade900,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: InkWell(
+            onTap: () => postProvider.sharePostData(
+              currentUser: widget.currentUser,
+              appUser: appUser,
+              postModel: widget.postModel,
             ),
-            child: InkWell(
-              onTap: () async {
-                // ChatController()x
-                // final messageRefForCurrentUser = FirebaseFirestore.instance
-                //     .collection("users")
-                //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                //     .collection('messageList')
-                //     .doc(appUserId)
-                //     .collection('messages')
-                //     .doc();
-
-                // final messageRefForAppUser = FirebaseFirestore.instance
-                //     .collection("users")
-                //     .doc(appUserId)
-                //     .collection('messageList')
-                //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                //     .collection('messages')
-                //     .doc(
-                //       messageRefForCurrentUser.id,
-                //     );
-
-                // var post = postModel.toMap();
-
-                // final Message message = Message(
-                //   id: messageRefForCurrentUser.id,
-                //   sentToId: appUserId,
-                //   sentById: FirebaseAuth.instance.currentUser!.uid,
-                //   content: post,
-                //   caption: '',
-                //   type: postModel.mediaData[0].type,
-                //   createdAt: DateTime.now().toIso8601String(),
-                //   isSeen: false,
-                // );
-                // print(
-                //     "============= ------------------- ------- --= ====== ==== $message");
-                // final appUserMessage =
-                //     message.copyWith(id: messageRefForAppUser.id);
-
-                // messageRefForCurrentUser.set(message.toMap());
-                // messageRefForAppUser.set(appUserMessage.toMap());
-                // isSent.value = true;
-                // var recieverRef = await FirebaseFirestore.instance
-                //     .collection("users")
-                //     .doc(appUserId)
-                //     .get();
-
-                // var recieverFCMToken = recieverRef.data()!['fcmToken'];
-                // print("=========> reciever fcm token = $recieverFCMToken");
-                // FirebaseMessagingService().sendNotificationToUser(
-                //   appUserId: recieverRef.id,
-                //   devRegToken: recieverFCMToken,
-                //   msg: "has sent you a post",
-                //   imageUrl: postModel.mediaData[0].type != 'Video'
-                //       ? postModel.mediaData[0].link
-                //       : "",
-                // );
-
-                //   if (isChatExits.value) {
-                //     appUserRef.collection('messageList').doc(currentUserId).update(
-                //           currentUserMessageDetails.toMap(),
-                //         );
-                //     unreadMessages += 1;
-                //   }
-
-                //   messageController.clear();
-                // } catch (e) {
-                //   GlobalSnackBar(message: e.toString());
-                // }
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
-                child: Text(
-                  isSent.value ? "Sent" : "Send",
-                  style: const TextStyle(
-                    letterSpacing: 0.7,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
+              child: Text(
+                postProvider.isSent ? "Sent" : "Send",
+                style: const TextStyle(
+                  letterSpacing: 0.7,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -241,35 +206,55 @@ class SharePostTile extends StatelessWidget {
   }
 }
 
-class SharePostTileForNewFreind extends StatelessWidget {
-  const SharePostTileForNewFreind(
-      {Key? key, required this.userModel, required this.isSent})
-      : super(key: key);
+class SharePostTileForNewFreind extends StatefulWidget {
+  const SharePostTileForNewFreind({
+    Key? key,
+    required this.userModel,
+    required this.postModel,
+    required this.currentUser,
+  }) : super(key: key);
 
   final UserModel userModel;
-  final Rx<bool> isSent;
+  final PostModel postModel;
+  final UserModel currentUser;
+
+  @override
+  State<SharePostTileForNewFreind> createState() =>
+      _SharePostTileForNewFreindState();
+}
+
+class _SharePostTileForNewFreindState extends State<SharePostTileForNewFreind> {
+  late PostProvider postProvider;
+
+  @override
+  void dispose() {
+    postProvider.disposeSendButton();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    postProvider = Provider.of<PostProvider>(context, listen: false);
+
     return SizedBox(
       height: 70,
       child: ListTile(
         title: Row(
           children: [
             TextWidget(
-              text: userModel.name,
+              text: widget.userModel.name,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
               color: const Color(0xff222939),
             ),
             widthBox(5.w),
             Visibility(
-                visible: userModel.isVerified,
+                visible: widget.userModel.isVerified,
                 child: SvgPicture.asset(icVerifyBadge))
           ],
         ),
         subtitle: TextWidget(
-          text: 'Start a conversation with ${userModel.name}',
+          text: 'Start a conversation with ${widget.userModel.name}',
           textOverflow: TextOverflow.ellipsis,
           fontWeight: FontWeight.w400,
           fontSize: 14.sp,
@@ -278,82 +263,29 @@ class SharePostTileForNewFreind extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Colors.yellow,
           backgroundImage: CachedNetworkImageProvider(
-            userModel.imageStr,
+            widget.userModel.imageStr,
           ),
         ),
-        trailing: Obx(
-          () => Container(
-            decoration: BoxDecoration(
-              color: isSent.value ? Colors.red.shade300 : Colors.red.shade900,
-              borderRadius: BorderRadius.circular(30),
+        trailing: Container(
+          decoration: BoxDecoration(
+            color:
+                postProvider.isSent ? Colors.red.shade300 : Colors.red.shade900,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: InkWell(
+            onTap: () => postProvider.sharePostData(
+              currentUser: widget.currentUser,
+              appUser: widget.userModel,
+              postModel: widget.postModel,
             ),
-            child: InkWell(
-              onTap: () async {
-                // ChatController()x
-                // final messageRefForCurrentUser = FirebaseFirestore.instance
-                //     .collection("users")
-                //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                //     .collection('messageList')
-                //     .doc(appUserId)
-                //     .collection('messages')
-                //     .doc();
-
-                // final messageRefForAppUser = FirebaseFirestore.instance
-                //     .collection("users")
-                //     .doc(appUserId)
-                //     .collection('messageList')
-                //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                //     .collection('messages')
-                //     .doc(
-                //       messageRefForCurrentUser.id,
-                //     );
-
-                // var post = postModel.toMap();
-
-                // final Message message = Message(
-                //   id: messageRefForCurrentUser.id,
-                //   sentToId: appUserId,
-                //   sentById: FirebaseAuth.instance.currentUser!.uid,
-                //   content: post,
-                //   caption: '',
-                //   type: postModel.mediaData[0].type,
-                //   createdAt: DateTime.now().toIso8601String(),
-                //   isSeen: false,
-                // );
-                // print(
-                //     "============= ------------------- ------- --= ====== ==== $message");
-                // final appUserMessage =
-                //     message.copyWith(id: messageRefForAppUser.id);
-
-                // messageRefForCurrentUser.set(message.toMap());
-                // messageRefForAppUser.set(appUserMessage.toMap());
-                // isSent.value = true;
-                // var recieverRef = await FirebaseFirestore.instance
-                //     .collection("users")
-                //     .doc(appUserId)
-                //     .get();
-
-                // var recieverFCMToken = recieverRef.data()!['fcmToken'];
-                // print("=========> reciever fcm token = $recieverFCMToken");
-                // FirebaseMessagingService().sendNotificationToUser(
-                //   appUserId: recieverRef.id,
-                //   devRegToken: recieverFCMToken,
-                //   msg: "has sent you a post",
-                //   imageUrl: postModel.mediaData[0].type != 'Video'
-                //       ? postModel.mediaData[0].link
-                //       : "",
-                // );
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
-                child: Text(
-                  isSent.value ? "Sent" : "Send",
-                  style: const TextStyle(
-                    letterSpacing: 0.7,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
+              child: Text(
+                postProvider.isSent ? "Sent" : "Send",
+                style: const TextStyle(
+                  letterSpacing: 0.7,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

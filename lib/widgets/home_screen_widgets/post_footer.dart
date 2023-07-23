@@ -1,49 +1,47 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/screens/chat/share_post_screen.dart';
+import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/comment_model.dart';
+import '../../models/post_model.dart';
+import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
+import '../../screens/profile/AppUser/app_user_screen.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
 
 class CustomPostFooter extends StatelessWidget {
   final bool? isLike;
-  final String? likes;
-  final int? comments;
-  final String? desc;
   final VoidCallback? ontapLike;
-  final VoidCallback? ontapCmnt;
-  final VoidCallback? ontapShare;
+  final VoidCallback? ontapSave;
   final Widget? saveBtn;
-  final String? postId;
   final bool? isDesc;
   final bool? isPostDetail;
   final bool? isVideoPost;
-  final String? videoViews;
+  final List<String> savepostIds;
+  final PostModel postModel;
 
   const CustomPostFooter({
     Key? key,
-    this.likes,
-    this.comments,
     this.ontapLike,
-    this.ontapCmnt,
-    this.ontapShare,
+    this.ontapSave,
     this.isDesc = false,
-    this.desc,
     this.isLike = false,
     this.isPostDetail = false,
     this.saveBtn,
-    this.postId,
     this.isVideoPost = false,
-    this.videoViews,
+    required this.postModel,
+    required this.savepostIds,
   }) : super(key: key);
-
-  // final postController = PostCardController(postdata: postdata);
 
   @override
   Widget build(BuildContext context) {
@@ -65,26 +63,28 @@ class CustomPostFooter extends StatelessWidget {
                   ),
                 ),
                 TextWidget(
-                  text: "$likes",
+                  text: postModel.likesIds.length.toString(),
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w400,
                   color: color221,
                 ),
                 IconButton(
-                  onPressed: ontapCmnt,
+                  onPressed: () =>
+                      Get.to(() => PostDetailScreen(postModel: postModel)),
                   icon: SvgPicture.asset(
                     icCommentPost,
                     color: color887,
                   ),
                 ),
                 TextWidget(
-                  text: "$comments",
+                  text: postModel.commentIds.length.toString(),
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w400,
                   color: color221,
                 ),
                 IconButton(
-                  onPressed: ontapShare,
+                  onPressed: () =>
+                      Get.to(() => SharePostScreen(postModel: postModel)),
                   icon: const Icon(Icons.share),
                   color: color887,
                 ),
@@ -96,7 +96,34 @@ class CustomPostFooter extends StatelessWidget {
                 Visibility(
                   visible: isVideoPost!,
                   child: TextWidget(
-                    text: "$videoViews",
+                    onTap: () {
+                      Get.bottomSheet(
+                        Consumer<List<UserModel>?>(
+                          builder: (context, value, child) {
+                            if (value == null) {
+                              return const CircularProgressIndicator();
+                            }
+                            var filterList = value
+                                .where((element) =>
+                                    postModel.videoViews.contains(element.id))
+                                .toList();
+                            return ListView.builder(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              itemCount: filterList.length,
+                              itemBuilder: (context, index) {
+                                return FollowFollowingTile(
+                                  user: filterList[index],
+                                  ontapToggleFollow: () {},
+                                  btnName: "",
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        backgroundColor: Colors.white,
+                      );
+                    },
+                    text: postModel.videoViews.length.toString(),
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w400,
                     color: color221,
@@ -104,71 +131,82 @@ class CustomPostFooter extends StatelessWidget {
                 ),
                 widthBox(isVideoPost! ? 5.w : 0.w),
                 Visibility(
-                    visible: isVideoPost!,
-                    child: const Icon(
-                      Icons.visibility,
-                      color: colorAA3,
-                    )),
-                saveBtn!,
+                  visible: isVideoPost!,
+                  child: const Icon(
+                    Icons.visibility,
+                    color: colorAA3,
+                  ),
+                ),
+                IconButton(
+                  onPressed: ontapSave,
+                  icon: SvgPicture.asset(
+                    savepostIds.contains(postModel.id)
+                        ? icSavedPost
+                        : icBookMarkReg,
+                  ),
+                ),
               ],
             ),
           ],
         ),
         Visibility(
-          visible: isDesc!,
+          visible: postModel.description.isNotEmpty,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
-              child: Text(
-                "$desc",
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  color: color13F,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: TextWidget(
+                text: postModel.description,
+                fontSize: 13.sp,
+                color: color13F,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
         ),
         Visibility(
-          visible: isPostDetail!
-              ? false
-              : comments != null
-                  ? comments! > 0
-                  : false,
+          visible: postModel.tagsIds.isNotEmpty,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+              child: Wrap(
+                children: postModel.tagsIds
+                    .map(
+                      (e) => TextWidget(
+                        text: e,
+                        fontSize: 13.sp,
+                        color: color13F,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ),
+        ),
+        Visibility(
+          visible: isPostDetail! ? false : postModel.commentIds.isNotEmpty,
           child: Align(
             alignment: Alignment.centerLeft,
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection("posts")
-                  .doc(postId)
+                  .doc(postModel.id)
                   .collection("comments")
                   .orderBy("createdAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var data = snapshot.data!.docs.first.data();
-                  // var cDetail =
-                  //     CreatorDetails.fromMap(data['creatorDetails']);
                   var cmnt = Comment.fromMap(data);
                   return ListTile(
                     horizontalTitleGap: 10,
-                    onTap: ontapCmnt,
+                    onTap: () =>
+                        Get.to(() => PostDetailScreen(postModel: postModel)),
                     leading: InkWell(
-                      onTap: () {
-                        // Get.to(
-                        //   () => AppUserScreen(
-                        //     appUserController: Get.put(
-                        //       AppUserController(
-                        //         appUserId: cmnt.creatorId,
-                        //         currentUserId:
-                        //             FirebaseAuth.instance.currentUser!.uid,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // );
-                      },
+                      onTap: () =>
+                          navigateToAppUserScreen(cmnt.creatorId, context),
                       child: Container(
                         height: 40.h,
                         width: 40.h,

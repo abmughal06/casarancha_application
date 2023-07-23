@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -7,9 +6,9 @@ import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/utils/app_constants.dart';
 
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
-import 'package:casarancha/widgets/primary_textButton.dart';
+import 'package:casarancha/widgets/primary_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/widgets/text_editing_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';

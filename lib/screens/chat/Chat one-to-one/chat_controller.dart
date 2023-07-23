@@ -89,8 +89,6 @@ class ChatProvider extends ChangeNotifier {
             currentUserMessageDetails.toMap(),
           );
 
-      // }
-
       final Message message = Message(
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
@@ -107,16 +105,14 @@ class ChatProvider extends ChangeNotifier {
       messageRefForCurrentUser.set(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
 
-      // if (isChatExits.value) {
-      userRef
-          .doc(appUser.id)
-          .collection('messageList')
-          .doc(currentUser.id)
-          .update(
-            currentUserMessageDetails.toMap(),
-          );
+      // userRef
+      //     .doc(appUser.id)
+      //     .collection('messageList')
+      //     .doc(currentUser.id)
+      //     .update(
+      //       currentUserMessageDetails.toMap(),
+      //     );
       unreadMessages += 1;
-      // }
       var recieverRef = await FirebaseFirestore.instance
           .collection("users")
           .doc(appUser.id)

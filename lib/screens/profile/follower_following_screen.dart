@@ -1,6 +1,6 @@
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
 import 'package:casarancha/widgets/text_widget.dart';

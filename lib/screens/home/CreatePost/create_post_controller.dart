@@ -14,7 +14,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 
@@ -91,8 +90,6 @@ class CreatePostMethods extends ChangeNotifier {
       userModel.postsIds.add(postId);
       await userRef.update({"postsIds": userModel.postsIds});
 
-      // profileScreenController.user.value = userModel;
-
       await postRef.set(post.toMap());
       Get.back();
       Get.back();
@@ -141,12 +138,7 @@ class CreatePostMethods extends ChangeNotifier {
         } else {
           fileType = 'Music';
         }
-/* 
-File image = new File('image.png'); // Or any other way to get a File instance.
-var decodedImage = await decodeImageFromList(image.readAsBytesSync());
-print(decodedImage.width);
-print(decodedImage.height);
- */
+
         log("check 2");
 
         final storageFileRef = storageRef.child('Posts/$postId/$fileName');

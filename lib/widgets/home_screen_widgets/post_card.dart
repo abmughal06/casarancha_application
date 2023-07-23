@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -7,16 +8,13 @@ import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
 import 'package:casarancha/widgets/home_screen_widgets/report_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
-import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
-import '../../screens/chat/share_post_screen.dart';
 import '../../screens/dashboard/provider/dashboard_provider.dart';
 import '../../screens/home/post_detail_screen.dart';
 import '../common_widgets.dart';
@@ -36,225 +34,167 @@ class PostCard extends StatelessWidget {
     final curruentUser = context.watch<UserModel?>();
     final postPorvider = Provider.of<PostProvider>(context, listen: false);
     final ghostProvider = context.watch<DashboardProvider>();
+    return Column(
+      children: [
+        CustomPostHeader(
+          showPostTime: post.showPostTime,
+          isVerified: post.creatorDetails.isVerified,
+          time: convertDateIntoTime(post.createdAt),
+          onVertItemClick: () {
+            Get.back();
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: 15.w),
-      child: Column(
-        children: [
-          CustomPostHeader(
-            showPostTime: post.showPostTime,
-            isVerified: post.creatorDetails.isVerified,
-            time: convertDateIntoTime(post.createdAt),
-            onVertItemClick: () {
-              Get.back();
-
-              if (post.creatorId == curruentUser!.id) {
-                Get.bottomSheet(
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.red),
-                    height: 80,
-                    child: InkWell(
-                      onTap: () => postPorvider.deletePost(postModel: post),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          TextWidget(
-                            text: "Delete Post",
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          )
-                        ],
-                      ),
+            if (post.creatorId == curruentUser!.id) {
+              Get.bottomSheet(
+                Container(
+                  decoration: const BoxDecoration(color: Colors.red),
+                  height: 80,
+                  child: InkWell(
+                    onTap: () => postPorvider.deletePost(postModel: post),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextWidget(
+                          text: "Delete Post",
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        )
+                      ],
                     ),
                   ),
-                  isScrollControlled: true,
-                );
-              } else {
-                Get.bottomSheet(
-                  BottomSheetWidget(
-                    ontapBlock: () {},
-                  ),
-                  isScrollControlled: true,
-                );
-              }
-            },
-            name: post.creatorDetails.name,
-            image: post.creatorDetails.imageUrl,
-            ontap: () {},
-            headerOnTap: () {
-              navigateToAppUserScreen(post.creatorId, context);
-            },
-          ),
-          showPostAccordingToItsType(
-              post: post,
+                ),
+                isScrollControlled: true,
+              );
+            } else {
+              Get.bottomSheet(
+                BottomSheetWidget(
+                  ontapBlock: () {},
+                ),
+                isScrollControlled: true,
+              );
+            }
+          },
+          name: post.creatorDetails.name,
+          image: post.creatorDetails.imageUrl,
+          ontap: () {},
+          headerOnTap: () {
+            navigateToAppUserScreen(post.creatorId, context);
+          },
+        ),
+        AspectRatio(
+          aspectRatio: post.mediaData[0].type == 'Qoute'
+              ? 16 / 9
+              : post.mediaData[0].type == 'Music'
+                  ? 13 / 9
+                  : 9 / 16,
+          child: ListView.builder(
+            itemCount: post.mediaData.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) => showPostAccordingToItsType(
+              post: post.mediaData[index],
+              ontap: () => Get.to(() => PostDetailScreen(postModel: post)),
               onDoubletap: () {
                 ghostProvider.checkGhostMode
                     ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
                     : postPorvider.toggleLikeDislike(
                         postModel: post,
                       );
-              })!,
-          heightBox(10.h),
-          CustomPostFooter(
-            likes: post.likesIds.length.toString(),
-            isLike: post.likesIds.contains(curruentUser!.id),
-            ontapLike: () {
-              ghostProvider.checkGhostMode
-                  ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
-                  : postPorvider.toggleLikeDislike(
-                      postModel: post,
-                    );
-            },
-            saveBtn: IconButton(
-              onPressed: () {
-                ghostProvider.checkGhostMode
-                    ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
-                    : postPorvider.onTapSave(
-                        userModel: curruentUser, postId: post.id);
               },
-              icon: SvgPicture.asset(
-                curruentUser.savedPostsIds.contains(post.id)
-                    ? icSavedPost
-                    : icBookMarkReg,
-              ),
-            ),
-            isVideoPost: post.mediaData[0].type == 'Video',
-            videoViews: '0',
-            postId: post.id,
-            ontapShare: () {
-              Get.to(
-                () => SharePostScreen(postModel: post),
-              );
-            },
-            ontapCmnt: () {
-              Get.to(() => PostDetailScreen(
-                    postModel: post,
-                  ));
-            },
-            comments: post.commentIds.length,
-            isDesc: post.description.isNotEmpty,
-            desc: post.description.toString(),
+            )!,
           ),
-        ],
-      ),
+        ),
+        heightBox(10.h),
+        CustomPostFooter(
+          isLike: post.likesIds.contains(curruentUser!.id),
+          ontapLike: () {
+            ghostProvider.checkGhostMode
+                ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                : postPorvider.toggleLikeDislike(
+                    postModel: post,
+                  );
+          },
+          ontapSave: () {
+            ghostProvider.checkGhostMode
+                ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                : postPorvider.onTapSave(
+                    userModel: curruentUser, postId: post.id);
+          },
+          isVideoPost: post.mediaData[0].type == 'Video',
+          postModel: post,
+          savepostIds: curruentUser.savedPostsIds,
+        ),
+      ],
     );
   }
 }
 
 Widget? showPostAccordingToItsType(
-    {PostModel? post, VoidCallback? onDoubletap}) {
-  Future<void>? initializedFuturePlay;
-  for (var element in post!.mediaData) {
-    switch (element.type) {
-      case "Photo":
-        return AspectRatio(
-          aspectRatio: 2 / 3,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            itemCount: post.mediaData.length,
-            itemBuilder: (context, index) => InkWell(
-                onTap: () => Get.to(() => PostDetailScreen(
-                      postModel: post,
-                    )),
-                onDoubleTap: onDoubletap,
-                child: CachedNetworkImage(
-                  imageUrl: post.mediaData[index].link,
-                )),
+    {MediaDetails? post, VoidCallback? onDoubletap, VoidCallback? ontap}) {
+  switch (post!.type) {
+    case "Photo":
+      return AspectRatio(
+        aspectRatio: 2 / 3,
+        child: InkWell(
+          onTap: ontap,
+          onDoubleTap: onDoubletap,
+          child: CachedNetworkImage(
+            imageUrl: post.link,
           ),
-        );
+        ),
+      );
 
-      case 'Qoute':
-        return AspectRatio(
-          aspectRatio: 16 / 9,
-          child: ListView.builder(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: post.mediaData.length,
-            itemBuilder: (context, index) => InkWell(
-              onTap: () => Get.to(() => PostDetailScreen(
-                    postModel: post,
-                  )),
-              onDoubleTap: onDoubletap,
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Container(
-                  // height: 16 / 9,
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(
-                    20,
-                  ),
-                  decoration: const BoxDecoration(color: Colors.white),
-                  child: SingleChildScrollView(
-                    child: TextWidget(
-                      text: post.mediaData[index].link,
-                      textAlign: TextAlign.left,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                      color: color221,
-                    ),
-                  ),
-                ),
+    case 'Qoute':
+      return AspectRatio(
+        aspectRatio: 16 / 9,
+        child: InkWell(
+          onTap: ontap,
+          onDoubleTap: onDoubletap,
+          child: Container(
+            // width: double.infinity,
+            padding: const EdgeInsets.all(
+              20,
+            ),
+            decoration: const BoxDecoration(color: Colors.white),
+            child: SingleChildScrollView(
+              child: TextWidget(
+                text: post.link,
+                textAlign: TextAlign.left,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+                color: color221,
               ),
             ),
           ),
-        );
-      case "Video":
-        return FutureBuilder(
-          future: initializedFuturePlay,
-          builder: (context, snapshot) {
-            return Visibility(
-              child: AspectRatio(
-                aspectRatio: 9 / 16,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: post.mediaData.length,
-                  itemBuilder: (context, i) {
-                    return InkWell(
-                      onTap: () => Get.to(() => PostDetailScreen(
-                            postModel: post,
-                          )),
-                      onDoubleTap: onDoubletap,
-                      child: AspectRatio(
-                        aspectRatio: 9 / 16,
-                        child: VideoPlayerWidget(
-                          postId: post.id,
-                          videoUrl: post.mediaData[i].link,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-          },
-        );
+        ),
+      );
+    case "Video":
+      return AspectRatio(
+        aspectRatio: 9 / 16,
+        child: InkWell(
+          onTap: ontap,
+          onDoubleTap: onDoubletap,
+          child: VideoPlayerWidget(
+            postId: post.id,
+            videoUrl: post.link,
+          ),
+        ),
+      );
 
-      case "Music":
-        return Column(
-          children: [
-            AspectRatio(
-              aspectRatio: 13 / 9,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: post.mediaData.length,
-                itemBuilder: (context, index) => InkWell(
-                  onDoubleTap: onDoubletap,
-                  child: MusicPlayerUrl(
-                      musicDetails: post.mediaData[index], ontap: () {}),
-                ),
-              ),
-            ),
-          ],
-        );
+    case "Music":
+      return AspectRatio(
+        aspectRatio: 13 / 9,
+        child: InkWell(
+          onDoubleTap: onDoubletap,
+          child: MusicPlayerUrl(
+            border: 0,
+            musicDetails: post,
+            ontap: () {},
+          ),
+        ),
+      );
 
-      default:
-        return Container();
-    }
+    default:
+      return Container();
   }
-  return null;
 }
