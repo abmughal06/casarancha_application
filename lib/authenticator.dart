@@ -31,7 +31,7 @@ class Authenticate extends StatelessWidget {
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
               body: Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator.adaptive(),
               ),
             );
           } else if (snapshot.hasError) {

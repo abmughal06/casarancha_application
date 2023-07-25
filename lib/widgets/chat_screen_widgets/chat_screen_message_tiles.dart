@@ -52,21 +52,20 @@ class MessageTiles extends StatelessWidget {
       case 'Video':
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
-        VideoPlayerController videoPlayerController;
-        videoPlayerController =
-            VideoPlayerController.network(postModel.mediaData[0].link);
+        // VideoPlayerController videoPlayerController;
+        // videoPlayerController =
+        //     VideoPlayerController.network(postModel.mediaData[0].link);
 
         return InkWell(
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
               )),
           child: ChatVideoTile(
-            aspectRatio: videoPlayerController.value.aspectRatio,
+            link: postModel.mediaData[0].link,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
             isMe: isMe,
             date: message.createdAt,
-            videoPlayerController: videoPlayerController,
           ),
         );
       case 'Music':
@@ -87,17 +86,12 @@ class MessageTiles extends StatelessWidget {
         );
       case 'story-Video':
         final postModel = MediaDetails.fromMap(message.content);
-        VideoPlayerController videoPlayerController;
-        videoPlayerController = VideoPlayerController.network(postModel.link);
-        videoPlayerController.initialize();
-        videoPlayerController.pause();
         return ChatVideoTile(
-          aspectRatio: videoPlayerController.value.aspectRatio,
+          link: postModel.link,
           appUserId: message.sentToId,
           isSeen: message.isSeen,
           isMe: isMe,
           date: message.createdAt,
-          videoPlayerController: videoPlayerController,
         );
       case 'story-Photo':
         return ChatStoryTile(

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:casarancha/models/message_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -12,6 +10,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
+import '../../screens/chat/ChatList/chat_list_controller.dart';
+
 class MessageList extends StatefulWidget {
   const MessageList({Key? key}) : super(key: key);
 
@@ -22,20 +22,24 @@ class MessageList extends StatefulWidget {
 class _MessageListState extends State<MessageList> {
   @override
   Widget build(BuildContext context) {
+    final chatQuery = Provider.of<ChatListController>(context);
+
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: searchTextField(
             context: context,
-            controller: TextEditingController(),
+            controller: chatQuery.searchController,
             onChange: (value) {
-              // chatListController.searchQuery.value = value;
+              chatQuery.searchText(value);
             },
           ),
         ),
         heightBox(10.h),
-        const Expanded(child: FriendChatList()),
+        const Expanded(
+          child: FriendChatList(),
+        ),
       ],
     );
   }
@@ -51,27 +55,52 @@ class FriendChatList extends StatefulWidget {
 class _FriendChatListState extends State<FriendChatList> {
   @override
   Widget build(BuildContext context) {
+    final chatQuery = Provider.of<ChatListController>(context);
+
     List<String> messageUserIds = [];
     return ListView(
       children: [
         Consumer<List<MessageDetails>?>(
           builder: (context, messages, b) {
             if (messages == null) {
-              return Container();
+              return const CircularProgressIndicator.adaptive();
             } else {
-              log(messages.length);
               messageUserIds = messages.map((e) => e.id).toList();
+
+              if (chatQuery.searchController.text.isEmpty) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    return ChatUserListTile(
+                      messageDetails: messages[index],
+                      ontapTile: () => Get.to(
+                        () => ChatScreen(
+                          appUserId: messages[index].id,
+                          creatorDetails: messages[index].creatorDetails,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+              var filterList = messages
+                  .where((element) => element.creatorDetails.name
+                      .toLowerCase()
+                      .contains(chatQuery.searchController.text.toLowerCase()))
+                  .toList();
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: messages.length,
+                itemCount: filterList.length,
                 itemBuilder: (context, index) {
                   return ChatUserListTile(
-                    messageDetails: messages[index],
+                    messageDetails: filterList[index],
                     ontapTile: () => Get.to(
                       () => ChatScreen(
-                        appUserId: messages[index].id,
-                        creatorDetails: messages[index].creatorDetails,
+                        appUserId: filterList[index].id,
+                        creatorDetails: filterList[index].creatorDetails,
                       ),
                     ),
                   );
@@ -100,20 +129,47 @@ class _FriendChatListState extends State<FriendChatList> {
                   .where((element) => !messageUserIds.contains(element.id))
                   .toList();
 
+              if (chatQuery.searchController.text.isEmpty) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: filterList.length,
+                  itemBuilder: (context, index) {
+                    return ChatUserListTileForNoChat(
+                      userModel: filterList[index],
+                      ontapTile: () => Get.to(
+                        () => ChatScreen(
+                          appUserId: filterList[index].id,
+                          creatorDetails: CreatorDetails(
+                            name: filterList[index].name,
+                            imageUrl: filterList[index].imageStr,
+                            isVerified: filterList[index].isVerified,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+              var searchList = filterList
+                  .where((element) => element.name
+                      .toLowerCase()
+                      .contains(chatQuery.searchController.text.toLowerCase()))
+                  .toList();
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: filterList.length,
+                itemCount: searchList.length,
                 itemBuilder: (context, index) {
                   return ChatUserListTileForNoChat(
-                    userModel: filterList[index],
+                    userModel: searchList[index],
                     ontapTile: () => Get.to(
                       () => ChatScreen(
-                        appUserId: filterList[index].id,
+                        appUserId: searchList[index].id,
                         creatorDetails: CreatorDetails(
-                          name: filterList[index].name,
-                          imageUrl: filterList[index].imageStr,
-                          isVerified: filterList[index].isVerified,
+                          name: searchList[index].name,
+                          imageUrl: searchList[index].imageStr,
+                          isVerified: searchList[index].isVerified,
                         ),
                       ),
                     ),

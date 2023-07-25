@@ -18,6 +18,7 @@ import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/follower_following_screen.dart';
+import '../../screens/profile/saved_post_screen.dart';
 import '../../utils/app_constants.dart';
 import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
@@ -124,7 +125,7 @@ _onTapSheetItem({required int index}) async {
       Get.to(() => const EditProfileScreen());
       break;
     case 1:
-      // Get.to(() => SavedPostScreen());
+      Get.to(() => const SavedPostScreen());
       break;
     case 2:
       //getVerify

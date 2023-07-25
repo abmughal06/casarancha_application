@@ -4,6 +4,7 @@ import 'package:casarancha/screens/auth/providers/login_provider.dart';
 import 'package:casarancha/screens/auth/providers/register_privder.dart';
 import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_controller.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
@@ -12,6 +13,7 @@ import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/home/providers/story_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
+import 'package:casarancha/screens/search/search_screen.dart';
 import 'package:casarancha/utils/providers/date_picker_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +84,9 @@ class ProviderApp extends StatelessWidget {
         ChangeNotifierProvider<ChatProvider>(create: (_) => ChatProvider()),
         ChangeNotifierProvider<EditProfileProvider>(
             create: (_) => EditProfileProvider()),
+        ChangeNotifierProvider<ChatListController>(
+            create: (_) => ChatListController()),
+        ChangeNotifierProvider<SearchProvider>(create: (_) => SearchProvider()),
       ],
       builder: (context, prov) {
         return app;

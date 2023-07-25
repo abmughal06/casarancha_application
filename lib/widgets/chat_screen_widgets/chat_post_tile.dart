@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:video_player/video_player.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../models/media_details.dart';
 import '../../models/message.dart';
@@ -12,39 +14,31 @@ import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../music_player_url.dart';
 import '../text_widget.dart';
 
-class ChatVideoTile extends StatefulWidget {
+class ChatVideoTile extends StatelessWidget {
   const ChatVideoTile({
     Key? key,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
     required this.date,
-    required this.videoPlayerController,
-    required this.aspectRatio,
+    required this.link,
   }) : super(key: key);
 
   final bool isMe;
   final bool isSeen;
   final String appUserId;
   final String date;
-  final VideoPlayerController videoPlayerController;
-  final double aspectRatio;
+  final String link;
 
-  @override
-  State<ChatVideoTile> createState() => _ChatVideoTileState();
-}
-
-class _ChatVideoTileState extends State<ChatVideoTile> {
-  @override
-  void initState() {
-    initVideo();
-    super.initState();
-  }
-
-  void initVideo() {
-    widget.videoPlayerController.initialize().then((value) {
-      setState(() {});
-    });
+  Future<String?> initThumbnail() async {
+    return await VideoThumbnail.thumbnailFile(
+      video: link,
+      thumbnailPath: (await getTemporaryDirectory()).path,
+      imageFormat: ImageFormat.PNG,
+      maxHeight: 1024,
+      maxWidth: 1024,
+      quality: 10,
+    );
   }
 
   @override
@@ -54,42 +48,44 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(
-                left: widget.isMe ? 120 : 0, right: widget.isMe ? 0 : 120),
+            padding:
+                EdgeInsets.only(left: isMe ? 120 : 0, right: isMe ? 0 : 120),
             child: Align(
-              alignment: widget.isMe ? Alignment.topRight : Alignment.topLeft,
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
                 aspectRatio: 9 / 13,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.grey,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: FutureBuilder<String?>(
+                    future: initThumbnail(),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == null) {
+                        return const CircularProgressIndicator.adaptive();
+                      } else {
+                        return Image.file(
+                          File(snapshot.data!),
+                          fit: BoxFit.fill,
+                        );
+                      }
+                    },
                   ),
-                  child: widget.videoPlayerController.value.isInitialized
-                      ? VideoPlayer(widget.videoPlayerController)
-                      : const Center(
-                          child: CircularProgressIndicator(),
-                        ),
                 ),
               ),
             ),
           ),
           Align(
-            alignment:
-                widget.isMe ? Alignment.centerRight : Alignment.centerLeft,
+            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                widget.isMe
+                isMe
                     ? Padding(
                         padding: EdgeInsets.symmetric(horizontal: 3.w),
-                        child: widget.isSeen
-                            ? SvgPicture.asset(icChatMsgSend)
-                            : null,
+                        child: isSeen ? SvgPicture.asset(icChatMsgSend) : null,
                       )
                     : Container(),
                 TextWidget(
-                  text: convertDateIntoTime(widget.date),
+                  text: convertDateIntoTime(date),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),

@@ -24,41 +24,13 @@ class _SearchScreenState extends State<SearchScreen> {
     Tab(text: 'Location'),
   ];
 
-  late TextEditingController searchController;
-
-  @override
-  void initState() {
-    searchController = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
-
-  bool compareStrings(String string1, String string2) {
-    int matchCount = 0;
-
-    // Loop through each character of the first string
-    for (int i = 0; i < string1.length; i++) {
-      // Loop through each character of the second string
-      for (int j = 0; j < string2.length; j++) {
-        // If the characters match, increment the match count
-        if (string1[i] == string2[j]) {
-          matchCount++;
-        }
-      }
-    }
-    // Return true if two or more characters match
-    return matchCount >= 2;
-  }
+  late TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
+    final search = Provider.of<SearchProvider>(context);
     return Scaffold(
       appBar: primaryAppbar(
         title: 'Search',
@@ -74,9 +46,9 @@ class _SearchScreenState extends State<SearchScreen> {
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: searchTextField(
                 context: context,
-                controller: searchController,
+                controller: search.searchController,
                 onChange: (value) {
-                  // setState(() {});
+                  search.searchText(value);
                 },
               ),
             ),
@@ -90,21 +62,35 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   /*people*/
 
-                  Consumer<List<UserModel>?>(builder: (context, users, b) {
-                    if (users == null) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: users.length,
-                      padding: const EdgeInsets.only(bottom: 100),
-                      itemBuilder: (context, index) {
-                        if (compareStrings(
-                                users[index].name, searchController.text) &&
-                            users[index].id !=
-                                FirebaseAuth.instance.currentUser!.uid) {
-                          var userSnap = users[index];
+                  Consumer<List<UserModel>?>(
+                    builder: (context, users, b) {
+                      if (users == null) {
+                        return const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        );
+                      }
+
+                      if (search.searchController.text.isEmpty) {
+                        return Container();
+                      }
+                      var filterList = users
+                          .where((element) =>
+                              (element.name.toLowerCase().contains(search
+                                      .searchController.text
+                                      .toLowerCase()) ||
+                                  element.username.toLowerCase().contains(search
+                                      .searchController.text
+                                      .toLowerCase())) &&
+                              element.id !=
+                                  FirebaseAuth.instance.currentUser!.uid)
+                          .toList();
+
+                      filterList.sort((a, b) => a.name.compareTo(b.name));
+                      return ListView.builder(
+                        itemCount: filterList.length,
+                        padding: const EdgeInsets.only(bottom: 100),
+                        itemBuilder: (context, index) {
+                          var userSnap = filterList[index];
                           var currentUser = users
                               .where((element) =>
                                   element.id ==
@@ -122,12 +108,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ? "Unfollow"
                                     : "Follow",
                           );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    );
-                  }),
+                        },
+                      );
+                    },
+                  ),
 
                   /*group*/
                   Container(),
@@ -140,5 +124,19 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
+  }
+}
+
+class SearchProvider extends ChangeNotifier {
+  late TextEditingController searchController;
+
+  SearchProvider() {
+    searchController = TextEditingController();
+  }
+
+  void searchText(value) {
+    if (value.isNotEmpty) {
+      notifyListeners();
+    }
   }
 }
