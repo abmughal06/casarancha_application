@@ -73,7 +73,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               builder: (context, notifications, b) {
                 if (notifications == null) {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator.adaptive(),
                   );
                 } else {
                   if (notifications.isNotEmpty) {

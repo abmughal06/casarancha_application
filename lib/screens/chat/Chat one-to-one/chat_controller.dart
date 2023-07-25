@@ -244,7 +244,7 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> resetMessageCount({currentUserId, appUserId}) async {
+  Future<void> resetMessageCount({currentUserId, appUserId, messageid}) async {
     await userRef
         .doc(currentUserId)
         .collection('messageList')
@@ -252,15 +252,34 @@ class ChatProvider extends ChangeNotifier {
         .update({
       'unreadMessageCount': 0,
     });
+    await userRef
+        .doc(appUserId)
+        .collection('messageList')
+        .doc(currentUserId)
+        .collection("messages")
+        .doc(messageid)
+        .update({
+      'isSeen': true,
+    });
   }
 
-  Future<void> resetMessageCountGhost({currentUserId, appUserId}) async {
+  Future<void> resetMessageCountGhost(
+      {currentUserId, appUserId, messageid}) async {
     userRef
         .doc(currentUserId)
         .collection("ghostMessageList")
         .doc(appUserId)
         .update({
       'unreadMessageCount': 0,
+    });
+    await userRef
+        .doc(appUserId)
+        .collection('ghostMessageList')
+        .doc(currentUserId)
+        .collection("messages")
+        .doc(messageid)
+        .update({
+      'isSeen': true,
     });
   }
 

@@ -323,7 +323,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                   ],
               body: Consumer<List<UserModel>?>(builder: (context, appUser, b) {
                 if (appUser == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var userList = appUser
                       .where((element) => element.id == widget.appUserId)
@@ -364,7 +365,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                 //qoute
                                 post == null
                                     ? const Center(
-                                        child: CircularProgressIndicator())
+                                        child: CircularProgressIndicator
+                                            .adaptive())
                                     : QoutesGridView(
                                         qoutesList: post
                                             .where((element) =>
@@ -376,7 +378,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                       ),
                                 post == null
                                     ? const Center(
-                                        child: CircularProgressIndicator())
+                                        child: CircularProgressIndicator
+                                            .adaptive())
                                     : ImageGridView(
                                         imageList: post
                                             .where((element) =>
@@ -388,7 +391,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                       ),
                                 post == null
                                     ? const Center(
-                                        child: CircularProgressIndicator())
+                                        child: CircularProgressIndicator
+                                            .adaptive())
                                     : VideoGridView(
                                         videoList: post
                                             .where((element) =>

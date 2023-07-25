@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../../widgets/chat_screen_widgets/chat_post_tile.dart';
 import '../../../widgets/chat_screen_widgets/chat_story_tile.dart';
@@ -76,7 +75,6 @@ class MessageTiles extends StatelessWidget {
                 postModel: postModel,
               )),
           child: ChatMusicTile(
-            aspectRatio: 13 / 9,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
             isMe: isMe,

@@ -6,6 +6,7 @@ import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -51,14 +52,12 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(
-            Icons.keyboard_arrow_left,
-            color: Colors.black,
-          ),
+          icon: SvgPicture.asset(icIosBackArrow),
           onPressed: () {
             Get.back();
           },
         ),
+        elevation: 0.1,
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
         title: ChatScreenUserAppBar(
@@ -93,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Consumer<List<Message>?>(
               builder: (context, messages, b) {
                 if (messages == null) {
-                  return const CircularProgressIndicator();
+                  return const CircularProgressIndicator.adaptive();
                 }
                 return Expanded(
                   child: ListView.builder(
@@ -105,8 +104,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       final isMe = message.sentToId == widget.appUserId;
                       if (messages.isNotEmpty && message.type == 'Text') {
                         chatProvider.resetMessageCount(
-                            currentUserId: currentUser.id,
-                            appUserId: appUser.id);
+                          currentUserId: currentUser.id,
+                          appUserId: appUser.id,
+                          messageid: message.id,
+                        );
                       }
                       return MessageTiles(
                         isMe: isMe,
@@ -119,13 +120,14 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           ChatTextField(
-              ontapSend: () {
-                chatProvider.sentMessage(
-                  currentUser: currentUser,
-                  appUser: appUser,
-                );
-              },
-              chatController: chatProvider.messageController),
+            ontapSend: () {
+              chatProvider.sentMessage(
+                currentUser: currentUser,
+                appUser: appUser,
+              );
+            },
+            chatController: chatProvider.messageController,
+          ),
         ],
       ),
     );

@@ -46,7 +46,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       body: Consumer<UserModel?>(builder: (context, user, b) {
         if (user == null) {
           return const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator.adaptive(),
           );
         }
         edit.firstNameController =

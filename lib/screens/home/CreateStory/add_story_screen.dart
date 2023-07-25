@@ -111,19 +111,17 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                                 double progress =
                                     data.bytesTransferred / data.totalBytes;
 
-                                return Stack(
-                                  children: [
-                                    LinearProgressIndicator(
-                                      value: progress,
-                                    ),
-                                    heightBox(10),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 15.w, vertical: 8.h),
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    minHeight: 10.h,
+                                    semanticsValue:
                                         '${(100 * progress).roundToDouble().toInt()}%',
-                                      ),
-                                    )
-                                  ],
+                                    semanticsLabel:
+                                        '${(100 * progress).roundToDouble().toInt()}%',
+                                  ),
                                 );
                               } else {
                                 return const SizedBox(

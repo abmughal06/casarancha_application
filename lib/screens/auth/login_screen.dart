@@ -310,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (context, prov, b) {
             if (prov.isSigningIn) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator.adaptive(),
               );
             } else {
               return Container();

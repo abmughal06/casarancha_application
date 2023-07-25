@@ -1,17 +1,21 @@
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:chewie/chewie.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../models/post_model.dart';
+
 class VideoPlayerWidget extends StatefulWidget {
-  const VideoPlayerWidget({Key? key, required this.videoUrl, this.postId})
+  const VideoPlayerWidget({Key? key, required this.videoUrl, this.postModel})
       : super(key: key);
   final String videoUrl;
-  final String? postId;
+  final PostModel? postModel;
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
 }
@@ -47,34 +51,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     );
   }
 
-  countVideoViews() async {
-    var postRef =
-        FirebaseFirestore.instance.collection("posts").doc(widget.postId);
-    var data = await postRef.get();
-    if (data.data()!.containsKey("viedoViews")) {
-      List viwers = data.data()!['videoViews'];
-      if (viwers.contains(FirebaseAuth.instance.currentUser!.uid)) {
-      } else {
-        postRef.update({
-          "videoViews":
-              FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
-        });
-      }
-    } else {
-      postRef.update({
-        "videoViews":
-            FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
     return VisibilityDetector(
       key: Key(widget.videoUrl),
       onVisibilityChanged: (visibilityInfo) {
         isVisible = visibilityInfo.visibleFraction > 0.6;
         if (isVisible) {
+          postProvider.countVideoViews(postModel: widget.postModel);
           videoPlayerController.play();
           videoPlayerController.setVolume(0.0);
         } else {

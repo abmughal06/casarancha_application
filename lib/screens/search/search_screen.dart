@@ -85,7 +85,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                   FirebaseAuth.instance.currentUser!.uid)
                           .toList();
 
-                      filterList.sort((a, b) => a.name.compareTo(b.name));
                       return ListView.builder(
                         itemCount: filterList.length,
                         padding: const EdgeInsets.only(bottom: 100),

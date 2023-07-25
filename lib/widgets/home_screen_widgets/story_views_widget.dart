@@ -25,7 +25,7 @@ Widget storyViews({required Story story}) {
       //         .snapshots(),
       builder: (context, user, b) {
         if (user == null) {
-          return const CircularProgressIndicator();
+          return const CircularProgressIndicator.adaptive();
         } else {
           var viewers = user
               .where((element) => story.storyViews.contains(element.id))

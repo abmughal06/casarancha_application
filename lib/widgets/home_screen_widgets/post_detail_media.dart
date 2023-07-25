@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../models/media_details.dart';
+import '../../models/post_model.dart';
 import '../../resources/color_resources.dart';
 import '../music_player_url.dart';
 import '../text_widget.dart';
@@ -14,10 +15,12 @@ class CheckMediaAndShowPost extends StatelessWidget {
       required this.mediaData,
       required this.postId,
       this.iniializedFuturePlay,
-      required this.ondoubleTap})
+      required this.ondoubleTap,
+      required this.postModel})
       : super(key: key);
 
   final MediaDetails mediaData;
+  final PostModel postModel;
   final Future<void>? iniializedFuturePlay;
   final String postId;
   final VoidCallback ondoubleTap;
@@ -34,7 +37,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
                   progressIndicatorBuilder: (context, url, progress) => Center(
                         child: SizedBox(
                           height: 30.h,
-                          child: const CircularProgressIndicator(),
+                          child: const CircularProgressIndicator.adaptive(),
                         ),
                       ),
                   imageUrl: mediaData.link),
@@ -49,7 +52,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
                 aspectRatio: 9 / 16,
                 child: VideoPlayerWidget(
                   videoUrl: mediaData.link,
-                  postId: postId,
+                  postModel: postModel,
                 ),
               ),
             );

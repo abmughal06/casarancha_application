@@ -49,7 +49,7 @@ class ChatVideoTile extends StatelessWidget {
         children: [
           Padding(
             padding:
-                EdgeInsets.only(left: isMe ? 120 : 0, right: isMe ? 0 : 120),
+                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
@@ -109,7 +109,6 @@ class ChatMusicTile extends StatelessWidget {
     required this.isSeen,
     required this.date,
     required this.media,
-    required this.aspectRatio,
   }) : super(key: key);
 
   final bool isMe;
@@ -117,7 +116,6 @@ class ChatMusicTile extends StatelessWidget {
   final String appUserId;
   final String date;
   final MediaDetails media;
-  final double aspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -127,16 +125,13 @@ class ChatMusicTile extends StatelessWidget {
         children: [
           Padding(
             padding:
-                EdgeInsets.only(left: isMe ? 120 : 0, right: isMe ? 0 : 120),
+                EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: AspectRatio(
-                aspectRatio: aspectRatio,
-                child: MusicPlayerUrl(
-                  border: 15,
-                  musicDetails: media,
-                  ontap: () {},
-                ),
+              child: MusicPlayerTile(
+                border: 15,
+                musicDetails: media,
+                ontap: () {},
               ),
             ),
           ),
@@ -190,7 +185,7 @@ class ChatPostTile extends StatelessWidget {
         children: [
           Padding(
             padding:
-                EdgeInsets.only(left: isMe ? 120 : 0, right: isMe ? 0 : 120),
+                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(

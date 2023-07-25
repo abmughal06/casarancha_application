@@ -97,6 +97,7 @@ class AppUserStoryWidget extends StatelessWidget {
             Container(
               height: 50.h,
               width: 50.h,
+              padding: const EdgeInsets.all(0.2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(

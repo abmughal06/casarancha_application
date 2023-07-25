@@ -32,53 +32,49 @@ class ChatStoryTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(left: isMe ? 70 : 0, right: isMe ? 0 : 70),
+            padding:
+                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16.r),
-                        topRight: Radius.circular(16.r),
-                        bottomLeft: Radius.circular(
-                          isMe ? 16.r : 0,
-                        ),
-                        bottomRight: Radius.circular(
-                          isMe ? 0 : 16.r,
-                        )),
-                    color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
+                decoration: BoxDecoration(
+                  color: colorF03.withOpacity(0.6),
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(15),
+                    topRight: const Radius.circular(15),
+                    bottomLeft: Radius.circular(isMe ? 15 : 0),
+                    bottomRight: Radius.circular(isMe ? 0 : 15),
                   ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                  child: Column(
-                    crossAxisAlignment: isMe
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      CachedNetworkImage(
-                        imageUrl: story.link,
-                        // color: isMe ? color13F : color55F,
-                        // fontWeight: FontWeight.w500,
-                      ),
-                      message.caption != ""
-                          ? const SizedBox(height: 5)
-                          : const SizedBox(
-                              height: 0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 9 / 13,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: CachedNetworkImageProvider(
+                              story.link,
                             ),
-                      message.caption != ""
-                          ? Text(
-                              message.caption,
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                              ),
-                            )
-                          : const SizedBox(
-                              height: 0,
-                            )
-                    ],
-                  )),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                      child: TextWidget(
+                        text: message.caption,
+                        color: isMe ? color13F : color55F,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           Align(

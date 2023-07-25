@@ -22,6 +22,7 @@ class SharePostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel>();
+    final users = context.watch<List<UserModel>?>();
 
     List<String> messageUserIds = [];
     return Scaffold(
@@ -53,9 +54,17 @@ class SharePostScreen extends StatelessWidget {
           ),
           SizedBox(height: 20.h),
           Consumer<List<MessageDetails>?>(
-            builder: (context, msg, b) {
-              if (msg == null) {
-                return const CircularProgressIndicator();
+            builder: (context, msg1, b) {
+              if (msg1 == null || users == null) {
+                return const CircularProgressIndicator.adaptive();
+              }
+              List<MessageDetails> msg = [];
+              for (var m in msg1) {
+                for (var u in users) {
+                  if (m.id == u.id) {
+                    msg.add(m);
+                  }
+                }
               }
               messageUserIds = msg.map((e) => e.id).toList();
 
@@ -147,15 +156,14 @@ class _SharePostTileState extends State<SharePostTile> {
     super.dispose();
   }
 
+  bool isSent = false;
+
   @override
   Widget build(BuildContext context) {
     postProvider = Provider.of<PostProvider>(context, listen: false);
     final users = context.watch<List<UserModel>>();
-    final appUser = users
-        .where(
-          (element) => element.id == widget.messageDetails.id,
-        )
-        .first;
+    final appUser =
+        users.where((element) => element.id == widget.messageDetails.id).first;
     return SizedBox(
       height: 70,
       child: ListTile(
@@ -178,20 +186,24 @@ class _SharePostTileState extends State<SharePostTile> {
         ),
         trailing: Container(
           decoration: BoxDecoration(
-            color:
-                postProvider.isSent ? Colors.red.shade300 : Colors.red.shade900,
+            color: isSent ? Colors.red.shade300 : Colors.red.shade900,
             borderRadius: BorderRadius.circular(30),
           ),
           child: InkWell(
-            onTap: () => postProvider.sharePostData(
-              currentUser: widget.currentUser,
-              appUser: appUser,
-              postModel: widget.postModel,
-            ),
+            onTap: () {
+              postProvider.sharePostData(
+                currentUser: widget.currentUser,
+                appUser: appUser,
+                postModel: widget.postModel,
+              );
+              setState(() {
+                isSent = true;
+              });
+            },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
               child: Text(
-                postProvider.isSent ? "Sent" : "Send",
+                isSent ? "Sent" : "Send",
                 style: const TextStyle(
                   letterSpacing: 0.7,
                   color: Colors.white,
@@ -232,6 +244,8 @@ class _SharePostTileForNewFreindState extends State<SharePostTileForNewFreind> {
     super.dispose();
   }
 
+  bool isSent = false;
+
   @override
   Widget build(BuildContext context) {
     postProvider = Provider.of<PostProvider>(context, listen: false);
@@ -268,20 +282,24 @@ class _SharePostTileForNewFreindState extends State<SharePostTileForNewFreind> {
         ),
         trailing: Container(
           decoration: BoxDecoration(
-            color:
-                postProvider.isSent ? Colors.red.shade300 : Colors.red.shade900,
+            color: isSent ? Colors.red.shade300 : Colors.red.shade900,
             borderRadius: BorderRadius.circular(30),
           ),
           child: InkWell(
-            onTap: () => postProvider.sharePostData(
-              currentUser: widget.currentUser,
-              appUser: widget.userModel,
-              postModel: widget.postModel,
-            ),
+            onTap: () {
+              postProvider.sharePostData(
+                currentUser: widget.currentUser,
+                appUser: widget.userModel,
+                postModel: widget.postModel,
+              );
+              setState(() {
+                isSent = !isSent;
+              });
+            },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
               child: Text(
-                postProvider.isSent ? "Sent" : "Send",
+                isSent ? "Sent" : "Send",
                 style: const TextStyle(
                   letterSpacing: 0.7,
                   color: Colors.white,

@@ -7,14 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-// import 'package:get/get.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/color_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/common_button.dart';
 import '../../../widgets/text_editing_widget.dart';
 
-class NewPostShareScreen extends StatefulWidget {
+class NewPostShareScreen extends StatelessWidget {
   const NewPostShareScreen({
     Key? key,
     required this.createPostController,
@@ -25,12 +24,6 @@ class NewPostShareScreen extends StatefulWidget {
 
   final CreatePostMethods createPostController;
 
-  @override
-  State<NewPostShareScreen> createState() => _NewPostShareScreenState();
-}
-
-class _NewPostShareScreenState extends State<NewPostShareScreen> {
-  bool showPostTime = false;
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();
@@ -50,8 +43,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
           onTap: () => user == null
               ? null
               : state.sharePost(
-                  groupId: widget.groupId,
-                  showPostTime: showPostTime,
+                  groupId: groupId,
                   user: user,
                 ),
         );
@@ -67,7 +59,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 TextEditingWidget(
-                  controller: widget.createPostController.captionController,
+                  controller: createPostController.captionController,
                   hintColor: color887,
                   hint: strWriteCaption,
                   color: colorFF4,
@@ -78,7 +70,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                 ),
                 heightBox(10.w),
                 TextEditingWidget(
-                  controller: widget.createPostController.tagsController,
+                  controller: createPostController.tagsController,
                   hintColor: color887,
                   hint: strTagPeople,
                   color: colorFF4,
@@ -92,7 +84,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                 ),
                 heightBox(10.w),
                 TextEditingWidget(
-                  controller: widget.createPostController.locationController,
+                  controller: createPostController.locationController,
                   hintColor: color887,
                   hint: strLocation,
                   prefixIcon: Padding(
@@ -105,14 +97,19 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
                 ),
                 heightBox(10.w),
-                SwitchListTile(
-                    visualDensity: const VisualDensity(horizontal: -3),
-                    title: const Text("Show post time"),
-                    value: showPostTime,
-                    onChanged: (value) {
-                      showPostTime = value;
-                      setState(() {});
-                    }),
+                Consumer<CreatePostMethods>(
+                  builder: (context, m, b) {
+                    return SwitchListTile(
+                      visualDensity: const VisualDensity(horizontal: -3),
+                      title: const Text("Show post time"),
+                      value: m.showPostTime,
+                      onChanged: (value) {
+                        // m.showPostTime = value;
+                        m.togglePostTime();
+                      },
+                    );
+                  },
+                ),
                 heightBox(10.w),
                 Expanded(
                   child:
@@ -132,18 +129,15 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                               double progress =
                                   data.bytesTransferred / data.totalBytes;
 
-                              return Stack(
-                                children: [
-                                  LinearProgressIndicator(
-                                    value: progress,
-                                  ),
-                                  heightBox(10),
-                                  Center(
-                                    child: Text(
+                              return Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 15.w, vertical: 8.h),
+                                child: LinearProgressIndicator(
+                                  value: progress,
+                                  minHeight: 10.h,
+                                  semanticsLabel:
                                       '${(100 * progress).roundToDouble().toInt()}%',
-                                    ),
-                                  )
-                                ],
+                                ),
                               );
                             } else {
                               return const SizedBox(

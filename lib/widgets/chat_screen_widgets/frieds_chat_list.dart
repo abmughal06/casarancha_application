@@ -56,15 +56,24 @@ class _FriendChatListState extends State<FriendChatList> {
   @override
   Widget build(BuildContext context) {
     final chatQuery = Provider.of<ChatListController>(context);
+    final users = context.watch<List<UserModel>?>();
 
     List<String> messageUserIds = [];
     return ListView(
       children: [
         Consumer<List<MessageDetails>?>(
-          builder: (context, messages, b) {
-            if (messages == null) {
+          builder: (context, messages1, b) {
+            if (messages1 == null || users == null) {
               return const CircularProgressIndicator.adaptive();
             } else {
+              List<MessageDetails> messages = [];
+              for (var m in messages1) {
+                for (var u in users) {
+                  if (m.id == u.id) {
+                    messages.add(m);
+                  }
+                }
+              }
               messageUserIds = messages.map((e) => e.id).toList();
 
               if (chatQuery.searchController.text.isEmpty) {

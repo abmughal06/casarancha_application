@@ -63,6 +63,18 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
+  void countVideoViews({PostModel? postModel}) async {
+    try {
+      if (!postModel!.videoViews.contains(fauth.currentUser!.uid)) {
+        await postRef.doc(postModel.id).set({
+          'videoViews': FieldValue.arrayUnion([fauth.currentUser!.uid])
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      log('$e');
+    }
+  }
+
   void postComment({PostModel? postModel, UserModel? user, String? comment}) {
     var cmnt = Comment(
       id: postModel!.id,

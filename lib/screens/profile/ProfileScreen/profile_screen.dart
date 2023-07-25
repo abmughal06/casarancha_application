@@ -75,7 +75,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       //qoute
                       post == null
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Center(
+                              child: CircularProgressIndicator.adaptive())
                           : QoutesGridView(
                               qoutesList: post
                                   .where((element) =>
@@ -84,7 +85,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   .toList(),
                             ),
                       post == null
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Center(
+                              child: CircularProgressIndicator.adaptive())
                           : ImageGridView(
                               imageList: post
                                   .where((element) =>
@@ -93,7 +95,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   .toList(),
                             ),
                       post == null
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Center(
+                              child: CircularProgressIndicator.adaptive())
                           : VideoGridView(
                               videoList: post
                                   .where((element) =>

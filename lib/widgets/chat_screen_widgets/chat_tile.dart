@@ -34,25 +34,25 @@ class ChatTile extends StatelessWidget {
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16.r),
-                        topRight: Radius.circular(16.r),
-                        bottomLeft: Radius.circular(
-                          isMe ? 16.r : 0,
-                        ),
-                        bottomRight: Radius.circular(
-                          isMe ? 0 : 16.r,
-                        )),
-                    color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
-                  ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                  child: TextWidget(
-                    text: message,
-                    color: isMe ? color13F : color55F,
-                    fontWeight: FontWeight.w500,
-                  )),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16.r),
+                      topRight: Radius.circular(16.r),
+                      bottomLeft: Radius.circular(
+                        isMe ? 16.r : 0,
+                      ),
+                      bottomRight: Radius.circular(
+                        isMe ? 0 : 16.r,
+                      )),
+                  color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                child: TextWidget(
+                  text: message,
+                  color: isMe ? color13F : color55F,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
           Align(

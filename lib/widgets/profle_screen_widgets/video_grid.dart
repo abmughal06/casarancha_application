@@ -51,7 +51,7 @@ class VideoGridView extends StatelessWidget {
                       creatorId: videoList![index].creatorId,
                     )),
                 child: Container(
-                  color: Colors.black,
+                  color: Colors.white,
                   child: FutureBuilder<String?>(
                     future: videoThumbnail(data.link),
                     builder: (context, snap) {

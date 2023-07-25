@@ -95,13 +95,13 @@ class CustomPostFooter extends StatelessWidget {
               children: [
                 Visibility(
                   visible: isVideoPost!,
-                  child: TextWidget(
+                  child: InkWell(
                     onTap: () {
                       Get.bottomSheet(
                         Consumer<List<UserModel>?>(
                           builder: (context, value, child) {
                             if (value == null) {
-                              return const CircularProgressIndicator();
+                              return const CircularProgressIndicator.adaptive();
                             }
                             var filterList = value
                                 .where((element) =>
@@ -123,20 +123,24 @@ class CustomPostFooter extends StatelessWidget {
                         backgroundColor: Colors.white,
                       );
                     },
-                    text: postModel.videoViews.length.toString(),
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
-                    color: color221,
+                    child: Row(
+                      children: [
+                        TextWidget(
+                          text: postModel.videoViews.length.toString(),
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w400,
+                          color: color221,
+                        ),
+                        widthBox(5.w),
+                        const Icon(
+                          Icons.visibility,
+                          color: colorAA3,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                widthBox(isVideoPost! ? 5.w : 0.w),
-                Visibility(
-                  visible: isVideoPost!,
-                  child: const Icon(
-                    Icons.visibility,
-                    color: colorAA3,
-                  ),
-                ),
+                // widthBox(isVideoPost! ? 5.w : 0.w),
                 IconButton(
                   onPressed: ontapSave,
                   icon: SvgPicture.asset(
@@ -250,7 +254,8 @@ class CustomPostFooter extends StatelessWidget {
                     ),
                   );
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 }
               },
             ),

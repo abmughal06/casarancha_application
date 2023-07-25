@@ -41,6 +41,13 @@ class CreatePostMethods extends ChangeNotifier {
   var mediaData = <MediaDetails>[];
   var isSharingPost = false;
 
+  bool showPostTime = false;
+
+  void togglePostTime() {
+    showPostTime = !showPostTime;
+    notifyListeners();
+  }
+
   //Methods
 
   void clearLists() {
@@ -55,8 +62,7 @@ class CreatePostMethods extends ChangeNotifier {
     locationController.clear();
   }
 
-  Future<void> sharePost(
-      {String? groupId, bool showPostTime = true, UserModel? user}) async {
+  Future<void> sharePost({String? groupId, UserModel? user}) async {
     isSharingPost = true;
     notifyListeners();
     final postRef = groupId != null
@@ -81,6 +87,7 @@ class CreatePostMethods extends ChangeNotifier {
         description: captionController.text.trim(),
         locationName: locationController.text.trim(),
         shareLink: '',
+        videoViews: [],
         showPostTime: showPostTime,
         mediaData: mediaData,
       );

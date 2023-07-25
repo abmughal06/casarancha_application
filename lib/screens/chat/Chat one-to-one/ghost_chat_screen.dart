@@ -122,13 +122,10 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
           builder: (context, messages, b) {
             if (messages == null) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator.adaptive(),
               );
             }
-            if (messages.isNotEmpty) {
-              chatProvider.resetMessageCountGhost(
-                  currentUserId: currentUser.id, appUserId: appUser.id);
-            }
+
             return Column(
               children: [
                 Expanded(
@@ -136,6 +133,12 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                     itemCount: messages.length,
                     reverse: true,
                     itemBuilder: (context, index) {
+                      if (messages.isNotEmpty) {
+                        chatProvider.resetMessageCountGhost(
+                            currentUserId: currentUser.id,
+                            appUserId: appUser.id,
+                            messageid: messages[index].id);
+                      }
                       final isMe = messages[index].sentToId == widget.appUserId;
                       var message = messages[index];
                       return MessageTiles(message: message, isMe: isMe);

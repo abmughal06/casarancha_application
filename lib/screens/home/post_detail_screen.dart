@@ -47,7 +47,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   builder: (context, posts, b) {
                     if (posts == null) {
                       log(widget.postModel.id);
-                      return const CircularProgressIndicator();
+                      return const CircularProgressIndicator.adaptive();
                     } else {
                       var post = posts
                           .where((element) => element.id == widget.postModel.id)
@@ -72,6 +72,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   itemBuilder: (context, index) {
                                     var mediaData = post.mediaData[index];
                                     return CheckMediaAndShowPost(
+                                      postModel: post,
                                       ondoubleTap: () => postProvider
                                           .toggleLikeDislike(postModel: post),
                                       mediaData: mediaData,
@@ -109,7 +110,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   child: Consumer<List<Comment>?>(
                     builder: (context, comment, b) {
                       return comment == null
-                          ? const CircularProgressIndicator()
+                          ? const CircularProgressIndicator.adaptive()
                           : ListView.builder(
                               itemCount: comment.length,
                               shrinkWrap: true,

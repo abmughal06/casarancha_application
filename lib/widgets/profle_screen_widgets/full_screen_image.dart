@@ -76,7 +76,8 @@ class FullScreenImage extends StatelessWidget {
       body: Center(
         child: CachedNetworkImage(
           imageUrl: image,
-          placeholder: (context, url) => const CircularProgressIndicator(),
+          placeholder: (context, url) =>
+              const CircularProgressIndicator.adaptive(),
         ),
       ),
     );

@@ -44,7 +44,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var filterList = users
                       .where((element) =>
@@ -80,7 +81,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var filterList = users
                       .where((element) =>
@@ -149,7 +151,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var appUser =
                       users.where((element) => element.id == appUserid).first;
@@ -195,7 +198,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var appUser =
                       users.where((element) => element.id == appUserid).first;

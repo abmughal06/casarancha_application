@@ -149,3 +149,123 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
     });
   }
 }
+
+class MusicPlayerTile extends StatefulWidget {
+  const MusicPlayerTile(
+      {Key? key,
+      required this.musicDetails,
+      required this.ontap,
+      required this.border})
+      : super(key: key);
+  final MediaDetails musicDetails;
+  final Function ontap;
+  final double border;
+
+  @override
+  State<MusicPlayerTile> createState() => _MusicPlayerTileState();
+}
+
+class _MusicPlayerTileState extends State<MusicPlayerTile> {
+  String formatTime(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+
+    return [
+      if (duration.inHours > 0) hours,
+      minutes,
+      seconds,
+    ].join(':');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<MusicProvider>(builder: (context, provider, b) {
+      provider.play(widget.musicDetails.link);
+
+      return VisibilityDetector(
+          key: Key(widget.musicDetails.link),
+          onVisibilityChanged: (visibilityInfo) {
+            var isVisible = visibilityInfo.visibleFraction > 0.5;
+            provider.listenToFrameChange(isVisible);
+          },
+          child: Container(
+            height: 120,
+            margin: const EdgeInsets.symmetric(vertical: 25),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.yellow.shade100,
+              borderRadius: BorderRadius.circular(widget.border),
+            ),
+            alignment: Alignment.bottomCenter,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    provider.audioState == PlayerState.playing
+                        ? provider.pause()
+                        : provider.resume();
+                  },
+                  child: SvgPicture.asset(
+                    provider.audioState == PlayerState.playing
+                        ? icMusicPauseBtn
+                        : icMusicPlayBtn,
+                    color: Colors.grey.shade800,
+                    width: 35,
+                    height: 35,
+                  ),
+                ),
+                widthBox(
+                  5.w,
+                ),
+                Expanded(
+                  // flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SliderTheme(
+                        data: SliderThemeData(
+                          overlayShape: SliderComponentShape.noOverlay,
+                        ),
+                        child: Slider.adaptive(
+                          thumbColor: Colors.yellow,
+                          activeColor: Colors.yellow,
+                          min: 0.0,
+                          max: provider.duration.inSeconds.toDouble() + 1.0,
+                          value: provider.position.inSeconds.toDouble() + 1.0,
+                          onChanged: (value) async {
+                            final position = Duration(seconds: value.toInt());
+                            await provider.audioPlayer.seek(position);
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              formatTime(
+                                provider.position,
+                              ),
+                            ),
+                            Text(
+                              formatTime(
+                                provider.duration,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ));
+    });
+  }
+}

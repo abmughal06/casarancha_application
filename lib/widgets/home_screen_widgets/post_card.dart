@@ -92,7 +92,8 @@ class PostCard extends StatelessWidget {
             itemCount: post.mediaData.length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) => showPostAccordingToItsType(
-              post: post.mediaData[index],
+              media: post.mediaData[index],
+              post: post,
               ontap: () => Get.to(() => PostDetailScreen(postModel: post)),
               onDoubletap: () {
                 ghostProvider.checkGhostMode
@@ -130,67 +131,59 @@ class PostCard extends StatelessWidget {
 }
 
 Widget? showPostAccordingToItsType(
-    {MediaDetails? post, VoidCallback? onDoubletap, VoidCallback? ontap}) {
-  switch (post!.type) {
+    {PostModel? post,
+    MediaDetails? media,
+    VoidCallback? onDoubletap,
+    VoidCallback? ontap}) {
+  switch (media!.type) {
     case "Photo":
-      return AspectRatio(
-        aspectRatio: 2 / 3,
-        child: InkWell(
-          onTap: ontap,
-          onDoubleTap: onDoubletap,
-          child: CachedNetworkImage(
-            imageUrl: post.link,
-          ),
+      return InkWell(
+        onTap: ontap,
+        onDoubleTap: onDoubletap,
+        child: CachedNetworkImage(
+          imageUrl: media.link,
+          fit: BoxFit.fitWidth,
         ),
       );
 
     case 'Qoute':
-      return AspectRatio(
-        aspectRatio: 16 / 9,
-        child: InkWell(
-          onTap: ontap,
-          onDoubleTap: onDoubletap,
-          child: Container(
-            // width: double.infinity,
-            padding: const EdgeInsets.all(
-              20,
-            ),
-            decoration: const BoxDecoration(color: Colors.white),
-            child: SingleChildScrollView(
-              child: TextWidget(
-                text: post.link,
-                textAlign: TextAlign.left,
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w500,
-                color: color221,
-              ),
+      return InkWell(
+        onTap: ontap,
+        onDoubleTap: onDoubletap,
+        child: Container(
+          // width: double.infinity,
+          padding: const EdgeInsets.all(
+            20,
+          ),
+          decoration: const BoxDecoration(color: Colors.white),
+          child: SingleChildScrollView(
+            child: TextWidget(
+              text: media.link,
+              textAlign: TextAlign.left,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w500,
+              color: color221,
             ),
           ),
         ),
       );
     case "Video":
-      return AspectRatio(
-        aspectRatio: 9 / 16,
-        child: InkWell(
-          onTap: ontap,
-          onDoubleTap: onDoubletap,
-          child: VideoPlayerWidget(
-            postId: post.id,
-            videoUrl: post.link,
-          ),
+      return InkWell(
+        onTap: ontap,
+        onDoubleTap: onDoubletap,
+        child: VideoPlayerWidget(
+          postModel: post,
+          videoUrl: media.link,
         ),
       );
 
     case "Music":
-      return AspectRatio(
-        aspectRatio: 13 / 9,
-        child: InkWell(
-          onDoubleTap: onDoubletap,
-          child: MusicPlayerUrl(
-            border: 0,
-            musicDetails: post,
-            ontap: () {},
-          ),
+      return InkWell(
+        onDoubleTap: onDoubletap,
+        child: MusicPlayerUrl(
+          border: 0,
+          musicDetails: media,
+          ontap: () {},
         ),
       );
 
