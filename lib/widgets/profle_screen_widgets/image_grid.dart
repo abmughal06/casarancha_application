@@ -21,6 +21,7 @@ class ImageGridView extends StatelessWidget {
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
+              crossAxisSpacing: 1,
             ),
             itemCount: imageList!.length,
             itemBuilder: (context, index) {

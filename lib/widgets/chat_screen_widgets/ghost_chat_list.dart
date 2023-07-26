@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/ghost_message_details.dart';
+import '../../screens/chat/ChatList/chat_list_controller.dart';
 
 class MessageListGhost extends StatefulWidget {
   const MessageListGhost({Key? key}) : super(key: key);
@@ -23,15 +24,16 @@ class MessageListGhost extends StatefulWidget {
 class _MessageListGhostState extends State<MessageListGhost> {
   @override
   Widget build(BuildContext context) {
+    final chatQuery = Provider.of<ChatListController>(context);
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: searchTextField(
             context: context,
-            controller: TextEditingController(),
+            controller: chatQuery.ghostSearchController,
             onChange: (value) {
-              // chatListController.searchQuery.value = value;
+              chatQuery.searchText(value);
             },
           ),
         ),
@@ -48,6 +50,8 @@ class GhostChatList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> messageUserIds = [];
+    final chatQuery = Provider.of<ChatListController>(context);
+
     return ListView(
       children: [
         Consumer<List<GhostMessageDetails>?>(
@@ -57,32 +61,78 @@ class GhostChatList extends StatelessWidget {
             } else {
               log(messages.length);
               messageUserIds = messages.map((e) => e.id).toList();
+              if (chatQuery.ghostSearchController.text.isEmpty ||
+                  chatQuery.ghostSearchController.text == '') {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    return messages[index].firstMessage ==
+                            FirebaseAuth.instance.currentUser!.uid
+                        ? GhostChatListTile(
+                            messageDetails: messages[index],
+                            ontapTile: () => Get.to(
+                              () => GhostChatScreen2(
+                                firstMessagebyMe:
+                                    messages[index].firstMessage ==
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                appUserId: messages[index].id,
+                                creatorDetails: messages[index].creatorDetails,
+                              ),
+                            ),
+                          )
+                        : GhostChatUserListTile(
+                            messageDetails: messages[index],
+                            ontapTile: () => Get.to(
+                              () => GhostChatScreen2(
+                                firstMessagebyMe:
+                                    messages[index].firstMessage ==
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                appUserId: messages[index].id,
+                                creatorDetails: messages[index].creatorDetails,
+                              ),
+                            ),
+                          );
+                  },
+                );
+              }
+
+              var filterList = messages
+                  .where((element) => element.creatorDetails.name
+                      .toLowerCase()
+                      .contains(
+                          chatQuery.ghostSearchController.text.toLowerCase()))
+                  .toList();
+
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: messages.length,
+                itemCount: filterList.length,
                 itemBuilder: (context, index) {
-                  return messages[index].firstMessage ==
+                  return filterList[index].firstMessage ==
                           FirebaseAuth.instance.currentUser!.uid
                       ? GhostChatListTile(
-                          messageDetails: messages[index],
+                          messageDetails: filterList[index],
                           ontapTile: () => Get.to(
                             () => GhostChatScreen2(
-                              firstMessagebyMe: messages[index].firstMessage ==
-                                  FirebaseAuth.instance.currentUser!.uid,
-                              appUserId: messages[index].id,
-                              creatorDetails: messages[index].creatorDetails,
+                              firstMessagebyMe:
+                                  filterList[index].firstMessage ==
+                                      FirebaseAuth.instance.currentUser!.uid,
+                              appUserId: filterList[index].id,
+                              creatorDetails: filterList[index].creatorDetails,
                             ),
                           ),
                         )
                       : GhostChatUserListTile(
-                          messageDetails: messages[index],
+                          messageDetails: filterList[index],
                           ontapTile: () => Get.to(
                             () => GhostChatScreen2(
-                              firstMessagebyMe: messages[index].firstMessage ==
-                                  FirebaseAuth.instance.currentUser!.uid,
-                              appUserId: messages[index].id,
-                              creatorDetails: messages[index].creatorDetails,
+                              firstMessagebyMe:
+                                  filterList[index].firstMessage ==
+                                      FirebaseAuth.instance.currentUser!.uid,
+                              appUserId: filterList[index].id,
+                              creatorDetails: filterList[index].creatorDetails,
                             ),
                           ),
                         );
@@ -111,21 +161,51 @@ class GhostChatList extends StatelessWidget {
                   .where((element) => !messageUserIds.contains(element.id))
                   .toList();
 
+              if (chatQuery.ghostSearchController.text.isEmpty ||
+                  chatQuery.ghostSearchController.text == '') {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: filterList.length,
+                  itemBuilder: (context, index) {
+                    return ChatUserListTileForNoChat(
+                      userModel: filterList[index],
+                      ontapTile: () => Get.to(
+                        () => GhostChatScreen2(
+                          firstMessagebyMe: true,
+                          appUserId: filterList[index].id,
+                          creatorDetails: CreatorDetails(
+                            name: filterList[index].username,
+                            imageUrl: filterList[index].imageStr,
+                            isVerified: filterList[index].isVerified,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+
+              var searchList = filterList
+                  .where((element) => element.name.toLowerCase().contains(
+                      chatQuery.ghostSearchController.text.toLowerCase()))
+                  .toList();
+
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: filterList.length,
+                itemCount: searchList.length,
                 itemBuilder: (context, index) {
                   return ChatUserListTileForNoChat(
-                    userModel: filterList[index],
+                    userModel: searchList[index],
                     ontapTile: () => Get.to(
                       () => GhostChatScreen2(
                         firstMessagebyMe: true,
-                        appUserId: filterList[index].id,
+                        appUserId: searchList[index].id,
                         creatorDetails: CreatorDetails(
-                          name: filterList[index].username,
-                          imageUrl: filterList[index].imageStr,
-                          isVerified: filterList[index].isVerified,
+                          name: searchList[index].username,
+                          imageUrl: searchList[index].imageStr,
+                          isVerified: searchList[index].isVerified,
                         ),
                       ),
                     ),

@@ -60,7 +60,10 @@ class VideoGridView extends StatelessWidget {
                           child: CircularProgressIndicator.adaptive(),
                         );
                       }
-                      return Image.file(File(snap.data!));
+                      return Image.file(
+                        File(snap.data!),
+                        fit: BoxFit.cover,
+                      );
                     },
                   ),
                 ),

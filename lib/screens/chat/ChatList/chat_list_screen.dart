@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart';
 
 import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
@@ -12,10 +15,15 @@ import '../../../widgets/chat_screen_widgets/ghost_chat_list.dart';
 import '../../dashboard/ghost_mode_btn.dart';
 
 String convertDateIntoTime(String date) {
-  final twentyFourHours = DateTime.now().subtract(const Duration(hours: 12));
+  final twentyFourHours = DateTime.now().subtract(const Duration(hours: 24));
+  var dateFormat = DateTime.parse(date);
+  log(int.parse(DateFormat('d').format(DateTime.parse(date))));
+  var checkDate = 7;
   var time = DateTime.parse(date).isAfter(twentyFourHours)
-      ? DateFormat('h:mm a').format(DateTime.parse(date))
-      : DateFormat('MMMM d, h:mm a').format(DateTime.parse(date));
+      ? DateFormat('h:mm a').format(dateFormat)
+      : checkDate > 7
+          ? format(dateFormat)
+          : DateFormat('d MMMM').format(DateTime.parse(date));
   return time;
 }
 

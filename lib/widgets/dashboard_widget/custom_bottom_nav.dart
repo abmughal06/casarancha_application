@@ -74,17 +74,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   },
                   icon: Consumer<List<MessageDetails>?>(
                       builder: (context, msg, b) {
-                    if (msg == null && ghostMessage == null) {
+                    if (msg == null || ghostMessage == null) {
                       return SvgPicture.asset(
                         provider.currentIndex == 3
                             ? icBottomSelChat
                             : icBottomDeSelChat,
                       );
                     }
-                    var filterList = msg!
+                    var filterList = msg
                         .where((element) => element.unreadMessageCount > 0)
                         .toList();
-                    var ghostFilter = ghostMessage!
+                    var ghostFilter = ghostMessage
                         .where((element) => element.unreadMessageCount > 0)
                         .toList();
 

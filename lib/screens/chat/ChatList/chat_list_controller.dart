@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ChatListController extends ChangeNotifier {
-  late TextEditingController searchController;
-
-  ChatListController() {
-    searchController = TextEditingController();
-  }
+  TextEditingController searchController = TextEditingController();
+  TextEditingController ghostSearchController = TextEditingController();
 
   void searchText(value) {
-    if (value.isNotEmpty) {
-      notifyListeners();
-    }
+    notifyListeners();
   }
 }

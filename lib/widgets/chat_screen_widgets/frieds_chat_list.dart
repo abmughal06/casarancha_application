@@ -76,7 +76,8 @@ class _FriendChatListState extends State<FriendChatList> {
               }
               messageUserIds = messages.map((e) => e.id).toList();
 
-              if (chatQuery.searchController.text.isEmpty) {
+              if (chatQuery.searchController.text.isEmpty ||
+                  chatQuery.searchController.text == '') {
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

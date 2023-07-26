@@ -1,6 +1,7 @@
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -8,7 +9,6 @@ import 'package:casarancha/widgets/chat_screen_widgets/chat_screen_message_tiles
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../models/user_model.dart';
@@ -86,10 +86,9 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                     title: TextWidget(text: appUser.ghostName),
                     subtitle: const Text('Live'),
                     leading: CircleAvatar(
-                      child: SvgPicture.asset(
-                        icGhostMode,
-                        height: 20,
-                        color: Colors.white,
+                      backgroundColor: colorF03,
+                      child: Image.asset(
+                        imgGhostUser,
                       ),
                     ),
                   );

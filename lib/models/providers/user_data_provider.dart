@@ -68,7 +68,11 @@ class DataProvider extends ChangeNotifier {
         .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data()['appUserId'] != null &&
+                element.data()['appUserId'] !=
+                    FirebaseAuth.instance.currentUser!.uid)
             .map((e) => NotificationModel.fromMap(e.data()))
             .toList());
   }

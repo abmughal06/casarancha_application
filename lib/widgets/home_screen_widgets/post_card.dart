@@ -92,6 +92,7 @@ class PostCard extends StatelessWidget {
             itemCount: post.mediaData.length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) => showPostAccordingToItsType(
+              context: context,
               media: post.mediaData[index],
               post: post,
               ontap: () => Get.to(() => PostDetailScreen(postModel: post)),
@@ -134,7 +135,8 @@ Widget? showPostAccordingToItsType(
     {PostModel? post,
     MediaDetails? media,
     VoidCallback? onDoubletap,
-    VoidCallback? ontap}) {
+    VoidCallback? ontap,
+    required BuildContext context}) {
   switch (media!.type) {
     case "Photo":
       return InkWell(
@@ -151,7 +153,7 @@ Widget? showPostAccordingToItsType(
         onTap: ontap,
         onDoubleTap: onDoubletap,
         child: Container(
-          // width: double.infinity,
+          width: MediaQuery.of(context).size.width,
           padding: const EdgeInsets.all(
             20,
           ),
@@ -178,12 +180,15 @@ Widget? showPostAccordingToItsType(
       );
 
     case "Music":
-      return InkWell(
-        onDoubleTap: onDoubletap,
-        child: MusicPlayerUrl(
-          border: 0,
-          musicDetails: media,
-          ontap: () {},
+      return AspectRatio(
+        aspectRatio: 13 / 9,
+        child: InkWell(
+          onDoubleTap: onDoubletap,
+          child: MusicPlayerUrl(
+            border: 0,
+            musicDetails: media,
+            ontap: () {},
+          ),
         ),
       );
 

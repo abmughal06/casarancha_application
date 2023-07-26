@@ -2,6 +2,7 @@ import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -70,8 +71,18 @@ class _SearchScreenState extends State<SearchScreen> {
                         );
                       }
 
-                      if (search.searchController.text.isEmpty) {
-                        return Container();
+                      if (search.searchController.text.isEmpty ||
+                          search.searchController.text == '') {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 60),
+                            child: TextWidget(
+                              textAlign: TextAlign.center,
+                              text:
+                                  "Write user name above to search and follow them",
+                            ),
+                          ),
+                        );
                       }
                       var filterList = users
                           .where((element) =>
@@ -134,8 +145,6 @@ class SearchProvider extends ChangeNotifier {
   }
 
   void searchText(value) {
-    if (value.isNotEmpty) {
-      notifyListeners();
-    }
+    notifyListeners();
   }
 }

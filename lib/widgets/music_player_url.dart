@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:casarancha/models/media_details.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/providers/music_provider.dart';
 import 'package:casarancha/utils/app_constants.dart';
@@ -184,88 +185,82 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
     return Consumer<MusicProvider>(builder: (context, provider, b) {
       provider.play(widget.musicDetails.link);
 
-      return VisibilityDetector(
-          key: Key(widget.musicDetails.link),
-          onVisibilityChanged: (visibilityInfo) {
-            var isVisible = visibilityInfo.visibleFraction > 0.5;
-            provider.listenToFrameChange(isVisible);
-          },
-          child: Container(
-            height: 120,
-            margin: const EdgeInsets.symmetric(vertical: 25),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.yellow.shade100,
-              borderRadius: BorderRadius.circular(widget.border),
-            ),
-            alignment: Alignment.bottomCenter,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    provider.audioState == PlayerState.playing
-                        ? provider.pause()
-                        : provider.resume();
-                  },
-                  child: SvgPicture.asset(
-                    provider.audioState == PlayerState.playing
-                        ? icMusicPauseBtn
-                        : icMusicPlayBtn,
-                    color: Colors.grey.shade800,
-                    width: 35,
-                    height: 35,
+      return Container(
+        height: 120,
+        // margin: const EdgeInsets.symmetric(vertical: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: colorF03.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(widget.border),
+        ),
+        alignment: Alignment.bottomCenter,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // widthBox(
+            //   5.w,
+            // ),
+            Expanded(
+              // flex: 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SliderTheme(
+                    data: SliderThemeData(
+                      overlayShape: SliderComponentShape.noOverlay,
+                    ),
+                    child: Slider.adaptive(
+                      thumbColor: Colors.orange,
+                      activeColor: Colors.red,
+                      min: 0.0,
+                      max: provider.duration.inSeconds.toDouble() + 1.0,
+                      value: provider.position.inSeconds.toDouble() + 1.0,
+                      onChanged: (value) async {
+                        final position = Duration(seconds: value.toInt());
+                        await provider.audioPlayer.seek(position);
+                      },
+                    ),
                   ),
-                ),
-                widthBox(
-                  5.w,
-                ),
-                Expanded(
-                  // flex: 1,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SliderTheme(
-                        data: SliderThemeData(
-                          overlayShape: SliderComponentShape.noOverlay,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          formatTime(
+                            provider.position,
+                          ),
                         ),
-                        child: Slider.adaptive(
-                          thumbColor: Colors.yellow,
-                          activeColor: Colors.yellow,
-                          min: 0.0,
-                          max: provider.duration.inSeconds.toDouble() + 1.0,
-                          value: provider.position.inSeconds.toDouble() + 1.0,
-                          onChanged: (value) async {
-                            final position = Duration(seconds: value.toInt());
-                            await provider.audioPlayer.seek(position);
+                        GestureDetector(
+                          onTap: () {
+                            provider.audioState == PlayerState.playing
+                                ? provider.pause()
+                                : provider.resume();
                           },
+                          child: SvgPicture.asset(
+                            provider.audioState == PlayerState.playing
+                                ? icMusicPauseBtn
+                                : icMusicPlayBtn,
+                            color: Colors.grey.shade800,
+                            width: 35,
+                            height: 35,
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              formatTime(
-                                provider.position,
-                              ),
-                            ),
-                            Text(
-                              formatTime(
-                                provider.duration,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          formatTime(
+                            provider.duration,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                )
-              ],
-            ),
-          ));
+                ],
+              ),
+            )
+          ],
+        ),
+      );
     });
   }
 }

@@ -128,10 +128,14 @@ class ChatMusicTile extends StatelessWidget {
                 EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: MusicPlayerTile(
-                border: 15,
-                musicDetails: media,
-                ontap: () {},
+              child: Column(
+                children: [
+                  MusicPlayerTile(
+                    border: 15,
+                    musicDetails: media,
+                    ontap: () {},
+                  ),
+                ],
               ),
             ),
           ),

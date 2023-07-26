@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -214,10 +215,9 @@ class GhostChatUserListTile extends StatelessWidget {
               : const Color(0xff000000),
         ),
         leading: CircleAvatar(
-          child: SvgPicture.asset(
-            icGhostMode,
-            color: Colors.white,
-            height: 20,
+          backgroundColor: colorF03,
+          child: Image.asset(
+            imgGhostUser,
           ),
         ),
         trailing: Column(

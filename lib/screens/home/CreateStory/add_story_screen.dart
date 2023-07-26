@@ -1,7 +1,6 @@
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
-import 'package:casarancha/widgets/common_widgets.dart';
 
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
