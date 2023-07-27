@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../models/story_model.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/home/CreateStory/add_story_screen.dart';
+import '../../screens/home/my_story_screen.dart';
 import '../../screens/home/story_view_screen.dart';
 
 class MyStoryWidget extends StatelessWidget {

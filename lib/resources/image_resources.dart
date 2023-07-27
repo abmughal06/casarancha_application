@@ -104,6 +104,8 @@ const icBottomSelChat = "assets/images/img_home_page/ic_btm_sel_chat.svg";
 const icBottomDeSelHome = "assets/images/img_home_page/ic_btm_de_sel_home.svg";
 const icBottomDeSelSearch =
     "assets/images/img_home_page/ic_btm_de_sel_search.svg";
+const icForumDeSelHome = "assets/images/img_home_page/ic_forum_de_sel.svg";
+const icForumSelHome = "assets/images/img_home_page/ic_forum_sel.svg";
 const icBottomDeSelGrp = "assets/images/img_home_page/ic_btm_de_sel_grp.svg";
 const icBottomDeSelChat = "assets/images/img_home_page/ic_btm_de_sel_chat.svg";
 const postLike = "assets/images/post_like_white.png";

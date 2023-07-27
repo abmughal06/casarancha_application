@@ -72,11 +72,22 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   onPressed: () {
                     provider.changePage(3);
                   },
+                  icon: SvgPicture.asset(
+                    provider.currentIndex == 3
+                        ? icForumSelHome
+                        : icForumDeSelHome,
+                    height: 24.h,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    provider.changePage(4);
+                  },
                   icon: Consumer<List<MessageDetails>?>(
                       builder: (context, msg, b) {
                     if (msg == null || ghostMessage == null) {
                       return SvgPicture.asset(
-                        provider.currentIndex == 3
+                        provider.currentIndex == 4
                             ? icBottomSelChat
                             : icBottomDeSelChat,
                       );
@@ -99,7 +110,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                       label: Text(count.toString()),
                       isLabelVisible: count > 0,
                       child: SvgPicture.asset(
-                        provider.currentIndex == 3
+                        provider.currentIndex == 4
                             ? icBottomSelChat
                             : icBottomDeSelChat,
                       ),
@@ -108,7 +119,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    provider.changePage(4);
+                    provider.changePage(5);
                   },
                   icon: CircleAvatar(
                     backgroundColor: Colors.red.withOpacity(

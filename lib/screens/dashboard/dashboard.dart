@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/dashboard_widget/custom_bottom_nav.dart';
+import '../forum/forum.dart';
 
 class DashBoard extends StatelessWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -34,6 +35,7 @@ class DashBoard extends StatelessWidget {
                 HomeScreen(),
                 SearchScreen(),
                 Scaffold(),
+                ForumsScreen(),
                 ChatListScreen(),
                 ProfileScreen(),
               ],
