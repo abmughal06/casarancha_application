@@ -12,6 +12,7 @@ class SavedPostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
+    final users = context.watch<List<UserModel>?>();
     return Scaffold(
       appBar: primaryAppbar(title: 'Saved Posts', elevation: 0.1),
       body: Consumer<List<PostModel>?>(
@@ -25,12 +26,24 @@ class SavedPostScreen extends StatelessWidget {
               .where(
                   (element) => currentUser!.savedPostsIds.contains(element.id))
               .toList();
+
+          List<UserModel> postCreator = [];
+          for (var p in filterPost) {
+            for (var u in users!) {
+              if (p.creatorId == u.id) {
+                postCreator.add(u);
+              }
+            }
+          }
           return ListView.builder(
             padding: const EdgeInsets.only(bottom: 30),
             shrinkWrap: true,
             itemCount: filterPost.length,
             itemBuilder: (cotext, index) {
-              return PostCard(post: filterPost[index]);
+              return PostCard(
+                post: filterPost[index],
+                postCreator: postCreator[index],
+              );
             },
           );
         },

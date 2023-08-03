@@ -3,6 +3,7 @@ import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,13 +27,15 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with AutomaticKeepAliveClientMixin<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
     final users = context.watch<List<UserModel>?>();
     final ghostProvider = context.watch<DashboardProvider>();
-    return Scaffold(
+    super.build(context);
+    return GhostScaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade50,
         centerTitle: true,
@@ -91,6 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView(
         // shrinkWrap: true,
+        controller: ghostProvider.scrollController,
+        key: const PageStorageKey(0),
         children: [
           SizedBox(
             height: 77.h,
@@ -171,42 +176,48 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Consumer<List<PostModel>?>(
             builder: (context, posts, b) {
-              if (posts == null) {
+              if (posts == null || users == null) {
                 return Container();
-              } else {
-                var post = ghostProvider.checkGhostMode
-                    ? posts.where((element) => (currentUser!.followersIds
-                            .contains(element.creatorId) ||
-                        currentUser.followingsIds.contains(element.creatorId) &&
-                            element.mediaData.isNotEmpty))
-                    : posts
-                        .where((element) => element.mediaData.isNotEmpty)
-                        .toList();
-                List<PostModel> filterList = [];
-                for (var p in post) {
-                  for (var u in users!) {
-                    if (p.creatorId == u.id) {
-                      filterList.add(p);
-                    }
+              }
+              var post = ghostProvider.checkGhostMode
+                  ? posts.where((element) => (currentUser!.followersIds
+                          .contains(element.creatorId) ||
+                      currentUser.followingsIds.contains(element.creatorId) &&
+                          element.mediaData.isNotEmpty))
+                  : posts
+                      .where((element) => element.mediaData.isNotEmpty)
+                      .toList();
+              List<PostModel> filterList = [];
+              List<UserModel> postCreator = [];
+              for (var p in post) {
+                for (var u in users) {
+                  if (p.creatorId == u.id) {
+                    filterList.add(p);
+                    postCreator.add(u);
                   }
                 }
-
-                return ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.only(bottom: 80.h),
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filterList.length,
-                  itemBuilder: (context, index) {
-                    return PostCard(
-                      post: filterList[index],
-                    );
-                  },
-                );
               }
+
+              return ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.only(bottom: 80.h),
+                physics: const NeverScrollableScrollPhysics(),
+                addAutomaticKeepAlives: true,
+                itemCount: filterList.length,
+                itemBuilder: (context, index) {
+                  return PostCard(
+                    post: filterList[index],
+                    postCreator: postCreator[index],
+                  );
+                },
+              );
             },
           )
         ],
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

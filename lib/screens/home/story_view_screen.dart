@@ -34,8 +34,6 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
   final FocusNode _commentFocus = FocusNode();
 
   List<MediaDetails> storyItems = [];
-  DateTime twentyFourHoursAgo =
-      DateTime.now().subtract(const Duration(hours: 24));
 
   countStoryViews({required List<MediaDetails> mediaList}) async {
     var storyViewsList = mediaList[currentIndex.value].storyViews;
@@ -75,8 +73,7 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
     controller = StoryController();
     final ghost = Provider.of<DashboardProvider>(context);
     storyItems = widget.story.mediaDetailsList
-        .where(
-            (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
+        .where((element) => isDateAfter24Hour(DateTime.parse(element.id)))
         .toList();
     final currentUser = context.watch<UserModel>();
     return SafeArea(
@@ -338,4 +335,13 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
       ),
     );
   }
+}
+
+bool isDateAfter24Hour(DateTime date) {
+  DateTime twentyFourHoursAgo =
+      DateTime.now().subtract(const Duration(hours: 24));
+  if (date.isAfter(twentyFourHoursAgo)) {
+    return true;
+  }
+  return false;
 }

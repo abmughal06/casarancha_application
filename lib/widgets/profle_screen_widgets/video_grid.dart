@@ -1,14 +1,13 @@
 import 'dart:io';
 
+import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../models/post_model.dart';
-import 'full_screen_video.dart';
 
 class VideoGridView extends StatelessWidget {
   const VideoGridView({Key? key, required this.videoList}) : super(key: key);
@@ -41,15 +40,10 @@ class VideoGridView extends StatelessWidget {
             itemCount: videoList!.length,
             itemBuilder: (context, index) {
               final data = videoList![index].mediaData[0];
-              VideoPlayerController videoPlayerController =
-                  VideoPlayerController.network(data.link);
 
               return GestureDetector(
-                onTap: () => Get.to(() => FullScreenVideo(
-                      videoPlayerController: videoPlayerController,
-                      postId: videoList![index].id,
-                      creatorId: videoList![index].creatorId,
-                    )),
+                onTap: () => Get.to(() => PostFullScreenView(
+                    post: videoList![index], isPostDetail: false)),
                 child: Container(
                   color: Colors.white,
                   child: FutureBuilder<String?>(
@@ -60,10 +54,12 @@ class VideoGridView extends StatelessWidget {
                           child: CircularProgressIndicator.adaptive(),
                         );
                       }
-                      return Image.file(
-                        File(snap.data!),
-                        fit: BoxFit.cover,
-                      );
+                      return snap.data != null
+                          ? Image.file(
+                              File(snap.data!),
+                              fit: BoxFit.cover,
+                            )
+                          : Container(color: Colors.black);
                     },
                   ),
                 ),

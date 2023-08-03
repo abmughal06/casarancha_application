@@ -60,38 +60,21 @@ class ChatVideoTile extends StatelessWidget {
                     future: initThumbnail(),
                     builder: (context, snapshot) {
                       if (snapshot.data == null) {
-                        return const CircularProgressIndicator.adaptive();
-                      } else {
-                        return Image.file(
-                          File(snapshot.data!),
-                          fit: BoxFit.fill,
+                        return const Center(
+                          child: CircularProgressIndicator.adaptive(),
                         );
                       }
+                      return Image.file(
+                        File(snapshot.data!),
+                        fit: BoxFit.fill,
+                      );
                     },
                   ),
                 ),
               ),
             ),
           ),
-          Align(
-            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                isMe
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 3.w),
-                        child: isSeen ? SvgPicture.asset(icChatMsgSend) : null,
-                      )
-                    : Container(),
-                TextWidget(
-                  text: convertDateIntoTime(date),
-                  color: colorAA3,
-                  fontSize: 11.sp,
-                ),
-              ],
-            ),
-          ),
+          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
           const SizedBox(
             height: 8,
           )
@@ -139,25 +122,7 @@ class ChatMusicTile extends StatelessWidget {
               ),
             ),
           ),
-          Align(
-            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                isMe
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 3.w),
-                        child: isSeen ? SvgPicture.asset(icChatMsgSend) : null,
-                      )
-                    : Container(),
-                TextWidget(
-                  text: convertDateIntoTime(date),
-                  color: colorAA3,
-                  fontSize: 11.sp,
-                ),
-              ],
-            ),
-          ),
+          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
           const SizedBox(
             height: 8,
           )
@@ -208,30 +173,95 @@ class ChatPostTile extends StatelessWidget {
               ),
             ),
           ),
-          Align(
-            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                isMe
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 3.w),
-                        child: message.isSeen
-                            ? SvgPicture.asset(icChatMsgSend)
-                            : null,
-                      )
-                    : Container(),
-                TextWidget(
-                  text: convertDateIntoTime(message.createdAt),
-                  color: colorAA3,
-                  fontSize: 11.sp,
-                ),
-              ],
-            ),
-          ),
+          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: message.createdAt),
           const SizedBox(
             height: 8,
           )
+        ],
+      ),
+    );
+  }
+}
+
+class ChatQouteTile extends StatelessWidget {
+  const ChatQouteTile({
+    Key? key,
+    required this.message,
+    required this.appUserId,
+    required this.isMe,
+    required this.isSeen,
+  }) : super(key: key);
+
+  final Message message;
+  final bool isMe;
+  final bool isSeen;
+  final String appUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding:
+                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            child: Align(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              child: AspectRatio(
+                aspectRatio: 1 / 1,
+                child: Container(
+                  padding: EdgeInsets.all(15.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: colorF03.withOpacity(0.6),
+                  ),
+                  child:
+                      TextWidget(text: message.content['mediaData'][0]['link']),
+                ),
+              ),
+            ),
+          ),
+          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: message.createdAt),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class DateAndSeenTile extends StatelessWidget {
+  const DateAndSeenTile(
+      {Key? key, required this.isMe, required this.isSeen, required this.date})
+      : super(key: key);
+  final bool isMe;
+  final bool isSeen;
+  final String date;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          isMe
+              ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 3.w),
+                  child: isSeen
+                      ? SvgPicture.asset(
+                          icChatMsgSend,
+                        )
+                      : null,
+                )
+              : Container(),
+          TextWidget(
+            text: convertDateIntoTime(date),
+            color: colorAA3,
+            fontSize: 11.sp,
+          ),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/message_details.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class SharePostScreen extends StatelessWidget {
     return Scaffold(
       body: ListView(
         children: [
-          SizedBox(height: 40.h),
+          SizedBox(height: 20.h),
           Row(
             children: [
               const Expanded(flex: 6, child: SizedBox()),
@@ -74,7 +75,7 @@ class SharePostScreen extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   return SharePostTile(
-                    messageDetails: msg[index],
+                    appUserId: msg[index].id,
                     currentUser: currentUser,
                     postModel: postModel,
                   );
@@ -82,7 +83,7 @@ class SharePostScreen extends StatelessWidget {
               );
             },
           ),
-          const Divider(),
+          // const Divider(),
           Consumer<List<UserModel>?>(
             builder: (context, users, b) {
               if (users == null) {
@@ -107,8 +108,9 @@ class SharePostScreen extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filterList.length,
                   itemBuilder: (context, index) {
-                    return SharePostTileForNewFreind(
-                      userModel: filterList[index],
+                    return SharePostTile(
+                      // userModel: filterList[index],
+                      appUserId: filterList[index].id,
                       postModel: postModel,
                       currentUser: currentUser,
                     );
@@ -135,13 +137,15 @@ class SharePostScreen extends StatelessWidget {
 class SharePostTile extends StatefulWidget {
   const SharePostTile({
     Key? key,
-    required this.messageDetails,
+    // required this.messageDetails,
     required this.postModel,
     required this.currentUser,
+    required this.appUserId,
   }) : super(key: key);
-  final MessageDetails messageDetails;
+  // final MessageDetails messageDetails;
   final PostModel postModel;
   final UserModel currentUser;
+  final String appUserId;
 
   @override
   State<SharePostTile> createState() => _SharePostTileState();
@@ -163,55 +167,86 @@ class _SharePostTileState extends State<SharePostTile> {
     postProvider = Provider.of<PostProvider>(context, listen: false);
     final users = context.watch<List<UserModel>>();
     final appUser =
-        users.where((element) => element.id == widget.messageDetails.id).first;
-    return SizedBox(
-      height: 70,
-      child: ListTile(
-        title: Text(widget.messageDetails.creatorDetails.name),
-        subtitle: Text(
-          widget.messageDetails.lastMessage,
-          overflow: TextOverflow.ellipsis,
-        ),
-        leading: CircleAvatar(
-          backgroundImage: widget.messageDetails.creatorDetails.imageUrl.isEmpty
-              ? null
-              : CachedNetworkImageProvider(
-                  widget.messageDetails.creatorDetails.imageUrl,
+        users.where((element) => element.id == widget.appUserId).first;
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.sp),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 25,
+                  backgroundImage: appUser.imageStr.isEmpty
+                      ? null
+                      : CachedNetworkImageProvider(
+                          appUser.imageStr,
+                        ),
+                  child: appUser.imageStr.isEmpty
+                      ? const Icon(
+                          Icons.question_mark,
+                        )
+                      : null,
                 ),
-          child: widget.messageDetails.creatorDetails.imageUrl.isEmpty
-              ? const Icon(
-                  Icons.question_mark,
-                )
-              : null,
-        ),
-        trailing: Container(
-          decoration: BoxDecoration(
-            color: isSent ? Colors.red.shade300 : Colors.red.shade900,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: InkWell(
-            onTap: () {
-              postProvider.sharePostData(
-                currentUser: widget.currentUser,
-                appUser: appUser,
-                postModel: widget.postModel,
-              );
-              setState(() {
-                isSent = true;
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
-              child: Text(
-                isSent ? "Sent" : "Send",
-                style: const TextStyle(
-                  letterSpacing: 0.7,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
+                widthBox(12.w),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextWidget(
+                      text: appUser.username,
+                      color: color221,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    heightBox(3.h),
+                    TextWidget(
+                      text: appUser.name,
+                      color: colorAA3,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: isSent
+                    ? colorPrimaryA05.withOpacity(0.16)
+                    : colorPrimaryA05,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: InkWell(
+                onTap: () {
+                  postProvider.sharePostData(
+                    currentUser: widget.currentUser,
+                    appUser: appUser,
+                    postModel: widget.postModel,
+                  );
+                  setState(() {
+                    isSent = true;
+                  });
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
+                  child: TextWidget(
+                    text: isSent ? "Sent" : "Send",
+                    letterSpacing: 0.7,
+                    color: isSent ? colorPrimaryA05 : colorFF3,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

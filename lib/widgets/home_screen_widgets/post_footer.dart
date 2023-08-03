@@ -1,8 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/chat/share_post_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/widgets/home_screen_widgets/post_comment_tile.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,11 +10,10 @@ import 'package:provider/provider.dart';
 
 import '../../models/comment_model.dart';
 import '../../models/post_model.dart';
+import '../../models/providers/user_data_provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../screens/chat/ChatList/chat_list_screen.dart';
-import '../../screens/profile/AppUser/app_user_screen.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
 
@@ -45,6 +43,7 @@ class CustomPostFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final users = context.watch<List<UserModel>?>();
     return Column(
       children: [
         Row(
@@ -191,72 +190,27 @@ class CustomPostFooter extends StatelessWidget {
         ),
         Visibility(
           visible: isPostDetail! ? false : postModel.commentIds.isNotEmpty,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance
-                  .collection("posts")
-                  .doc(postModel.id)
-                  .collection("comments")
-                  .orderBy("createdAt", descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  var data = snapshot.data!.docs.first.data();
-                  var cmnt = Comment.fromMap(data);
-                  return ListTile(
-                    horizontalTitleGap: 10,
-                    onTap: () =>
-                        Get.to(() => PostDetailScreen(postModel: postModel)),
-                    leading: InkWell(
-                      onTap: () =>
-                          navigateToAppUserScreen(cmnt.creatorId, context),
-                      child: Container(
-                        height: 40.h,
-                        width: 40.h,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.amber,
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                                cmnt.creatorDetails.imageUrl),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                    title: Row(
-                      children: [
-                        TextWidget(
-                            text: cmnt.creatorDetails.name,
-                            fontSize: 14.sp,
-                            color: const Color(0xff212121),
-                            fontWeight: FontWeight.w600),
-                        widthBox(4.w),
-                        if (cmnt.creatorDetails.isVerified)
-                          SvgPicture.asset(icVerifyBadge),
-                        widthBox(8.w),
-                        Text(
-                          convertDateIntoTime(cmnt.createdAt),
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff5c5c5c)),
-                        ),
-                      ],
-                    ),
-                    subtitle: TextWidget(
-                      text: cmnt.message.isEmpty ? "---" : cmnt.message,
-                      fontSize: 12.sp,
-                      color: const Color(0xff5f5f5f),
-                      fontWeight: FontWeight.w400,
-                      textOverflow: TextOverflow.visible,
-                    ),
-                  );
-                } else {
-                  return const Center(
-                      child: CircularProgressIndicator.adaptive());
+          child: StreamProvider.value(
+            value: DataProvider().comment(postModel.id),
+            initialData: null,
+            child: Consumer<List<Comment>?>(
+              builder: (context, comment, b) {
+                if (comment == null || users == null) {
+                  return const CircularProgressIndicator.adaptive();
                 }
+
+                if (comment.isEmpty) {
+                  return Container();
+                }
+                var data = comment.first;
+                var cmnt = data;
+                return cmnt.message.isEmpty
+                    ? Container()
+                    : PostCommentTile(
+                        cmnt: cmnt,
+                        isFeedTile: true,
+                        postModel: postModel,
+                      );
               },
             ),
           ),

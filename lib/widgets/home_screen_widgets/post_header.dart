@@ -2,33 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
 
 class CustomPostHeader extends StatelessWidget {
-  final String? name;
-  final String? image;
+  // final String? name;
+  // final String? image;
   final VoidCallback? ontap;
   final VoidCallback? headerOnTap;
-  final bool? isVerified;
+  // final bool? isVerified;
   final String? time;
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
   final bool? showPostTime;
+  final UserModel postCreator;
 
   const CustomPostHeader(
       {Key? key,
-      this.name,
-      this.image,
       this.ontap,
       this.isVideoPost = false,
       this.headerOnTap,
-      this.isVerified = false,
       this.onVertItemClick,
       this.time,
-      this.showPostTime = false})
+      this.showPostTime = false,
+      required this.postCreator})
       : super(key: key);
 
   @override
@@ -46,7 +46,7 @@ class CustomPostHeader extends StatelessWidget {
             shape: BoxShape.circle,
             color: Colors.amber,
             image: DecorationImage(
-              image: NetworkImage("$image"),
+              image: NetworkImage(postCreator.imageStr),
               fit: BoxFit.cover,
             ),
           ),
@@ -57,14 +57,14 @@ class CustomPostHeader extends StatelessWidget {
         child: Row(
           children: [
             TextWidget(
-              text: "$name",
+              text: postCreator.username,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
               color: isVideoPost! ? colorFF7 : color221,
             ),
             widthBox(5.w),
             Visibility(
-              visible: isVerified!,
+              visible: postCreator.isVerified,
               child: SvgPicture.asset(
                 icVerifyBadge,
                 width: 17.w,

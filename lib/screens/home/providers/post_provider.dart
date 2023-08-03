@@ -75,9 +75,30 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
+  void deletePostComment({String? postId}) async {
+    try {
+      // if (!postModel!.videoViews.contains(fauth.currentUser!.uid)) {
+      //   await postRef.doc(postModel.id).set({
+      //     'videoViews': FieldValue.arrayUnion([fauth.currentUser!.uid])
+      //   }, SetOptions(merge: true));
+      // }
+      await postRef.doc(postId).collection("comments").get().then((value) {});
+    } catch (e) {
+      log('$e');
+    }
+  }
+
   void postComment({PostModel? postModel, UserModel? user, String? comment}) {
+    var cmntRef = FirebaseFirestore.instance
+        .collection("posts")
+        .doc(postModel!.id)
+        .collection("comments")
+        .doc();
+    cmntRef.set({});
+    var cmntId = cmntRef.id;
+
     var cmnt = Comment(
-      id: postModel!.id,
+      id: cmntId,
       creatorId: FirebaseAuth.instance.currentUser!.uid,
       creatorDetails: CreatorDetails(
           name: user!.name,
@@ -85,30 +106,26 @@ class PostProvider extends ChangeNotifier {
           isVerified: user.isVerified),
       createdAt: DateTime.now().toIso8601String(),
       message: comment!,
+      postId: postModel.id,
     );
 
     FirebaseFirestore.instance
         .collection("posts")
         .doc(postModel.id)
         .collection("comments")
-        .doc()
+        .doc(cmntId)
         .set(cmnt.toMap(), SetOptions(merge: true))
         .then((value) async {
-      var cmntId = await FirebaseFirestore.instance
-          .collection("posts")
-          .doc(postModel.id)
-          .collection("comments")
-          .get();
+      FirebaseFirestore.instance.collection("posts").doc(postModel.id).set({
+        "commentIds": FieldValue.arrayUnion([cmntId])
+      }, SetOptions(merge: true));
 
-      List listOfCommentsId = [];
-      for (var i in cmntId.docs) {
-        listOfCommentsId.add(i.id);
-      }
-
-      FirebaseFirestore.instance
-          .collection("posts")
-          .doc(postModel.id)
-          .set({"commentIds": listOfCommentsId}, SetOptions(merge: true));
+      // FirebaseFirestore.instance
+      //     .collection("posts")
+      //     .doc(postModel.id)
+      //     .collection('comments')
+      //     .doc(cmntId)
+      //     .set({"commentIds": listOfCommentsId}, SetOptions(merge: true));
 
       var recieverRef = await FirebaseFirestore.instance
           .collection("users")
@@ -144,13 +161,11 @@ class PostProvider extends ChangeNotifier {
 
     final messageRefForAppUser = FirebaseFirestore.instance
         .collection("users")
-        .doc(currentUser!.id)
+        .doc(appUser.id)
         .collection('messageList')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('messages')
-        .doc(
-          messageRefForCurrentUser.id,
-        );
+        .doc(messageRefForCurrentUser.id);
 
     var post = postModel!.toMap();
 
@@ -168,7 +183,7 @@ class PostProvider extends ChangeNotifier {
     );
 
     final MessageDetails currentUserMessageDetails = MessageDetails(
-      id: currentUser.id,
+      id: currentUser!.id,
       lastMessage: "Post",
       unreadMessageCount: unreadMessages + 1,
       searchCharacters: [...currentUser.name.toLowerCase().split('')],

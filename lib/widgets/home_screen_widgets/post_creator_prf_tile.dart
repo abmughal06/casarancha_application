@@ -30,6 +30,10 @@ class PostCreatorProfileTile extends StatelessWidget {
     final postProvider = Provider.of<PostProvider>(context, listen: false);
     final curruentUser = context.watch<UserModel?>();
     final ghostProvider = Provider.of<DashboardProvider>(context);
+    final appUser = context
+        .watch<List<UserModel>?>()!
+        .where((element) => element.id == post.creatorId)
+        .first;
 
     return Container(
       padding: const EdgeInsets.only(bottom: 20),
@@ -72,16 +76,17 @@ class PostCreatorProfileTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                InkWell(
-                  onTap: () => navigateToAppUserScreen(post.creatorId, context),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        height: 34.h,
-                        width: 34.h,
-                        child: Stack(
-                          children: [
-                            Container(
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 34.h,
+                      width: 34.h,
+                      child: Stack(
+                        children: [
+                          InkWell(
+                            onTap: () => navigateToAppUserScreen(
+                                post.creatorId, context),
+                            child: Container(
                               height: 30.h,
                               width: 30.h,
                               decoration: BoxDecoration(
@@ -89,42 +94,44 @@ class PostCreatorProfileTile extends StatelessWidget {
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
                                   image: CachedNetworkImageProvider(
-                                    post.creatorDetails.imageUrl,
+                                    appUser.imageStr,
                                   ),
                                 ),
                               ),
                             ),
-                            Visibility(
-                              visible: post.creatorDetails.isVerified,
-                              child: Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: SvgPicture.asset(icVerifyBadge),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      widthBox(7.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextWidget(
-                            text: post.creatorDetails.name,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
                           ),
-                          TextWidget(
-                            text: convertDateIntoTime(post.createdAt),
-                            fontWeight: FontWeight.w400,
-                            fontSize: 9.sp,
-                            color: Colors.black,
+                          Visibility(
+                            visible: appUser.isVerified,
+                            child: Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: SvgPicture.asset(icVerifyBadge),
+                            ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    widthBox(7.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextWidget(
+                          onTap: () =>
+                              navigateToAppUserScreen(post.creatorId, context),
+                          text: appUser.username,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                        TextWidget(
+                          text: convertDateIntoTime(post.createdAt),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 9.sp,
+                          color: Colors.black,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 Visibility(
                   visible: post.description.isNotEmpty,

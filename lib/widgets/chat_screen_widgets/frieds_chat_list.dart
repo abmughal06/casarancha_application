@@ -67,10 +67,12 @@ class _FriendChatListState extends State<FriendChatList> {
               return const CircularProgressIndicator.adaptive();
             } else {
               List<MessageDetails> messages = [];
+              List<UserModel> messagePerson = [];
               for (var m in messages1) {
                 for (var u in users) {
                   if (m.id == u.id) {
                     messages.add(m);
+                    messagePerson.add(u);
                   }
                 }
               }
@@ -84,11 +86,16 @@ class _FriendChatListState extends State<FriendChatList> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     return ChatUserListTile(
+                      personDetail: messagePerson[index],
                       messageDetails: messages[index],
                       ontapTile: () => Get.to(
                         () => ChatScreen(
                           appUserId: messages[index].id,
-                          creatorDetails: messages[index].creatorDetails,
+                          creatorDetails: CreatorDetails(
+                            name: messagePerson[index].name,
+                            imageUrl: messagePerson[index].imageStr,
+                            isVerified: messagePerson[index].isVerified,
+                          ),
                         ),
                       ),
                     );
@@ -106,11 +113,16 @@ class _FriendChatListState extends State<FriendChatList> {
                 itemCount: filterList.length,
                 itemBuilder: (context, index) {
                   return ChatUserListTile(
+                    personDetail: messagePerson[index],
                     messageDetails: filterList[index],
                     ontapTile: () => Get.to(
                       () => ChatScreen(
                         appUserId: filterList[index].id,
-                        creatorDetails: filterList[index].creatorDetails,
+                        creatorDetails: CreatorDetails(
+                          name: messagePerson[index].name,
+                          imageUrl: messagePerson[index].imageStr,
+                          isVerified: messagePerson[index].isVerified,
+                        ),
                       ),
                     ),
                   );
@@ -191,5 +203,14 @@ class _FriendChatListState extends State<FriendChatList> {
         ),
       ],
     );
+  }
+}
+
+class DataCall extends StatelessWidget {
+  const DataCall({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

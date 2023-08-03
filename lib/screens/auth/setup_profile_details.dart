@@ -38,8 +38,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
   void initState() {
     User? user = FirebaseAuth.instance.currentUser;
     if (user?.displayName != null) {
-      _userNameController.text = user!.displayName!;
-      List<String> name = user.displayName!.split(" ");
+      List<String> name = user!.displayName!.split(" ");
 
       if (name.isNotEmpty && name.length < 2) {
         _firstNameController.text = name[0];
@@ -49,9 +48,13 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
       }
     }
 
+    if (user!.email != null) {
+      _userNameController.text = user.email!.split("@").first;
+    }
+
     final provider = Provider.of<SetupProfileProvider>(context, listen: false);
-    if (user?.photoURL != null) {
-      provider.profileImage = user?.photoURL;
+    if (user.photoURL != null) {
+      provider.profileImage = user.photoURL;
     }
     super.initState();
   }
@@ -95,7 +98,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                                         image: FileImage(
                                             provider.imageFilePicked!))),
                               ) /* CircleAvatar(
-                                  radius: 20,
+                                  radius: 20,s
                                   backgroundImage:
                                       Image.file(imageFilePicked!).image) */
                             : provider.profileImage != null
@@ -152,7 +155,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                     hintColor: color080,
                     isShadowEnable: false,
                     hint: strUserName,
-                    maxLength: 10,
+                    maxLength: 150,
                     color: colorFF4,
                     textInputType: TextInputType.text,
                     textInputAction: TextInputAction.next,

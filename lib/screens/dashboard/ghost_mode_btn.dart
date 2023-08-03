@@ -1,3 +1,4 @@
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _GhostModeBtnState extends State<GhostModeBtn> {
           onPressed: () => ghostMode.toggleGhostMode(),
           icon: SvgPicture.asset(
             icGhostMode,
-            color: ghostMode.checkGhostMode ? Colors.red : Colors.black,
+            color: ghostMode.checkGhostMode ? colorPrimaryA05 : Colors.black,
           ),
         );
       },

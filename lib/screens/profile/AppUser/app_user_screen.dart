@@ -1,6 +1,7 @@
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
+import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
@@ -32,7 +33,8 @@ void navigateToAppUserScreen(userId, context) {
   } else {
     final dasboardController =
         Provider.of<DashboardProvider>(context, listen: false);
-    dasboardController.changePage(4);
+    Get.to(() => const DashBoard());
+    dasboardController.changePage(5);
   }
 }
 

@@ -29,11 +29,28 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<UserModel>?> get users {
-    return FirebaseFirestore.instance.collection("users").snapshots().map(
-        (event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+    return FirebaseFirestore.instance
+        .collection("users")
+        .snapshots()
+        .map((event) => event.docs
+            .where(
+              (element) =>
+                  element.data().isNotEmpty &&
+                  element.data().containsKey('name') &&
+                  element.data().containsKey('username') &&
+                  element.data().containsKey('bio') &&
+                  element.data().containsKey('dob'),
+            )
             .map((e) => UserModel.fromMap(e.data()))
             .toList());
+  }
+
+  Stream<UserModel?>? getSingleUser(id) {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .snapshots()
+        .map((event) => event.exists ? UserModel.fromMap(event.data()!) : null);
   }
 
   Stream<List<PostModel>?> get posts {
@@ -77,16 +94,29 @@ class DataProvider extends ChangeNotifier {
             .toList());
   }
 
-  Stream<List<Comment>>? comment(id) {
+  Stream<List<Comment>?> comment(id) {
     return FirebaseFirestore.instance
         .collection("posts")
         .doc(id)
         .collection("comments")
+        .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data().containsKey('postId'))
             .map((e) => Comment.fromMap(e.data()))
             .toList());
+  }
+
+  Stream<Comment?>? getSingleComment({postId, cmntId}) {
+    return FirebaseFirestore.instance
+        .collection("posts")
+        .doc(postId)
+        .collection("comments")
+        .doc(cmntId)
+        .snapshots()
+        .map((event) => Comment.fromMap(event.data()!));
   }
 
   Stream<List<MessageDetails>?>? get chatListUsers {

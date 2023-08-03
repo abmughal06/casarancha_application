@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:casarancha/models/post_creator_details.dart';
 
 class Comment {
-  String id;
-  String creatorId;
-  CreatorDetails creatorDetails;
-  String createdAt;
-  String message;
+  final String id;
+  final String postId;
+  final String creatorId;
+  final CreatorDetails creatorDetails;
+  final String createdAt;
+  final String message;
   Comment({
+    required this.postId,
     required this.id,
     required this.creatorId,
     required this.creatorDetails,
@@ -18,6 +20,7 @@ class Comment {
 
   Comment copyWith({
     String? id,
+    String? postId,
     String? creatorId,
     CreatorDetails? creatorDetails,
     String? createdAt,
@@ -25,6 +28,7 @@ class Comment {
   }) {
     return Comment(
       id: id ?? this.id,
+      postId: postId ?? this.postId,
       creatorId: creatorId ?? this.creatorId,
       creatorDetails: creatorDetails ?? this.creatorDetails,
       createdAt: createdAt ?? this.createdAt,
@@ -36,6 +40,7 @@ class Comment {
     return {
       'id': id,
       'creatorId': creatorId,
+      'postId': postId,
       'creatorDetails': creatorDetails.toMap(),
       'createdAt': createdAt,
       'message': message,
@@ -45,6 +50,7 @@ class Comment {
   factory Comment.fromMap(Map<String, dynamic> map) {
     return Comment(
       id: map['id'] ?? '',
+      postId: map['postId'] ?? '',
       creatorId: map['creatorId'] ?? '',
       creatorDetails: CreatorDetails.fromMap(map['creatorDetails']),
       createdAt: map['createdAt'] ?? '',
@@ -59,7 +65,7 @@ class Comment {
 
   @override
   String toString() {
-    return 'Comment(id: $id, creatorId: $creatorId, creatorDetails: $creatorDetails, createdAt: $createdAt, message: $message)';
+    return 'Comment(id: $id, postId:$postId,creatorId: $creatorId, creatorDetails: $creatorDetails, createdAt: $createdAt, message: $message)';
   }
 
   @override
@@ -67,6 +73,7 @@ class Comment {
     if (identical(this, other)) return true;
 
     return other is Comment &&
+        other.postId == postId &&
         other.id == id &&
         other.creatorId == creatorId &&
         other.creatorDetails == creatorDetails &&
@@ -77,6 +84,7 @@ class Comment {
   @override
   int get hashCode {
     return id.hashCode ^
+        postId.hashCode ^
         creatorId.hashCode ^
         creatorDetails.hashCode ^
         createdAt.hashCode ^

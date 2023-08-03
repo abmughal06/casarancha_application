@@ -32,12 +32,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   unreadNotification();
-  //   super.initState();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -3,6 +3,7 @@ import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
 import 'package:casarancha/widgets/home_screen_widgets/report_sheet.dart';
@@ -16,18 +17,22 @@ import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../../screens/dashboard/provider/dashboard_provider.dart';
-import '../../screens/home/post_detail_screen.dart';
 import '../common_widgets.dart';
 import '../music_player_url.dart';
 import '../text_widget.dart';
 import '../video_player_url.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({Key? key, required this.post, this.initializedFuturePlay})
+  const PostCard(
+      {Key? key,
+      required this.post,
+      this.initializedFuturePlay,
+      required this.postCreator})
       : super(key: key);
 
   final PostModel post;
   final Future<void>? initializedFuturePlay;
+  final UserModel postCreator;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +43,7 @@ class PostCard extends StatelessWidget {
       children: [
         CustomPostHeader(
           showPostTime: post.showPostTime,
-          isVerified: post.creatorDetails.isVerified,
+          postCreator: postCreator,
           time: convertDateIntoTime(post.createdAt),
           onVertItemClick: () {
             Get.back();
@@ -75,37 +80,12 @@ class PostCard extends StatelessWidget {
               );
             }
           },
-          name: post.creatorDetails.name,
-          image: post.creatorDetails.imageUrl,
           ontap: () {},
           headerOnTap: () {
             navigateToAppUserScreen(post.creatorId, context);
           },
         ),
-        AspectRatio(
-          aspectRatio: post.mediaData[0].type == 'Qoute'
-              ? 16 / 9
-              : post.mediaData[0].type == 'Music'
-                  ? 13 / 9
-                  : 9 / 16,
-          child: ListView.builder(
-            itemCount: post.mediaData.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) => showPostAccordingToItsType(
-              context: context,
-              media: post.mediaData[index],
-              post: post,
-              ontap: () => Get.to(() => PostDetailScreen(postModel: post)),
-              onDoubletap: () {
-                ghostProvider.checkGhostMode
-                    ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
-                    : postPorvider.toggleLikeDislike(
-                        postModel: post,
-                      );
-              },
-            )!,
-          ),
-        ),
+        PostMediaWidget(post: post, isPostDetail: false),
         heightBox(10.h),
         CustomPostFooter(
           isLike: post.likesIds.contains(curruentUser!.id),

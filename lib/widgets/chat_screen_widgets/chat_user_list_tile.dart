@@ -14,9 +14,13 @@ import '../text_widget.dart';
 
 class ChatUserListTile extends StatelessWidget {
   const ChatUserListTile(
-      {Key? key, required this.messageDetails, required this.ontapTile})
+      {Key? key,
+      required this.messageDetails,
+      required this.ontapTile,
+      required this.personDetail})
       : super(key: key);
   final MessageDetails messageDetails;
+  final UserModel personDetail;
 
   final VoidCallback ontapTile;
 
@@ -28,14 +32,14 @@ class ChatUserListTile extends StatelessWidget {
         title: Row(
           children: [
             TextWidget(
-              text: messageDetails.creatorDetails.name,
+              text: personDetail.name,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
               color: const Color(0xff222939),
             ),
             widthBox(5.w),
             Visibility(
-                visible: messageDetails.creatorDetails.isVerified,
+                visible: personDetail.isVerified,
                 child: SvgPicture.asset(icVerifyBadge))
           ],
         ),
@@ -51,12 +55,12 @@ class ChatUserListTile extends StatelessWidget {
               : const Color(0xff000000),
         ),
         leading: CircleAvatar(
-          backgroundImage: messageDetails.creatorDetails.imageUrl.isEmpty
+          backgroundImage: personDetail.imageStr.isEmpty
               ? null
               : CachedNetworkImageProvider(
-                  messageDetails.creatorDetails.imageUrl,
+                  personDetail.imageStr,
                 ),
-          child: messageDetails.creatorDetails.imageUrl.isEmpty
+          child: personDetail.imageStr.isEmpty
               ? const Icon(
                   Icons.question_mark,
                 )

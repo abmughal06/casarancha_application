@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DashboardProvider extends ChangeNotifier {
   int currentIndex = 0;
   PageController pageController = PageController(initialPage: 0);
+  ScrollController scrollController = ScrollController();
 
   changePage(int page) {
     currentIndex = page;

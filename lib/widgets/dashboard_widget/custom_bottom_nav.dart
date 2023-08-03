@@ -22,6 +22,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
     return Consumer<DashboardProvider>(
       builder: (context, provider, b) {
         return Card(
+          color: Colors.transparent,
           margin: EdgeInsets.symmetric(
             horizontal: 20.w,
             vertical:
@@ -42,10 +43,19 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   onPressed: () {
                     provider.changePage(0);
                   },
-                  icon: SvgPicture.asset(
-                    provider.currentIndex == 0
-                        ? icBottomSelHome
-                        : icBottomDeSelHome,
+                  icon: InkWell(
+                    onTap: () => provider.changePage(0),
+                    onDoubleTap: () {
+                      provider.scrollController.animateTo(0,
+                          duration: const Duration(milliseconds: 1500),
+                          curve: Curves.easeIn);
+                    },
+                    child: SvgPicture.asset(
+                      provider.currentIndex == 0
+                          ? icBottomSelHome
+                          : icBottomDeSelHome,
+                      color: provider.currentIndex == 0 ? null : Colors.white,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -56,6 +66,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     provider.currentIndex == 1
                         ? icBottomSelSearch
                         : icBottomDeSelSearch,
+                    color: provider.currentIndex == 1 ? null : Colors.white,
                   ),
                 ),
                 IconButton(
@@ -66,6 +77,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     provider.currentIndex == 2
                         ? icBottomSelGrp
                         : icBottomDeSelGrp,
+                    color: provider.currentIndex == 2 ? null : Colors.white,
                   ),
                 ),
                 IconButton(
@@ -76,6 +88,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     provider.currentIndex == 3
                         ? icForumSelHome
                         : icForumDeSelHome,
+                    color: provider.currentIndex == 3 ? null : Colors.white,
                     height: 24.h,
                   ),
                 ),
@@ -90,6 +103,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                         provider.currentIndex == 4
                             ? icBottomSelChat
                             : icBottomDeSelChat,
+                        color: provider.currentIndex == 4 ? null : Colors.white,
                       );
                     }
                     var filterList = msg
@@ -113,6 +127,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                         provider.currentIndex == 4
                             ? icBottomSelChat
                             : icBottomDeSelChat,
+                        color: provider.currentIndex == 4 ? null : Colors.white,
                       ),
                     );
                   }),

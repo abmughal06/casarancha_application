@@ -137,7 +137,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     hintColor: color080,
                     isShadowEnable: false,
                     hint: strUserName,
-                    maxLength: 10,
+                    maxLength: 150,
                     color: colorFF4,
                     textInputType: TextInputType.text,
                     textInputAction: TextInputAction.next,

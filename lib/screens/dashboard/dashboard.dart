@@ -15,35 +15,20 @@ class DashBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dashboardProvider = context.watch<DashboardProvider>();
-    return SafeArea(
-      top: dashboardProvider.checkGhostMode,
-      bottom: dashboardProvider.checkGhostMode,
-      child: Scaffold(
-          body: Container(
-            decoration: dashboardProvider.checkGhostMode
-                ? BoxDecoration(
-                    border: Border.all(
-                      width: 2.5,
-                      color: Colors.red,
-                    ),
-                  )
-                : null,
-            child: PageView(
-              controller: dashboardProvider.pageController,
-              onPageChanged: (value) {},
-              children: const [
-                HomeScreen(),
-                SearchScreen(),
-                Scaffold(),
-                ForumsScreen(),
-                ChatListScreen(),
-                ProfileScreen(),
-              ],
-            ),
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: const CustomBottomNavigationBar()),
-    );
+    return Scaffold(
+        body: PageView(
+          controller: dashboardProvider.pageController,
+          onPageChanged: (value) {},
+          children: const [
+            HomeScreen(),
+            SearchScreen(),
+            GroupScreen(),
+            ForumsScreen(),
+            ChatListScreen(),
+            ProfileScreen(),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: const CustomBottomNavigationBar());
   }
 }

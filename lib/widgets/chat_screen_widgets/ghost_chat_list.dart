@@ -61,6 +61,7 @@ class GhostChatList extends StatelessWidget {
             } else {
               log(messages.length);
               messageUserIds = messages.map((e) => e.id).toList();
+
               if (chatQuery.ghostSearchController.text.isEmpty ||
                   chatQuery.ghostSearchController.text == '') {
                 return ListView.builder(

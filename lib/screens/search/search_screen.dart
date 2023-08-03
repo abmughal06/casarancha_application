@@ -1,5 +1,6 @@
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
+import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -32,7 +33,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
     final search = Provider.of<SearchProvider>(context);
-    return Scaffold(
+    return GhostScaffold(
       appBar: primaryAppbar(
         title: 'Search',
         elevation: 0,

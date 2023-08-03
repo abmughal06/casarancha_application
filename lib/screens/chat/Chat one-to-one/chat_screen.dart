@@ -32,7 +32,8 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen>
+    with AutomaticKeepAliveClientMixin<ChatScreen> {
   late ChatProvider chatProvider;
 
   @override
@@ -48,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final users = context.watch<List<UserModel>>();
     final appUser =
         users.where((element) => element.id == widget.appUserId).first;
-
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -98,6 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: ListView.builder(
                     itemCount: messages.length,
                     reverse: true,
+                    addAutomaticKeepAlives: true,
                     itemBuilder: (context, index) {
                       final message = messages[index];
 
@@ -132,4 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -1,7 +1,5 @@
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:chewie/chewie.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -29,8 +27,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
 
-    videoPlayerController = VideoPlayerController.network(widget.videoUrl);
-    // countVideoViews();
+    videoPlayerController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
 
     videoPlayerController.setVolume(0.0); // Mute the video initially
 

@@ -2,15 +2,17 @@ import 'dart:developer';
 
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/screens/home/providers/post_provider.dart';
+import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_creator_prf_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/comment_model.dart';
+import '../../models/user_model.dart';
 import '../../widgets/home_screen_widgets/post_comment_field.dart';
 import '../../widgets/home_screen_widgets/post_comment_tile.dart';
 import '../../widgets/home_screen_widgets/post_detail_media.dart';
@@ -28,8 +30,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final postProvider = Provider.of<PostProvider>(context, listen: false);
-
+    final users = context.watch<List<UserModel>?>();
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -41,99 +42,82 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         ),
         child: Stack(
           children: [
-            ListView(
-              children: [
-                Consumer<List<PostModel>?>(
-                  builder: (context, posts, b) {
-                    if (posts == null) {
-                      log(widget.postModel.id);
-                      return const CircularProgressIndicator.adaptive();
-                    } else {
-                      var post = posts
-                          .where((element) => element.id == widget.postModel.id)
-                          .first;
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          AspectRatio(
-                            aspectRatio: post.mediaData[0].type == 'Photo'
-                                ? 2 / 3
-                                : post.mediaData[0].type == 'Video'
-                                    ? 9 / 16
-                                    : post.mediaData[0].type == 'Music'
-                                        ? 13 / 9
-                                        : 1 / 1,
-                            child: Stack(
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  Consumer<List<PostModel>?>(
+                    builder: (context, posts, b) {
+                      if (posts == null) {
+                        log(widget.postModel.id);
+                        return const CircularProgressIndicator.adaptive();
+                      } else {
+                        var post = posts
+                            .where(
+                                (element) => element.id == widget.postModel.id)
+                            .first;
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Stack(
                               children: [
-                                ListView.builder(
-                                  itemCount: post.mediaData.length,
-                                  scrollDirection: Axis.horizontal,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    var mediaData = post.mediaData[index];
-                                    return CheckMediaAndShowPost(
-                                      postModel: post,
-                                      ondoubleTap: () => postProvider
-                                          .toggleLikeDislike(postModel: post),
-                                      mediaData: mediaData,
-                                      postId: widget.postModel.id,
-                                    );
-                                  },
-                                ),
+                                PostMediaWidget(post: post, isPostDetail: true),
                                 Positioned(
                                   top: 60,
                                   left: 20,
                                   child: CircleAvatar(
-                                    backgroundColor:
-                                        Colors.grey.withOpacity(0.20),
+                                    backgroundColor: Colors.grey.shade50,
                                     child: InkWell(
-                                        child: const Icon(
-                                          Icons.navigate_before,
-                                          color: Colors.black,
-                                        ),
-                                        onTap: () => Get.back()),
+                                      child: SvgPicture.asset(
+                                        icIosBackArrow,
+                                        color: Colors.black,
+                                      ),
+                                      onTap: () => Get.back(),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          PostCreatorProfileTile(post: post)
-                        ],
-                      );
-                    }
-                  },
-                ),
-                StreamProvider.value(
-                  value: DataProvider().comment(widget.postModel.id),
-                  initialData: null,
-                  child: Consumer<List<Comment>?>(
-                    builder: (context, comment, b) {
-                      return comment == null
-                          ? const CircularProgressIndicator.adaptive()
-                          : ListView.builder(
-                              itemCount: comment.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 24),
-                              itemBuilder: (context, index) {
-                                var data = comment[index];
-                                var cmnt = data;
-                                if (cmnt.creatorDetails.name.isNotEmpty) {
-                                  return cmnt.message.isEmpty
-                                      ? Container()
-                                      : PostCommentTile(cmnt: cmnt);
-                                } else {
-                                  return Container();
-                                }
-                              },
-                            );
+                            const SizedBox(height: 12),
+                            PostCreatorProfileTile(post: post),
+                          ],
+                        );
+                      }
                     },
                   ),
-                ),
-                heightBox(70.h),
-              ],
+                  StreamProvider.value(
+                    value: DataProvider().comment(widget.postModel.id),
+                    initialData: null,
+                    child: Consumer<List<Comment>?>(
+                      builder: (context, comment, b) {
+                        if (comment == null || users == null) {
+                          return const CircularProgressIndicator.adaptive();
+                        }
+
+                        return ListView.builder(
+                          itemCount: comment.length,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 24),
+                          itemBuilder: (context, index) {
+                            var data = comment[index];
+                            var cmnt = data;
+                            if (cmnt.creatorDetails.name.isNotEmpty) {
+                              return cmnt.message.isEmpty
+                                  ? Container()
+                                  : PostCommentTile(
+                                      cmnt: cmnt, isFeedTile: false);
+                            } else {
+                              return Container();
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  heightBox(70.h),
+                ],
+              ),
             ),
             PostCommentField(
               postModel: widget.postModel,

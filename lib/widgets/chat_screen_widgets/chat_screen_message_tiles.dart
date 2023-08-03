@@ -8,6 +8,7 @@ import '../../../widgets/chat_screen_widgets/chat_story_tile.dart';
 import '../../../widgets/chat_screen_widgets/chat_tile.dart';
 import '../../models/message.dart';
 import '../../screens/home/post_detail_screen.dart';
+import '../../screens/home/story_view_screen.dart';
 
 class MessageTiles extends StatelessWidget {
   const MessageTiles({Key? key, required this.message, required this.isMe})
@@ -40,7 +41,7 @@ class MessageTiles extends StatelessWidget {
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
               )),
-          child: ChatPostTile(
+          child: ChatQouteTile(
             message: message,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
@@ -84,20 +85,24 @@ class MessageTiles extends StatelessWidget {
         );
       case 'story-Video':
         final postModel = MediaDetails.fromMap(message.content);
-        return ChatVideoTile(
-          link: postModel.link,
-          appUserId: message.sentToId,
-          isSeen: message.isSeen,
-          isMe: isMe,
-          date: message.createdAt,
-        );
+        return isDateAfter24Hour(DateTime.parse(message.createdAt))
+            ? ChatVideoTile(
+                link: postModel.link,
+                appUserId: message.sentToId,
+                isSeen: message.isSeen,
+                isMe: isMe,
+                date: message.createdAt,
+              )
+            : Container();
       case 'story-Photo':
-        return ChatStoryTile(
-          message: message,
-          appUserId: message.sentToId,
-          isSeen: message.isSeen,
-          isMe: isMe,
-        );
+        return isDateAfter24Hour(DateTime.parse(message.createdAt))
+            ? ChatStoryTile(
+                message: message,
+                appUserId: message.sentToId,
+                isSeen: message.isSeen,
+                isMe: isMe,
+              )
+            : Container();
       case 'Text':
         return ChatTile(
           message: message.content,
