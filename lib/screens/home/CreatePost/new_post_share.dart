@@ -1,5 +1,6 @@
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -41,7 +42,7 @@ class NewPostShareScreen extends StatelessWidget {
           verticalOutMargin: 10.w,
           horizontalOutMargin: 10.w,
           onTap: () => user == null
-              ? null
+              ? GlobalSnackBar.show(message: "Cannot post right now")
               : state.sharePost(
                   groupId: groupId,
                   user: user,
@@ -112,43 +113,44 @@ class NewPostShareScreen extends StatelessWidget {
                 ),
                 heightBox(10.w),
                 Expanded(
-                  child:
-                      Consumer<CreatePostMethods>(builder: (context, state, b) {
-                    return ListView.builder(
-                      itemCount: state.mediaUploadTasks.length,
-                      itemBuilder: (context, index) {
-                        final UploadTask uploadTask =
-                            state.mediaUploadTasks[index];
+                  child: Consumer<CreatePostMethods>(
+                    builder: (context, state, b) {
+                      return ListView.builder(
+                        itemCount: state.mediaUploadTasks.length,
+                        itemBuilder: (context, index) {
+                          final UploadTask uploadTask =
+                              state.mediaUploadTasks[index];
 
-                        return StreamBuilder<TaskSnapshot>(
-                          stream: uploadTask.snapshotEvents,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<TaskSnapshot> snapshot) {
-                            if (snapshot.hasData) {
-                              final data = snapshot.data!;
-                              double progress =
-                                  data.bytesTransferred / data.totalBytes;
+                          return StreamBuilder<TaskSnapshot>(
+                            stream: uploadTask.snapshotEvents,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<TaskSnapshot> snapshot) {
+                              if (snapshot.hasData) {
+                                final data = snapshot.data!;
+                                double progress =
+                                    data.bytesTransferred / data.totalBytes;
 
-                              return Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 15.w, vertical: 8.h),
-                                child: LinearProgressIndicator(
-                                  value: progress,
-                                  minHeight: 10.h,
-                                  semanticsLabel:
-                                      '${(100 * progress).roundToDouble().toInt()}%',
-                                ),
-                              );
-                            } else {
-                              return const SizedBox(
-                                height: 50,
-                              );
-                            }
-                          },
-                        );
-                      },
-                    );
-                  }),
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 15.w, vertical: 8.h),
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    minHeight: 10.h,
+                                    semanticsLabel:
+                                        '${(100 * progress).roundToDouble().toInt()}%',
+                                  ),
+                                );
+                              } else {
+                                return const SizedBox(
+                                  height: 50,
+                                );
+                              }
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

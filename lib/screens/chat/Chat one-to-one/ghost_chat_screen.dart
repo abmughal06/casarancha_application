@@ -3,6 +3,7 @@ import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_screen_message_tiles.dart';
@@ -49,7 +50,7 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
     final appUser =
         users.where((element) => element.id == widget.appUserId).first;
     final ghostProvider = context.watch<DashboardProvider>();
-    return Scaffold(
+    return GhostScaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(

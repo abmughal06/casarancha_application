@@ -12,16 +12,21 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../models/post_model.dart';
+import '../screens/home/providers/post_provider.dart';
+
 class MusicPlayerUrl extends StatefulWidget {
   const MusicPlayerUrl(
       {Key? key,
       required this.musicDetails,
       required this.ontap,
-      required this.border})
+      required this.border,
+      required this.postModel})
       : super(key: key);
   final MediaDetails musicDetails;
   final Function ontap;
   final double border;
+  final PostModel postModel;
 
   @override
   State<MusicPlayerUrl> createState() => _MusicPlayerWithFileState();
@@ -43,9 +48,11 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
+
     return Consumer<MusicProvider>(builder: (context, provider, b) {
       provider.play(widget.musicDetails.link);
-
+      postProvider.countVideoViews(postModel: widget.postModel);
       return VisibilityDetector(
           key: Key(widget.musicDetails.link),
           onVisibilityChanged: (visibilityInfo) {

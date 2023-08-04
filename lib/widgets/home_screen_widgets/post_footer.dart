@@ -131,8 +131,10 @@ class CustomPostFooter extends StatelessWidget {
                           color: color221,
                         ),
                         widthBox(5.w),
-                        const Icon(
-                          Icons.visibility,
+                        Icon(
+                          postModel.mediaData.first.type == 'Music'
+                              ? Icons.headset
+                              : Icons.visibility,
                           color: colorAA3,
                         ),
                       ],
@@ -153,11 +155,11 @@ class CustomPostFooter extends StatelessWidget {
           ],
         ),
         Visibility(
-          visible: postModel.description.isNotEmpty,
+          visible: !isPostDetail! && postModel.description.isNotEmpty,
           child: Align(
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.topLeft,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 6.h),
               child: TextWidget(
                 text: postModel.description,
                 fontSize: 13.sp,
@@ -168,19 +170,22 @@ class CustomPostFooter extends StatelessWidget {
           ),
         ),
         Visibility(
-          visible: postModel.tagsIds.isNotEmpty,
+          visible: !isPostDetail! && postModel.tagsIds.isNotEmpty,
           child: Align(
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.topLeft,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+              padding: EdgeInsets.symmetric(horizontal: 15.w),
               child: Wrap(
                 children: postModel.tagsIds
                     .map(
-                      (e) => TextWidget(
-                        text: e,
-                        fontSize: 13.sp,
-                        color: color13F,
-                        fontWeight: FontWeight.w500,
+                      (e) => Padding(
+                        padding: EdgeInsets.only(right: 6.w),
+                        child: TextWidget(
+                          text: e,
+                          fontSize: 13.sp,
+                          color: Colors.blue.shade900,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     )
                     .toList(),
@@ -215,6 +220,7 @@ class CustomPostFooter extends StatelessWidget {
             ),
           ),
         ),
+        heightBox(12.h),
       ],
     );
   }

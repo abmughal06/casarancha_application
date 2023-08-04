@@ -69,6 +69,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   void dispose() {
+    createPost.clearLists();
     super.dispose();
   }
 
@@ -333,12 +334,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     groupId: widget.groupId,
                   ),
                 );
-                createPost.clearLists();
-
-                // log(createPost.photosList.toString());
-                // log(createPost.qouteList.toString());
-                // log(createPost.videosList.toString());
-                // log(createPost.musicList.toString());
               },
             )
           ],

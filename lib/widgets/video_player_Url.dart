@@ -27,8 +27,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
 
-    videoPlayerController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+    videoPlayerController = VideoPlayerController.network(widget.videoUrl);
 
     videoPlayerController.setVolume(0.0); // Mute the video initially
 

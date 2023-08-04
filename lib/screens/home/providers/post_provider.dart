@@ -235,7 +235,7 @@ class PostProvider extends ChangeNotifier {
       appUserId: appUser.id,
       devRegToken: recieverFCMToken,
       msg: "has sent you a post",
-      imageUrl: postModel.mediaData[0].type != 'Video'
+      imageUrl: postModel.mediaData[0].type == 'Photo'
           ? postModel.mediaData[0].link
           : "",
     );

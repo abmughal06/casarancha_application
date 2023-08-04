@@ -1,5 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -14,13 +12,9 @@ import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
-import '../../resources/color_resources.dart';
-import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../../screens/dashboard/provider/dashboard_provider.dart';
 import '../common_widgets.dart';
-import '../music_player_url.dart';
 import '../text_widget.dart';
-import '../video_player_url.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard(
@@ -42,9 +36,8 @@ class PostCard extends StatelessWidget {
     return Column(
       children: [
         CustomPostHeader(
-          showPostTime: post.showPostTime,
           postCreator: postCreator,
-          time: convertDateIntoTime(post.createdAt),
+          postModel: post,
           onVertItemClick: () {
             Get.back();
 
@@ -102,77 +95,12 @@ class PostCard extends StatelessWidget {
                 : postPorvider.onTapSave(
                     userModel: curruentUser, postId: post.id);
           },
-          isVideoPost: post.mediaData[0].type == 'Video',
+          isVideoPost: post.mediaData[0].type == 'Video' ||
+              post.mediaData[0].type == 'Music',
           postModel: post,
           savepostIds: curruentUser.savedPostsIds,
         ),
       ],
     );
-  }
-}
-
-Widget? showPostAccordingToItsType(
-    {PostModel? post,
-    MediaDetails? media,
-    VoidCallback? onDoubletap,
-    VoidCallback? ontap,
-    required BuildContext context}) {
-  switch (media!.type) {
-    case "Photo":
-      return InkWell(
-        onTap: ontap,
-        onDoubleTap: onDoubletap,
-        child: CachedNetworkImage(
-          imageUrl: media.link,
-          fit: BoxFit.fitWidth,
-        ),
-      );
-
-    case 'Qoute':
-      return InkWell(
-        onTap: ontap,
-        onDoubleTap: onDoubletap,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: const EdgeInsets.all(
-            20,
-          ),
-          decoration: const BoxDecoration(color: Colors.white),
-          child: SingleChildScrollView(
-            child: TextWidget(
-              text: media.link,
-              textAlign: TextAlign.left,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w500,
-              color: color221,
-            ),
-          ),
-        ),
-      );
-    case "Video":
-      return InkWell(
-        onTap: ontap,
-        onDoubleTap: onDoubletap,
-        child: VideoPlayerWidget(
-          postModel: post,
-          videoUrl: media.link,
-        ),
-      );
-
-    case "Music":
-      return AspectRatio(
-        aspectRatio: 13 / 9,
-        child: InkWell(
-          onDoubleTap: onDoubletap,
-          child: MusicPlayerUrl(
-            border: 0,
-            musicDetails: media,
-            ontap: () {},
-          ),
-        ),
-      );
-
-    default:
-      return Container();
   }
 }

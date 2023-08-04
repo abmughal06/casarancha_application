@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
@@ -17,22 +15,15 @@ import '../../dashboard/ghost_mode_btn.dart';
 
 String convertDateIntoTime(String date) {
   final twentyFourHours = DateTime.now().subtract(const Duration(hours: 24));
-  final oneHourAgo = DateTime.now().subtract(const Duration(hours: 1));
+  final oneHourAgo = DateTime.now().subtract(const Duration(minutes: 59));
   final oneWeekAgo = DateTime.now().subtract(const Duration(days: 7));
   var dateFormat = DateTime.parse(date);
-  log(int.parse(DateFormat('d').format(DateTime.parse(date))));
-  // var time = DateTime.parse(date).isAfter(twentyFourHours)
-  //     ? DateFormat('h:mm a').format(dateFormat)
-  //     : checkDate > 7
-  //         ? format(dateFormat)
-  //         : DateFormat('d MMMM').format(DateTime.parse(date));
-
   if (dateFormat.isAfter(oneHourAgo)) {
-    return format(dateFormat, locale: 'en_short');
+    return "${format(dateFormat, locale: 'en_short').split('~').last} ago";
   } else if (dateFormat.isAfter(twentyFourHours)) {
     return DateFormat('h:mm a').format(dateFormat);
   } else if (dateFormat.isAfter(oneWeekAgo)) {
-    return format(dateFormat, locale: 'en_short');
+    return "${format(dateFormat, locale: 'en_short').split('~').last} ago";
   } else {
     return DateFormat('d MMMM').format(DateTime.parse(date));
   }

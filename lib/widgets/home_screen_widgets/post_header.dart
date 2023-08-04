@@ -1,7 +1,9 @@
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../models/post_model.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
@@ -9,15 +11,11 @@ import '../common_widgets.dart';
 import '../text_widget.dart';
 
 class CustomPostHeader extends StatelessWidget {
-  // final String? name;
-  // final String? image;
   final VoidCallback? ontap;
   final VoidCallback? headerOnTap;
-  // final bool? isVerified;
-  final String? time;
+  final PostModel postModel;
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
-  final bool? showPostTime;
   final UserModel postCreator;
 
   const CustomPostHeader(
@@ -26,9 +24,8 @@ class CustomPostHeader extends StatelessWidget {
       this.isVideoPost = false,
       this.headerOnTap,
       this.onVertItemClick,
-      this.time,
-      this.showPostTime = false,
-      required this.postCreator})
+      required this.postCreator,
+      required this.postModel})
       : super(key: key);
 
   @override
@@ -75,9 +72,10 @@ class CustomPostHeader extends StatelessWidget {
         ),
       ),
       subtitle: Visibility(
-        visible: showPostTime!,
+        visible: postModel.showPostTime || postModel.locationName.isNotEmpty,
         child: TextWidget(
-          text: time,
+          text:
+              "${postModel.showPostTime ? "${convertDateIntoTime(postModel.createdAt)} " : ""}${postModel.locationName.isEmpty ? "" : "at ${postModel.locationName}"}",
           fontSize: 11.sp,
           fontWeight: FontWeight.w400,
           color: isVideoPost!

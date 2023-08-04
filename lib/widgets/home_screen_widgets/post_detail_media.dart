@@ -83,6 +83,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
                   post: postModel, isPostDetail: isPostDetail))
               : () => Get.to(() => PostDetailScreen(postModel: postModel)),
           child: MusicPlayerUrl(
+            postModel: postModel,
             border: 0,
             musicDetails: mediaData,
             ontap: () {},
@@ -108,13 +109,29 @@ class CheckMediaAndShowPost extends StatelessWidget {
               child: TextWidget(
                 text: mediaData.link,
                 textAlign: isFullScreen ? TextAlign.center : TextAlign.left,
-                fontSize: 15.sp,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
                 color: isFullScreen ? colorFF3 : color221,
               ),
             ),
           ),
         );
+    }
+  }
+}
+
+double getQouteAspectRatio(String text, bool isPostDetail) {
+  if (isPostDetail) {
+    if (text.length > 400) {
+      return 9 / 13;
+    } else {
+      return 1 / 1;
+    }
+  } else {
+    if (text.length > 400) {
+      return 9 / 13;
+    } else {
+      return 17 / 9;
     }
   }
 }
@@ -137,21 +154,50 @@ class PostMediaWidget extends StatelessWidget {
     return CarouselSlider(
       items: post.mediaData
           .map(
-            (e) => CheckMediaAndShowPost(
-              isPostDetail: isPostDetail,
-              postModel: post,
-              ondoubleTap: () => prov.toggleLikeDislike(postModel: post),
-              mediaData: e,
-              postId: post.id,
-              isFullScreen: isFullScreen,
+            (e) => Stack(
+              children: [
+                CheckMediaAndShowPost(
+                  isPostDetail: isPostDetail,
+                  postModel: post,
+                  ondoubleTap: () => prov.toggleLikeDislike(postModel: post),
+                  mediaData: e,
+                  postId: post.id,
+                  isFullScreen: isFullScreen,
+                ),
+                Visibility(
+                  visible: post.mediaData.length > 1,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: post.mediaData
+                            .map(
+                              (i) => Container(
+                                height: 8.h,
+                                width: 8.h,
+                                margin: EdgeInsets.all(3.w),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: i.id != e.id
+                                      ? colorDD9.withOpacity(0.3)
+                                      : colorFF7,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
           )
           .toList(),
       options: CarouselOptions(
         aspectRatio: post.mediaData[0].type == 'Qoute'
-            ? isPostDetail
-                ? 1 / 1
-                : 16 / 9
+            ? getQouteAspectRatio(post.mediaData[0].link, isPostDetail)
             : post.mediaData[0].type == 'Music'
                 ? 13 / 9
                 : post.mediaData[0].type == 'Photo'

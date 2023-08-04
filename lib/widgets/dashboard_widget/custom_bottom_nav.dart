@@ -46,9 +46,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   icon: InkWell(
                     onTap: () => provider.changePage(0),
                     onDoubleTap: () {
-                      provider.scrollController.animateTo(0,
-                          duration: const Duration(milliseconds: 1500),
-                          curve: Curves.easeIn);
+                      provider.scrollController.animateTo(
+                        0,
+                        duration: const Duration(milliseconds: 100),
+                        curve: Curves.easeIn,
+                      );
                     },
                     child: SvgPicture.asset(
                       provider.currentIndex == 0

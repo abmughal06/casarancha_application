@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:casarancha/models/user_model.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:path/path.dart';
@@ -77,8 +78,10 @@ class CreatePostMethods extends ChangeNotifier {
       imageUrl: user.imageStr,
       isVerified: user.isVerified,
     );
+
     try {
       await uploadMediaFiles(postId: postId);
+
       final post = PostModel(
         id: postId,
         creatorId: creatorId,
@@ -86,6 +89,7 @@ class CreatePostMethods extends ChangeNotifier {
         createdAt: DateTime.now().toIso8601String(),
         description: captionController.text.trim(),
         locationName: locationController.text.trim(),
+        tagsIds: tagsController.text.split(" ").map((e) => e).toList(),
         shareLink: '',
         videoViews: [],
         showPostTime: showPostTime,
@@ -127,11 +131,9 @@ class CreatePostMethods extends ChangeNotifier {
     final allMediaFiles = [...photosList, ...videosList, ...musicList];
 
     final storageRef = FirebaseStorage.instance.ref();
-
     try {
       for (var element in allMediaFiles) {
         final String fileType;
-        log("check 1");
         final String fileName = basename(element.path);
         Size? imageSize;
         double? videoAspectRatio;
@@ -146,32 +148,22 @@ class CreatePostMethods extends ChangeNotifier {
           fileType = 'Music';
         }
 
-        log("check 2");
-
         final storageFileRef = storageRef.child('Posts/$postId/$fileName');
-        log("check 3");
 
         storageFileRef.putFile(element);
 
         final uploadTask = storageFileRef.putData(await element.readAsBytes());
-        log("check 4");
 
         mediaUploadTasks.add(uploadTask);
         notifyListeners();
-        log("check 5");
 
         final mediaRef = await uploadTask.whenComplete(() {});
-        log("check 6");
 
         final fileUrl = await mediaRef.ref.getDownloadURL();
-        log("check 7");
 
         final MediaDetails mediaDetails;
-        log("check 8");
 
         if (fileType == 'Photo') {
-          log("check 9");
-
           mediaDetails = MediaDetails(
               id: DateTime.now().toIso8601String(),
               name: fileName,
@@ -194,12 +186,15 @@ class CreatePostMethods extends ChangeNotifier {
             link: fileUrl,
           );
         }
-        log("check 10");
 
         mediaData.add(mediaDetails);
       }
     } on FirebaseException catch (e) {
       log("error 1  ${e.message}");
+
+      GlobalSnackBar.show(message: e.toString());
+    } on PlatformException catch (e) {
+      log("error 2  ${e.message}");
 
       GlobalSnackBar.show(message: e.toString());
     }
