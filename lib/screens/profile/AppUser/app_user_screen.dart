@@ -1,7 +1,7 @@
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
-import 'package:casarancha/screens/dashboard/dashboard.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
@@ -23,6 +23,7 @@ import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/menu_user_button.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
+import '../../../widgets/profle_screen_widgets/music_grid.dart';
 import '../../../widgets/profle_screen_widgets/video_grid.dart';
 import '../../../widgets/text_widget.dart';
 import '../follower_following_screen.dart';
@@ -33,7 +34,6 @@ void navigateToAppUserScreen(userId, context) {
   } else {
     final dasboardController =
         Provider.of<DashboardProvider>(context, listen: false);
-    Get.to(() => const DashBoard());
     dasboardController.changePage(5);
   }
 }
@@ -58,6 +58,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
     final post = context.watch<List<PostModel>?>();
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
+    final ghost = Provider.of<DashboardProvider>(context);
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -293,16 +294,31 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                             GestureDetector(
                                               onTap: () {
                                                 Get.to(
-                                                  () => ChatScreen(
-                                                    appUserId: user.id,
-                                                    creatorDetails:
-                                                        CreatorDetails(
-                                                      name: user.name,
-                                                      imageUrl: user.imageStr,
-                                                      isVerified:
-                                                          user.isVerified,
-                                                    ),
-                                                  ),
+                                                  () => ghost.checkGhostMode
+                                                      ? GhostChatScreen2(
+                                                          appUserId: user.id,
+                                                          firstMessagebyMe:
+                                                              true,
+                                                          creatorDetails:
+                                                              CreatorDetails(
+                                                            name: user.name,
+                                                            imageUrl:
+                                                                user.imageStr,
+                                                            isVerified:
+                                                                user.isVerified,
+                                                          ),
+                                                        )
+                                                      : ChatScreen(
+                                                          appUserId: user.id,
+                                                          creatorDetails:
+                                                              CreatorDetails(
+                                                            name: user.name,
+                                                            imageUrl:
+                                                                user.imageStr,
+                                                            isVerified:
+                                                                user.isVerified,
+                                                          ),
+                                                        ),
                                                 );
                                               },
                                               child: Image.asset(
@@ -356,7 +372,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                 child: Text('Videos'),
                               ),
                               Tab(
-                                child: Text('Stories'),
+                                child: Text('Musics'),
                               ),
                             ],
                           ),
@@ -405,7 +421,18 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                             .toList(),
                                       ),
                                 //story
-                                Container()
+                                post == null
+                                    ? const Center(
+                                        child: CircularProgressIndicator
+                                            .adaptive())
+                                    : MusicGrid(
+                                        musicList: post
+                                            .where((element) =>
+                                                element.creatorId == user.id &&
+                                                element.mediaData.first.type ==
+                                                    'Music')
+                                            .toList(),
+                                      ),
                               ],
                             ),
                           )

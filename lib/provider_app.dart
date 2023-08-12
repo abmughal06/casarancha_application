@@ -1,6 +1,7 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/screens/auth/providers/login_provider.dart';
+import 'package:casarancha/screens/auth/providers/phone_provider.dart';
 import 'package:casarancha/screens/auth/providers/register_privder.dart';
 import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
@@ -8,13 +9,14 @@ import 'package:casarancha/screens/chat/ChatList/chat_list_controller.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
-import 'package:casarancha/screens/home/providers/music_provider.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/home/providers/story_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
 import 'package:casarancha/utils/providers/date_picker_provider.dart';
+import 'package:casarancha/widgets/chat_screen_widgets/voice_recorder.dart';
+import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -76,7 +78,7 @@ class ProviderApp extends StatelessWidget {
             create: (_) => ProfileProvider()),
         ChangeNotifierProvider<StoryProvider>(create: (_) => StoryProvider()),
         ChangeNotifierProvider<PostProvider>(create: (_) => PostProvider()),
-        ChangeNotifierProvider<MusicProvider>(create: (_) => MusicProvider()),
+        ChangeNotifierProvider<VoiceRecorder>(create: (_) => VoiceRecorder()),
         ChangeNotifierProvider<CreatePostMethods>(
             create: (_) => CreatePostMethods()),
         ChangeNotifierProvider<AddStoryProvider>(
@@ -87,6 +89,9 @@ class ProviderApp extends StatelessWidget {
         ChangeNotifierProvider<ChatListController>(
             create: (_) => ChatListController()),
         ChangeNotifierProvider<SearchProvider>(create: (_) => SearchProvider()),
+        ChangeNotifierProvider<PhoneProvider>(create: (_) => PhoneProvider()),
+        ChangeNotifierProvider<DownloadProvider>(
+            create: (_) => DownloadProvider()),
       ],
       builder: (context, prov) {
         return app;

@@ -114,6 +114,7 @@ class ChatMusicTile extends StatelessWidget {
               child: Column(
                 children: [
                   MusicPlayerTile(
+                    isMe: isMe,
                     border: 15,
                     musicDetails: media,
                     ontap: () {},
@@ -139,9 +140,11 @@ class ChatPostTile extends StatelessWidget {
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
+    required this.imageUrl,
   }) : super(key: key);
 
   final Message message;
+  final String imageUrl;
   final bool isMe;
   final bool isSeen;
   final String appUserId;
@@ -165,10 +168,65 @@ class ChatPostTile extends StatelessWidget {
                     image: DecorationImage(
                       fit: BoxFit.cover,
                       image: CachedNetworkImageProvider(
-                        message.content['mediaData'][0]['link'],
+                        imageUrl,
                       ),
                     ),
                   ),
+                ),
+              ),
+            ),
+          ),
+          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: message.createdAt),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ChatImageTile extends StatelessWidget {
+  const ChatImageTile({
+    Key? key,
+    required this.message,
+    required this.appUserId,
+    required this.isMe,
+    required this.isSeen,
+  }) : super(key: key);
+
+  final Message message;
+  final bool isMe;
+  final bool isSeen;
+  final String appUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    final media = message.content.map((e) => MediaDetails.fromMap(e)).toList();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding:
+                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            child: Align(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              child: AspectRatio(
+                aspectRatio: 9 / 13,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: CachedNetworkImageProvider(
+                        media.first.link,
+                      ),
+                    ),
+                  ),
+                  // child: TextWidget(
+                  //   text: media.length,
+                  // ),
                 ),
               ),
             ),
@@ -214,7 +272,7 @@ class ChatQouteTile extends StatelessWidget {
                   padding: EdgeInsets.all(15.h),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    color: colorF03.withOpacity(0.6),
+                    color: isMe ? colorF03.withOpacity(0.6) : colorFF3,
                   ),
                   child:
                       TextWidget(text: message.content['mediaData'][0]['link']),

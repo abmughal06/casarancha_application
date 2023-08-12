@@ -8,7 +8,8 @@ import '../common_widgets.dart';
 import '../text_widget.dart';
 
 class BottomSheetWidget extends StatelessWidget {
-  BottomSheetWidget({Key? key, this.ontapBlock}) : super(key: key);
+  BottomSheetWidget({Key? key, this.ontapBlock, this.onTapDownload})
+      : super(key: key);
 
   final List reportList = [
     "It's a spam",
@@ -20,6 +21,7 @@ class BottomSheetWidget extends StatelessWidget {
   ];
 
   final VoidCallback? ontapBlock;
+  final VoidCallback? onTapDownload;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +140,14 @@ class BottomSheetWidget extends StatelessWidget {
               text: "Block User",
               fontWeight: FontWeight.w600,
             ),
-          )
+          ),
+          TextButton(
+            onPressed: onTapDownload,
+            child: const TextWidget(
+              text: "Download",
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );

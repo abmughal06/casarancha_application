@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:casarancha/screens/auth/phone_login_screen.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/screens/auth/providers/login_provider.dart';
 import 'package:casarancha/screens/auth/sign_up_screen.dart';
@@ -184,31 +185,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
+                    heightBox(24.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Platform.isIOS
-                            ? InkWell(
-                                onTap: () {
-                                  context
-                                      .read<AuthenticationProvider>()
-                                      .callAppleSignIn();
-                                },
-                                child: Container(
-                                  height: 40.w,
-                                  width: 40.w,
-                                  padding: const EdgeInsets.only(bottom: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.circular(7),
-                                  ),
-                                  child: const ImageIcon(
-                                    AssetImage(imgAppleSignIn),
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              )
-                            : Container(),
+                        InkWell(
+                          onTap: () {
+                            Get.to(() => PhoneLoginScreen());
+                          },
+                          child: Container(
+                            height: 40.w,
+                            width: 40.w,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            child: Icon(Icons.phone_iphone,
+                                color: Colors.white, size: 26.sp),
+                          ),
+                        ),
+
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12.w),
                           child: InkWell(
@@ -234,24 +231,49 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Image.asset(imgGoogleSignIn)),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 12.w),
-                          child: InkWell(
-                            onTap: () {
-                              context
-                                  .read<AuthenticationProvider>()
-                                  .callTwitterSignIn();
-                            },
-                            child: Container(
-                              height: 40.w,
-                              width: 40.w,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(7),
-                                  image: const DecorationImage(
-                                      image: AssetImage(imgTwitterSignIn))),
-                            ),
-                          ),
-                        ),
+                        Platform.isIOS
+                            ? Padding(
+                                padding: EdgeInsets.only(right: 12.w),
+                                child: InkWell(
+                                  onTap: () {
+                                    context
+                                        .read<AuthenticationProvider>()
+                                        .callAppleSignIn();
+                                  },
+                                  child: Container(
+                                    height: 40.w,
+                                    width: 40.w,
+                                    padding: const EdgeInsets.only(bottom: 3),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: const ImageIcon(
+                                      AssetImage(imgAppleSignIn),
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        // Padding(
+                        //   padding: EdgeInsets.only(right: 12.w),
+                        //   child: InkWell(
+                        //     onTap: () {
+                        //       context
+                        //           .read<AuthenticationProvider>()
+                        //           .callTwitterSignIn();
+                        //     },
+                        //     child: Container(
+                        //       height: 40.w,
+                        //       width: 40.w,
+                        //       decoration: BoxDecoration(
+                        //           borderRadius: BorderRadius.circular(7),
+                        //           image: const DecorationImage(
+                        //               image: AssetImage(imgTwitterSignIn))),
+                        //     ),
+                        //   ),
+                        // ),
                         InkWell(
                           onTap: () {
                             context
@@ -269,7 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    heightBox(24.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

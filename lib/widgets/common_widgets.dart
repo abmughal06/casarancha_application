@@ -322,7 +322,7 @@ Widget searchTextField(
 Widget centerLoader() {
   return Center(
     child: SizedBox(
-        height: 30.h,
+        height: 30.w,
         width: 30.w,
         child: const CircularProgressIndicator.adaptive()),
   );

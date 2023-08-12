@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/comment_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/utils/snackbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -98,7 +100,9 @@ class PostCommentTile extends StatelessWidget {
             textOverflow: TextOverflow.visible,
           ),
           trailing: Visibility(
-            visible: cmnt.creatorId == FirebaseAuth.instance.currentUser!.uid,
+            visible: FirebaseAuth.instance.currentUser?.uid != null
+                ? cmnt.creatorId == FirebaseAuth.instance.currentUser!.uid
+                : false,
             child: InkWell(
               onTap: () {
                 if (cmnt.creatorId == FirebaseAuth.instance.currentUser!.uid) {
@@ -108,21 +112,25 @@ class PostCommentTile extends StatelessWidget {
                       height: 80,
                       child: InkWell(
                         onTap: () async {
-                          // await FirebaseFirestore.instance
-                          //     .collection("posts")
-                          //     .doc(cmnt.id)
-                          //     .collection("comments")
-                          //     .doc(cmntId)
-                          //     .delete();
+                          try {
+                            await FirebaseFirestore.instance
+                                .collection("posts")
+                                .doc(cmnt.postId)
+                                .collection("comments")
+                                .doc(cmnt.id)
+                                .delete();
 
-                          // await FirebaseFirestore.instance
-                          //     .collection("posts")
-                          //     .doc(cmnt.id)
-                          //     .update({
-                          //   "commentIds": FieldValue.arrayRemove([cmntId])
-                          // });
-
-                          // Get.back();
+                            await FirebaseFirestore.instance
+                                .collection("posts")
+                                .doc(cmnt.postId)
+                                .update({
+                              "commentIds": FieldValue.arrayRemove([cmnt.id])
+                            });
+                          } catch (e) {
+                            GlobalSnackBar.show(message: e.toString());
+                          } finally {
+                            Get.back();
+                          }
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,

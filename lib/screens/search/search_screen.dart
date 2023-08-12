@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../resources/color_resources.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/profle_screen_widgets/follow_following_tile.dart';
 
@@ -54,9 +55,17 @@ class _SearchScreenState extends State<SearchScreen> {
                 },
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: commonTabBar(tabsList: _myTabs),
+            TabBar(
+              labelColor: colorPrimaryA05,
+              unselectedLabelColor: colorAA3,
+              labelStyle: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14.sp,
+              ),
+              indicatorColor: Colors.yellow,
+              indicatorPadding: const EdgeInsets.symmetric(vertical: 5),
+              dividerColor: Colors.transparent,
+              tabs: _myTabs,
             ),
             heightBox(10.w),
             Expanded(

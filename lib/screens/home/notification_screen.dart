@@ -48,8 +48,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 fontSize: 14.sp,
               ),
               indicatorColor: Colors.yellow,
-              indicatorPadding:
-                  const EdgeInsets.symmetric(horizontal: 75, vertical: 5),
+              indicatorPadding: const EdgeInsets.symmetric(vertical: 5),
+              dividerColor: Colors.transparent,
               tabs: const [
                 Tab(
                   text: 'Notification',

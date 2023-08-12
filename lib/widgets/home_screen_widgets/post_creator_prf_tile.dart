@@ -60,7 +60,6 @@ class PostCreatorProfileTile extends StatelessWidget {
           CustomPostFooter(
             isLike:
                 post.likesIds.contains(FirebaseAuth.instance.currentUser!.uid),
-            isVideoPost: post.mediaData[0].type == 'Video',
             isPostDetail: true,
             ontapLike: () => postProvider.toggleLikeDislike(postModel: post),
             ontapSave: () {
@@ -124,7 +123,8 @@ class PostCreatorProfileTile extends StatelessWidget {
                           color: Colors.black,
                         ),
                         TextWidget(
-                          text: convertDateIntoTime(post.createdAt),
+                          text:
+                              "${post.showPostTime ? "${convertDateIntoTime(post.createdAt)} " : ""}${post.locationName.isEmpty ? "" : "at ${post.locationName}"}",
                           fontWeight: FontWeight.w400,
                           fontSize: 9.sp,
                           color: Colors.black,
@@ -152,6 +152,27 @@ class PostCreatorProfileTile extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                ),
+                Visibility(
+                  visible: post.tagsIds.isNotEmpty,
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Wrap(
+                      children: post.tagsIds
+                          .map(
+                            (e) => Padding(
+                              padding: EdgeInsets.only(right: 6.w),
+                              child: TextWidget(
+                                text: e,
+                                fontSize: 13.sp,
+                                color: Colors.blue.shade900,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
                   ),
                 ),
               ],

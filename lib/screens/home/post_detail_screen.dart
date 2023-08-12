@@ -31,6 +31,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final users = context.watch<List<UserModel>?>();
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(

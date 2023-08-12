@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../models/user_model.dart';
@@ -66,9 +67,6 @@ class EditProfileProvider extends ChangeNotifier {
     } else if (userNameController.text.isEmpty) {
       GlobalSnackBar.show(message: "Please Enter $strUserName");
       return false;
-    } else if (bioController.text.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strBio');
-      return false;
     } else if (selectedDob == null || selectedDob == "") {
       GlobalSnackBar.show(message: 'Please enter $strDateOfBirth');
       return false;
@@ -107,32 +105,6 @@ class EditProfileProvider extends ChangeNotifier {
           'dob': selectedDob,
           'imageStr': imageUrl,
         });
-        // await FirebaseFirestore.instance
-        //     .collection('users')
-        //     .doc(userId)
-        //     .collection('ghostConversation')
-        //     .get()
-        //     .then(
-        //   (value) async {
-        //     for (var element in value.docs) {
-        //       await FirebaseFirestore.instance
-        //           .collection('users')
-        //           .doc(element.data()['receiverId'])
-        //           .collection('ghostConversation')
-        //           .where("receiverId", isEqualTo: userId)
-        //           .get()
-        //           .then((value) async {
-        //         for (var e in value.docs) {
-        //           await e.reference.update({
-        //             'receiverName': userNameController.text.toLowerCase().trim()
-        //           });
-        //         }
-        //       });
-        //     }
-        //   },
-        // );dad
-
-        // Get.back();dasd
       }
     } on FirebaseException catch (e) {
       GlobalSnackBar.show(message: e.message.toString());
@@ -141,6 +113,7 @@ class EditProfileProvider extends ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners();
+      Get.back();
     }
   }
 }

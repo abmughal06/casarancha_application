@@ -1,6 +1,7 @@
 import 'package:casarancha/models/message_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_user_list_tile.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -131,7 +132,11 @@ class _FriendChatListState extends State<FriendChatList> {
             }
           },
         ),
-        const Divider(),
+        Divider(
+          indent: 20.w,
+          endIndent: 20.w,
+          color: color221.withOpacity(0.1),
+        ),
         Consumer<List<UserModel>?>(
           builder: (context, users, b) {
             if (users == null) {

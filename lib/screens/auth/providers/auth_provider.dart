@@ -16,12 +16,11 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:twitter_login/entity/auth_result.dart';
-import 'package:twitter_login/twitter_login.dart';
 
 import '../../../resources/localization_text_strings.dart';
 import '../../../utils/app_constants.dart';
 import '../../../utils/snackbar.dart';
+import '../phone_otp_screen.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   final FirebaseAuth firebaseAuth;
@@ -96,6 +95,74 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> verifyPhoneNumber(number) async {
+    try {
+      isSigningIn = true;
+      notifyListeners();
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: number,
+        verificationCompleted: (PhoneAuthCredential credential) {
+          dev.log('complete $credential');
+          saveTokenAndNavigateToNext();
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          dev.log('failed $e');
+          isSigningIn = false;
+          notifyListeners();
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          dev.log('code sent');
+          Get.to(
+            () => PhoneOTPScreen(
+              verificationId: verificationId,
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          dev.log(verificationId);
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Google login cancelled');
+    } finally {
+      isSigningIn = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> checkOtpVerification(smsCode, verifyId) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verifyId, smsCode: smsCode);
+
+    try {
+      isSigningIn = true;
+      notifyListeners();
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      saveTokenAndNavigateToNext();
+    } on FirebaseAuthException catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Google login cancelled');
+    } finally {
+      isSigningIn = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> callGoogleSignIn() async {
     GoogleSignIn googleSignIn = GoogleSignIn();
     GoogleSignInAccount? signInAccount = await googleSignIn.signIn();
@@ -117,6 +184,11 @@ class AuthenticationProvider extends ChangeNotifier {
         notifyListeners();
 
         GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      } catch (e) {
+        isSigningIn = false;
+        notifyListeners();
+
+        GlobalSnackBar.show(message: 'Google login cancelled');
       } finally {
         isSigningIn = false;
         notifyListeners();
@@ -143,6 +215,11 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
 
       GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Facebook login cancelled');
     } finally {
       isSigningIn = false;
       notifyListeners();
@@ -203,40 +280,45 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
 
       GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Apple login cancelled');
     } finally {
       isSigningIn = false;
       notifyListeners();
     }
   }
 
-  Future<void> callTwitterSignIn() async {
-    try {
-      isSigningIn = true;
-      notifyListeners();
+  // Future<void> callTwitterSignIn() async {
+  //   try {
+  //     isSigningIn = true;
+  //     notifyListeners();
 
-      TwitterLogin login = TwitterLogin(
-        apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
-        apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
-        redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler",
-      );
-      AuthResult authResult = await login.loginV2();
-      if (authResult.authToken != null && authResult.authTokenSecret != null) {
-        AuthCredential credential = TwitterAuthProvider.credential(
-            accessToken: authResult.authToken!,
-            secret: authResult.authTokenSecret!);
-        FirebaseAuth.instance.signInWithCredential(credential);
-        saveTokenAndNavigateToNext();
-      }
-    } on FirebaseAuthException catch (e) {
-      isSigningIn = false;
-      notifyListeners();
+  //     TwitterLogin login = TwitterLogin(
+  //       apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
+  //       apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
+  //       redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler",
+  //     );
+  //     AuthResult authResult = await login.loginV2();
+  //     if (authResult.authToken != null && authResult.authTokenSecret != null) {
+  //       AuthCredential credential = TwitterAuthProvider.credential(
+  //           accessToken: authResult.authToken!,
+  //           secret: authResult.authTokenSecret!);
+  //       FirebaseAuth.instance.signInWithCredential(credential);
+  //       saveTokenAndNavigateToNext();
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     isSigningIn = false;
+  //     notifyListeners();
 
-      GlobalSnackBar.show(message: 'Please enter ${e.message}');
-    } finally {
-      isSigningIn = false;
-      notifyListeners();
-    }
-  }
+  //     GlobalSnackBar.show(message: 'Please enter ${e.message}');
+  //   } finally {
+  //     isSigningIn = false;
+  //     notifyListeners();
+  //   }
+  // }
 
   bool checkValidDataLogin({String? email, String? password}) {
     if (email!.isEmpty) {

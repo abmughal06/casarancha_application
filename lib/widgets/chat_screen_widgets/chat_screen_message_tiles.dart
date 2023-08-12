@@ -20,6 +20,18 @@ class MessageTiles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (message.type) {
+      case "InChatPic":
+        return InkWell(
+          // onTap: () => Get.to(() => PostDetailScreen(
+          //       postModel: postModel,
+          //     )),
+          child: ChatImageTile(
+            message: message,
+            appUserId: message.sentToId,
+            isSeen: message.isSeen,
+            isMe: isMe,
+          ),
+        );
       case "Photo":
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
@@ -28,6 +40,7 @@ class MessageTiles extends StatelessWidget {
                 postModel: postModel,
               )),
           child: ChatPostTile(
+            imageUrl: message.content['mediaData'][0]['link'],
             message: message,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
@@ -48,7 +61,25 @@ class MessageTiles extends StatelessWidget {
             isMe: isMe,
           ),
         );
+      case 'InChatVideo':
+        final prePost = message.content;
+        final postModel = MediaDetails.fromMap(prePost[0]);
+        // VideoPlayerController videoPlayerController;
+        // videoPlayerController =
+        //     VideoPlayerController.network(postModel.mediaData[0].link);
 
+        return InkWell(
+          // onTap: () => Get.to(() => PostDetailScreen(
+          //       postModel: postModel,
+          //     )),
+          child: ChatVideoTile(
+            link: postModel.link,
+            appUserId: message.sentToId,
+            isSeen: message.isSeen,
+            isMe: isMe,
+            date: message.createdAt,
+          ),
+        );
       case 'Video':
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
@@ -66,6 +97,20 @@ class MessageTiles extends StatelessWidget {
             isSeen: message.isSeen,
             isMe: isMe,
             date: message.createdAt,
+          ),
+        );
+      case 'InChatMusic':
+        final music = MediaDetails.fromMap(message.content[0]);
+        return InkWell(
+          // onTap: () => Get.to(() => PostDetailScreen(
+          //       postModel: postModel,
+          //     )),
+          child: ChatMusicTile(
+            appUserId: message.sentToId,
+            isSeen: message.isSeen,
+            isMe: isMe,
+            date: message.createdAt,
+            media: music,
           ),
         );
       case 'Music':

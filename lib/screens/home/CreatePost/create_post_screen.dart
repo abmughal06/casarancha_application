@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -69,6 +70,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   void dispose() {
+    createPost.clearLists();
     super.dispose();
   }
 
@@ -300,6 +302,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               itemCount: state.musicList.length,
                               itemBuilder: (context, index) {
                                 final music = state.musicList[index];
+                                log(music.path);
                                 return Card(
                                   elevation: 5,
                                   shape: RoundedRectangleBorder(
@@ -333,12 +336,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     groupId: widget.groupId,
                   ),
                 );
-                createPost.clearLists();
-
-                // log(createPost.photosList.toString());
-                // log(createPost.qouteList.toString());
-                // log(createPost.videosList.toString());
-                // log(createPost.musicList.toString());
               },
             )
           ],
@@ -434,19 +431,25 @@ class _MusicPlayerWithFileState extends State<MusicPlayerWithFile> {
     audioPlayer = AudioPlayer();
     setAudio();
     audioPlayer.onPlayerStateChanged.listen((event) {
-      setState(() {
-        isPlaying = event == PlayerState.playing;
-      });
+      if (mounted) {
+        setState(() {
+          isPlaying = event == PlayerState.playing;
+        });
+      }
     });
     audioPlayer.onDurationChanged.listen((event) {
-      setState(() {
-        duration = event;
-      });
+      if (mounted) {
+        setState(() {
+          duration = event;
+        });
+      }
     });
     audioPlayer.onPositionChanged.listen((event) {
-      setState(() {
-        position = event;
-      });
+      if (mounted) {
+        setState(() {
+          position = event;
+        });
+      }
     });
   }
 
