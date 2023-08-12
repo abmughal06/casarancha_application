@@ -24,7 +24,6 @@ class CustomPostFooter extends StatelessWidget {
   final Widget? saveBtn;
   final bool? isDesc;
   final bool? isPostDetail;
-  final bool? isVideoPost;
   final List<String> savepostIds;
   final PostModel postModel;
 
@@ -36,7 +35,6 @@ class CustomPostFooter extends StatelessWidget {
     this.isLike = false,
     this.isPostDetail = false,
     this.saveBtn,
-    this.isVideoPost = false,
     required this.postModel,
     required this.savepostIds,
   }) : super(key: key);
@@ -68,8 +66,10 @@ class CustomPostFooter extends StatelessWidget {
                   color: color221,
                 ),
                 IconButton(
-                  onPressed: () =>
-                      Get.to(() => PostDetailScreen(postModel: postModel)),
+                  onPressed: () {
+                    Get.to(() => PostDetailScreen(postModel: postModel));
+                    // context.read<MusicProvider>().pause();
+                  },
                   icon: SvgPicture.asset(
                     icCommentPost,
                     color: color887,
@@ -92,56 +92,56 @@ class CustomPostFooter extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Visibility(
-                  visible: isVideoPost!,
-                  child: InkWell(
-                    onTap: () {
-                      Get.bottomSheet(
-                        Consumer<List<UserModel>?>(
-                          builder: (context, value, child) {
-                            if (value == null) {
-                              return const CircularProgressIndicator.adaptive();
-                            }
-                            var filterList = value
-                                .where((element) =>
-                                    postModel.videoViews.contains(element.id))
-                                .toList();
-                            return ListView.builder(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              itemCount: filterList.length,
-                              itemBuilder: (context, index) {
-                                return FollowFollowingTile(
-                                  user: filterList[index],
-                                  ontapToggleFollow: () {},
-                                  btnName: "",
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        backgroundColor: Colors.white,
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        TextWidget(
-                          text: postModel.videoViews.length.toString(),
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400,
-                          color: color221,
-                        ),
-                        widthBox(5.w),
-                        Icon(
-                          postModel.mediaData.first.type == 'Music'
-                              ? Icons.headset
-                              : Icons.visibility,
-                          color: colorAA3,
-                        ),
-                      ],
-                    ),
+                InkWell(
+                  onTap: () {
+                    Get.bottomSheet(
+                      Consumer<List<UserModel>?>(
+                        builder: (context, value, child) {
+                          if (value == null) {
+                            return const CircularProgressIndicator.adaptive();
+                          }
+                          var filterList = value
+                              .where((element) =>
+                                  postModel.videoViews.contains(element.id))
+                              .toList();
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            itemCount: filterList.length,
+                            itemBuilder: (context, index) {
+                              return FollowFollowingTile(
+                                user: filterList[index],
+                                ontapToggleFollow: () {},
+                                btnName: "",
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      backgroundColor: Colors.white,
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      TextWidget(
+                        text: postModel.videoViews.length.toString(),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        color: color221,
+                      ),
+                      widthBox(5.w),
+                      Icon(
+                        postModel.mediaData.first.type == 'Music'
+                            ? Icons.headset
+                            : postModel.mediaData.first.type == 'Photo'
+                                ? Icons.camera_alt
+                                : postModel.mediaData.first.type == 'Qoute'
+                                    ? Icons.notes
+                                    : Icons.visibility,
+                        color: colorAA3,
+                      ),
+                    ],
                   ),
                 ),
-                // widthBox(isVideoPost! ? 5.w : 0.w),
                 IconButton(
                   onPressed: ontapSave,
                   icon: SvgPicture.asset(

@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/ghost_message_details.dart';
+import '../../resources/color_resources.dart';
 import '../../screens/chat/ChatList/chat_list_controller.dart';
 
 class MessageListGhost extends StatefulWidget {
@@ -142,7 +143,11 @@ class GhostChatList extends StatelessWidget {
             }
           },
         ),
-        const Divider(),
+        Divider(
+          indent: 20.w,
+          endIndent: 20.w,
+          color: color221.withOpacity(0.1),
+        ),
         Consumer<List<UserModel>?>(
           builder: (context, users, b) {
             if (users == null) {

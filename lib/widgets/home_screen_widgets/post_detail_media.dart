@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/screens/home/providers/music_provider.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,8 +42,11 @@ class CheckMediaAndShowPost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
+
     switch (mediaData.type) {
       case "Photo":
+        postProvider.countVideoViews(postModel: postModel);
         return InkWell(
           onDoubleTap: ondoubleTap,
           onTap: isPostDetail
@@ -76,23 +80,26 @@ class CheckMediaAndShowPost extends StatelessWidget {
               }),
         );
       case "Music":
-        return InkWell(
-          onDoubleTap: ondoubleTap,
-          onTap: isPostDetail
-              ? () => Get.to(() => PostFullScreenView(
-                  post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(postModel: postModel)),
-          child: MusicPlayerUrl(
-            postModel: postModel,
-            border: 0,
-            musicDetails: mediaData,
-            ontap: () {},
+        return ChangeNotifierProvider<MusicProvider>(
+          create: (context) => MusicProvider(),
+          child: InkWell(
+            onDoubleTap: ondoubleTap,
+            onTap: isPostDetail
+                ? () => Get.to(() => PostFullScreenView(
+                    post: postModel, isPostDetail: isPostDetail))
+                : () => Get.to(() => PostDetailScreen(postModel: postModel)),
+            child: MusicPlayerUrl(
+              postModel: postModel,
+              border: 0,
+              musicDetails: mediaData,
+              ontap: () {},
+            ),
           ),
         );
 
       default:
+        postProvider.countVideoViews(postModel: postModel);
         return InkWell(
-          // onDoubleTap: ondoubleTap,
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
@@ -225,6 +232,7 @@ class PostFullScreenView extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: colorWhite),
         actions: [
           Visibility(
             visible: post.creatorId == FirebaseAuth.instance.currentUser!.uid,

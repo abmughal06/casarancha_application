@@ -60,8 +60,6 @@ class PostCreatorProfileTile extends StatelessWidget {
           CustomPostFooter(
             isLike:
                 post.likesIds.contains(FirebaseAuth.instance.currentUser!.uid),
-            isVideoPost: post.mediaData[0].type == 'Video' ||
-                post.mediaData[0].type == 'Music',
             isPostDetail: true,
             ontapLike: () => postProvider.toggleLikeDislike(postModel: post),
             ontapSave: () {

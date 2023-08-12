@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
+import '../../../widgets/profle_screen_widgets/music_grid.dart';
 import '../../../widgets/profle_screen_widgets/profile_top_loader.dart';
 import '../../../widgets/profle_screen_widgets/qoutes_grid.dart';
 
@@ -65,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Text('Videos'),
                     ),
                     Tab(
-                      child: Text('Stories'),
+                      child: Text('Musics'),
                     ),
                   ],
                 ),
@@ -81,7 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               qoutesList: post
                                   .where((element) =>
                                       element.creatorId == user!.id &&
-                                      element.mediaData[0].type == 'Qoute')
+                                      element.mediaData.first.type == 'Qoute')
                                   .toList(),
                             ),
                       post == null
@@ -91,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               imageList: post
                                   .where((element) =>
                                       element.creatorId == user!.id &&
-                                      element.mediaData[0].type == 'Photo')
+                                      element.mediaData.first.type == 'Photo')
                                   .toList(),
                             ),
                       post == null
@@ -101,11 +102,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               videoList: post
                                   .where((element) =>
                                       element.creatorId == user!.id &&
-                                      element.mediaData[0].type == 'Video')
+                                      element.mediaData.first.type == 'Video')
                                   .toList(),
                             ),
-                      //story
-                      Container()
+                      //music
+                      post == null
+                          ? const Center(
+                              child: CircularProgressIndicator.adaptive())
+                          : MusicGrid(
+                              musicList: post
+                                  .where((element) =>
+                                      element.creatorId == user!.id &&
+                                      element.mediaData.first.type == 'Music')
+                                  .toList(),
+                            ),
                     ],
                   ),
                 )
@@ -117,48 +127,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-// deleteAccountFromId(User user) async {
-//   String id = user.uid;
-//   FirebaseFirestore firestore = FirebaseFirestore.instance;
-//   try {
-//     ProfileScreenController profileScreenController =
-//         Get.put(ProfileScreenController(isFromDelete: true));
-//     profileScreenController.setUserAgain();
-//     GhostChatHelper.shared.gMessageCtrl.disposeStream();
-//     await firestore
-//         .collection("posts")
-//         .where("creatorId", isEqualTo: id)
-//         .get()
-//         .then((value) async {
-//       for (var element in value.docs) {
-//         if (element.exists) {
-//           await deletePost(PostModel.fromMap(element.data()));
-//         }
-//       }
-//     });
-//     await deleteStories(id);
-//     await deleteUser(id);
-//     FirebaseAuth.instance.signOut();
-//     await deleteUserFirebase(id);
-//   } catch (e) {
-//     Get.back();
-//     print("errors => $e");
-//   }
-// }
-
-// deleteUserFirebase(String uid) async {
-//   try {
-//     HttpsCallable callable = FirebaseFunctions.instance
-//         .httpsCallable("deleteUserFromAuthentication");
-//     Map<String, dynamic> params = {
-//       "data": {"uid": uid}
-//     };
-//     final results = (await callable.call(jsonEncode(params))).data;
-//     return results;
-//   } on FirebaseFunctionsException catch (e) {
-//     print(e.code);
-//     print(e.details);
-//     throw Exception(e.message);
-//   }
-// }

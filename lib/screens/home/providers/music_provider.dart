@@ -1,12 +1,11 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
-class MusicProvider with ChangeNotifier {
+class MusicProvider extends ChangeNotifier {
   AudioPlayer audioPlayer = AudioPlayer();
   PlayerState _audioState = PlayerState.stopped;
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
-  String musicUrl = '';
 
   MusicProvider() {
     audioPlayer.onPlayerStateChanged.listen((state) {
@@ -25,13 +24,13 @@ class MusicProvider with ChangeNotifier {
     });
   }
 
+  setAudio(url) async {
+    await audioPlayer.setSourceUrl(url);
+  }
+
   PlayerState get audioState => _audioState;
   Duration get position => _position;
   Duration get duration => _duration;
-
-  void play(String url) async {
-    await audioPlayer.setSourceUrl(url);
-  }
 
   void resume() async {
     await audioPlayer.resume();
@@ -54,6 +53,6 @@ class MusicProvider with ChangeNotifier {
     } else {
       pause();
     }
-    notifyListeners();
+    // notifyListeners();
   }
 }

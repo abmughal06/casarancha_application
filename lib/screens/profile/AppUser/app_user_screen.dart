@@ -23,6 +23,7 @@ import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/menu_user_button.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
+import '../../../widgets/profle_screen_widgets/music_grid.dart';
 import '../../../widgets/profle_screen_widgets/video_grid.dart';
 import '../../../widgets/text_widget.dart';
 import '../follower_following_screen.dart';
@@ -371,7 +372,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                 child: Text('Videos'),
                               ),
                               Tab(
-                                child: Text('Stories'),
+                                child: Text('Musics'),
                               ),
                             ],
                           ),
@@ -420,7 +421,18 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                             .toList(),
                                       ),
                                 //story
-                                Container()
+                                post == null
+                                    ? const Center(
+                                        child: CircularProgressIndicator
+                                            .adaptive())
+                                    : MusicGrid(
+                                        musicList: post
+                                            .where((element) =>
+                                                element.creatorId == user.id &&
+                                                element.mediaData.first.type ==
+                                                    'Music')
+                                            .toList(),
+                                      ),
                               ],
                             ),
                           )

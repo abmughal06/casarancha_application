@@ -1,12 +1,11 @@
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../resources/color_resources.dart';
-import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
-import '../clip_pad_shadow.dart';
-import '../common_widgets.dart';
 
 class ChatTextField extends StatelessWidget {
   const ChatTextField(
@@ -17,21 +16,14 @@ class ChatTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: ClipRect(
-        clipper: const ClipPad(padding: EdgeInsets.only(top: 30)),
-        child: Container(
-          padding:
-              EdgeInsets.only(left: 20.w, right: 20.w, bottom: 25.h, top: 10.h),
-          decoration: BoxDecoration(color: colorWhite, boxShadow: [
-            BoxShadow(
-              color: colorPrimaryA05.withOpacity(.36),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(4, 0),
-            ),
-          ]),
+    return Consumer<ChatProvider>(
+      builder: (context, chat, b) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: colorFF3,
+            borderRadius: BorderRadius.circular(30),
+          ),
           child: TextField(
             minLines: 1,
             maxLines: 3,
@@ -42,6 +34,10 @@ class ChatTextField extends StatelessWidget {
               fontFamily: strFontName,
               fontWeight: FontWeight.w600,
             ),
+            onChanged: (v) {
+              chat.notifyUI();
+            },
+            focusNode: chat.textFieldFocus,
             maxLength: 1500,
             decoration: InputDecoration(
               isDense: true,
@@ -54,25 +50,7 @@ class ChatTextField extends StatelessWidget {
                 fontFamily: strFontName,
                 fontWeight: FontWeight.w400,
               ),
-              suffixIcon: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      widthBox(12.w),
-                      GestureDetector(
-                        onTap: ontapSend,
-                        child: Image.asset(
-                          imgSendComment,
-                          height: 38.h,
-                          width: 38.w,
-                        ),
-                      ),
-                    ],
-                  )),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.w, vertical: 20.h),
+              contentPadding: EdgeInsets.zero,
               focusColor: Colors.transparent,
               focusedBorder: const OutlineInputBorder(
                 borderSide: BorderSide(
@@ -85,8 +63,8 @@ class ChatTextField extends StatelessWidget {
             textInputAction: TextInputAction.newline,
             onEditingComplete: () => FocusScope.of(context).unfocus(),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
