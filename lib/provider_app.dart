@@ -7,6 +7,7 @@ import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_controller.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
@@ -16,7 +17,6 @@ import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provid
 import 'package:casarancha/screens/search/search_screen.dart';
 import 'package:casarancha/utils/providers/date_picker_provider.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/voice_recorder.dart';
-import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
