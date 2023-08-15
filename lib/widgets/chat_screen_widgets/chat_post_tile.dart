@@ -13,6 +13,7 @@ import '../../models/message.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
+import '../music_player_url.dart';
 import '../text_widget.dart';
 
 class ChatVideoTile extends StatelessWidget {
@@ -155,7 +156,7 @@ class ChatMusicTile extends StatelessWidget {
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: VoiceMessage(
                 audioSrc: media.link,
-                meBgColor: Colors.black,
+                meBgColor: isMe ? colorF03.withOpacity(0.6) : colorFF3,
                 played: false, // To show played badge or not.
                 me: true, // Set message side.
                 onPlay: () {}, // Do something when voice played.
