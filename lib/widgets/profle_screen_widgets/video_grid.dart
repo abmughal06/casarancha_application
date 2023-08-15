@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -44,24 +45,26 @@ class VideoGridView extends StatelessWidget {
               return GestureDetector(
                 onTap: () => Get.to(() => PostFullScreenView(
                     post: videoList![index], isPostDetail: false)),
-                child: Container(
-                  color: Colors.white,
-                  child: FutureBuilder<String?>(
-                    future: videoThumbnail(data.link),
-                    builder: (context, snap) {
-                      if (snap.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        );
-                      }
-                      return snap.data != null
-                          ? Image.file(
-                              File(snap.data!),
-                              fit: BoxFit.cover,
-                            )
-                          : Container(color: Colors.black);
-                    },
-                  ),
+                child: FutureBuilder<String?>(
+                  future: videoThumbnail(data.link),
+                  builder: (context, snap) {
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      );
+                    }
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: colorWhite,
+                        image: snap.data != null
+                            ? DecorationImage(
+                                image: FileImage(File(snap.data!)),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                      ),
+                    );
+                  },
                 ),
               );
             },

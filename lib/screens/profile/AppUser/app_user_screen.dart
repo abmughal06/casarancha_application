@@ -4,7 +4,6 @@ import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
-import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/profile_top_loader.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/qoutes_grid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -360,7 +359,17 @@ class _AppUserScreenState extends State<AppUserScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          primaryTabBar(
+                          TabBar(
+                            labelColor: colorPrimaryA05,
+                            unselectedLabelColor: colorAA3,
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
+                            ),
+                            indicatorColor: Colors.yellow,
+                            indicatorPadding: EdgeInsets.symmetric(
+                                vertical: 5.h, horizontal: 10.w),
+                            dividerColor: Colors.transparent,
                             tabs: const [
                               Tab(
                                 child: Text('Qoutes'),

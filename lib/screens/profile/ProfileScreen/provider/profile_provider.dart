@@ -22,6 +22,7 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   void toggleFollowBtn({UserModel? userModel, String? appUserId}) async {
+    log('in metthod');
     try {
       if (userModel!.followingsIds.contains(appUserId)) {
         await currentUserRef.update({

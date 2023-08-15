@@ -41,7 +41,11 @@ class ChatListScreen extends StatelessWidget {
         title: 'Messages',
         elevation: 0,
         leading: const GhostModeBtn(),
-        actions: [IconButton(onPressed: () {}, icon: Image.asset(imgAddPost))],
+        actions: [
+          IconButton(
+              onPressed: () => context.read<DashboardProvider>().changePage(1),
+              icon: Image.asset(imgAddPost))
+        ],
       ),
       body: Consumer<DashboardProvider>(builder: (context, ghost, b) {
         return DefaultTabController(
@@ -59,7 +63,8 @@ class ChatListScreen extends StatelessWidget {
                 ),
                 indicatorColor: Colors.yellow,
                 dividerColor: Colors.transparent,
-                indicatorPadding: const EdgeInsets.symmetric(vertical: 5),
+                indicatorPadding:
+                    EdgeInsets.symmetric(vertical: 5.h, horizontal: 65.w),
                 tabs: const [
                   Tab(
                     text: "Friends",

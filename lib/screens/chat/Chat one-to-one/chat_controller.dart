@@ -340,7 +340,7 @@ class ChatProvider extends ChangeNotifier {
         id: appUser.id,
         lastMessage: mediaType == 'InChatVideo'
             ? "Video"
-            : mediaType == 'InChatPhoto'
+            : mediaType == 'InChatPic'
                 ? "Photo"
                 : 'Music',
         unreadMessageCount: 0,
@@ -355,7 +355,11 @@ class ChatProvider extends ChangeNotifier {
 
       final MessageDetails currentUserMessageDetails = MessageDetails(
         id: currentUser.id,
-        lastMessage: "Photo",
+        lastMessage: mediaType == 'InChatVideo'
+            ? "Video"
+            : mediaType == 'InChatPic'
+                ? "Photo"
+                : 'Music',
         unreadMessageCount: unreadMessages + 1,
         searchCharacters: [...currentUser.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
@@ -393,7 +397,7 @@ class ChatProvider extends ChangeNotifier {
         createdAt: DateTime.now().toIso8601String(),
         isSeen: false,
       );
-      log(message.toString());
+      // log(message.toString());
 
       final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
@@ -431,6 +435,7 @@ class ChatProvider extends ChangeNotifier {
     videosList.clear();
     musicList.clear();
     mediaUploadTasks.clear();
+    tasksProgress = 0.0;
     mediaData.clear();
     notifyListeners();
   }
@@ -442,6 +447,8 @@ class ChatProvider extends ChangeNotifier {
     mediaUploadTasks.clear();
     mediaData.clear();
   }
+
+  double tasksProgress = 0.0;
 
   Future<void> uploadMediaFiles({required String recieverId}) async {
     final allMediaFiles = [...photosList, ...videosList, ...musicList];
@@ -471,6 +478,13 @@ class ChatProvider extends ChangeNotifier {
         final uploadTask = storageFileRef.putData(await element.readAsBytes());
 
         mediaUploadTasks.add(uploadTask);
+        notifyListeners();
+
+        for (var i in mediaUploadTasks) {
+          tasksProgress += i.snapshot.bytesTransferred / i.snapshot.totalBytes;
+          notifyListeners();
+        }
+        tasksProgress = tasksProgress / mediaUploadTasks.length;
         notifyListeners();
 
         final mediaRef = await uploadTask.whenComplete(() {});
@@ -548,7 +562,7 @@ class ChatProvider extends ChangeNotifier {
       );
       videoFileHelper = File(pickedVideo!.path);
       videosList.add(videoFileHelper);
-      log(videosList.toString());
+      // log(videosList.toString());
     } catch (e) {
       GlobalSnackBar.show(message: 'Operation Cancelled');
     }

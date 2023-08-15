@@ -21,12 +21,12 @@ class MusicPlayerUrl extends StatefulWidget {
       required this.musicDetails,
       required this.ontap,
       required this.border,
-      required this.postModel})
+      this.postModel})
       : super(key: key);
   final MediaDetails musicDetails;
   final Function ontap;
   final double border;
-  final PostModel postModel;
+  final PostModel? postModel;
 
   @override
   State<MusicPlayerUrl> createState() => _MusicPlayerWithFileState();

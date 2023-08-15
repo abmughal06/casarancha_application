@@ -1,10 +1,10 @@
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../../resources/color_resources.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
 import '../../../widgets/profle_screen_widgets/music_grid.dart';
@@ -54,7 +54,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             length: 4,
             child: Column(
               children: [
-                primaryTabBar(
+                TabBar(
+                  labelColor: colorPrimaryA05,
+                  unselectedLabelColor: colorAA3,
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
+                  ),
+                  indicatorColor: Colors.yellow,
+                  indicatorPadding:
+                      EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+                  dividerColor: Colors.transparent,
                   tabs: const [
                     Tab(
                       child: Text('Quotes'),

@@ -17,8 +17,11 @@ class DashBoard extends StatelessWidget {
     final dashboardProvider = context.watch<DashboardProvider>();
     return Scaffold(
         body: PageView(
+          pageSnapping: false,
           controller: dashboardProvider.pageController,
-          onPageChanged: (value) {},
+          onPageChanged: (value) {
+            dashboardProvider.changePage(value);
+          },
           children: const [
             HomeScreen(),
             SearchScreen(),

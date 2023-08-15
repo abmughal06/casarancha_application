@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
                 navigatorKey: rootNavigatorKey,
                 debugShowCheckedModeBanner: false,
                 theme: ThemeData(
-                  useMaterial3: true,
                   primarySwatch: Colors.red,
                 ),
                 home: const Authenticate(),

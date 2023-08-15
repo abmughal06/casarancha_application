@@ -73,7 +73,9 @@ dependencies:
   story_view: ^0.14.0
   url_launcher: ^6.1.6
   video_player: ^2.5.2
-  audioplayers: ^2.0.0
+  audioplayers: ^3.0.1
+  voice_message_package: ^1.0.41
+  just_audio: ^0.9.34
   timeago: ^3.3.0
   google_sign_in: ^5.4.3
   flutter_facebook_auth: ^4.4.1+1

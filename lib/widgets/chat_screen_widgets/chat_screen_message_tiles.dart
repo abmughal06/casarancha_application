@@ -1,3 +1,4 @@
+import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:casarancha/models/media_details.dart';
@@ -22,9 +23,10 @@ class MessageTiles extends StatelessWidget {
     switch (message.type) {
       case "InChatPic":
         return InkWell(
-          // onTap: () => Get.to(() => PostDetailScreen(
-          //       postModel: postModel,
-          //     )),
+          onTap: () => Get.to(() => ChatMediaFullScreenView(
+                media: List.generate(message.content.length,
+                    (index) => MediaDetails.fromMap(message.content[index])),
+              )),
           child: ChatImageTile(
             message: message,
             appUserId: message.sentToId,
@@ -64,15 +66,15 @@ class MessageTiles extends StatelessWidget {
       case 'InChatVideo':
         final prePost = message.content;
         final postModel = MediaDetails.fromMap(prePost[0]);
-        // VideoPlayerController videoPlayerController;
-        // videoPlayerController =
-        //     VideoPlayerController.network(postModel.mediaData[0].link);
+        var media = List.generate(message.content.length,
+            (index) => MediaDetails.fromMap(message.content[index]));
 
         return InkWell(
-          // onTap: () => Get.to(() => PostDetailScreen(
-          //       postModel: postModel,
-          //     )),
+          onTap: () => Get.to(() => ChatMediaFullScreenView(
+                media: media,
+              )),
           child: ChatVideoTile(
+            mediaLength: media.length > 1 ? media.length : null,
             link: postModel.link,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
@@ -83,10 +85,6 @@ class MessageTiles extends StatelessWidget {
       case 'Video':
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
-        // VideoPlayerController videoPlayerController;
-        // videoPlayerController =
-        //     VideoPlayerController.network(postModel.mediaData[0].link);
-
         return InkWell(
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
@@ -102,9 +100,6 @@ class MessageTiles extends StatelessWidget {
       case 'InChatMusic':
         final music = MediaDetails.fromMap(message.content[0]);
         return InkWell(
-          // onTap: () => Get.to(() => PostDetailScreen(
-          //       postModel: postModel,
-          //     )),
           child: ChatMusicTile(
             appUserId: message.sentToId,
             isSeen: message.isSeen,

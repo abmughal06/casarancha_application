@@ -553,34 +553,75 @@ class ShowMediaToSendInChat extends StatelessWidget {
                     },
                   ),
                 ),
-                // GestureDetector(
-                //   onTap: () => media.photosList.isNotEmpty
-                //       ? media.getPhoto()
-                //       : media.videosList.isNotEmpty
-                //           ? media.getVideo()
-                //           : media.getMusic(),
-                //   child: Image.asset(
-                //     imgAddPost,
-                //     height: 38.h,
-                //     width: 38.w,
-                //   ),
-                // ),
+                media.photosList.isNotEmpty || media.videosList.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () => media.photosList.isNotEmpty
+                            ? media.getPhoto()
+                            : media.getVideo(),
+                        child: Image.asset(
+                          imgAddPost,
+                          height: 38.h,
+                          width: 38.w,
+                        ),
+                      )
+                    : widthBox(0),
                 GestureDetector(
-                  onTap: () => media.pickImageAndSentViaMessage(
-                    currentUser: currentUser,
-                    appUser: appUser,
-                    mediaType: media.photosList.isNotEmpty
-                        ? 'InChatPic'
-                        : media.videosList.isNotEmpty
-                            ? 'InChatVideo'
-                            : 'InChatMusic',
-                  ),
+                  onTap: () {
+                    media.pickImageAndSentViaMessage(
+                      currentUser: currentUser,
+                      appUser: appUser,
+                      mediaType: media.photosList.isNotEmpty
+                          ? 'InChatPic'
+                          : media.videosList.isNotEmpty
+                              ? 'InChatVideo'
+                              : 'InChatMusic',
+                    );
+
+                    Get.defaultDialog(
+                      title: 'Sending Attachments',
+                      titleStyle: TextStyle(
+                        fontSize: 14.sp,
+                        color: color221,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      content: Consumer<ChatProvider>(
+                        builder: (context, state, b) {
+                          if (state.mediaUploadTasks.isNotEmpty) {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 15.w, vertical: 8.h),
+                              child: Column(
+                                children: [
+                                  LinearProgressIndicator(
+                                    value: state.tasksProgress,
+                                    minHeight: 10.h,
+                                  ),
+                                  heightBox(5.h),
+                                  TextWidget(
+                                    text:
+                                        '${(100 * state.tasksProgress).roundToDouble().toInt()}%',
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return ElevatedButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              child: const Text('Done'),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  },
                   child: Image.asset(
                     imgSendComment,
                     height: 38.h,
                     width: 38.w,
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -589,7 +630,3 @@ class ShowMediaToSendInChat extends StatelessWidget {
     );
   }
 }
-
-// Expanded(
-//
-//                 ),

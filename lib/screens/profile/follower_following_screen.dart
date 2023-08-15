@@ -103,8 +103,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                         user: user,
                         ontapToggleFollow: () =>
                             profileProvider.toggleFollowBtn(
-                                userModel: user,
-                                appUserId: filterList[index].id),
+                                userModel: currentUser, appUserId: user.id),
                         btnName: "Remove",
                       );
                     },

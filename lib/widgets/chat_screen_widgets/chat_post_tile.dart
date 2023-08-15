@@ -1,17 +1,18 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:voice_message_package/voice_message_package.dart';
 
 import '../../models/media_details.dart';
 import '../../models/message.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
-import '../music_player_url.dart';
 import '../text_widget.dart';
 
 class ChatVideoTile extends StatelessWidget {
@@ -22,6 +23,7 @@ class ChatVideoTile extends StatelessWidget {
     required this.isSeen,
     required this.date,
     required this.link,
+    this.mediaLength,
   }) : super(key: key);
 
   final bool isMe;
@@ -29,6 +31,7 @@ class ChatVideoTile extends StatelessWidget {
   final String appUserId;
   final String date;
   final String link;
+  final int? mediaLength;
 
   Future<String?> initThumbnail() async {
     return await VideoThumbnail.thumbnailFile(
@@ -64,9 +67,48 @@ class ChatVideoTile extends StatelessWidget {
                           child: CircularProgressIndicator.adaptive(),
                         );
                       }
-                      return Image.file(
-                        File(snapshot.data!),
-                        fit: BoxFit.fill,
+                      return Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(
+                              File(snapshot.data!),
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: double.infinity,
+                              width: double.infinity,
+                              color: Colors.black.withOpacity(0.2),
+                              child: const Icon(
+                                Icons.play_arrow_rounded,
+                                size: 40,
+                                color: colorWhite,
+                              ),
+                            ),
+                            Positioned(
+                              right: 12,
+                              top: 12,
+                              child: mediaLength != null
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.6),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8.w, vertical: 4.h),
+                                      child: TextWidget(
+                                        text: '1/$mediaLength',
+                                        fontSize: 9.sp,
+                                        color: colorWhite,
+                                      ),
+                                    )
+                                  : widthBox(0),
+                            )
+                          ],
+                        ),
                       );
                     },
                   ),
@@ -111,15 +153,12 @@ class ChatMusicTile extends StatelessWidget {
                 EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: Column(
-                children: [
-                  MusicPlayerTile(
-                    isMe: isMe,
-                    border: 15,
-                    musicDetails: media,
-                    ontap: () {},
-                  ),
-                ],
+              child: VoiceMessage(
+                audioSrc: media.link,
+                meBgColor: Colors.black,
+                played: false, // To show played badge or not.
+                me: true, // Set message side.
+                onPlay: () {}, // Do something when voice played.
               ),
             ),
           ),
@@ -224,9 +263,28 @@ class ChatImageTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // child: TextWidget(
-                  //   text: media.length,
-                  // ),
+                  child: media.length > 1
+                      ? Align(
+                          alignment:
+                              isMe ? Alignment.topRight : Alignment.topLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8.w, vertical: 4.h),
+                              child: TextWidget(
+                                text: '1/${media.length}',
+                                fontSize: 9.sp,
+                                color: colorWhite,
+                              ),
+                            ),
+                          ),
+                        )
+                      : widthBox(0),
                 ),
               ),
             ),
