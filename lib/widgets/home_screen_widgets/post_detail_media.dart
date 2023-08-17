@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/music_provider.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
+import 'package:casarancha/widgets/custom_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +19,7 @@ import '../../models/media_details.dart';
 import '../../models/post_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
+import '../../screens/dashboard/provider/download_provider.dart';
 import '../music_player_url.dart';
 import '../text_widget.dart';
 import '../video_player_url.dart';
@@ -49,6 +53,19 @@ class CheckMediaAndShowPost extends StatelessWidget {
         postProvider.countVideoViews(postModel: postModel);
         return InkWell(
           onDoubleTap: ondoubleTap,
+          onLongPress: () {
+            isPostDetail
+                ? showDialog(
+                    context: context,
+                    builder: (context) {
+                      return CustomDownloadDialog(
+                        url: mediaData.link,
+                        path:
+                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
+                      );
+                    })
+                : null;
+          },
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
@@ -65,6 +82,19 @@ class CheckMediaAndShowPost extends StatelessWidget {
 
       case "Video":
         return InkWell(
+          onLongPress: () {
+            isPostDetail
+                ? showDialog(
+                    context: context,
+                    builder: (context) {
+                      return CustomDownloadDialog(
+                        url: mediaData.link,
+                        path:
+                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
+                      );
+                    })
+                : null;
+          },
           onDoubleTap: ondoubleTap,
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
@@ -83,6 +113,19 @@ class CheckMediaAndShowPost extends StatelessWidget {
         return ChangeNotifierProvider<MusicProvider>(
           create: (context) => MusicProvider(),
           child: InkWell(
+            onLongPress: () {
+              isPostDetail
+                  ? showDialog(
+                      context: context,
+                      builder: (context) {
+                        return CustomDownloadDialog(
+                          url: mediaData.link,
+                          path:
+                              '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
+                        );
+                      })
+                  : null;
+            },
             onDoubleTap: ondoubleTap,
             onTap: isPostDetail
                 ? () => Get.to(() => PostFullScreenView(

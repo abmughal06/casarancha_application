@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,8 +10,10 @@ import '../../../widgets/chat_screen_widgets/chat_post_tile.dart';
 import '../../../widgets/chat_screen_widgets/chat_story_tile.dart';
 import '../../../widgets/chat_screen_widgets/chat_tile.dart';
 import '../../models/message.dart';
+import '../../screens/dashboard/provider/download_provider.dart';
 import '../../screens/home/post_detail_screen.dart';
 import '../../screens/home/story_view_screen.dart';
+import '../custom_dialog.dart';
 
 class MessageTiles extends StatelessWidget {
   const MessageTiles({Key? key, required this.message, required this.isMe})
@@ -20,9 +24,23 @@ class MessageTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // List<MediaDetails> media = List.generate(message.content.length,
+    //     (index) => MediaDetails.fromMap(message.content[index]));
+
     switch (message.type) {
       case "InChatPic":
         return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: message.content[0]['link'],
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
           onTap: () => Get.to(() => ChatMediaFullScreenView(
                 media: List.generate(message.content.length,
                     (index) => MediaDetails.fromMap(message.content[index])),
@@ -38,6 +56,17 @@ class MessageTiles extends StatelessWidget {
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
         return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: message.content['mediaData'][0]['link'],
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
               )),
@@ -70,6 +99,17 @@ class MessageTiles extends StatelessWidget {
             (index) => MediaDetails.fromMap(message.content[index]));
 
         return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: postModel.link,
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
           onTap: () => Get.to(() => ChatMediaFullScreenView(
                 media: media,
               )),
@@ -86,6 +126,17 @@ class MessageTiles extends StatelessWidget {
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
         return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: postModel.mediaData[0].link,
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
               )),
@@ -100,6 +151,17 @@ class MessageTiles extends StatelessWidget {
       case 'InChatMusic':
         final music = MediaDetails.fromMap(message.content[0]);
         return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: message.content[0]['link'],
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
           child: ChatMusicTile(
             appUserId: message.sentToId,
             isSeen: message.isSeen,
@@ -112,6 +174,17 @@ class MessageTiles extends StatelessWidget {
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
         return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: postModel.mediaData[0].link,
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
               )),
