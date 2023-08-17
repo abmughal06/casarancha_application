@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/widgets/custom_dialog.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
@@ -36,7 +37,6 @@ class PostCard extends StatelessWidget {
     final curruentUser = context.watch<UserModel?>();
     final postPorvider = Provider.of<PostProvider>(context, listen: false);
     final ghostProvider = context.watch<DashboardProvider>();
-    final download = context.watch<DownloadProvider>();
     return Column(
       children: [
         CustomPostHeader(
@@ -73,10 +73,13 @@ class PostCard extends StatelessWidget {
                 BottomSheetWidget(
                   ontapBlock: () {},
                   onTapDownload: () async {
-                    download.startDownloading(post.mediaData.first.link,
-                        '${post.mediaData.first.type}${Random().nextInt(2)}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}');
-                    Get.back();
-                    Get.bottomSheet(const DownloadProgressContainer());
+                    showDialog(
+                        context: context,
+                        builder: (c) => CustomDownloadDialog(
+                              path:
+                                  '${post.mediaData.first.type}${Random().nextInt(2)}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}',
+                              url: post.mediaData.first.link,
+                            ));
                   },
                 ),
                 isScrollControlled: true,

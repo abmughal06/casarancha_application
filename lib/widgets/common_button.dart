@@ -100,10 +100,10 @@ class CommonButton extends StatelessWidget {
               horizontal: horizontalPadding ?? 0.0),
           child: Center(
             child: showLoading
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
+                ? SizedBox(
+                    height: 19.h,
+                    width: 19.h,
+                    child: const CircularProgressIndicator(
                       color: colorWhite,
                       strokeWidth: 3,
                     ),

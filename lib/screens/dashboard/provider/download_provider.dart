@@ -1,15 +1,8 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
-
-import '../../../widgets/common_widgets.dart';
-import '../../../widgets/text_widget.dart';
 
 class DownloadProvider extends ChangeNotifier {
   Dio dio = Dio();
@@ -17,7 +10,7 @@ class DownloadProvider extends ChangeNotifier {
   bool isDownloading = false;
   File? filePath;
 
-  void startDownloading(String url, String filename) async {
+  void startDownloading(String url, String filename, context) async {
     isDownloading = true;
     notifyListeners();
     try {
@@ -29,6 +22,7 @@ class DownloadProvider extends ChangeNotifier {
               url: url,
               onProgress: (fileName, p) {
                 progress = p;
+                notifyListeners();
               },
             )
           : await dio.download(
@@ -45,6 +39,7 @@ class DownloadProvider extends ChangeNotifier {
       notifyListeners();
     } finally {
       isDownloading = false;
+      progress = 0.0;
       notifyListeners();
     }
   }
@@ -52,63 +47,6 @@ class DownloadProvider extends ChangeNotifier {
   Future<String> _getPath(String filename) async {
     final dir = await getApplicationDocumentsDirectory();
     return '${dir.path}/$filename';
-  }
-}
-
-class DownloadProgressContainer extends StatelessWidget {
-  const DownloadProgressContainer({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<DownloadProvider>(
-      builder: (context, d, b) {
-        return Container(
-          height: 200.h,
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 65),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      d.isDownloading == false
-                          ? const Icon(Icons.done)
-                          : centerLoader(),
-                      heightBox(12.h),
-                      TextWidget(
-                        text: Platform.isAndroid
-                            ? 'Downloading file (${(d.progress * 1).toInt()}%)'
-                            : 'Downloading file (${(d.progress * 100).toInt()}%)',
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 25.w,
-                top: 20.h,
-                child: d.isDownloading == false
-                    ? InkWell(
-                        onTap: () {
-                          Get.back();
-                          d.progress = 0.0;
-                        },
-                        child: const Icon(Icons.close),
-                      )
-                    : Container(),
-              )
-            ],
-          ),
-        );
-      },
-    );
   }
 }
 
