@@ -78,32 +78,51 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           children: [
                             edit.imageFilePicked != null
                                 ? Container(
-                                    height: 150,
-                                    width: 150,
+                                    height: 127.h,
+                                    width: 127.h,
                                     alignment: Alignment.center,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: DecorationImage(
+                                            fit: BoxFit.cover,
                                             image: FileImage(
                                                 edit.imageFilePicked!))),
                                   )
                                 : edit.profileImage != null
-                                    ? imgProVerified(
-                                        imgRadius: 80,
-                                        profileImg: edit.profileImage,
-                                        idIsVerified: false)
+                                    ? Container(
+                                        height: 127.h,
+                                        width: 127.h,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(
+                                                    edit.profileImage!))),
+                                      )
                                     : CircleAvatar(
                                         radius: 20,
                                         backgroundImage:
                                             Image.asset(imgProfile).image,
                                       ),
                             Positioned(
-                              bottom: 5.h,
-                              left: 100.w,
+                              top: 0.h,
+                              right: 0.w,
                               child: SvgPicture.asset(
                                 icProfileAdd,
+                                height: 30,
                               ),
                             ),
+                            Positioned(
+                              bottom: 10.w,
+                              right: 5.w,
+                              child: Visibility(
+                                  visible: user.isVerified,
+                                  child: SvgPicture.asset(
+                                    icVerifyBadge,
+                                    height: 20,
+                                  )),
+                            )
                           ],
                         ),
                       ),

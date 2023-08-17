@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:casarancha/screens/home/providers/music_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/media_details.dart';
 import '../../resources/color_resources.dart';
@@ -42,13 +40,11 @@ class CheckMediaAndShow extends StatelessWidget {
               );
             });
       case "Music":
-        return ChangeNotifierProvider<MusicProvider>(
-          create: (context) => MusicProvider(),
-          child: MusicPlayerUrl(
-            border: 0,
-            musicDetails: mediaData,
-            ontap: () {},
-          ),
+        return MusicPlayerUrl(
+          isPostDetail: false,
+          border: 0,
+          musicDetails: mediaData,
+          ontap: () {},
         );
 
       default:
@@ -142,13 +138,13 @@ class ChatMediaWidget extends StatelessWidget {
           )
           .toList(),
       options: CarouselOptions(
-        aspectRatio: media[0].type == 'Qoute'
-            ? getQouteAspectRatio(media[0].link, false)
-            : media[0].type == 'Music'
+        aspectRatio: media.first.type == 'Qoute'
+            ? getQouteAspectRatio(media.first.link, false)
+            : media.first.type == 'Music'
                 ? 13 / 9
-                : media[0].type == 'Photo'
-                    ? double.parse(media[0].imageWidth!) /
-                        double.parse(media[0].imageHeight!)
+                : media.first.type == 'Photo'
+                    ? double.parse(media.first.imageWidth!) /
+                        double.parse(media.first.imageHeight!)
                     : 9 / 16,
         viewportFraction: 1,
         enableInfiniteScroll: false,

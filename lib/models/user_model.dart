@@ -18,6 +18,7 @@ class UserModel {
   List<String> followingsIds;
   List<String> savedPostsIds;
   List<String> groupIds;
+  List<String> blockIds;
   bool isOnline;
   bool isdobShown;
   bool isEmailShown;
@@ -39,6 +40,7 @@ class UserModel {
     this.followersIds = const [],
     this.followingsIds = const [],
     this.savedPostsIds = const [],
+    this.blockIds = const [],
     this.groupIds = const [],
     required this.isOnline,
     this.isdobShown = false,
@@ -64,6 +66,7 @@ class UserModel {
     List<String>? followingsIds,
     List<String>? savedPostsIds,
     List<String>? groupIds,
+    List<String>? blockIds,
     bool? isOnline,
     bool? isdobShown,
     bool? isEmailShown,
@@ -73,6 +76,7 @@ class UserModel {
   }) {
     return UserModel(
       id: id ?? this.id,
+      blockIds: blockIds ?? this.blockIds,
       email: email ?? this.email,
       username: username ?? this.username,
       ghostName: ghostName ?? this.ghostName,
@@ -106,6 +110,7 @@ class UserModel {
       'email': email,
       'username': username,
       'ghostName': ghostName,
+      'blockIds': blockIds,
       'dob': dob,
       'name': name,
       'createdAt': createdAt,
@@ -129,6 +134,9 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['id'] ?? '',
+      blockIds: map['blockIds'] == null
+          ? const []
+          : List<String>.from(map['blockIds']),
       email: map['email'] ?? '',
       username: map['username'] ?? '',
       ghostName: map['ghostName'] ?? '',
@@ -159,7 +167,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, username: $username, ghosName : $ghostName,dob: $dob, name: $name, createdAt: $createdAt, bio: $bio, imageStr: $imageStr, postsIds: $postsIds, storiesIds: $storiesIds, followersIds: $followersIds, followingsIds: $followingsIds, savedPostsIds: $savedPostsIds, groupIds: $groupIds, isOnline: $isOnline, isdobShown: $isdobShown, isEmailShown: $isEmailShown, isVerified: $isVerified,reportCount: $reportCount,fcmToken: $fcmToken )';
+    return 'UserModel(id: $id,blockIds: $blockIds, email: $email, username: $username, ghosName : $ghostName,dob: $dob, name: $name, createdAt: $createdAt, bio: $bio, imageStr: $imageStr, postsIds: $postsIds, storiesIds: $storiesIds, followersIds: $followersIds, followingsIds: $followingsIds, savedPostsIds: $savedPostsIds, groupIds: $groupIds, isOnline: $isOnline, isdobShown: $isdobShown, isEmailShown: $isEmailShown, isVerified: $isVerified,reportCount: $reportCount,fcmToken: $fcmToken )';
   }
 
   @override
@@ -176,6 +184,7 @@ class UserModel {
         other.createdAt == createdAt &&
         other.bio == bio &&
         other.imageStr == imageStr &&
+        listEquals(other.blockIds, blockIds) &&
         listEquals(other.postsIds, postsIds) &&
         listEquals(other.storiesIds, storiesIds) &&
         listEquals(other.followersIds, followersIds) &&
@@ -202,6 +211,7 @@ class UserModel {
         bio.hashCode ^
         imageStr.hashCode ^
         postsIds.hashCode ^
+        blockIds.hashCode ^
         storiesIds.hashCode ^
         followersIds.hashCode ^
         followingsIds.hashCode ^
