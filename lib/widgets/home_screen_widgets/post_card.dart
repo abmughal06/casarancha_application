@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -72,7 +74,7 @@ class PostCard extends StatelessWidget {
                   ontapBlock: () {},
                   onTapDownload: () async {
                     download.startDownloading(post.mediaData.first.link,
-                        '${post.mediaData.first.link.split('/').last}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}');
+                        '${post.mediaData.first.type}${Random().nextInt(2)}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}');
                     Get.back();
                     Get.bottomSheet(const DownloadProgressContainer());
                   },

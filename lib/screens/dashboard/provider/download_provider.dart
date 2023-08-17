@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,15 +23,23 @@ class DownloadProvider extends ChangeNotifier {
     try {
       String path = await _getPath(filename);
 
-      await dio.download(
-        url,
-        path,
-        onReceiveProgress: (count, total) {
-          progress = count / total;
-          notifyListeners();
-        },
-        deleteOnError: true,
-      );
+      Platform.isAndroid
+          ? await FileDownloader.downloadFile(
+              name: filename,
+              url: url,
+              onProgress: (fileName, p) {
+                progress = p;
+              },
+            )
+          : await dio.download(
+              url,
+              path,
+              onReceiveProgress: (count, total) {
+                progress = count / total;
+                notifyListeners();
+              },
+              deleteOnError: true,
+            );
     } catch (e) {
       isDownloading = false;
       notifyListeners();
@@ -73,8 +83,9 @@ class DownloadProgressContainer extends StatelessWidget {
                           : centerLoader(),
                       heightBox(12.h),
                       TextWidget(
-                        text:
-                            'Downloading file (${(d.progress * 100).toInt()}%)',
+                        text: Platform.isAndroid
+                            ? 'Downloading file (${(d.progress * 1).toInt()}%)'
+                            : 'Downloading file (${(d.progress * 100).toInt()}%)',
                       ),
                     ],
                   ),
@@ -105,9 +116,15 @@ String checkMediaTypeAndSetExtention(String media) {
   switch (media) {
     case 'Photo':
       return '.jpg';
+    case 'InChatPic':
+      return '.jpg';
     case 'Video':
       return '.MOV';
+    case 'InChatVideo':
+      return '.mp4';
     case 'Music':
+      return '.mp3';
+    case 'InChatMusic':
       return '.mp3';
     default:
       return '.txt';
