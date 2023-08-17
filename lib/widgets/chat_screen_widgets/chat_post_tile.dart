@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
+import 'package:casarancha/widgets/music_player_url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,7 +14,6 @@ import '../../models/message.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
-import '../music_player_url.dart';
 import '../text_widget.dart';
 
 class ChatVideoTile extends StatelessWidget {
@@ -154,13 +154,8 @@ class ChatMusicTile extends StatelessWidget {
                 EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: VoiceMessage(
-                audioSrc: media.link,
-                meBgColor: isMe ? colorF03.withOpacity(0.6) : colorFF3,
-                played: false, // To show played badge or not.
-                me: true, // Set message side.
-                onPlay: () {}, // Do something when voice played.
-              ),
+              child: MusicPlayerTile(
+                  musicDetails: media, ontap: () {}, border: 16, isMe: isMe),
             ),
           ),
           DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),

@@ -94,18 +94,32 @@ Widget imgProVerified(
     required String? profileImg,
     required bool idIsVerified}) {
   return Container(
-      height: 40,
-      width: 40,
+      height: 40.w,
+      width: 40.w,
+      margin: EdgeInsets.only(bottom: 12.w),
       alignment: Alignment.center,
       decoration: const BoxDecoration(shape: BoxShape.circle),
       child: AspectRatio(
         aspectRatio: 1,
-        child: ClipOval(
-          child: FadeInImage(
-            fit: BoxFit.cover,
-            image: NetworkImage(profileImg!),
-            placeholder: const AssetImage(imgUserPlaceHolder),
-          ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(3.w),
+              child: ClipOval(
+                child: FadeInImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(profileImg!),
+                  placeholder: const AssetImage(imgUserPlaceHolder),
+                ),
+              ),
+            ),
+            Positioned(
+                right: 0,
+                bottom: 0,
+                child: Visibility(
+                    visible: idIsVerified,
+                    child: SvgPicture.asset(icVerifyBadge)))
+          ],
         ),
       ));
 }

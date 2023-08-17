@@ -66,6 +66,11 @@ class AuthenticationProvider extends ChangeNotifier {
           "ghostName": "Ghost---- ${AppUtils.instance.generateRandomNumber()}"
         }, SetOptions(merge: true));
       }
+      if (!data.data()!.containsKey("blockIds")) {
+        ref.set({
+          "blockIds": FieldValue.arrayUnion([]),
+        }, SetOptions(merge: true));
+      }
       Get.offAll(() => const DashBoard());
     } else {
       Get.offAll(() => const SetupProfileScreen());

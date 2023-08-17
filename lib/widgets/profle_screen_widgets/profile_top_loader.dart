@@ -1,28 +1,18 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/screens/auth/login_screen.dart';
-import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:casarancha/widgets/profle_screen_widgets/profile_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
-import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/follower_following_screen.dart';
-import '../../screens/profile/saved_post_screen.dart';
-import '../../utils/app_constants.dart';
-import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
-import '../home_page_widgets.dart';
 import '../text_widget.dart';
 
 Widget postFollowCount({required String count, required String strText}) {
@@ -69,130 +59,6 @@ Widget postStoriesBtn(
   );
 }
 
-_bottomSheetProfile(context) {
-  showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(40.r), topRight: Radius.circular(40.r)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-            height: 550,
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisSize: MainAxisSize.min,
-                children: [
-                  heightBox(10.h),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                      height: 6.h,
-                      width: 78.w,
-                      decoration: BoxDecoration(
-                        color: colorDD9,
-                        borderRadius: BorderRadius.all(Radius.circular(30.r)),
-                      ),
-                    ),
-                  ),
-                  heightBox(10.h),
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: AppConstant.profileBottomSheetList.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                            child: textMenuItem(
-                                text: AppConstant.profileBottomSheetList[index],
-                                color: index > 6 ? Colors.red : null,
-                                onTap: () {
-                                  _onTapSheetItem(index: index);
-                                }),
-                          );
-                        }),
-                  )
-                ]));
-      });
-}
-
-_onTapSheetItem({required int index}) async {
-  switch (index) {
-    case 0:
-      Get.to(() => const EditProfileScreen());
-      break;
-    case 1:
-      Get.to(() => const SavedPostScreen());
-      break;
-    case 2:
-      //getVerify
-      Get.back();
-      GlobalSnackBar.show(message: 'Coming Soon');
-      break;
-    case 3:
-      Get.back();
-      GlobalSnackBar.show(message: 'Coming Soon');
-      break;
-
-    case 4:
-      //about
-      Get.back();
-      launchUrls("https://casarancha.com/about/");
-      break;
-
-    case 5:
-      //terms
-
-      Get.back();
-      launchUrls("https://casarancha.com/terms-conditions/");
-      break;
-    case 6:
-      //privacy
-
-      Get.back();
-      launchUrls("https://casarancha.com/privacy-policy/");
-      break;
-    case 7:
-      //logout
-      // profileScreenController.logout();
-      Get.back();
-      AuthenticationProvider(FirebaseAuth.instance).signOut().whenComplete(() {
-        User? user;
-        if (user == null) {
-          Get.offAll(() => const LoginScreen());
-        }
-      });
-
-      break;
-    case 8:
-      //logout
-
-      // showDialog(
-      //     context: context,
-      //     builder: (context) {
-      //       return deleteAccountDialog(context);
-      //     });
-
-      break;
-  }
-}
-
-void launchUrls(String url) async {
-  Uri? uri = Uri.tryParse(url);
-  if (uri != null) {
-    if (await canLaunchUrl(uri)) {
-      launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      log("Can't launch url => $url");
-    }
-  } else {
-    log("$url is not valid");
-  }
-}
-
 class ProfileTopLoader extends StatelessWidget {
   const ProfileTopLoader({Key? key}) : super(key: key);
 
@@ -207,7 +73,7 @@ class ProfileTopLoader extends StatelessWidget {
               alignment: Alignment.topRight,
               child: IconButton(
                 onPressed: () {
-                  _bottomSheetProfile(context);
+                  bottomSheetProfile(context);
                 },
                 icon: Image.asset(
                   imgProfileOption,
@@ -299,7 +165,7 @@ class ProfileTop extends StatelessWidget {
               alignment: Alignment.topRight,
               child: IconButton(
                 onPressed: () {
-                  _bottomSheetProfile(context);
+                  bottomSheetProfile(context);
                 },
                 icon: Image.asset(
                   imgProfileOption,

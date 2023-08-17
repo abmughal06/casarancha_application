@@ -80,20 +80,14 @@ class CheckMediaAndShowPost extends StatelessWidget {
               }),
         );
       case "Music":
-        return ChangeNotifierProvider<MusicProvider>(
-          create: (context) => MusicProvider(),
-          child: InkWell(
-            onDoubleTap: ondoubleTap,
-            onTap: isPostDetail
-                ? () => Get.to(() => PostFullScreenView(
-                    post: postModel, isPostDetail: isPostDetail))
-                : () => Get.to(() => PostDetailScreen(postModel: postModel)),
-            child: MusicPlayerUrl(
-              postModel: postModel,
-              border: 0,
-              musicDetails: mediaData,
-              ontap: () {},
-            ),
+        return InkWell(
+          onDoubleTap: ondoubleTap,
+          child: MusicPlayerUrl(
+            postModel: postModel,
+            border: 0,
+            musicDetails: mediaData,
+            ontap: () {},
+            isPostDetail: isPostDetail,
           ),
         );
 
