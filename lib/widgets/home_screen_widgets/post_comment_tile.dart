@@ -97,7 +97,8 @@ class PostCommentTile extends StatelessWidget {
             fontSize: 12.sp,
             color: const Color(0xff5f5f5f),
             fontWeight: FontWeight.w400,
-            textOverflow: TextOverflow.visible,
+            textOverflow:
+                isFeedTile ? TextOverflow.ellipsis : TextOverflow.visible,
           ),
           trailing: Visibility(
             visible: FirebaseAuth.instance.currentUser?.uid != null

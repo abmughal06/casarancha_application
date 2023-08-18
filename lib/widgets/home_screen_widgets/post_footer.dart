@@ -220,7 +220,7 @@ class CustomPostFooter extends StatelessWidget {
             ),
           ),
         ),
-        heightBox(12.h),
+        // heightBox(12.h),
       ],
     );
   }
