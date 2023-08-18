@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/resources/localization_text_strings.dart';
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_button.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
@@ -89,6 +90,7 @@ class BlockAccountsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
     return Scaffold(
       appBar: primaryAppbar(title: 'Block Accounts', elevation: 0.2),
       body: Consumer<List<UserModel>?>(builder: (context, users, b) {
@@ -111,7 +113,8 @@ class BlockAccountsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               return FollowFollowingTile(
                   user: filterList[index],
-                  ontapToggleFollow: () {},
+                  ontapToggleFollow: () => postProvider.blockUnblockUser(
+                      currentUser: currentUser, appUser: filterList[index].id),
                   btnName: 'Remove');
             });
       }),

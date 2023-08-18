@@ -88,6 +88,24 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
+  void blockUnblockUser({UserModel? currentUser, String? appUser}) async {
+    try {
+      var ref =
+          FirebaseFirestore.instance.collection('users').doc(currentUser!.id);
+      if (currentUser.blockIds.contains(appUser)) {
+        await ref.update({
+          'blockIds': FieldValue.arrayRemove([appUser])
+        });
+      } else {
+        await ref.update({
+          'blockIds': FieldValue.arrayUnion([appUser])
+        });
+      }
+    } catch (e) {
+      log('$e');
+    }
+  }
+
   void postComment({PostModel? postModel, UserModel? user, String? comment}) {
     var cmntRef = FirebaseFirestore.instance
         .collection("posts")
