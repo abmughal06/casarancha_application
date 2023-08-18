@@ -8,7 +8,8 @@ import '../common_widgets.dart';
 import '../text_widget.dart';
 
 class BottomSheetWidget extends StatelessWidget {
-  BottomSheetWidget({Key? key, this.ontapBlock, this.onTapDownload})
+  BottomSheetWidget(
+      {Key? key, this.ontapBlock, this.onTapDownload, required this.blockText})
       : super(key: key);
 
   final List reportList = [
@@ -22,6 +23,7 @@ class BottomSheetWidget extends StatelessWidget {
 
   final VoidCallback? ontapBlock;
   final VoidCallback? onTapDownload;
+  final String blockText;
 
   @override
   Widget build(BuildContext context) {
@@ -136,8 +138,8 @@ class BottomSheetWidget extends StatelessWidget {
           ),
           TextButton(
             onPressed: ontapBlock,
-            child: const TextWidget(
-              text: "Block User",
+            child: TextWidget(
+              text: blockText,
               fontWeight: FontWeight.w600,
             ),
           ),

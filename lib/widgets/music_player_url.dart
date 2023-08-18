@@ -112,13 +112,6 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
           key: Key(widget.musicDetails.link),
           onVisibilityChanged: (visibilityInfo) {
             audioPlayer.pause();
-            log('true');
-            // var isVisible = visibilityInfo.visibleFraction > 0;
-            // if (isVisible) {
-            //   audioPlayer.pause();
-            // } else {
-            //   audioPlayer.pause();
-            // }
           },
           child: Stack(
             children: [

@@ -71,7 +71,13 @@ class PostCard extends StatelessWidget {
             } else {
               Get.bottomSheet(
                 BottomSheetWidget(
-                  ontapBlock: () {},
+                  blockText: curruentUser.blockIds.contains(post.creatorId)
+                      ? 'Unblock User'
+                      : 'Block User',
+                  ontapBlock: () {
+                    postPorvider.blockUnblockUser(
+                        currentUser: curruentUser, appUser: post.creatorId);
+                  },
                   onTapDownload: () async {
                     showDialog(
                         context: context,
