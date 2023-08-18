@@ -43,14 +43,15 @@ class TextWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: Text(
+      child: SelectableText(
         text ?? "",
         textAlign: textAlign,
         maxLines: maxLines,
-        softWrap: true,
-        overflow: textOverflow,
+
+        // softWrap: true,
         style: textStyle ??
             TextStyle(
+              overflow: textOverflow,
               shadows: shadow,
               color: color,
               height: textHeight,
