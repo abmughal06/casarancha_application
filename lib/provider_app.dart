@@ -16,7 +16,6 @@ import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_p
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
 import 'package:casarancha/utils/providers/date_picker_provider.dart';
-import 'package:casarancha/widgets/chat_screen_widgets/voice_recorder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -78,7 +77,7 @@ class ProviderApp extends StatelessWidget {
             create: (_) => ProfileProvider()),
         ChangeNotifierProvider<StoryProvider>(create: (_) => StoryProvider()),
         ChangeNotifierProvider<PostProvider>(create: (_) => PostProvider()),
-        ChangeNotifierProvider<VoiceRecorder>(create: (_) => VoiceRecorder()),
+        // ChangeNotifierProvider<VoiceRecorder>(create: (_) => VoiceRecorder()),
         ChangeNotifierProvider<CreatePostMethods>(
             create: (_) => CreatePostMethods()),
         ChangeNotifierProvider<AddStoryProvider>(

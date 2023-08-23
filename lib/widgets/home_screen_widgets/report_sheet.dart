@@ -33,7 +33,7 @@ class BottomSheetWidget extends StatelessWidget {
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(30), topRight: Radius.circular(30)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,8 +44,8 @@ class BottomSheetWidget extends StatelessWidget {
             child: SvgPicture.asset(icBottomSheetScroller),
           ),
           heightBox(12.h),
-          TextButton(
-            onPressed: () {
+          TextWidget(
+            onTap: () {
               Get.back();
               Get.bottomSheet(Container(
                 height: 425.h,
@@ -131,25 +131,22 @@ class BottomSheetWidget extends StatelessWidget {
                 ),
               ));
             },
-            child: const TextWidget(
-              text: "Report Post",
-              fontWeight: FontWeight.w600,
-            ),
+            text: "Report Post",
+            fontWeight: FontWeight.w600,
           ),
-          TextButton(
-            onPressed: ontapBlock,
-            child: TextWidget(
-              text: blockText,
-              fontWeight: FontWeight.w600,
-            ),
+          heightBox(20.h),
+          TextWidget(
+            onTap: ontapBlock,
+            text: blockText,
+            fontWeight: FontWeight.w600,
           ),
-          TextButton(
-            onPressed: onTapDownload,
-            child: const TextWidget(
-              text: "Download",
-              fontWeight: FontWeight.w600,
-            ),
+          heightBox(20.h),
+          TextWidget(
+            onTap: onTapDownload,
+            text: "Download",
+            fontWeight: FontWeight.w600,
           ),
+          heightBox(20.h),
         ],
       ),
     );

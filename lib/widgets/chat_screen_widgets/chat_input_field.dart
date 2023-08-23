@@ -1,7 +1,3 @@
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:audioplayers/audioplayers.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
@@ -35,105 +31,156 @@ class ChatInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, b) {
-        return chatProvider.voiceFile == null
-            ? chatProvider.photosList.isNotEmpty ||
-                    chatProvider.videosList.isNotEmpty ||
-                    chatProvider.musicList.isNotEmpty
-                ? ShowMediaToSendInChat(
-                    currentUser: currentUser,
-                    appUser: appUser,
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                        color: colorWhite,
-                        border: Border(
-                            top: BorderSide(color: color221.withOpacity(0.3)))),
-                    padding: const EdgeInsets.only(
-                        left: 20, right: 20, bottom: 35, top: 10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ChatTextField(
-                            chatController: chatProvider.messageController,
-                            ontapSend: () {},
-                          ),
+        return chatProvider.photosList.isNotEmpty ||
+                chatProvider.videosList.isNotEmpty ||
+                chatProvider.musicList.isNotEmpty
+            ? ShowMediaToSendInChat(
+                currentUser: currentUser,
+                appUser: appUser,
+              )
+            : Container(
+                decoration: BoxDecoration(
+                    color: colorWhite,
+                    border: Border(
+                        top: BorderSide(color: color221.withOpacity(0.3)))),
+                padding: const EdgeInsets.only(
+                    left: 20, right: 20, bottom: 35, top: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Visibility(
+                      visible: !chatProvider.isRecording,
+                      child: Expanded(
+                        child: ChatTextField(
+                          chatController: chatProvider.messageController,
+                          ontapSend: () {},
                         ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: chatProvider.messageController.text.isEmpty &&
+                          !chatProvider.isRecording,
+                      child: SpeedDial(
+                        closeDialOnPop: true,
+                        backgroundColor: Colors.transparent,
+                        activeBackgroundColor: colorF03,
+                        activeChild: const Icon(
+                          Icons.close,
+                          size: 26,
+                          color: color221,
+                        ),
+                        buttonSize: Size(40.h, 40.h),
+                        overlayColor: Colors.black,
+                        overlayOpacity: 0.5,
+                        elevation: 0,
+                        spacing: 5,
+                        childMargin: EdgeInsets.zero,
+                        children: [
+                          SpeedDialChild(
+                            child: Icon(
+                              Icons.photo_size_select_actual_rounded,
+                              size: 18.sp,
+                            ),
+                            onTap: () {
+                              chatProvider.getPhoto();
+                            },
+                            label: 'Image',
+                          ),
+                          SpeedDialChild(
+                            child: Icon(
+                              Icons.video_collection_sharp,
+                              size: 18.sp,
+                            ),
+                            onTap: () {
+                              chatProvider.getVideo();
+                            },
+                            label: 'Video',
+                          ),
+                          SpeedDialChild(
+                            child: Icon(
+                              Icons.music_note_outlined,
+                              size: 20.sp,
+                            ),
+                            onTap: () {
+                              chatProvider.getMusic();
+                            },
+                            label: 'Music',
+                          ),
+                        ],
+                        child: SvgPicture.asset(
+                          icChatPaperClip,
+                          height: 25.h,
+                          color: color221,
+                        ),
+                      ),
+                    ),
+                    // AnimatedContainer(
+                    //   duration: const Duration(milliseconds: 100),
+                    //   height: 40.h,
+                    //   width: !chatProvider.isRecording
+                    //       ? MediaQuery.of(context).size.width * 0
+                    //       : MediaQuery.of(context).size.width * .68,
+                    //   decoration: BoxDecoration(
+                    //       color: colorFF4,
+                    //       borderRadius: BorderRadius.circular(30)),
+                    //   child: Center(
+                    //     child:
+                    //         // StreamBuilder<Amplitude?>(
+                    //         //   stream: chatProvider.audioRecorder
+                    //         //       .onAmplitudeChanged(Duration.zero),
+                    //         //   builder: (context, snap) {
+                    //         //     // final duration =
+                    //         //     //     snap.hasData ? snap.data! : Duration.zero;
+                    //         //     if (snap.data!.current == 0.0) {
+                    //         //       return widthBox(0);
+                    //         //     }
+                    //         //     return
+                    //         TextWidget(
+                    //       text: '0',
+                    //       fontWeight: FontWeight.w700,
+                    //       fontSize: 16.sp,
+                    //       color: colorPrimaryA05,
+                    //       //   );
+                    //       // },
+                    //     ),
+                    //   ),
+                    // ),
+                    Row(
+                      children: [
                         Visibility(
                           visible: chatProvider.messageController.text.isEmpty,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              // widthBox(8.w),
-                              SpeedDial(
-                                closeDialOnPop: true,
-                                backgroundColor: Colors.transparent,
-                                activeBackgroundColor: colorPrimaryA05,
-                                activeChild: const Icon(
-                                  Icons.close,
-                                  color: colorWhite,
-                                ),
-                                buttonSize: Size(40.h, 40.h),
-                                overlayColor: Colors.black,
-                                overlayOpacity: 0.5,
-                                elevation: 0,
-                                spacing: 5,
-                                childMargin: EdgeInsets.zero,
-                                children: [
-                                  SpeedDialChild(
-                                    child: Icon(
-                                      Icons.photo_size_select_actual_rounded,
-                                      size: 18.sp,
-                                    ),
-                                    onTap: () {
-                                      chatProvider.getPhoto();
-                                    },
-                                    label: 'Image',
-                                  ),
-                                  SpeedDialChild(
-                                    child: Icon(
-                                      Icons.video_collection_sharp,
-                                      size: 18.sp,
-                                    ),
-                                    onTap: () {
-                                      chatProvider.getVideo();
-                                    },
-                                    label: 'Video',
-                                  ),
-                                  SpeedDialChild(
-                                    child: Icon(
-                                      Icons.music_note_outlined,
-                                      size: 20.sp,
-                                    ),
-                                    onTap: () {
-                                      chatProvider.getMusic();
-                                    },
-                                    label: 'Music',
-                                  ),
-                                ],
-                                child: SvgPicture.asset(
-                                  icChatPaperClip,
-                                  height: 25.h,
-                                  color: color221,
-                                ),
+                          child: GestureDetector(
+                            onLongPress: () {
+                              chatProvider.startRecording();
+                            },
+                            onLongPressEnd: (c) {
+                              chatProvider.stopRecording(
+                                currentUser: currentUser,
+                                appUser: appUser,
+                              );
+
+                              // chatProvider.sendVoiceMessage(
+
+                              // );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(9.w),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: colorF03.withOpacity(0.6)),
+                              child: const Icon(
+                                Icons.mic_none_sharp,
+                                color: color221,
                               ),
-                              // widthBox(8.w),
-                              Container(
-                                padding: EdgeInsets.all(9.w),
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: colorF03.withOpacity(0.6)),
-                                child: const Icon(
-                                  Icons.mic_none_sharp,
-                                  color: color221,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                         Visibility(
                           child: Visibility(
-                            visible:
-                                chatProvider.messageController.text.isNotEmpty,
+                            visible: chatProvider
+                                    .messageController.text.isNotEmpty &&
+                                !chatProvider.isRecording,
                             child: Row(
                               children: [
                                 widthBox(12.w),
@@ -148,167 +195,159 @@ class ChatInputField extends StatelessWidget {
                               ],
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  )
-            : VoiceRecordingPlayer(voiceFile: chatProvider.voiceFile!);
-      },
-    );
-  }
-}
-
-class VoiceRecordingPlayer extends StatefulWidget {
-  const VoiceRecordingPlayer({
-    Key? key,
-    required this.voiceFile,
-  }) : super(key: key);
-  final File voiceFile;
-
-  @override
-  State<VoiceRecordingPlayer> createState() => _VoiceRecordingPlayerState();
-}
-
-class _VoiceRecordingPlayerState extends State<VoiceRecordingPlayer> {
-  late AudioPlayer audioPlayer;
-  bool isPlaying = false;
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
-
-  @override
-  void initState() {
-    audioPlayer = AudioPlayer()..setSourceDeviceFile(widget.voiceFile.path);
-
-    log(widget.voiceFile.path);
-    audioPlayer.onPlayerStateChanged.listen((event) {
-      if (mounted) {
-        setState(() {
-          isPlaying = event == PlayerState.playing;
-        });
-      }
-    });
-    audioPlayer.onDurationChanged.listen((event) {
-      if (mounted) {
-        setState(() {
-          duration = event;
-        });
-      }
-    });
-    audioPlayer.onPositionChanged.listen((event) {
-      if (mounted) {
-        setState(() {
-          position = event;
-        });
-      }
-    });
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    audioPlayer.pause();
-    super.dispose();
-  }
-
-  String formatTime(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-
-    return [
-      if (duration.inHours > 0) hours,
-      minutes,
-      seconds,
-    ].join(':');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: ClipRect(
-        clipper: const ClipPad(padding: EdgeInsets.only(top: 30)),
-        child: Container(
-          // height: 100.h,
-          padding: EdgeInsets.only(
-            left: 20.w,
-            right: 20.w,
-            bottom: 20.h,
-          ),
-          decoration: BoxDecoration(
-            color: colorWhite,
-            boxShadow: [
-              BoxShadow(
-                color: colorPrimaryA05.withOpacity(.36),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(4, 0),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    SliderTheme(
-                      data: SliderThemeData(
-                        overlayShape: SliderComponentShape.noOverlay,
-                      ),
-                      child: Slider.adaptive(
-                        thumbColor: colorPrimaryA05,
-                        activeColor: colorPrimaryA05,
-                        min: 0.0,
-                        max: duration.inSeconds.toDouble() + 1.0,
-                        value: position.inSeconds.toDouble() + 1.0,
-                        onChanged: (value) async {
-                          final position = Duration(seconds: value.toInt());
-                          await audioPlayer.seek(position);
-                        },
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        TextWidget(
-                          text: formatTime(position),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            audioPlayer.setSourceDeviceFile(
-                                context.read<ChatProvider>().voiceFile!.path);
-                            isPlaying
-                                ? audioPlayer.pause()
-                                : audioPlayer.resume();
-                          },
-                          child: Icon(isPlaying
-                              ? Icons.pause
-                              : Icons.play_arrow_rounded),
-                        ),
-                        TextWidget(
-                          text: formatTime(duration),
                         ),
                       ],
                     )
                   ],
                 ),
-              ),
-              IconButton(
-                onPressed: () {
-                  context.read<ChatProvider>().clearVoiceFile();
-                },
-                icon: const Icon(Icons.close_outlined),
-              ),
-            ],
-          ),
-        ),
-      ),
+              );
+      },
     );
   }
 }
+
+// class VoiceRecordingPlayer extends StatefulWidget {
+//   const VoiceRecordingPlayer({
+//     Key? key,
+//     required this.voiceFile,
+//   }) : super(key: key);
+//   final File voiceFile;
+
+//   @override
+//   State<VoiceRecordingPlayer> createState() => _VoiceRecordingPlayerState();
+// }
+
+// class _VoiceRecordingPlayerState extends State<VoiceRecordingPlayer> {
+//   late AudioPlayer audioPlayer;
+//   bool isPlaying = false;
+//   Duration duration = Duration.zero;
+//   Duration position = Duration.zero;
+
+//   @override
+//   void initState() {
+//     audioPlayer = AudioPlayer();
+//     setAudio();
+
+//     // log(widget.voiceFile.path);
+//     audioPlayer.onPlayerStateChanged.listen((event) {
+//       if (mounted) {
+//         setState(() {
+//           isPlaying = event == PlayerState.playing;
+//         });
+//       }
+//     });
+//     audioPlayer.onDurationChanged.listen((event) {
+//       if (mounted) {
+//         setState(() {
+//           duration = event;
+//         });
+//       }
+//     });
+//     audioPlayer.onPositionChanged.listen((event) {
+//       if (mounted) {
+//         setState(() {
+//           position = event;
+//         });
+//       }
+//     });
+
+//     super.initState();
+//   }
+
+//   setAudio() async {
+//     await audioPlayer.setSourceDeviceFile(widget.voiceFile.path);
+//   }
+
+//   @override
+//   void dispose() {
+//     audioPlayer.pause();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Align(
+//       alignment: Alignment.bottomCenter,
+//       child: ClipRect(
+//         clipper: const ClipPad(padding: EdgeInsets.only(top: 30)),
+//         child: Container(
+//           // height: 100.h,
+//           padding: EdgeInsets.only(
+//             left: 20.w,
+//             right: 20.w,
+//             bottom: 20.h,
+//           ),
+//           decoration: BoxDecoration(
+//             color: colorWhite,
+//             boxShadow: [
+//               BoxShadow(
+//                 color: colorPrimaryA05.withOpacity(.36),
+//                 spreadRadius: 1,
+//                 blurRadius: 5,
+//                 offset: const Offset(4, 0),
+//               ),
+//             ],
+//           ),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Expanded(
+//                 child: Column(
+//                   children: [
+//                     SliderTheme(
+//                       data: SliderThemeData(
+//                         overlayShape: SliderComponentShape.noThumb,
+//                       ),
+//                       child: Slider(
+//                         thumbColor: colorF03,
+//                         activeColor: colorF03,
+//                         inactiveColor: colorEE5,
+//                         min: 0.0,
+//                         max: duration.inSeconds.toDouble() + 1.0,
+//                         value: position.inSeconds.toDouble() + 0.0,
+//                         onChanged: (value) async {
+//                           final position = Duration(seconds: value.toInt());
+//                           await audioPlayer.seek(position);
+//                         },
+//                       ),
+//                     ),
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+//                       children: [
+//                         TextWidget(
+//                           text: formatTime(position),
+//                         ),
+//                         InkWell(
+//                           onTap: () {
+//                             isPlaying
+//                                 ? audioPlayer.pause()
+//                                 : audioPlayer.resume();
+//                           },
+//                           child: Icon(isPlaying
+//                               ? Icons.pause
+//                               : Icons.play_arrow_rounded),
+//                         ),
+//                         TextWidget(
+//                           text: formatTime(duration),
+//                         ),
+//                       ],
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               IconButton(
+//                 onPressed: () {
+//                   context.read<ChatProvider>().clearRecorder();
+//                 },
+//                 icon: const Icon(Icons.close_outlined),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class ShowMediaToSendInChat extends StatelessWidget {
   const ShowMediaToSendInChat(
@@ -512,4 +551,17 @@ class ShowMediaToSendInChat extends StatelessWidget {
       ),
     );
   }
+}
+
+String formatTime(Duration duration) {
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+  final hours = twoDigits(duration.inHours);
+  final minutes = twoDigits(duration.inMinutes.remainder(60));
+  final seconds = twoDigits(duration.inSeconds.remainder(60));
+
+  return [
+    if (duration.inHours > 0) hours,
+    minutes,
+    seconds,
+  ].join(':');
 }

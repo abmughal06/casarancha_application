@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/comment_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -93,12 +94,14 @@ class PostCommentTile extends StatelessWidget {
             ),
           ),
           subtitle: TextWidget(
+            onTap: !isFeedTile
+                ? null
+                : () => Get.to(() => PostDetailScreen(postModel: postModel!)),
             text: cmnt.message.isEmpty ? "---" : cmnt.message,
             fontSize: 12.sp,
-            color: const Color(0xff5f5f5f),
+            color: color55F,
             fontWeight: FontWeight.w400,
-            textOverflow:
-                isFeedTile ? TextOverflow.ellipsis : TextOverflow.visible,
+            textOverflow: TextOverflow.ellipsis,
           ),
           trailing: Visibility(
             visible: FirebaseAuth.instance.currentUser?.uid != null

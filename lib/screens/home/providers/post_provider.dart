@@ -4,6 +4,8 @@ import 'package:casarancha/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../../models/comment_model.dart';
@@ -12,6 +14,9 @@ import '../../../models/message_details.dart';
 import '../../../models/post_creator_details.dart';
 import '../../../models/post_model.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
+import '../../../resources/image_resources.dart';
+import '../../../widgets/common_widgets.dart';
+import '../../../widgets/text_widget.dart';
 
 class PostProvider extends ChangeNotifier {
   final firestore = FirebaseFirestore.instance;
@@ -96,10 +101,66 @@ class PostProvider extends ChangeNotifier {
         await ref.update({
           'blockIds': FieldValue.arrayRemove([appUser])
         });
+        Get.bottomSheet(
+          Container(
+            height: 200.h,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(icBottomSheetScroller),
+                heightBox(15.h),
+                SvgPicture.asset(icReportPostDone),
+                heightBox(15.h),
+                TextWidget(
+                  text: "The user is unblocked now",
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18.sp,
+                  color: const Color(0xff212121),
+                ),
+                heightBox(12.h),
+              ],
+            ),
+          ),
+        );
       } else {
         await ref.update({
           'blockIds': FieldValue.arrayUnion([appUser])
         });
+        Get.bottomSheet(
+          Container(
+            height: 200.h,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(icBottomSheetScroller),
+                heightBox(15.h),
+                SvgPicture.asset(icReportPostDone),
+                heightBox(15.h),
+                TextWidget(
+                  text: "The user is blocked now",
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.sp,
+                  color: const Color(0xff212121),
+                ),
+                heightBox(12.h),
+              ],
+            ),
+          ),
+        );
       }
     } catch (e) {
       log('$e');
