@@ -167,6 +167,48 @@ class ChatMusicTile extends StatelessWidget {
   }
 }
 
+class ChatDocumentTile extends StatelessWidget {
+  const ChatDocumentTile({
+    Key? key,
+    required this.appUserId,
+    required this.isMe,
+    required this.isSeen,
+    required this.date,
+    required this.media,
+  }) : super(key: key);
+
+  final bool isMe;
+  final bool isSeen;
+  final String appUserId;
+  final String date;
+  final MediaDetails media;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding:
+                EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
+            child: Align(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              child: const TextWidget(
+                text: 'filename',
+              ),
+            ),
+          ),
+          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class ChatPostTile extends StatelessWidget {
   const ChatPostTile({
     Key? key,

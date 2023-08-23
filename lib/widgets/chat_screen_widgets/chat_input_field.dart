@@ -38,7 +38,8 @@ class ChatInputField extends StatelessWidget {
         return chatProvider.voiceFile == null
             ? chatProvider.photosList.isNotEmpty ||
                     chatProvider.videosList.isNotEmpty ||
-                    chatProvider.musicList.isNotEmpty
+                    chatProvider.musicList.isNotEmpty ||
+                    chatProvider.mediaList.isNotEmpty
                 ? ShowMediaToSendInChat(
                     currentUser: currentUser,
                     appUser: appUser,
@@ -89,6 +90,15 @@ class ChatInputField extends StatelessWidget {
                                     },
                                     label: 'Image',
                                   ),
+                                  SpeedDialChild(
+                                      label: 'Media',
+                                      child: Icon(
+                                        Icons.attach_file,
+                                        size: 18.sp,
+                                      ),
+                                      onTap: () {
+                                        chatProvider.getMedia();
+                                      }),
                                   SpeedDialChild(
                                     child: Icon(
                                       Icons.video_collection_sharp,
@@ -353,7 +363,9 @@ class ShowMediaToSendInChat extends StatelessWidget {
                         ? media.photosList.length
                         : media.videosList.isNotEmpty
                             ? media.videosList.length
-                            : media.musicList.length,
+                            : media.mediaList.isNotEmpty
+                                ? media.mediaList.length
+                                : media.musicList.length,
                     itemBuilder: (context, index) {
                       if (media.videosList.isNotEmpty) {
                         VideoPlayerController videoPlayerController;
@@ -432,15 +444,69 @@ class ShowMediaToSendInChat extends StatelessWidget {
                           ],
                         );
                       }
+                      if (media.mediaList.isNotEmpty) {
+                        var fileName =
+                            media.mediaList[index].path.substring(0, 10);
+
+                        return Stack(
+                          children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height * .1,
+                              width: MediaQuery.of(context).size.width * .6,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: colorPrimaryA05,
+                              ),
+                              child: Center(
+                                  child: Row(
+                                // mainAxisAlignment:
+                                // MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.file_copy,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: TextWidget(
+                                      color: Colors.white,
+                                      text: media.mediaList[index].path
+                                          .split('/')
+                                          .last,
+                                    ),
+                                  )
+                                ],
+                              )),
+                            ),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: InkWell(
+                                onTap: () {
+                                  log(fileName);
+                                  media.removeMediaFile(media.mediaList[index]);
+                                },
+                                child: SvgPicture.asset(icRemovePost),
+                              ),
+                            )
+                          ],
+                        );
+                      }
                       return Container();
                     },
                   ),
                 ),
-                media.photosList.isNotEmpty || media.videosList.isNotEmpty
+                media.photosList.isNotEmpty ||
+                        media.videosList.isNotEmpty ||
+                        media.mediaList.isNotEmpty
                     ? GestureDetector(
                         onTap: () => media.photosList.isNotEmpty
                             ? media.getPhoto()
-                            : media.getVideo(),
+                            : media.mediaList.isNotEmpty
+                                ? media.getMedia()
+                                : media.getVideo(),
                         child: Image.asset(
                           imgAddPost,
                           height: 38.h,
@@ -457,7 +523,9 @@ class ShowMediaToSendInChat extends StatelessWidget {
                           ? 'InChatPic'
                           : media.videosList.isNotEmpty
                               ? 'InChatVideo'
-                              : 'InChatMusic',
+                              : media.mediaList.isNotEmpty
+                                  ? 'InChatDoc'
+                                  : 'InChatMusic',
                     );
 
                     Get.defaultDialog(

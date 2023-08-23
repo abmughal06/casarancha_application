@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,9 +25,6 @@ class MessageTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // List<MediaDetails> media = List.generate(message.content.length,
-    //     (index) => MediaDetails.fromMap(message.content[index]));
-
     switch (message.type) {
       case "InChatPic":
         return InkWell(
@@ -195,6 +193,18 @@ class MessageTiles extends StatelessWidget {
             date: message.createdAt,
             media: postModel.mediaData[0],
           ),
+        );
+
+      case 'InChatDoc':
+        final prePost = message.content[0];
+        final postModel = MediaDetails.fromMap(prePost);
+
+        return ChatDocumentTile(
+          appUserId: message.sentToId,
+          isSeen: message.isSeen,
+          isMe: isMe,
+          date: message.createdAt,
+          media: postModel,
         );
       case 'story-Video':
         final postModel = MediaDetails.fromMap(message.content);
