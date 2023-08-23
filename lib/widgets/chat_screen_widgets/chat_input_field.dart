@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
@@ -31,9 +33,9 @@ class ChatInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, b) {
-
         return chatProvider.photosList.isNotEmpty ||
-                chatProvider.videosList.isNotEmpty || chatProvider.mediaList.isNotEmpty || 
+                chatProvider.videosList.isNotEmpty ||
+                chatProvider.mediaList.isNotEmpty ||
                 chatProvider.musicList.isNotEmpty
             ? ShowMediaToSendInChat(
                 currentUser: currentUser,
@@ -78,6 +80,16 @@ class ChatInputField extends StatelessWidget {
                         spacing: 5,
                         childMargin: EdgeInsets.zero,
                         children: [
+                          SpeedDialChild(
+                            child: Icon(
+                              Icons.file_copy_sharp,
+                              size: 18.sp,
+                            ),
+                            onTap: () {
+                              chatProvider.getMedia();
+                            },
+                            label: 'Media',
+                          ),
                           SpeedDialChild(
                             child: Icon(
                               Icons.photo_size_select_actual_rounded,
@@ -151,82 +163,6 @@ class ChatInputField extends StatelessWidget {
                       children: [
                         Visibility(
                           visible: chatProvider.messageController.text.isEmpty,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              // widthBox(8.w),
-                              SpeedDial(
-                                closeDialOnPop: true,
-                        backgroundColor: Colors.transparent,
-                        activeBackgroundColor: colorF03,
-                        activeChild: const Icon(
-                          Icons.close,
-                          size: 26,
-                          color: color221,
-                        ),
-                        buttonSize: Size(40.h, 40.h),
-                        overlayColor: Colors.black,
-                        overlayOpacity: 0.5,
-                        elevation: 0,
-                        spacing: 5,
-                        childMargin: EdgeInsets.zero,
-                                children: [
-                                  SpeedDialChild(
-                                    child: Icon(
-                                      Icons.photo_size_select_actual_rounded,
-                                      size: 18.sp,
-                                    ),
-                                    onTap: () {
-                                      chatProvider.getPhoto();
-                                    },
-                                    label: 'Image',
-                                  ),
-                                  SpeedDialChild(
-                                      label: 'Media',
-                                      child: Icon(
-                                        Icons.attach_file,
-                                        size: 18.sp,
-                                      ),
-                                      onTap: () {
-                                        chatProvider.getMedia();
-                                      }),
-                                  SpeedDialChild(
-                                    child: Icon(
-                                      Icons.video_collection_sharp,
-                                      size: 18.sp,
-                                    ),
-                                    onTap: () {
-                                      chatProvider.getVideo();
-                                    },
-                                    label: 'Video',
-                                  ),
-                                  SpeedDialChild(
-                                    child: Icon(
-                                      Icons.music_note_outlined,
-                                      size: 20.sp,
-                                    ),
-                                    onTap: () {
-                                      chatProvider.getMusic();
-                                    },
-                                    label: 'Music',
-                                  ),
-                                ],
-                                child: SvgPicture.asset(
-                                  icChatPaperClip,
-                                  height: 25.h,
-                                  color: color221,
-                                ),
-                              ),
-                              // widthBox(8.w),
-                              Container(
-                                padding: EdgeInsets.all(9.w),
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: colorF03.withOpacity(0.6)),
-                                child: const Icon(
-                                  Icons.mic_none_sharp,
-                                  color: color221,
-                                ),
                           child: GestureDetector(
                             onLongPress: () {
                               chatProvider.startRecording();
