@@ -64,6 +64,10 @@ String checkMediaTypeAndSetExtention(String media) {
       return '.mp3';
     case 'InChatMusic':
       return '.mp3';
+    case 'InChatPDF':
+      return '.pdf';
+    case 'InChatDoc':
+      return '.doc';
     default:
       return '.txt';
   }

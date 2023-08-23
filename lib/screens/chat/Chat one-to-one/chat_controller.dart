@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
@@ -312,7 +313,8 @@ class ChatProvider extends ChangeNotifier {
 
   var photosList = <File>[];
   var videosList = <File>[];
-  var musicList = <File>[];
+  var musicList = <File>[];  
+  var mediaList = <File>[];
   var voiceList = <File>[];
   var mediaUploadTasks = <UploadTask>[];
   var mediaData = <MediaDetails>[];
@@ -344,7 +346,9 @@ class ChatProvider extends ChangeNotifier {
             ? "Video"
             : mediaType == 'InChatPic'
                 ? "Photo"
-                : 'Music',
+                : mediaType == 'InChatDoc'
+                    ? "Doc"
+                    : 'Music',
         unreadMessageCount: 0,
         searchCharacters: [...appUser.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
@@ -361,7 +365,9 @@ class ChatProvider extends ChangeNotifier {
             ? "Video"
             : mediaType == 'InChatPic'
                 ? "Photo"
-                : 'Music',
+                : mediaType == 'InChatDoc'
+                    ? "Doc"
+                    : 'Music',
         unreadMessageCount: unreadMessages + 1,
         searchCharacters: [...currentUser.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
@@ -429,6 +435,7 @@ class ChatProvider extends ChangeNotifier {
     photosList.clear();
     videosList.clear();
     musicList.clear();
+    mediaList.clear();
     voiceList.clear();
     mediaUploadTasks.clear();
     tasksProgress = 0.0;
@@ -442,6 +449,7 @@ class ChatProvider extends ChangeNotifier {
     photosList.clear();
     videosList.clear();
     musicList.clear();
+    mediaList.clear();
     mediaUploadTasks.clear();
     mediaData.clear();
   }
@@ -453,10 +461,12 @@ class ChatProvider extends ChangeNotifier {
       ...photosList,
       ...videosList,
       ...musicList,
+      ...mediaList,
       ...voiceList,
     ];
 
     log(allMediaFiles.toString());
+
 
     final storageRef = FirebaseStorage.instance.ref();
     try {
@@ -472,7 +482,11 @@ class ChatProvider extends ChangeNotifier {
         } else if (videosList.contains(element)) {
           fileType = 'Video';
           videoAspectRatio = await getVideoAspectRatio(element);
-        } else if (musicList.contains(element)) {
+
+        } else if (mediaList.contains(element)) {
+          fileType = 'Media';
+        }  else if (musicList.contains(element)) {
+
           fileType = 'Music';
         } else {
           fileType = 'voice';
@@ -516,6 +530,12 @@ class ChatProvider extends ChangeNotifier {
               type: fileType,
               link: fileUrl,
               videoAspectRatio: videoAspectRatio?.toString());
+        } else if (fileType == 'Media') {
+          mediaDetails = MediaDetails(
+              id: DateTime.now().toIso8601String(),
+              name: fileName,
+              type: fileType,
+              link: fileUrl);
         } else {
           mediaDetails = MediaDetails(
             id: DateTime.now().toIso8601String(),
@@ -603,6 +623,36 @@ class ChatProvider extends ChangeNotifier {
   void removeMusicFile(File musicFile) {
     musicList.remove(musicFile);
     notifyListeners();
+  }
+
+  Future<void> getMedia() async {
+    final List<File> mediaFilesHelper = [];
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx'],
+      );
+      for (var element in result!.files) {
+        log('========>>>>>');
+        mediaFilesHelper.add(File(element.path ?? ''));
+      }
+
+      mediaList.assignAll(mediaFilesHelper);
+      log(mediaList.toString());
+    } catch (e) {
+      GlobalSnackBar.show(message: 'Operation Cancelled');
+    }
+    notifyListeners();
+  }
+
+  void removeMediaFile(File mediaFile) {
+    mediaList.remove(mediaFile);
+    notifyListeners();
+  }
+
+  Future openDocFile({String? path}) async {
+    OpenFile.open(path);
   }
 
   void notifyUI() {

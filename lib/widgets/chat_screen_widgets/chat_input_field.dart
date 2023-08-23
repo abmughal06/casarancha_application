@@ -31,8 +31,9 @@ class ChatInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, b) {
+
         return chatProvider.photosList.isNotEmpty ||
-                chatProvider.videosList.isNotEmpty ||
+                chatProvider.videosList.isNotEmpty || chatProvider.mediaList.isNotEmpty || 
                 chatProvider.musicList.isNotEmpty
             ? ShowMediaToSendInChat(
                 currentUser: currentUser,
@@ -150,6 +151,82 @@ class ChatInputField extends StatelessWidget {
                       children: [
                         Visibility(
                           visible: chatProvider.messageController.text.isEmpty,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              // widthBox(8.w),
+                              SpeedDial(
+                                closeDialOnPop: true,
+                        backgroundColor: Colors.transparent,
+                        activeBackgroundColor: colorF03,
+                        activeChild: const Icon(
+                          Icons.close,
+                          size: 26,
+                          color: color221,
+                        ),
+                        buttonSize: Size(40.h, 40.h),
+                        overlayColor: Colors.black,
+                        overlayOpacity: 0.5,
+                        elevation: 0,
+                        spacing: 5,
+                        childMargin: EdgeInsets.zero,
+                                children: [
+                                  SpeedDialChild(
+                                    child: Icon(
+                                      Icons.photo_size_select_actual_rounded,
+                                      size: 18.sp,
+                                    ),
+                                    onTap: () {
+                                      chatProvider.getPhoto();
+                                    },
+                                    label: 'Image',
+                                  ),
+                                  SpeedDialChild(
+                                      label: 'Media',
+                                      child: Icon(
+                                        Icons.attach_file,
+                                        size: 18.sp,
+                                      ),
+                                      onTap: () {
+                                        chatProvider.getMedia();
+                                      }),
+                                  SpeedDialChild(
+                                    child: Icon(
+                                      Icons.video_collection_sharp,
+                                      size: 18.sp,
+                                    ),
+                                    onTap: () {
+                                      chatProvider.getVideo();
+                                    },
+                                    label: 'Video',
+                                  ),
+                                  SpeedDialChild(
+                                    child: Icon(
+                                      Icons.music_note_outlined,
+                                      size: 20.sp,
+                                    ),
+                                    onTap: () {
+                                      chatProvider.getMusic();
+                                    },
+                                    label: 'Music',
+                                  ),
+                                ],
+                                child: SvgPicture.asset(
+                                  icChatPaperClip,
+                                  height: 25.h,
+                                  color: color221,
+                                ),
+                              ),
+                              // widthBox(8.w),
+                              Container(
+                                padding: EdgeInsets.all(9.w),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: colorF03.withOpacity(0.6)),
+                                child: const Icon(
+                                  Icons.mic_none_sharp,
+                                  color: color221,
+                                ),
                           child: GestureDetector(
                             onLongPress: () {
                               chatProvider.startRecording();
@@ -392,7 +469,9 @@ class ShowMediaToSendInChat extends StatelessWidget {
                         ? media.photosList.length
                         : media.videosList.isNotEmpty
                             ? media.videosList.length
-                            : media.musicList.length,
+                            : media.mediaList.isNotEmpty
+                                ? media.mediaList.length
+                                : media.musicList.length,
                     itemBuilder: (context, index) {
                       if (media.videosList.isNotEmpty) {
                         VideoPlayerController videoPlayerController;
@@ -471,15 +550,69 @@ class ShowMediaToSendInChat extends StatelessWidget {
                           ],
                         );
                       }
+                      if (media.mediaList.isNotEmpty) {
+                        var fileName =
+                            media.mediaList[index].path.substring(0, 10);
+
+                        return Stack(
+                          children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height * .1,
+                              width: MediaQuery.of(context).size.width * .6,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: colorPrimaryA05,
+                              ),
+                              child: Center(
+                                  child: Row(
+                                // mainAxisAlignment:
+                                // MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.file_copy,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: TextWidget(
+                                      color: Colors.white,
+                                      text: media.mediaList[index].path
+                                          .split('/')
+                                          .last,
+                                    ),
+                                  )
+                                ],
+                              )),
+                            ),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: InkWell(
+                                onTap: () {
+                                  log(fileName);
+                                  media.removeMediaFile(media.mediaList[index]);
+                                },
+                                child: SvgPicture.asset(icRemovePost),
+                              ),
+                            )
+                          ],
+                        );
+                      }
                       return Container();
                     },
                   ),
                 ),
-                media.photosList.isNotEmpty || media.videosList.isNotEmpty
+                media.photosList.isNotEmpty ||
+                        media.videosList.isNotEmpty ||
+                        media.mediaList.isNotEmpty
                     ? GestureDetector(
                         onTap: () => media.photosList.isNotEmpty
                             ? media.getPhoto()
-                            : media.getVideo(),
+                            : media.mediaList.isNotEmpty
+                                ? media.getMedia()
+                                : media.getVideo(),
                         child: Image.asset(
                           imgAddPost,
                           height: 38.h,
@@ -496,7 +629,9 @@ class ShowMediaToSendInChat extends StatelessWidget {
                           ? 'InChatPic'
                           : media.videosList.isNotEmpty
                               ? 'InChatVideo'
-                              : 'InChatMusic',
+                              : media.mediaList.isNotEmpty
+                                  ? 'InChatDoc'
+                                  : 'InChatMusic',
                     );
 
                     Get.defaultDialog(
