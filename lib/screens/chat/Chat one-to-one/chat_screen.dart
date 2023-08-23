@@ -41,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen>
   void dispose() {
     chatProvider.clearMessageController();
     chatProvider.clearListsondispose();
-    chatProvider.voiceFile = null;
+    chatProvider.recordedFilePath = null;
     super.dispose();
   }
 

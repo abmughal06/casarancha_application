@@ -59,10 +59,12 @@ Widget settingTile({leadIcon, title, subtitle, ontap, trailing}) {
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
                   color: color221,
+                  onTap: ontap,
                 ),
                 heightBox(8.h),
                 TextWidget(
                   text: subtitle,
+                  onTap: ontap,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w400,
                   color: colorAA3,
