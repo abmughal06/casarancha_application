@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:uuid/uuid.dart';
 
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/message_details.dart';
@@ -10,11 +11,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 
 import '../../../models/ghost_message_details.dart';
 import '../../../models/media_details.dart';
@@ -26,14 +28,13 @@ class ChatProvider extends ChangeNotifier {
 //variables
 
   late TextEditingController messageController;
+  late Record audioRecorder;
   ChatProvider() {
     messageController = TextEditingController();
-    initRecorder();
+    audioRecorder = Record();
   }
 
   final textFieldFocus = FocusNode();
-
-  bool recoderStart = false;
 
   bool isExpanded = false;
 
@@ -312,6 +313,7 @@ class ChatProvider extends ChangeNotifier {
   var photosList = <File>[];
   var videosList = <File>[];
   var musicList = <File>[];
+  var voiceList = <File>[];
   var mediaUploadTasks = <UploadTask>[];
   var mediaData = <MediaDetails>[];
 
@@ -404,13 +406,6 @@ class ChatProvider extends ChangeNotifier {
       messageRefForCurrentUser.set(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
 
-      // userRef
-      //     .doc(appUser.id)
-      //     .collection('messageList')
-      //     .doc(currentUser.id)
-      //     .update(
-      //       currentUserMessageDetails.toMap(),
-      //     );
       unreadMessages += 1;
       var recieverRef = await FirebaseFirestore.instance
           .collection("users")
@@ -420,7 +415,7 @@ class ChatProvider extends ChangeNotifier {
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
-        msg: "has sent you a $unreadMessages message",
+        msg: "has sent you a $unreadMessages attachment",
       );
       clearLists();
 
@@ -434,9 +429,12 @@ class ChatProvider extends ChangeNotifier {
     photosList.clear();
     videosList.clear();
     musicList.clear();
+    voiceList.clear();
     mediaUploadTasks.clear();
     tasksProgress = 0.0;
     mediaData.clear();
+    recordedFilePath = null;
+    voiceUrl = null;
     notifyListeners();
   }
 
@@ -451,7 +449,14 @@ class ChatProvider extends ChangeNotifier {
   double tasksProgress = 0.0;
 
   Future<void> uploadMediaFiles({required String recieverId}) async {
-    final allMediaFiles = [...photosList, ...videosList, ...musicList];
+    final allMediaFiles = [
+      ...photosList,
+      ...videosList,
+      ...musicList,
+      ...voiceList,
+    ];
+
+    log(allMediaFiles.toString());
 
     final storageRef = FirebaseStorage.instance.ref();
     try {
@@ -467,13 +472,16 @@ class ChatProvider extends ChangeNotifier {
         } else if (videosList.contains(element)) {
           fileType = 'Video';
           videoAspectRatio = await getVideoAspectRatio(element);
-        } else {
+        } else if (musicList.contains(element)) {
           fileType = 'Music';
+        } else {
+          fileType = 'voice';
         }
 
-        final storageFileRef = storageRef.child('Chats/$recieverId/$fileName');
+        final storageFileRef =
+            storageRef.child('Chats/$recieverId/$fileType/$fileName');
 
-        storageFileRef.putFile(element);
+        await storageFileRef.putFile(element);
 
         final uploadTask = storageFileRef.putData(await element.readAsBytes());
 
@@ -601,50 +609,205 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final recorder = FlutterSoundRecorder();
-  bool isRecorderReady = false;
-  String? path;
+  bool isRecording = false;
+  File? recordedFilePath;
+  String? voiceUrl;
 
-  // // final audioPlayer = audio.AudioPlayer();
-  // bool isPlaying = false;
-  // Duration duration = Duration.zero;
-  // Duration position = Duration.zero;
-  File? voiceFile;
+  startRecording() async {
+    final String filename =
+        '${DateTime.now().millisecondsSinceEpoch}_${const Uuid().v4()}';
 
-  Future record() async {
-    if (!isRecorderReady) return;
-    await recorder.startRecorder(toFile: 'audio');
+    log(filename);
+    if (await audioRecorder.hasPermission()) {
+      final dir = await getApplicationDocumentsDirectory();
+      await audioRecorder.start(
+        path: "${dir.path}/$filename.m4a",
+      );
+      isRecording = true;
+      notifyListeners();
+    }
   }
 
-  Future stop(context) async {
-    // final registerController =
-    //     Provider.of<RegisterController>(context, listen: false);
-    // if (!isRecorderReady) return;
-    path = await recorder.stopRecorder();
-    log(path!);
-    final audioFile = File(path!);
-    voiceFile = audioFile;
+  stopRecording({UserModel? currentUser, UserModel? appUser}) async {
+    try {
+      String? path = await audioRecorder.stop();
+      if (path == null) {
+        // Handle the case where recording didn't produce a valid path
+        return;
+      }
+
+      isRecording = false;
+      recordedFilePath = File(path);
+
+      voiceList.add(recordedFilePath!);
+
+      log(voiceList.toString());
+
+      if (voiceList.isEmpty) {
+        return;
+      }
+      await sendVoiceMessage(currentUser: currentUser, appUser: appUser);
+    } catch (e) {
+      log('Error: $e');
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  sendVoiceMessage({UserModel? currentUser, UserModel? appUser}) async {
+    try {
+      await uploadMediaFiles(recieverId: appUser!.id);
+
+      log('done');
+
+      final messageRefForCurrentUser = userRef
+          .doc(currentUser!.id)
+          .collection('messageList')
+          .doc(appUser.id)
+          .collection('messages')
+          .doc();
+
+      final messageRefForAppUser = userRef
+          .doc(appUser.id)
+          .collection('messageList')
+          .doc(currentUser.id)
+          .collection('messages')
+          .doc(
+            messageRefForCurrentUser.id,
+          );
+
+      final MessageDetails appUserMessageDetails = MessageDetails(
+        id: appUser.id,
+        lastMessage: 'voice message',
+        unreadMessageCount: 0,
+        searchCharacters: [...appUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: appUser.name,
+          imageUrl: appUser.imageStr,
+          isVerified: appUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
+
+      final MessageDetails currentUserMessageDetails = MessageDetails(
+        id: currentUser.id,
+        lastMessage: 'voice message',
+        unreadMessageCount: unreadMessages + 1,
+        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
+
+      // if (!isChatExits.value) {
+      await userRef
+          .doc(currentUser.id)
+          .collection('messageList')
+          .doc(appUser.id)
+          .set(
+            appUserMessageDetails.toMap(),
+          );
+
+      await userRef
+          .doc(appUser.id)
+          .collection('messageList')
+          .doc(currentUser.id)
+          .set(
+            currentUserMessageDetails.toMap(),
+          );
+
+      // log(mediaData.toString());
+
+      final Message message = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: mediaData.map((e) => e.toMap()).toList(),
+        caption: '',
+        type: 'voice',
+        createdAt: DateTime.now().toIso8601String(),
+        isSeen: false,
+      );
+      // log(message.toString());
+
+      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
+
+      messageRefForCurrentUser.set(message.toMap());
+      messageRefForAppUser.set(appUserMessage.toMap());
+
+      unreadMessages += 1;
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUser.id)
+          .get();
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: recieverRef.id,
+        devRegToken: recieverFCMToken,
+        msg: "has sent you a $unreadMessages voice message",
+      );
+
+      clearLists();
+
+      // messageController.clear();
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  // Future<void> uploadVoice({required String recieverId}) async {
+  //   final storageRef = FirebaseStorage.instance.ref();
+  //   try {
+  //     final element = recordedFilePath!;
+
+  //     log(element.toString());
+
+  //     final String fileName = basename(element.path.split('/').last);
+
+  //     log('before setting $fileName');
+
+  //     final storageFileRef = storageRef.child('Chats/$recieverId/$fileName');
+
+  //     log('after setting ref');
+
+  //     await storageFileRef.putFile(element);
+
+  //     log('after putting file');
+
+  //     final uploadTask = storageFileRef.putData(await element.readAsBytes());
+
+  //     mediaUploadTasks.add(uploadTask);
+  //     notifyListeners();
+
+  //     for (var i in mediaUploadTasks) {
+  //       tasksProgress += i.snapshot.bytesTransferred / i.snapshot.totalBytes;
+  //       notifyListeners();
+  //     }
+  //     tasksProgress = tasksProgress / mediaUploadTasks.length;
+  //     notifyListeners();
+
+  //     final mediaRef = await uploadTask.whenComplete(() {});
+
+  //     final fileUrl = await mediaRef.ref.getDownloadURL();
+  //     voiceUrl = fileUrl;
+  //     log('voice url $voiceUrl');
+  //     notifyListeners();
+  //   } on FirebaseException catch (e) {
+  //     log("error 1  ${e.message}");
+
+  //     GlobalSnackBar.show(message: e.toString());
+  //   } on PlatformException catch (e) {
+  //     log("error 2  ${e.message}");
+
+  //     GlobalSnackBar.show(message: e.toString());
+  //   }
+  // }
+
+  clearRecorder() {
+    recordedFilePath = null;
     notifyListeners();
-
-    log('================== Recorded audio: ${audioFile.path}');
-  }
-
-  // bool? _showIntro;
-
-  clearVoiceFile() {
-    voiceFile = null;
-    notifyListeners();
-  }
-
-  Future initRecorder() async {
-    await recorder.openRecorder();
-    isRecorderReady = true;
-    recorder.setSubscriptionDuration(const Duration(milliseconds: 500));
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    recorder.closeRecorder();
   }
 }

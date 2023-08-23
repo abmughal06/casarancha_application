@@ -32,6 +32,7 @@ class ChatUserListTile extends StatelessWidget {
         title: Row(
           children: [
             TextWidget(
+              onTap: ontapTile,
               text: personDetail.name,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
@@ -44,6 +45,7 @@ class ChatUserListTile extends StatelessWidget {
           ],
         ),
         subtitle: TextWidget(
+          onTap: ontapTile,
           text: messageDetails.lastMessage,
           textOverflow: TextOverflow.ellipsis,
           fontWeight: messageDetails.unreadMessageCount == 0
@@ -71,6 +73,7 @@ class ChatUserListTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextWidget(
+              onTap: ontapTile,
               text: convertDateIntoTime(messageDetails.createdAt),
               fontWeight: FontWeight.w400,
               fontSize: 12.sp,
@@ -83,12 +86,12 @@ class ChatUserListTile extends StatelessWidget {
                     padding: const EdgeInsets.all(3),
                     decoration: const BoxDecoration(
                         color: Color(0xff7BC246), shape: BoxShape.circle),
-                    child: Text(
-                      messageDetails.unreadMessageCount.toString(),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400),
+                    child: TextWidget(
+                      text: messageDetails.unreadMessageCount.toString(),
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      onTap: ontapTile,
                     ),
                   ),
           ],
@@ -114,6 +117,7 @@ class GhostChatListTile extends StatelessWidget {
         title: Row(
           children: [
             TextWidget(
+              onTap: ontapTile,
               text: messageDetails.creatorDetails.name,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
@@ -126,6 +130,7 @@ class GhostChatListTile extends StatelessWidget {
           ],
         ),
         subtitle: TextWidget(
+          onTap: ontapTile,
           text: messageDetails.lastMessage,
           textOverflow: TextOverflow.ellipsis,
           fontWeight: messageDetails.unreadMessageCount == 0
@@ -153,6 +158,7 @@ class GhostChatListTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextWidget(
+              onTap: ontapTile,
               text: convertDateIntoTime(messageDetails.createdAt),
               fontWeight: FontWeight.w400,
               fontSize: 12.sp,
@@ -165,12 +171,12 @@ class GhostChatListTile extends StatelessWidget {
                     padding: const EdgeInsets.all(3),
                     decoration: const BoxDecoration(
                         color: Color(0xff7BC246), shape: BoxShape.circle),
-                    child: Text(
-                      messageDetails.unreadMessageCount.toString(),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400),
+                    child: TextWidget(
+                      text: messageDetails.unreadMessageCount.toString(),
+                      onTap: ontapTile,
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
           ],
@@ -200,6 +206,7 @@ class GhostChatUserListTile extends StatelessWidget {
         title: Row(
           children: [
             TextWidget(
+              onTap: ontapTile,
               text: user.ghostName,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
@@ -208,6 +215,7 @@ class GhostChatUserListTile extends StatelessWidget {
           ],
         ),
         subtitle: TextWidget(
+          onTap: ontapTile,
           text: messageDetails.lastMessage,
           textOverflow: TextOverflow.ellipsis,
           fontWeight: messageDetails.unreadMessageCount == 0
@@ -229,6 +237,7 @@ class GhostChatUserListTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextWidget(
+              onTap: ontapTile,
               text: convertDateIntoTime(messageDetails.createdAt),
               fontWeight: FontWeight.w400,
               fontSize: 12.sp,
@@ -241,12 +250,12 @@ class GhostChatUserListTile extends StatelessWidget {
                     padding: const EdgeInsets.all(3),
                     decoration: const BoxDecoration(
                         color: Color(0xff7BC246), shape: BoxShape.circle),
-                    child: Text(
-                      messageDetails.unreadMessageCount.toString(),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400),
+                    child: TextWidget(
+                      onTap: ontapTile,
+                      text: messageDetails.unreadMessageCount.toString(),
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
           ],

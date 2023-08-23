@@ -43,25 +43,45 @@ class TextWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: SelectableText(
-        text ?? "",
-        textAlign: textAlign,
-        maxLines: maxLines,
+      child: onTap == null
+          ? SelectableText(
+              text ?? "",
+              textAlign: textAlign,
+              maxLines: maxLines,
 
-        // softWrap: true,
-        style: textStyle ??
-            TextStyle(
-              overflow: textOverflow,
-              shadows: shadow,
-              color: color,
-              height: textHeight,
-              fontSize: fontSize ?? 14.sp,
-              letterSpacing: letterSpacing,
-              decoration: decoration,
-              fontFamily: fontFamily ?? strFontName,
-              fontWeight: fontWeight,
+              // softWrap: true,
+              style: textStyle ??
+                  TextStyle(
+                    overflow: textOverflow,
+                    shadows: shadow,
+                    color: color,
+                    height: textHeight,
+                    fontSize: fontSize ?? 14.sp,
+                    letterSpacing: letterSpacing,
+                    decoration: decoration,
+                    fontFamily: fontFamily ?? strFontName,
+                    fontWeight: fontWeight,
+                  ),
+            )
+          : Text(
+              text ?? "",
+              textAlign: textAlign,
+              maxLines: maxLines,
+
+              // softWrap: true,
+              style: textStyle ??
+                  TextStyle(
+                    overflow: textOverflow,
+                    shadows: shadow,
+                    color: color,
+                    height: textHeight,
+                    fontSize: fontSize ?? 14.sp,
+                    letterSpacing: letterSpacing,
+                    decoration: decoration,
+                    fontFamily: fontFamily ?? strFontName,
+                    fontWeight: fontWeight,
+                  ),
             ),
-      ),
     );
   }
 }

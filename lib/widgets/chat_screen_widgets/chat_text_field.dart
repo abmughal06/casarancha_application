@@ -19,7 +19,7 @@ class ChatTextField extends StatelessWidget {
     return Consumer<ChatProvider>(
       builder: (context, chat, b) {
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
           decoration: BoxDecoration(
             color: colorFF3,
             borderRadius: BorderRadius.circular(30),

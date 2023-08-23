@@ -96,14 +96,12 @@ class FollowFollowingTile extends StatelessWidget {
                 ),
               ],
             ),
-            InkWell(
+            TextWidget(
               onTap: ontapToggleFollow,
-              child: TextWidget(
-                text: btnName,
-                fontWeight: FontWeight.w500,
-                fontSize: 14.sp,
-                color: colorPrimaryA05,
-              ),
+              text: btnName,
+              fontWeight: FontWeight.w500,
+              fontSize: 14.sp,
+              color: colorPrimaryA05,
             ),
           ],
         ),

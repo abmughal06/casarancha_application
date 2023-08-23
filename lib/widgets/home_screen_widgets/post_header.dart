@@ -49,27 +49,25 @@ class CustomPostHeader extends StatelessWidget {
           ),
         ),
       ),
-      title: InkWell(
-        onTap: headerOnTap,
-        child: Row(
-          children: [
-            TextWidget(
-              text: postCreator.username,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-              color: isVideoPost! ? colorFF7 : color221,
+      title: Row(
+        children: [
+          TextWidget(
+            onTap: headerOnTap,
+            text: postCreator.username,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w500,
+            color: isVideoPost! ? colorFF7 : color221,
+          ),
+          widthBox(5.w),
+          Visibility(
+            visible: postCreator.isVerified,
+            child: SvgPicture.asset(
+              icVerifyBadge,
+              width: 17.w,
+              height: 17.h,
             ),
-            widthBox(5.w),
-            Visibility(
-              visible: postCreator.isVerified,
-              child: SvgPicture.asset(
-                icVerifyBadge,
-                width: 17.w,
-                height: 17.h,
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
       subtitle: Visibility(
         visible: postModel.showPostTime || postModel.locationName.isNotEmpty,

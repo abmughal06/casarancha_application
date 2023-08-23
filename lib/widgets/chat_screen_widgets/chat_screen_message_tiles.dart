@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -195,6 +196,16 @@ class MessageTiles extends StatelessWidget {
             date: message.createdAt,
             media: postModel.mediaData[0],
           ),
+        );
+      case 'voice':
+        final voice = MediaDetails.fromMap(message.content[0]);
+        printLog(voice.id);
+        return ChatMusicTile(
+          appUserId: message.sentToId,
+          isSeen: message.isSeen,
+          isMe: isMe,
+          date: message.createdAt,
+          media: voice,
         );
       case 'story-Video':
         final postModel = MediaDetails.fromMap(message.content);

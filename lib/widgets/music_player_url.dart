@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/resources/color_resources.dart';
@@ -148,8 +146,8 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
                       },
                       child: SvgPicture.asset(
                         isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
-                        width: 35.h,
-                        height: 35.h,
+                        width: 38.h,
+                        height: 38.h,
                       ),
                     ),
                     widthBox(5.w),
@@ -180,7 +178,7 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
                           ),
                           heightBox(5.h),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w),
+                            padding: EdgeInsets.symmetric(horizontal: 7.w),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -337,8 +335,8 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
                     activeColor: colorF03,
                     inactiveColor: colorEE5,
                     min: 0.0,
-                    max: duration.inSeconds.toDouble() + 1.0,
-                    value: position.inSeconds.toDouble() + 1.0,
+                    max: duration.inSeconds.toDouble(),
+                    value: position.inSeconds.toDouble(),
                     onChanged: (value) async {
                       final position = Duration(seconds: value.toInt());
                       await audioPlayer.seek(position);
