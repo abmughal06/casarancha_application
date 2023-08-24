@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/widgets/chat_screen_widgets/chat_input_field.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/music_player_url.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:voice_message_package/voice_message_package.dart';
 
 import '../../models/media_details.dart';
 import '../../models/message.dart';
@@ -150,11 +152,57 @@ class ChatMusicTile extends StatelessWidget {
         children: [
           Padding(
             padding:
-                EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
+                EdgeInsets.only(left: isMe ? 145 : 0, right: isMe ? 0 : 145),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: MusicPlayerTile(
                   musicDetails: media, ontap: () {}, border: 16, isMe: isMe),
+            ),
+          ),
+          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ChatVoiceTile extends StatelessWidget {
+  const ChatVoiceTile({
+    Key? key,
+    required this.appUserId,
+    required this.isMe,
+    required this.isSeen,
+    required this.date,
+    required this.media,
+  }) : super(key: key);
+
+  final bool isMe;
+  final bool isSeen;
+  final String appUserId;
+  final String date;
+  final MediaDetails media;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Padding(
+            padding:
+                EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
+            child: Align(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              child: VoiceMessage(
+                me: isMe,
+                audioSrc: media.link,
+                meBgColor: colorPrimaryA05,
+                meFgColor: colorFF3,
+                formatDuration: (duration) => formatTime(duration),
+              ),
             ),
           ),
           DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),

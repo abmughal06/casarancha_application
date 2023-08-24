@@ -128,37 +128,25 @@ class ChatInputField extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // AnimatedContainer(
-                    //   duration: const Duration(milliseconds: 100),
-                    //   height: 40.h,
-                    //   width: !chatProvider.isRecording
-                    //       ? MediaQuery.of(context).size.width * 0
-                    //       : MediaQuery.of(context).size.width * .68,
-                    //   decoration: BoxDecoration(
-                    //       color: colorFF4,
-                    //       borderRadius: BorderRadius.circular(30)),
-                    //   child: Center(
-                    //     child:
-                    //         // StreamBuilder<Amplitude?>(
-                    //         //   stream: chatProvider.audioRecorder
-                    //         //       .onAmplitudeChanged(Duration.zero),
-                    //         //   builder: (context, snap) {
-                    //         //     // final duration =
-                    //         //     //     snap.hasData ? snap.data! : Duration.zero;
-                    //         //     if (snap.data!.current == 0.0) {
-                    //         //       return widthBox(0);
-                    //         //     }
-                    //         //     return
-                    //         TextWidget(
-                    //       text: '0',
-                    //       fontWeight: FontWeight.w700,
-                    //       fontSize: 16.sp,
-                    //       color: colorPrimaryA05,
-                    //       //   );
-                    //       // },
-                    //     ),
-                    //   ),
-                    // ),
+                    Visibility(
+                      visible: chatProvider.isRecording,
+                      child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 100),
+                          height: 40.h,
+                          width: !chatProvider.isRecording
+                              ? MediaQuery.of(context).size.width * 0
+                              : MediaQuery.of(context).size.width * .68,
+                          decoration: BoxDecoration(
+                              color: colorFF4,
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Center(
+                              child: TextWidget(
+                            text: formatTime(chatProvider.durationInSeconds),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16.sp,
+                            color: colorPrimaryA05,
+                          ))),
+                    ),
                     Row(
                       children: [
                         Visibility(
@@ -172,10 +160,6 @@ class ChatInputField extends StatelessWidget {
                                 currentUser: currentUser,
                                 appUser: appUser,
                               );
-
-                              // chatProvider.sendVoiceMessage(
-
-                              // );
                             },
                             child: Container(
                               padding: EdgeInsets.all(9.w),
@@ -218,149 +202,6 @@ class ChatInputField extends StatelessWidget {
     );
   }
 }
-
-// class VoiceRecordingPlayer extends StatefulWidget {
-//   const VoiceRecordingPlayer({
-//     Key? key,
-//     required this.voiceFile,
-//   }) : super(key: key);
-//   final File voiceFile;
-
-//   @override
-//   State<VoiceRecordingPlayer> createState() => _VoiceRecordingPlayerState();
-// }
-
-// class _VoiceRecordingPlayerState extends State<VoiceRecordingPlayer> {
-//   late AudioPlayer audioPlayer;
-//   bool isPlaying = false;
-//   Duration duration = Duration.zero;
-//   Duration position = Duration.zero;
-
-//   @override
-//   void initState() {
-//     audioPlayer = AudioPlayer();
-//     setAudio();
-
-//     // log(widget.voiceFile.path);
-//     audioPlayer.onPlayerStateChanged.listen((event) {
-//       if (mounted) {
-//         setState(() {
-//           isPlaying = event == PlayerState.playing;
-//         });
-//       }
-//     });
-//     audioPlayer.onDurationChanged.listen((event) {
-//       if (mounted) {
-//         setState(() {
-//           duration = event;
-//         });
-//       }
-//     });
-//     audioPlayer.onPositionChanged.listen((event) {
-//       if (mounted) {
-//         setState(() {
-//           position = event;
-//         });
-//       }
-//     });
-
-//     super.initState();
-//   }
-
-//   setAudio() async {
-//     await audioPlayer.setSourceDeviceFile(widget.voiceFile.path);
-//   }
-
-//   @override
-//   void dispose() {
-//     audioPlayer.pause();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Align(
-//       alignment: Alignment.bottomCenter,
-//       child: ClipRect(
-//         clipper: const ClipPad(padding: EdgeInsets.only(top: 30)),
-//         child: Container(
-//           // height: 100.h,
-//           padding: EdgeInsets.only(
-//             left: 20.w,
-//             right: 20.w,
-//             bottom: 20.h,
-//           ),
-//           decoration: BoxDecoration(
-//             color: colorWhite,
-//             boxShadow: [
-//               BoxShadow(
-//                 color: colorPrimaryA05.withOpacity(.36),
-//                 spreadRadius: 1,
-//                 blurRadius: 5,
-//                 offset: const Offset(4, 0),
-//               ),
-//             ],
-//           ),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Expanded(
-//                 child: Column(
-//                   children: [
-//                     SliderTheme(
-//                       data: SliderThemeData(
-//                         overlayShape: SliderComponentShape.noThumb,
-//                       ),
-//                       child: Slider(
-//                         thumbColor: colorF03,
-//                         activeColor: colorF03,
-//                         inactiveColor: colorEE5,
-//                         min: 0.0,
-//                         max: duration.inSeconds.toDouble() + 1.0,
-//                         value: position.inSeconds.toDouble() + 0.0,
-//                         onChanged: (value) async {
-//                           final position = Duration(seconds: value.toInt());
-//                           await audioPlayer.seek(position);
-//                         },
-//                       ),
-//                     ),
-//                     Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                       children: [
-//                         TextWidget(
-//                           text: formatTime(position),
-//                         ),
-//                         InkWell(
-//                           onTap: () {
-//                             isPlaying
-//                                 ? audioPlayer.pause()
-//                                 : audioPlayer.resume();
-//                           },
-//                           child: Icon(isPlaying
-//                               ? Icons.pause
-//                               : Icons.play_arrow_rounded),
-//                         ),
-//                         TextWidget(
-//                           text: formatTime(duration),
-//                         ),
-//                       ],
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               IconButton(
-//                 onPressed: () {
-//                   context.read<ChatProvider>().clearRecorder();
-//                 },
-//                 icon: const Icon(Icons.close_outlined),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class ShowMediaToSendInChat extends StatelessWidget {
   const ShowMediaToSendInChat(

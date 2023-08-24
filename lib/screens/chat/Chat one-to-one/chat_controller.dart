@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
@@ -313,7 +314,7 @@ class ChatProvider extends ChangeNotifier {
 
   var photosList = <File>[];
   var videosList = <File>[];
-  var musicList = <File>[];  
+  var musicList = <File>[];
   var mediaList = <File>[];
   var voiceList = <File>[];
   var mediaUploadTasks = <UploadTask>[];
@@ -467,7 +468,6 @@ class ChatProvider extends ChangeNotifier {
 
     log(allMediaFiles.toString());
 
-
     final storageRef = FirebaseStorage.instance.ref();
     try {
       for (var element in allMediaFiles) {
@@ -482,11 +482,9 @@ class ChatProvider extends ChangeNotifier {
         } else if (videosList.contains(element)) {
           fileType = 'Video';
           videoAspectRatio = await getVideoAspectRatio(element);
-
         } else if (mediaList.contains(element)) {
           fileType = 'Media';
-        }  else if (musicList.contains(element)) {
-
+        } else if (musicList.contains(element)) {
           fileType = 'Music';
         } else {
           fileType = 'voice';
@@ -662,6 +660,8 @@ class ChatProvider extends ChangeNotifier {
   bool isRecording = false;
   File? recordedFilePath;
   String? voiceUrl;
+  Duration durationInSeconds = Duration.zero;
+  late Timer timer;
 
   startRecording() async {
     final String filename =
@@ -669,12 +669,17 @@ class ChatProvider extends ChangeNotifier {
 
     log(filename);
     if (await audioRecorder.hasPermission()) {
-      final dir = await getApplicationDocumentsDirectory();
+      final dir = await getTemporaryDirectory();
       await audioRecorder.start(
         path: "${dir.path}/$filename.m4a",
       );
       isRecording = true;
       notifyListeners();
+
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        durationInSeconds += const Duration(seconds: 1);
+        notifyListeners();
+      });
     }
   }
 
@@ -696,10 +701,14 @@ class ChatProvider extends ChangeNotifier {
       if (voiceList.isEmpty) {
         return;
       }
+
       await sendVoiceMessage(currentUser: currentUser, appUser: appUser);
+      notifyListeners();
     } catch (e) {
       log('Error: $e');
     } finally {
+      timer.cancel();
+      durationInSeconds = Duration.zero;
       notifyListeners();
     }
   }

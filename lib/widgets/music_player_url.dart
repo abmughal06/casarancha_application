@@ -289,7 +289,7 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
   Widget build(BuildContext context) {
     return Container(
       height: 85,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: colorPrimaryA05,
         borderRadius: BorderRadius.only(
@@ -351,14 +351,14 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
                     children: [
                       TextWidget(
                         text: formatTime(position),
+                        fontWeight: FontWeight.w500,
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.w400,
                         color: colorWhite,
                       ),
                       TextWidget(
                         text: formatTime(duration),
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w500,
                         color: colorWhite,
                       ),
                     ],
