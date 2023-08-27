@@ -1,8 +1,4 @@
 import 'dart:math';
-
-import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
-
-import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

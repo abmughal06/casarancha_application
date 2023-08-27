@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_input_field.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/music_player_url.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:voice_message_package/voice_message_package.dart';
 
@@ -215,6 +217,7 @@ class ChatVoiceTile extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class ChatDocumentTile extends StatelessWidget {
   const ChatDocumentTile({
     Key? key,
@@ -233,27 +236,76 @@ class ChatDocumentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: Column(
-        children: [
-          Padding(
-            padding:
-                EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
-            child: Align(
-              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: const TextWidget(
-                text: 'filename',
+    return Consumer<DownloadProvider>(builder: (c, downloadProgress, _) {
+      bool isDownloading = downloadProgress.isDownload(media.link);
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        child: Column(
+          children: [
+            Padding(
+              padding:
+                  EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
+              child: Align(
+                alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+                child: InkWell(
+                  onTap: () {
+                    downloadProgress.openDocument(
+                      media.link,
+                      media.name,
+                    );
+                  },
+                  child: Container(
+                      height: MediaQuery.of(context).size.height * .1,
+                      width: MediaQuery.of(context).size.width * .6,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: colorPrimaryA05,
+                      ),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: isMe
+                                ? null
+                                : isDownloading
+                                    ? CircularProgressIndicator(
+                                        color: Colors.white,
+                                        value: downloadProgress
+                                            .getProgress(media.link),
+                                        semanticsLabel:
+                                            '${(100 * downloadProgress.getProgress(media.link)).roundToDouble().toInt()}%',
+                                      )
+                                    : InkWell(
+                                        onTap: () {
+                                          downloadProgress.documentDownloading(
+                                              media.link, media.name, context);
+                                        },
+                                        child: const Icon(
+                                          Icons.download,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                          ),
+                          Expanded(
+                            child: TextWidget(
+                              color: Colors.white,
+                              text: media.name.split('/').last,
+                            ),
+                          )
+                        ],
+                      )),
+                ),
               ),
             ),
-          ),
-          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
-          const SizedBox(
-            height: 8,
-          )
-        ],
-      ),
-    );
+            DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+            const SizedBox(
+              height: 8,
+            )
+          ],
+        ),
+      );
+    });
   }
 }
 

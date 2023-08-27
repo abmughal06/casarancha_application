@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
@@ -328,9 +326,6 @@ class ShowMediaToSendInChat extends StatelessWidget {
                         );
                       }
                       if (media.mediaList.isNotEmpty) {
-                        var fileName =
-                            media.mediaList[index].path.substring(0, 10);
-
                         return Stack(
                           children: [
                             Container(
@@ -342,8 +337,6 @@ class ShowMediaToSendInChat extends StatelessWidget {
                               ),
                               child: Center(
                                   child: Row(
-                                // mainAxisAlignment:
-                                // MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Padding(
                                     padding: EdgeInsets.all(8.0),
@@ -368,7 +361,6 @@ class ShowMediaToSendInChat extends StatelessWidget {
                               top: 0,
                               child: InkWell(
                                 onTap: () {
-                                  log(fileName);
                                   media.removeMediaFile(media.mediaList[index]);
                                 },
                                 child: SvgPicture.asset(icRemovePost),
