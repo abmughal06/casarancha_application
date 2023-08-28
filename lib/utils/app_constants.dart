@@ -26,6 +26,34 @@ class AppConstant {
   static const String userTokenPre = "userToken";
   static const String isLoggedInPre = "isLoggedIn";
 
+  static final RegExp regexEmoji = RegExp(
+      r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])');
+
+  Widget emojiSize(String content, Color color) {
+    final Iterable<Match> matches = regexEmoji.allMatches(content);
+    if (matches.isEmpty) {
+      return SelectableText(
+        content,
+        style: const TextStyle(
+          fontSize: 14.0,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+      );
+    }
+
+    return RichText(
+        text: TextSpan(children: [
+      for (var t in content.characters)
+        TextSpan(
+            text: t,
+            style: TextStyle(
+                fontSize: regexEmoji.allMatches(t).isNotEmpty ? 24.0 : 12.0,
+                color: color,
+                fontWeight: FontWeight.w500)),
+    ]));
+  }
+
   static List<String> profileBottomSheetList = [
     strEditProfile,
     strSavedPosts,

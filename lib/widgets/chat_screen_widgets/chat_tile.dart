@@ -1,3 +1,4 @@
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -47,11 +48,8 @@ class ChatTile extends StatelessWidget {
                   color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                child: TextWidget(
-                  text: message,
-                  color: isMe ? color13F : color55F,
-                  fontWeight: FontWeight.w500,
-                ),
+                child: AppConstant()
+                    .emojiSize(message, isMe ? color13F : color55F),
               ),
             ),
           ),
