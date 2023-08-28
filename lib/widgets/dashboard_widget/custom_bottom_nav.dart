@@ -135,20 +135,27 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   }),
                 ),
                 IconButton(
-                  onPressed: () {
-                    provider.changePage(5);
-                  },
-                  icon: CircleAvatar(
-                    backgroundColor: Colors.red.withOpacity(
-                      0.1,
-                    ),
-                    backgroundImage: currentUser == null
-                        ? null
-                        : CachedNetworkImageProvider(
-                            currentUser.imageStr,
-                          ),
-                  ),
-                ),
+                    onPressed: () {
+                      provider.changePage(5);
+                    },
+                    icon: currentUser!.imageStr != ''
+                        ? CircleAvatar(
+                            backgroundColor: Colors.red.withOpacity(
+                              0.1,
+                            ),
+                            backgroundImage:
+                                // currentUser == null
+                                //     ? null
+                                // :
+                                CachedNetworkImageProvider(
+                              currentUser.imageStr,
+                            ),
+                          )
+                        : CircleAvatar(
+                            backgroundColor: Colors.red.withOpacity(0.1),
+                            backgroundImage:
+                                const AssetImage(imgUserPlaceHolder),
+                          )),
               ],
             ),
           ),

@@ -89,17 +89,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                 edit.imageFilePicked!))),
                                   )
                                 : edit.profileImage != null
-                                    ? Container(
-                                        height: 127.h,
-                                        width: 127.h,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
+                                    ? edit.profileImage != ''
+                                        ? Container(
+                                            height: 127.h,
+                                            width: 127.h,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
                                                 fit: BoxFit.cover,
                                                 image: NetworkImage(
-                                                    edit.profileImage!))),
-                                      )
+                                                    edit.profileImage!),
+                                              ),
+                                            ),
+                                          )
+                                        : Container(
+                                            height: 127.h,
+                                            width: 127.h,
+                                            alignment: Alignment.center,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: AssetImage(
+                                                    imgUserPlaceHolder),
+                                              ),
+                                            ),
+                                          )
                                     : CircleAvatar(
                                         radius: 20,
                                         backgroundImage:

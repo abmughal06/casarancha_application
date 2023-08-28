@@ -70,10 +70,11 @@ class EditProfileProvider extends ChangeNotifier {
     } else if (selectedDob == null || selectedDob == "") {
       GlobalSnackBar.show(message: 'Please enter $strDateOfBirth');
       return false;
-    } else if (imageFilePicked == null && profileImage == null) {
-      GlobalSnackBar.show(message: 'Please select image');
-      return false;
     }
+    //  else if (imageFilePicked == null && profileImage == null) {
+    //   GlobalSnackBar.show(message: 'Please select image');
+    //   return false;
+    // }
     return true;
   }
 

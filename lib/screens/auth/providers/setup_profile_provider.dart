@@ -88,11 +88,12 @@ class SetupProfileProvider extends ChangeNotifier {
       GlobalSnackBar.show(message: 'Please enter $strDateOfBirth');
 
       return false;
-    } else if (imageFilePicked == null && profileImage == null) {
-      GlobalSnackBar.show(message: 'Please select image');
-
-      return false;
     }
+    // else if (imageFilePicked == null && profileImage == null) {
+    //   GlobalSnackBar.show(message: 'Please select image');
+
+    //   return false;
+    // }
 
     return true;
   }
@@ -141,7 +142,7 @@ class SetupProfileProvider extends ChangeNotifier {
           name: '${fname!.trim()} ${lname!.trim()} ',
           createdAt: DateTime.now().toIso8601String(),
           bio: bio!.trim(),
-          imageStr: imageUrl ?? "",
+          imageStr: imageUrl ?? '',
           isOnline: false,
         );
 

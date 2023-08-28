@@ -186,12 +186,17 @@ class ProfileTop extends StatelessWidget {
           child: AspectRatio(
             aspectRatio: 1 / 1,
             child: ClipOval(
-              child: FadeInImage(
-                fit: BoxFit.cover,
-                placeholder: const AssetImage(imgUserPlaceHolder),
-                image: CachedNetworkImageProvider(user!.imageStr),
-              ),
-            ),
+                child: user!.imageStr != ""
+                    ? FadeInImage(
+                        fit: BoxFit.cover,
+                        placeholder: const AssetImage(imgUserPlaceHolder),
+                        image: CachedNetworkImageProvider(user!.imageStr),
+                      )
+                    : const FadeInImage(
+                        fit: BoxFit.cover,
+                        placeholder: AssetImage(imgUserPlaceHolder),
+                        image: AssetImage(imgUserPlaceHolder),
+                      )),
           ),
         ),
         heightBox(15.h),
