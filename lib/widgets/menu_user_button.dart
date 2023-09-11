@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:developer';
 
 import 'package:casarancha/models/user_model.dart';
@@ -79,7 +77,7 @@ Future<bool?> reportUser(String userId, String reporterUserId) async {
         "objId": reportDocRef.id,
         "reporterUserId": reporterUserId,
         "userId": userId,
-        "createAt": DateTime.now().microsecondsSinceEpoch
+        "createAt": DateTime.now().toIso8601String()
       });
       return true;
     } else {

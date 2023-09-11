@@ -47,7 +47,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 fontWeight: FontWeight.w600,
                 fontSize: 14.sp,
               ),
-              indicatorColor: Colors.yellow,
+              indicatorColor: colorF03,
               indicatorPadding:
                   EdgeInsets.symmetric(vertical: 5.h, horizontal: 35.w),
               dividerColor: Colors.transparent,
@@ -99,7 +99,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               width: 46.h,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: colorF03,
+                                color:
+                                    notification.createdDetails!.imageUrl != ''
+                                        ? colorF03
+                                        : Colors.transparent,
                                 image: notification
                                         .createdDetails!.imageUrl.isNotEmpty
                                     ? DecorationImage(
@@ -108,10 +111,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                 .createdDetails!.imageUrl),
                                         fit: BoxFit.cover,
                                       )
-                                    : const DecorationImage(
-                                        image: AssetImage(imgGhostUser),
-                                        fit: BoxFit.cover,
-                                      ),
+                                    : notification.createdDetails!.imageUrl !=
+                                            ''
+                                        ? const DecorationImage(
+                                            image: AssetImage(imgGhostUser),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : const DecorationImage(
+                                            image:
+                                                AssetImage(imgUserPlaceHolder),
+                                            fit: BoxFit.cover,
+                                          ),
                               ),
                             ),
                             title: RichText(

@@ -190,21 +190,16 @@ class ChatVoiceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
       child: Column(
         children: [
           Padding(
             padding:
-                EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
+                EdgeInsets.only(left: isMe ? 150 : 0, right: isMe ? 0 : 150),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: VoiceMessage(
-                me: isMe,
-                audioSrc: media.link,
-                meBgColor: colorPrimaryA05,
-                meFgColor: colorFF3,
-                formatDuration: (duration) => formatTime(duration),
-              ),
+              child: MusicPlayerTile(
+                  musicDetails: media, ontap: () {}, border: 16, isMe: isMe),
             ),
           ),
           DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
@@ -256,39 +251,44 @@ class ChatDocumentTile extends StatelessWidget {
                     );
                   },
                   child: Container(
-                      height: MediaQuery.of(context).size.height * .1,
+                      // height: MediaQuery.of(context).size.height * .1,
                       width: MediaQuery.of(context).size.width * .6,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         color: colorPrimaryA05,
                       ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 10),
                       child: Row(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: isMe
-                                ? null
-                                : isDownloading
-                                    ? CircularProgressIndicator(
-                                        color: Colors.white,
-                                        value: downloadProgress
-                                            .getProgress(media.link),
-                                        semanticsLabel:
-                                            '${(100 * downloadProgress.getProgress(media.link)).roundToDouble().toInt()}%',
-                                      )
-                                    : InkWell(
-                                        onTap: () {
-                                          downloadProgress.documentDownloading(
-                                              media.link, media.name, context);
-                                        },
-                                        child: const Icon(
-                                          Icons.download,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                          const Icon(
+                            Icons.file_copy,
+                            color: colorWhite,
                           ),
+                          widthBox(8.w),
+                          isMe
+                              ? widthBox(0.0)
+                              : isDownloading
+                                  ? CircularProgressIndicator(
+                                      color: Colors.white,
+                                      value: downloadProgress
+                                          .getProgress(media.link),
+                                      semanticsLabel:
+                                          '${(100 * downloadProgress.getProgress(media.link)).roundToDouble().toInt()}%',
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        downloadProgress.documentDownloading(
+                                            media.link, media.name, context);
+                                      },
+                                      child: const Icon(
+                                        Icons.download,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                           Expanded(
                             child: TextWidget(
+                              // onTap: () {},
                               color: Colors.white,
                               text: media.name.split('/').last,
                             ),

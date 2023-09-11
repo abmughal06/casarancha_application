@@ -62,7 +62,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 fontWeight: FontWeight.w600,
                 fontSize: 14.sp,
               ),
-              indicatorColor: Colors.yellow,
+              indicatorColor: colorF03,
               indicatorPadding:
                   EdgeInsets.symmetric(vertical: 5.h, horizontal: 25.w),
               dividerColor: Colors.transparent,

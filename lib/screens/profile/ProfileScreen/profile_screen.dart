@@ -31,7 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(
-              // child: Text(userData!.name),
               child: Consumer<UserModel?>(
                 builder: (context, user, b) {
                   if (user == null) {
@@ -61,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontWeight: FontWeight.w600,
                     fontSize: 14.sp,
                   ),
-                  indicatorColor: Colors.yellow,
+                  indicatorColor: colorF03,
                   indicatorPadding:
                       EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
                   dividerColor: Colors.transparent,
@@ -76,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Text('Videos'),
                     ),
                     Tab(
-                      child: Text('Musics'),
+                      child: Text('Music'),
                     ),
                   ],
                 ),

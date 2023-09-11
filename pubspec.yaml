@@ -56,6 +56,7 @@ dependencies:
   flutter_launcher_icons: ^0.11.0
   visibility_detector: ^0.2.0
   story_viewer: ^0.2.0
+  slide_action: ^0.0.2
   carousel_slider: ^4.2.1
   mask_text_input_formatter: ^2.5.0
   pin_code_fields: ^8.0.1

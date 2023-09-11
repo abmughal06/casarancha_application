@@ -26,6 +26,8 @@ class SetupProfileProvider extends ChangeNotifier {
 
   File? imageFilePicked;
   String bioTxtCount = "0";
+  String educationTxtCount = "0";
+  String workTxtCount = "0";
 
   bool isLoading = false;
 
@@ -101,7 +103,12 @@ class SetupProfileProvider extends ChangeNotifier {
   FirebaseMessagingService message = FirebaseMessagingService();
 
   setupProfileData(
-      {String? fname, String? lname, String? username, String? bio}) async {
+      {String? fname,
+      String? lname,
+      String? username,
+      String? bio,
+      String? education,
+      String? work}) async {
     try {
       if (checkValidData(fname: fname, lname: lname, username: username)) {
         isLoading = true;
@@ -142,8 +149,12 @@ class SetupProfileProvider extends ChangeNotifier {
           name: '${fname!.trim()} ${lname!.trim()} ',
           createdAt: DateTime.now().toIso8601String(),
           bio: bio!.trim(),
+          work: work!.trim(),
+          education: education!.trim(),
           imageStr: imageUrl ?? '',
           isOnline: false,
+          isEducationVerified: false,
+          isWorkVerified: false,
         );
 
         await FirebaseFirestore.instance

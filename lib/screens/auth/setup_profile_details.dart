@@ -18,6 +18,7 @@ import '../../utils/app_utils.dart';
 import '../../utils/custom_date_picker.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/profle_screen_widgets/setup_profile_textfield.dart';
 import '../../widgets/text_editing_widget.dart';
 import '../../widgets/text_widget.dart';
 
@@ -33,6 +34,8 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _educationController = TextEditingController();
+  final TextEditingController _workController = TextEditingController();
 
   @override
   void initState() {
@@ -162,54 +165,49 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                     onEditingComplete: () => FocusScope.of(context).nextFocus(),
                   ),
                   heightBox(10.w),
-                  SizedBox(
-                    height: 156.h,
-                    child: TextFormField(
-                      controller: _bioController,
-                      onChanged: (value) {
-                        provider.bioTxtCount =
-                            _bioController.text.length.toString();
-                        setState(() {});
-                      },
-                      style: TextStyle(
-                        color: color239,
-                        fontSize: 16.sp,
-                        fontFamily: strFontName,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(300),
-                      ],
-                      cursorColor: color239,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: colorFF4,
-                        suffixIcon: Container(
-                          padding: const EdgeInsets.all(10),
-                          width: 75.w,
-                          alignment: Alignment.bottomRight,
-                          height: 150,
-                          child: TextWidget(
-                            text: "${provider.bioTxtCount}/300",
-                            fontSize: 14.sp,
-                            color: color080,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        hintText: strBio,
-                        hintStyle: TextStyle(
-                          color: const Color(0xFF3B3B3B).withOpacity(0.5),
-                          fontSize: 16.sp,
-                          fontFamily: strFontName,
-                          fontWeight: FontWeight.w300,
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16.0),
-                            borderSide: BorderSide.none),
-                      ),
-                      maxLines: 5,
-                      onEditingComplete: () => FocusScope.of(context).unfocus(),
-                    ),
+                  SetupProfileTextField(
+                    controller: _bioController,
+                    sizeHeight: 156.h,
+                    onchange: (value) {
+                      provider.bioTxtCount =
+                          _bioController.text.length.toString();
+                      setState(() {});
+                    },
+                    limitfield: 300,
+                    hintText: strBio,
+                    maxlines: 5,
+                    countText: "${provider.bioTxtCount}/300",
+                    inputHeight: 150,
+                  ),
+                  heightBox(10.w),
+                  SetupProfileTextField(
+                    controller: _educationController,
+                    sizeHeight: 80.h,
+                    onchange: (value) {
+                      provider.educationTxtCount =
+                          _educationController.text.length.toString();
+                      setState(() {});
+                    },
+                    limitfield: 100,
+                    hintText: strEducation,
+                    maxlines: 3,
+                    countText: "${provider.educationTxtCount}/300",
+                    inputHeight: 100,
+                  ),
+                  heightBox(10.w),
+                  SetupProfileTextField(
+                    controller: _workController,
+                    sizeHeight: 80.h,
+                    onchange: (value) {
+                      provider.workTxtCount =
+                          _workController.text.length.toString();
+                      setState(() {});
+                    },
+                    limitfield: 100,
+                    hintText: strWork,
+                    maxlines: 3,
+                    countText: "${provider.workTxtCount}/300",
+                    inputHeight: 100,
                   ),
                   heightBox(10.w),
                   CustomDatePicker2(
@@ -239,6 +237,8 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                     lname: _lastNameController.text,
                     username: _userNameController.text,
                     bio: _bioController.text,
+                    education: _educationController.text,
+                    work: _workController.text,
                   );
                 },
                 width: double.infinity,

@@ -2,7 +2,6 @@ import 'package:casarancha/models/ghost_message_details.dart';
 import 'package:casarancha/models/message_details.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,13 +9,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../screens/dashboard/provider/dashboard_provider.dart';
+import '../profile_pic.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.watch<UserModel?>();
     final ghostMessage = context.watch<List<GhostMessageDetails>?>();
 
     return Consumer<DashboardProvider>(
@@ -39,20 +38,19 @@ class CustomBottomNavigationBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(
-                  onPressed: () {
-                    provider.changePage(0);
+                InkWell(
+                  onDoubleTap: () {
+                    provider.scrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeIn,
+                    );
                   },
-                  icon: InkWell(
-                    onTap: () => provider.changePage(0),
-                    onDoubleTap: () {
-                      provider.scrollController.animateTo(
-                        0,
-                        duration: const Duration(milliseconds: 100),
-                        curve: Curves.easeIn,
-                      );
+                  child: IconButton(
+                    onPressed: () {
+                      provider.changePage(0);
                     },
-                    child: SvgPicture.asset(
+                    icon: SvgPicture.asset(
                       provider.currentIndex == 0
                           ? icBottomSelHome
                           : icBottomDeSelHome,
@@ -135,27 +133,18 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   }),
                 ),
                 IconButton(
-                    onPressed: () {
-                      provider.changePage(5);
-                    },
-                    icon: currentUser!.imageStr != ''
-                        ? CircleAvatar(
-                            backgroundColor: Colors.red.withOpacity(
-                              0.1,
-                            ),
-                            backgroundImage:
-                                // currentUser == null
-                                //     ? null
-                                // :
-                                CachedNetworkImageProvider(
-                              currentUser.imageStr,
-                            ),
-                          )
-                        : CircleAvatar(
-                            backgroundColor: Colors.red.withOpacity(0.1),
-                            backgroundImage:
-                                const AssetImage(imgUserPlaceHolder),
-                          )),
+                  onPressed: () {
+                    provider.changePage(5);
+                  },
+                  icon: Consumer<UserModel?>(builder: (context, user, b) {
+                    if (user == null) {
+                      return const CircularProgressIndicator.adaptive();
+                    }
+                    return ProfilePic(
+                      pic: user.imageStr,
+                    );
+                  }),
+                ),
               ],
             ),
           ),

@@ -62,6 +62,7 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
             Get.back();
           },
         ),
+        elevation: 1,
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Consumer<List<UserModel>?>(

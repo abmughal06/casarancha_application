@@ -493,7 +493,7 @@ class ChatProvider extends ChangeNotifier {
         final storageFileRef =
             storageRef.child('Chats/$recieverId/$fileType/$fileName');
 
-        await storageFileRef.putFile(element);
+        await storageFileRef.putData(await element.readAsBytes());
 
         final uploadTask = storageFileRef.putData(await element.readAsBytes());
 
@@ -546,7 +546,7 @@ class ChatProvider extends ChangeNotifier {
         mediaData.add(mediaDetails);
       }
     } on FirebaseException catch (e) {
-      log("error 1  ${e.message}");
+      log("error 1 === ${e.code} ${e.message}");
 
       GlobalSnackBar.show(message: e.toString());
     } on PlatformException catch (e) {
@@ -662,6 +662,13 @@ class ChatProvider extends ChangeNotifier {
   String? voiceUrl;
   Duration durationInSeconds = Duration.zero;
   late Timer timer;
+  bool isRecordingSend = false;
+  bool isRecorderLock = false;
+
+  toggleRecorderLock() {
+    isRecorderLock = true;
+    notifyListeners();
+  }
 
   startRecording() async {
     final String filename =
@@ -683,7 +690,11 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  stopRecording({UserModel? currentUser, UserModel? appUser}) async {
+  stopRecording(
+      {UserModel? currentUser,
+      UserModel? appUser,
+      bool? isGhostMessage,
+      bool? firstMessageByWho}) async {
     try {
       String? path = await audioRecorder.stop();
       if (path == null) {
@@ -691,29 +702,46 @@ class ChatProvider extends ChangeNotifier {
         return;
       }
 
-      isRecording = false;
-      recordedFilePath = File(path);
+      if (durationInSeconds.inMinutes < 60) {
+        isRecording = false;
+        recordedFilePath = File(path);
 
-      voiceList.add(recordedFilePath!);
+        voiceList.add(recordedFilePath!);
 
-      log(voiceList.toString());
+        log(voiceList.toString());
 
-      if (voiceList.isEmpty) {
-        return;
+        if (voiceList.isEmpty) {
+          return;
+        }
+
+        isGhostMessage!
+            ? await sendVoiceMessageGhost(
+                currentUser: currentUser,
+                appUser: appUser,
+                firstMessageByMe: firstMessageByWho,
+              )
+            : await sendVoiceMessage(
+                currentUser: currentUser, appUser: appUser);
+      } else {
+        GlobalSnackBar.show(
+            message: 'You cannot send a recording greater than 60 minutes');
+        deleteRecording();
       }
-
-      await sendVoiceMessage(currentUser: currentUser, appUser: appUser);
       notifyListeners();
     } catch (e) {
       log('Error: $e');
     } finally {
       timer.cancel();
       durationInSeconds = Duration.zero;
+      isRecorderLock = false;
       notifyListeners();
     }
   }
 
   sendVoiceMessage({UserModel? currentUser, UserModel? appUser}) async {
+    isRecordingSend = true;
+    notifyListeners();
+
     try {
       await uploadMediaFiles(recieverId: appUser!.id);
 
@@ -814,56 +842,143 @@ class ChatProvider extends ChangeNotifier {
       // messageController.clear();
     } catch (e) {
       log(e.toString());
+    } finally {
+      isRecordingSend = false;
+      notifyListeners();
     }
   }
 
-  // Future<void> uploadVoice({required String recieverId}) async {
-  //   final storageRef = FirebaseStorage.instance.ref();
-  //   try {
-  //     final element = recordedFilePath!;
+  sendVoiceMessageGhost(
+      {UserModel? currentUser,
+      UserModel? appUser,
+      bool? firstMessageByMe}) async {
+    isRecordingSend = true;
+    notifyListeners();
 
-  //     log(element.toString());
+    try {
+      await uploadMediaFiles(recieverId: appUser!.id);
 
-  //     final String fileName = basename(element.path.split('/').last);
+      log('done');
 
-  //     log('before setting $fileName');
+      final messageRefForCurrentUser = userRef
+          .doc(currentUser!.id)
+          .collection('ghostMessageList')
+          .doc(appUser.id)
+          .collection('messages')
+          .doc();
 
-  //     final storageFileRef = storageRef.child('Chats/$recieverId/$fileName');
+      final messageRefForAppUser = userRef
+          .doc(appUser.id)
+          .collection('ghostMessageList')
+          .doc(currentUser.id)
+          .collection('messages')
+          .doc(
+            messageRefForCurrentUser.id,
+          );
 
-  //     log('after setting ref');
+      final GhostMessageDetails appUserMessageDetails = GhostMessageDetails(
+        id: appUser.id,
+        lastMessage: 'voice message',
+        firstMessage: firstMessageByMe! ? currentUser.id : appUser.id,
+        unreadMessageCount: 0,
+        searchCharacters: [...appUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: appUser.name,
+          imageUrl: appUser.imageStr,
+          isVerified: appUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
 
-  //     await storageFileRef.putFile(element);
+      final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
+        id: currentUser.id,
+        firstMessage: firstMessageByMe ? currentUser.id : appUser.id,
+        lastMessage: 'voice message',
+        unreadMessageCount: unreadMessages + 1,
+        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
 
-  //     log('after putting file');
+      // if (!isChatExits.value) {
+      await userRef
+          .doc(currentUser.id)
+          .collection('ghostMessageList')
+          .doc(appUser.id)
+          .set(
+            appUserMessageDetails.toMap(),
+          );
 
-  //     final uploadTask = storageFileRef.putData(await element.readAsBytes());
+      await userRef
+          .doc(appUser.id)
+          .collection('ghostMessageList')
+          .doc(currentUser.id)
+          .set(
+            currentUserMessageDetails.toMap(),
+          );
 
-  //     mediaUploadTasks.add(uploadTask);
-  //     notifyListeners();
+      // log(mediaData.toString());
 
-  //     for (var i in mediaUploadTasks) {
-  //       tasksProgress += i.snapshot.bytesTransferred / i.snapshot.totalBytes;
-  //       notifyListeners();
-  //     }
-  //     tasksProgress = tasksProgress / mediaUploadTasks.length;
-  //     notifyListeners();
+      final Message message = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: mediaData.map((e) => e.toMap()).toList(),
+        caption: '',
+        type: 'voice',
+        createdAt: DateTime.now().toIso8601String(),
+        isSeen: false,
+      );
+      // log(message.toString());
 
-  //     final mediaRef = await uploadTask.whenComplete(() {});
+      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-  //     final fileUrl = await mediaRef.ref.getDownloadURL();
-  //     voiceUrl = fileUrl;
-  //     log('voice url $voiceUrl');
-  //     notifyListeners();
-  //   } on FirebaseException catch (e) {
-  //     log("error 1  ${e.message}");
+      messageRefForCurrentUser.set(message.toMap());
+      messageRefForAppUser.set(appUserMessage.toMap());
 
-  //     GlobalSnackBar.show(message: e.toString());
-  //   } on PlatformException catch (e) {
-  //     log("error 2  ${e.message}");
+      unreadMessages += 1;
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUser.id)
+          .get();
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: recieverRef.id,
+        devRegToken: recieverFCMToken,
+        msg: "has sent you a $unreadMessages voice message",
+      );
 
-  //     GlobalSnackBar.show(message: e.toString());
-  //   }
-  // }
+      clearLists();
+
+      // messageController.clear();
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      isRecordingSend = false;
+      notifyListeners();
+    }
+  }
+
+  deleteRecording() async {
+    try {
+      await audioRecorder.stop();
+      print('deleted');
+      isRecording = false;
+      clearRecorder();
+      isRecorderLock = false;
+      notifyListeners();
+    } catch (e) {
+      log('Error: $e');
+    } finally {
+      timer.cancel();
+      durationInSeconds = Duration.zero;
+      notifyListeners();
+    }
+  }
 
   clearRecorder() {
     recordedFilePath = null;

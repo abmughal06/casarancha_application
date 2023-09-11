@@ -16,6 +16,8 @@ class EditProfileProvider extends ChangeNotifier {
   late TextEditingController lastNameController;
   late TextEditingController userNameController;
   late TextEditingController bioController;
+  late TextEditingController workController;
+  late TextEditingController educationController;
 
   String? profileImage, selectedDob;
   DateTime? getDateTime;
@@ -23,6 +25,8 @@ class EditProfileProvider extends ChangeNotifier {
 
   File? imageFilePicked;
   String bioTxtCount = "0";
+  String educationTxtCount = "0";
+  String workTxtCount = "0";
 
   bool isLoading = false;
 
@@ -31,6 +35,8 @@ class EditProfileProvider extends ChangeNotifier {
     lastNameController = TextEditingController();
     userNameController = TextEditingController();
     bioController = TextEditingController();
+    educationController = TextEditingController();
+    workController = TextEditingController();
   }
 
   void clearAll() {
@@ -38,6 +44,8 @@ class EditProfileProvider extends ChangeNotifier {
     lastNameController.clear();
     userNameController.clear();
     bioController.clear();
+    workController.clear();
+    educationController.clear();
     imageFilePicked = null;
   }
 
@@ -104,6 +112,8 @@ class EditProfileProvider extends ChangeNotifier {
           'username': userNameController.text.trim(),
           'bio': bioController.text,
           'dob': selectedDob,
+          'work': workController.text,
+          'education': educationController.text,
           'imageStr': imageUrl,
         });
       }

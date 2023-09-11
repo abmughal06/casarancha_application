@@ -93,16 +93,23 @@ class PostCommentTile extends StatelessWidget {
               ),
             ),
           ),
-          subtitle: TextWidget(
-            onTap: !isFeedTile
-                ? null
-                : () => Get.to(() => PostDetailScreen(postModel: postModel!)),
-            text: cmnt.message.isEmpty ? "---" : cmnt.message,
-            fontSize: 12.sp,
-            color: color55F,
-            fontWeight: FontWeight.w400,
-            textOverflow: TextOverflow.ellipsis,
-          ),
+          subtitle: isFeedTile
+              ? TextWidget(
+                  onTap: () =>
+                      Get.to(() => PostDetailScreen(postModel: postModel!)),
+                  text: cmnt.message.isEmpty ? "---" : cmnt.message,
+                  fontSize: 12.sp,
+                  color: color55F,
+                  fontWeight: FontWeight.w400,
+                  textOverflow: TextOverflow.ellipsis,
+                )
+              : SelectableTextWidget(
+                  text: cmnt.message.isEmpty ? "---" : cmnt.message,
+                  fontSize: 12.sp,
+                  color: color55F,
+                  fontWeight: FontWeight.w400,
+                  textOverflow: TextOverflow.ellipsis,
+                ),
           trailing: Visibility(
             visible: FirebaseAuth.instance.currentUser?.uid != null
                 ? cmnt.creatorId == FirebaseAuth.instance.currentUser!.uid
