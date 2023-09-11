@@ -71,6 +71,13 @@ class AuthenticationProvider extends ChangeNotifier {
           "blockIds": FieldValue.arrayUnion([]),
         }, SetOptions(merge: true));
       }
+      if (!data.data()!.containsKey('isWorkVerified') ||
+          !data.data()!.containsKey('isEducationVerified')) {
+        ref.set({
+          'isWorkVerified': false,
+          'isEducationVerified': true,
+        }, SetOptions(merge: true));
+      }
       Get.offAll(() => const DashBoard());
     } else {
       Get.offAll(() => const SetupProfileScreen());

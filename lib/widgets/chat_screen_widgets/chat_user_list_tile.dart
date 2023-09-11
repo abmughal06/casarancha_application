@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +9,7 @@ import '../../models/user_model.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../common_widgets.dart';
+import '../profile_pic.dart';
 import '../text_widget.dart';
 
 class ChatUserListTile extends StatelessWidget {
@@ -56,17 +56,9 @@ class ChatUserListTile extends StatelessWidget {
               ? const Color(0xff8a8a8a)
               : const Color(0xff000000),
         ),
-        leading: CircleAvatar(
-          backgroundImage: personDetail.imageStr.isEmpty
-              ? null
-              : CachedNetworkImageProvider(
-                  personDetail.imageStr,
-                ),
-          child: personDetail.imageStr.isEmpty
-              ? const Icon(
-                  Icons.question_mark,
-                )
-              : null,
+        leading: ProfilePic(
+          pic: personDetail.imageStr,
+          heightAndWidth: 45.h,
         ),
         trailing: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -141,17 +133,9 @@ class GhostChatListTile extends StatelessWidget {
               ? const Color(0xff8a8a8a)
               : const Color(0xff000000),
         ),
-        leading: CircleAvatar(
-          backgroundImage: messageDetails.creatorDetails.imageUrl.isEmpty
-              ? null
-              : CachedNetworkImageProvider(
-                  messageDetails.creatorDetails.imageUrl,
-                ),
-          child: messageDetails.creatorDetails.imageUrl.isEmpty
-              ? const Icon(
-                  Icons.question_mark,
-                )
-              : null,
+        leading: ProfilePic(
+          pic: messageDetails.creatorDetails.imageUrl,
+          heightAndWidth: 45.h,
         ),
         trailing: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -299,17 +283,9 @@ class ChatUserListTileForNoChat extends StatelessWidget {
           fontSize: 14.sp,
           color: const Color(0xff8a8a8a),
         ),
-        leading: CircleAvatar(
-          backgroundImage: userModel.imageStr.isEmpty
-              ? null
-              : CachedNetworkImageProvider(
-                  userModel.imageStr,
-                ),
-          child: userModel.imageStr.isEmpty
-              ? const Icon(
-                  Icons.question_mark,
-                )
-              : null,
+        leading: ProfilePic(
+          pic: userModel.imageStr,
+          heightAndWidth: 45.h,
         ),
         trailing: const Icon(Icons.navigate_next),
       ),

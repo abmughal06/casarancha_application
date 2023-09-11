@@ -136,7 +136,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
               bottom: 20,
             ),
             child: SingleChildScrollView(
-              child: TextWidget(
+              child: SelectableTextWidget(
                 text: mediaData.link,
                 textAlign: isFullScreen ? TextAlign.center : TextAlign.left,
                 fontSize: 16.sp,

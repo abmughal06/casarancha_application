@@ -61,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen>
             Get.back();
           },
         ),
-        elevation: 0.1,
+        elevation: 1,
         automaticallyImplyLeading: false,
         backgroundColor: colorWhite,
         title: ChatScreenUserAppBar(
@@ -87,22 +87,20 @@ class _ChatScreenState extends State<ChatScreen>
           ),
         ],
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          StreamProvider.value(
-            value: DataProvider().messages(widget.appUserId, false),
-            initialData: null,
-            child: Consumer<List<Message>?>(
-              builder: (context, messages, b) {
-                if (messages == null) {
-                  return const CircularProgressIndicator.adaptive();
-                }
-                return Expanded(
+      body: StreamProvider.value(
+        value: DataProvider().messages(widget.appUserId, false),
+        initialData: null,
+        child: Consumer<List<Message>?>(
+          builder: (context, messages, b) {
+            if (messages == null) {
+              return const CircularProgressIndicator.adaptive();
+            }
+            return Column(
+              children: [
+                Expanded(
                   child: ListView.builder(
                     itemCount: messages.length,
                     reverse: true,
-                    // padding: EdgeInsets.only(bottom: 100.h),
                     addAutomaticKeepAlives: true,
                     itemBuilder: (context, index) {
                       final message = messages[index];
@@ -121,22 +119,36 @@ class _ChatScreenState extends State<ChatScreen>
                       );
                     },
                   ),
-                );
-              },
-            ),
-          ),
-          ChatInputField(
-            currentUser: currentUser,
-            appUser: appUser,
-            onTapSentMessage: () {
-              chatProvider.sentMessage(
-                currentUser: currentUser,
-                appUser: appUser,
-              );
-            },
-          )
-        ],
+                ),
+                ChatInputField(
+                  currentUser: currentUser,
+                  appUser: appUser,
+                  onTapSentMessage: () {
+                    chatProvider.sentMessage(
+                      currentUser: currentUser,
+                      appUser: appUser,
+                    );
+                  },
+                )
+              ],
+            );
+          },
+        ),
       ),
+      floatingActionButton: Consumer<ChatProvider>(builder: (context, v, b) {
+        if (v.isRecording && !v.isRecorderLock) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 50),
+            child: FloatingActionButton(
+              mini: true,
+              onPressed: () {},
+              backgroundColor: colorWhite,
+              child: SvgPicture.asset(icSelectLock),
+            ),
+          );
+        }
+        return Container();
+      }),
     );
   }
 

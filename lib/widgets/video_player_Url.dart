@@ -43,7 +43,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       deviceOrientationsOnEnterFullScreen: [DeviceOrientation.portraitUp],
       deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
       aspectRatio: 9 / 16,
-      looping: false,
+      looping: true,
       allowMuting: true,
       showControls: true,
     );

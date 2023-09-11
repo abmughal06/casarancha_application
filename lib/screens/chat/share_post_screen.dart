@@ -181,19 +181,25 @@ class _SharePostTileState extends State<SharePostTile> {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  radius: 25,
-                  backgroundImage: appUser.imageStr.isEmpty
-                      ? null
-                      : CachedNetworkImageProvider(
-                          appUser.imageStr,
-                        ),
-                  child: appUser.imageStr.isEmpty
-                      ? const Icon(
-                          Icons.question_mark,
-                        )
-                      : null,
-                ),
+                appUser.imageStr != ''
+                    ? CircleAvatar(
+                        radius: 25,
+                        backgroundImage: appUser.imageStr.isEmpty
+                            ? null
+                            : CachedNetworkImageProvider(
+                                appUser.imageStr,
+                              ),
+                        child: appUser.imageStr.isEmpty
+                            ? const Icon(
+                                Icons.question_mark,
+                              )
+                            : null,
+                      )
+                    : const CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        radius: 25,
+                        backgroundImage: AssetImage(imgUserPlaceHolder),
+                      ),
                 widthBox(12.w),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

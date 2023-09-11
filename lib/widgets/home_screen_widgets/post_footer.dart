@@ -160,7 +160,7 @@ class CustomPostFooter extends StatelessWidget {
             alignment: Alignment.topLeft,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 6.h),
-              child: TextWidget(
+              child: SelectableTextWidget(
                 text: postModel.description,
                 fontSize: 13.sp,
                 color: color13F,
@@ -180,7 +180,7 @@ class CustomPostFooter extends StatelessWidget {
                     .map(
                       (e) => Padding(
                         padding: EdgeInsets.only(right: 6.w),
-                        child: TextWidget(
+                        child: SelectableTextWidget(
                           text: e,
                           fontSize: 13.sp,
                           color: Colors.blue.shade900,

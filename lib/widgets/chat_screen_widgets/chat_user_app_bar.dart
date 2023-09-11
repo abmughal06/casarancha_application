@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../resources/image_resources.dart';
 import '../common_widgets.dart';
+import '../profile_pic.dart';
 
 class ChatScreenUserAppBar extends StatelessWidget {
   const ChatScreenUserAppBar(
@@ -47,12 +47,9 @@ class ChatScreenUserAppBar extends StatelessWidget {
         ],
       ),
       subtitle: const Text('Live'),
-      leading: CircleAvatar(
-        backgroundImage: creatorDetails.imageUrl.isNotEmpty
-            ? CachedNetworkImageProvider(
-                creatorDetails.imageUrl,
-              )
-            : null,
+      leading: ProfilePic(
+        pic: creatorDetails.imageUrl,
+        heightAndWidth: 40.h,
       ),
     );
   }

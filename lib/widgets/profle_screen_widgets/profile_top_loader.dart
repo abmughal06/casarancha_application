@@ -1,5 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
+import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/profile_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -176,54 +176,84 @@ class ProfileTop extends StatelessWidget {
             ),
           ],
         ),
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: colorPrimaryA05, width: 1.5),
-              shape: BoxShape.circle),
-          height: 90.h,
-          width: 90.h,
-          alignment: Alignment.center,
-          child: AspectRatio(
-            aspectRatio: 1 / 1,
-            child: ClipOval(
-                child: user!.imageStr != ""
-                    ? FadeInImage(
-                        fit: BoxFit.cover,
-                        placeholder: const AssetImage(imgUserPlaceHolder),
-                        image: CachedNetworkImageProvider(user!.imageStr),
-                      )
-                    : const FadeInImage(
-                        fit: BoxFit.cover,
-                        placeholder: AssetImage(imgUserPlaceHolder),
-                        image: AssetImage(imgUserPlaceHolder),
-                      )),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 45.w),
+          child: Row(
+            children: [
+              ProfilePic(
+                pic: user!.imageStr,
+                showBorder: true,
+              ),
+              widthBox(13.w),
+              Expanded(
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  horizontalTitleGap: 0,
+                  visualDensity:
+                      const VisualDensity(horizontal: 4, vertical: 4),
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          SelectableTextWidget(
+                            text: user!.name,
+                            color: color13F,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16.sp,
+                            textOverflow: TextOverflow.ellipsis,
+                          ),
+                          Visibility(
+                              visible: user!.isVerified,
+                              child: SvgPicture.asset(icVerifyBadge))
+                        ],
+                      ),
+                      SelectableTextWidget(
+                        text: user!.username,
+                        color: colorAA3,
+                        fontSize: 12.sp,
+                      ),
+                      Visibility(
+                        visible: user!.work.isNotEmpty,
+                        child: Row(
+                          children: [
+                            SelectableTextWidget(
+                              text: 'Works at ${user!.work}',
+                              color: colorAA3,
+                              fontSize: 12.sp,
+                            ),
+                            Visibility(
+                              visible: user!.isWorkVerified,
+                              child: SvgPicture.asset(icVerifyBadge),
+                            )
+                          ],
+                        ),
+                      ),
+                      Visibility(
+                        visible: user!.education.isNotEmpty,
+                        child: Row(
+                          children: [
+                            SelectableTextWidget(
+                              text: "studied from ${user!.education}",
+                              color: colorAA3,
+                              fontSize: 12.sp,
+                            ),
+                            Visibility(
+                              visible: user!.isEducationVerified,
+                              child: SvgPicture.asset(icVerifyBadge),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        heightBox(15.h),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextWidget(
-              text: user!.name,
-              color: color13F,
-              fontWeight: FontWeight.w600,
-              fontSize: 16.sp,
-            ),
-            widthBox(6.w),
-            if (user!.isVerified)
-              SvgPicture.asset(
-                icVerifyBadge,
-                width: 17.w,
-                height: 17.h,
-              )
-          ],
-        ),
-        TextWidget(
-          text: user!.username,
-          color: colorAA3,
-          fontSize: 12.sp,
-        ),
-        heightBox(12.h),
+        heightBox(20.h),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -261,7 +291,7 @@ class ProfileTop extends StatelessWidget {
             ),
           ],
         ),
-        heightBox(14.h),
+        heightBox(20.h),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 27.w),
           child: TextWidget(

@@ -288,8 +288,9 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 85,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      key: Key(widget.musicDetails.link),
+      height: 70,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
       decoration: BoxDecoration(
         color: colorPrimaryA05,
         borderRadius: BorderRadius.only(

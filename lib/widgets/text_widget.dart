@@ -43,45 +43,78 @@ class TextWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: onTap == null
-          ? SelectableText(
-              text ?? "",
-              textAlign: textAlign,
-              maxLines: maxLines,
+      child: Text(
+        text ?? "",
+        textAlign: textAlign,
+        maxLines: maxLines,
+        overflow: textOverflow,
 
-              // softWrap: true,
-              style: textStyle ??
-                  TextStyle(
-                    overflow: textOverflow,
-                    shadows: shadow,
-                    color: color,
-                    height: textHeight,
-                    fontSize: fontSize ?? 14.sp,
-                    letterSpacing: letterSpacing,
-                    decoration: decoration,
-                    fontFamily: fontFamily ?? strFontName,
-                    fontWeight: fontWeight,
-                  ),
-            )
-          : Text(
-              text ?? "",
-              textAlign: textAlign,
-              maxLines: maxLines,
-
-              // softWrap: true,
-              style: textStyle ??
-                  TextStyle(
-                    overflow: textOverflow,
-                    shadows: shadow,
-                    color: color,
-                    height: textHeight,
-                    fontSize: fontSize ?? 14.sp,
-                    letterSpacing: letterSpacing,
-                    decoration: decoration,
-                    fontFamily: fontFamily ?? strFontName,
-                    fontWeight: fontWeight,
-                  ),
+        // softWrap: true,
+        style: textStyle ??
+            TextStyle(
+              shadows: shadow,
+              color: color,
+              height: textHeight,
+              fontSize: fontSize ?? 14.sp,
+              letterSpacing: letterSpacing,
+              decoration: decoration,
+              fontFamily: fontFamily ?? strFontName,
+              fontWeight: fontWeight,
             ),
+      ),
+    );
+  }
+}
+
+class SelectableTextWidget extends StatelessWidget {
+  final String? text;
+  final Color? color;
+  final double? fontSize;
+  final double? letterSpacing;
+  final TextAlign? textAlign;
+  final FontWeight? fontWeight;
+  final String? fontFamily;
+  final TextOverflow? textOverflow;
+  final int? maxLines;
+  final double? textHeight;
+  final TextStyle? textStyle;
+  final TextDecoration? decoration;
+  final List<Shadow>? shadow;
+  const SelectableTextWidget(
+      {Key? key,
+      this.text,
+      this.color,
+      this.fontSize,
+      this.letterSpacing,
+      this.textAlign,
+      this.fontWeight,
+      this.fontFamily,
+      this.textOverflow,
+      this.maxLines,
+      this.textHeight,
+      this.textStyle,
+      this.decoration,
+      this.shadow})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SelectableText(
+      text ?? "",
+      textAlign: textAlign,
+      maxLines: maxLines,
+      style: textStyle ??
+          TextStyle(
+            overflow: textOverflow,
+            shadows: shadow,
+            color: color,
+            height: textHeight,
+            fontSize: fontSize ?? 14.sp,
+            letterSpacing: letterSpacing,
+            decoration: decoration,
+            fontFamily: fontFamily ?? strFontName,
+            fontWeight: fontWeight,
+          ),
     );
   }
 }

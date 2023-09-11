@@ -54,10 +54,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         edit.lastNameController =
             TextEditingController(text: user.name.split(" ").last);
         edit.bioController = TextEditingController(text: user.bio);
+        edit.educationController = TextEditingController(text: user.education);
+        edit.workController = TextEditingController(text: user.work);
         edit.userNameController = TextEditingController(text: user.username);
         edit.selectedDob = user.dob;
         edit.getDateTime = DateTime.parse(edit.selectedDob!);
         edit.bioTxtCount = user.bio.length.toString();
+        edit.educationTxtCount = user.education.length.toString();
+        edit.workTxtCount = user.work.length.toString();
         edit.profileImage = user.imageStr;
         return Column(
           children: [
@@ -186,6 +190,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     isShadowEnable: false,
                     hint: strBio,
                     maxLength: 300,
+                    color: colorFF4,
+                    textInputType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  ),
+                  heightBox(10.w),
+                  TextEditingWidget(
+                    controller: edit.workController,
+                    hintColor: color080,
+                    maxLines: 3,
+                    isShadowEnable: false,
+                    hint: strWork,
+                    maxLength: 100,
+                    color: colorFF4,
+                    textInputType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  ),
+                  heightBox(10.w),
+                  TextEditingWidget(
+                    controller: edit.educationController,
+                    hintColor: color080,
+                    maxLines: 3,
+                    isShadowEnable: false,
+                    hint: strEducation,
+                    maxLength: 100,
                     color: colorFF4,
                     textInputType: TextInputType.text,
                     textInputAction: TextInputAction.next,

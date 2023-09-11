@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,6 +7,7 @@ import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/profile/AppUser/app_user_screen.dart';
 import '../common_widgets.dart';
+import '../profile_pic.dart';
 import '../text_widget.dart';
 
 class FollowFollowingTile extends StatelessWidget {
@@ -37,25 +37,11 @@ class FollowFollowingTile extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    // Get.to(
-                    //   () => AppUserScreen(
-                    //     appUserId: user.id,
-                    //     appUserName: user.name,
-                    //   ),
-                    // );
                     navigateToAppUserScreen(user.id, context);
                   },
-                  child: Container(
-                    height: 50.h,
-                    width: 50.h,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.amber,
-                      image: DecorationImage(
-                        image: CachedNetworkImageProvider(user.imageStr),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  child: ProfilePic(
+                    pic: user.imageStr,
+                    heightAndWidth: 50.h,
                   ),
                 ),
                 widthBox(12.w),
@@ -64,12 +50,6 @@ class FollowFollowingTile extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        // Get.to(
-                        //   () => AppUserScreen(
-                        //     appUserId: user.id,
-                        //     appUserName: user.name,
-                        //   ),
-                        // );
                         navigateToAppUserScreen(user.id, context);
                       },
                       child: Row(

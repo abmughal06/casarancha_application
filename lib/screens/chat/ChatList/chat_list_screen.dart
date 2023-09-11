@@ -61,7 +61,7 @@ class ChatListScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   fontSize: 14.sp,
                 ),
-                indicatorColor: Colors.yellow,
+                indicatorColor: colorF03,
                 dividerColor: Colors.transparent,
                 indicatorPadding:
                     EdgeInsets.symmetric(vertical: 5.h, horizontal: 65.w),

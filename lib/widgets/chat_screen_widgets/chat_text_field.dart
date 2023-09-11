@@ -1,9 +1,13 @@
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../resources/color_resources.dart';
+import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 
@@ -50,6 +54,108 @@ class ChatTextField extends StatelessWidget {
                 fontFamily: strFontName,
                 fontWeight: FontWeight.w400,
               ),
+              suffixIcon: Visibility(
+                visible: chat.messageController.text.isEmpty &&
+                    !chat.isRecording &&
+                    !chat.isRecordingSend,
+                child: GestureDetector(
+                  onTap: () {
+                    Get.bottomSheet(
+                      CupertinoActionSheet(
+                        actions: [
+                          CupertinoActionSheetAction(
+                            onPressed: () {
+                              Get.back();
+                              chat.getPhoto();
+                            },
+                            child: SizedBox(
+                              height: 80,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.back();
+                                          chat.getMusic();
+                                        },
+                                        child: Container(
+                                            padding: EdgeInsets.all(10.h),
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.red),
+                                            child: const Icon(
+                                              Icons.music_note,
+                                              color: colorWhite,
+                                            )),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.back();
+                                          chat.getVideo();
+                                        },
+                                        child: Container(
+                                            padding: EdgeInsets.all(10.h),
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.blue),
+                                            child: const Icon(
+                                                Icons.video_collection_outlined,
+                                                color: colorWhite)),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.back();
+                                          chat.getPhoto();
+                                        },
+                                        child: Container(
+                                            padding: EdgeInsets.all(10.h),
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.orange),
+                                            child: const Icon(Icons.photo,
+                                                color: colorWhite)),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.back();
+                                          chat.getMedia();
+                                        },
+                                        child: Container(
+                                            padding: EdgeInsets.all(10.h),
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.purple),
+                                            child: const Icon(
+                                                Icons.file_copy_sharp,
+                                                color: colorWhite)),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                        cancelButton: CupertinoActionSheetAction(
+                          onPressed: () {
+                            Get.back();
+                          },
+                          child: const Text(
+                            'Cancel',
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  child: SvgPicture.asset(icChatPaperClip),
+                ),
+              ),
+              suffixIconConstraints: const BoxConstraints(maxHeight: 18),
               contentPadding: EdgeInsets.zero,
               focusColor: Colors.transparent,
               focusedBorder: const OutlineInputBorder(

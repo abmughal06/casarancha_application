@@ -206,7 +206,7 @@ class MessageTiles extends StatelessWidget {
 
       case 'voice':
         final voice = MediaDetails.fromMap(message.content[0]);
-        return ChatMusicTile(
+        return ChatVoiceTile(
           appUserId: message.sentToId,
           isSeen: message.isSeen,
           isMe: isMe,

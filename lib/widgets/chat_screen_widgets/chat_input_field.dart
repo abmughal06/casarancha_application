@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class ChatInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isRecordingDelete = false;
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, b) {
         return chatProvider.photosList.isNotEmpty ||
@@ -47,11 +49,11 @@ class ChatInputField extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     left: 20, right: 20, bottom: 35, top: 10),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Visibility(
-                      visible: !chatProvider.isRecording,
+                      visible: !chatProvider.isRecording &&
+                          !chatProvider.isRecordingSend,
                       child: Expanded(
                         child: ChatTextField(
                           chatController: chatProvider.messageController,
@@ -60,138 +62,100 @@ class ChatInputField extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: chatProvider.messageController.text.isEmpty &&
-                          !chatProvider.isRecording,
-                      child: SpeedDial(
-                        closeDialOnPop: true,
-                        backgroundColor: Colors.transparent,
-                        activeBackgroundColor: colorF03,
-                        activeChild: const Icon(
-                          Icons.close,
-                          size: 26,
-                          color: color221,
-                        ),
-                        buttonSize: Size(40.h, 40.h),
-                        overlayColor: Colors.black,
-                        overlayOpacity: 0.5,
-                        elevation: 0,
-                        spacing: 5,
-                        childMargin: EdgeInsets.zero,
-                        children: [
-                          SpeedDialChild(
-                            child: Icon(
-                              Icons.file_copy_sharp,
-                              size: 18.sp,
-                            ),
-                            onTap: () {
-                              chatProvider.getMedia();
-                            },
-                            label: 'Media',
-                          ),
-                          SpeedDialChild(
-                            child: Icon(
-                              Icons.photo_size_select_actual_rounded,
-                              size: 18.sp,
-                            ),
-                            onTap: () {
-                              chatProvider.getPhoto();
-                            },
-                            label: 'Image',
-                          ),
-                          SpeedDialChild(
-                            child: Icon(
-                              Icons.video_collection_sharp,
-                              size: 18.sp,
-                            ),
-                            onTap: () {
-                              chatProvider.getVideo();
-                            },
-                            label: 'Video',
-                          ),
-                          SpeedDialChild(
-                            child: Icon(
-                              Icons.music_note_outlined,
-                              size: 20.sp,
-                            ),
-                            onTap: () {
-                              chatProvider.getMusic();
-                            },
-                            label: 'Music',
-                          ),
-                        ],
-                        child: SvgPicture.asset(
-                          icChatPaperClip,
-                          height: 25.h,
-                          color: color221,
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: chatProvider.isRecording,
-                      child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 100),
-                          height: 40.h,
-                          width: !chatProvider.isRecording
-                              ? MediaQuery.of(context).size.width * 0
-                              : MediaQuery.of(context).size.width * .68,
-                          decoration: BoxDecoration(
-                              color: colorFF4,
-                              borderRadius: BorderRadius.circular(30)),
-                          child: Center(
-                              child: TextWidget(
-                            text: formatTime(chatProvider.durationInSeconds),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16.sp,
-                            color: colorPrimaryA05,
-                          ))),
-                    ),
-                    Row(
-                      children: [
-                        Visibility(
-                          visible: chatProvider.messageController.text.isEmpty,
-                          child: GestureDetector(
-                            onLongPress: () {
-                              chatProvider.startRecording();
-                            },
-                            onLongPressEnd: (c) {
-                              chatProvider.stopRecording(
+                      visible: chatProvider.isRecording ||
+                          chatProvider.isRecordingSend,
+                      child: VoiceRecordingWidget(
+                          sendRecording: () => chatProvider.stopRecording(
                                 currentUser: currentUser,
                                 appUser: appUser,
-                              );
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(9.w),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: colorF03.withOpacity(0.6)),
-                              child: const Icon(
-                                Icons.mic_none_sharp,
-                                color: color221,
                               ),
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          child: Visibility(
-                            visible: chatProvider
-                                    .messageController.text.isNotEmpty &&
-                                !chatProvider.isRecording,
-                            child: Row(
-                              children: [
-                                widthBox(12.w),
-                                GestureDetector(
-                                  onTap: onTapSentMessage,
+                          isRecorderLock: chatProvider.isRecorderLock,
+                          onTapDelete: () => chatProvider.deleteRecording(),
+                          isRecording: chatProvider.isRecording,
+                          isRecordingSend: chatProvider.isRecordingSend,
+                          duration: formatTime(chatProvider.durationInSeconds)),
+                    ),
+                    Visibility(
+                      visible: chatProvider.messageController.text.isEmpty,
+                      child: Row(
+                        children: [
+                          widthBox(12.w),
+                          chatProvider.isRecorderLock
+                              ? GestureDetector(
+                                  onTap: () {
+                                    chatProvider.stopRecording(
+                                      currentUser: currentUser,
+                                      appUser: appUser,
+                                    );
+                                  },
                                   child: Image.asset(
                                     imgSendComment,
                                     height: 38.h,
                                     width: 38.w,
                                   ),
-                                ),
-                              ],
+                                )
+                              : GestureDetector(
+                                  onLongPressStart: (c) async {
+                                    if (await chatProvider.audioRecorder
+                                        .hasPermission()) {
+                                      chatProvider.startRecording();
+                                    }
+                                    isRecordingDelete = false;
+                                  },
+                                  onLongPressMoveUpdate: (details) {
+                                    final dragDistanceHor =
+                                        details.localPosition.dx;
+                                    final dragDistanceVer =
+                                        details.localPosition.dy;
+
+                                    if (dragDistanceHor < -50) {
+                                      chatProvider.deleteRecording();
+                                      log('deleted');
+                                      isRecordingDelete = true;
+                                    }
+                                    if (dragDistanceVer < -20) {
+                                      chatProvider.toggleRecorderLock();
+                                    }
+                                  },
+                                  onLongPressEnd: (details) {
+                                    if (!isRecordingDelete) {
+                                      chatProvider.stopRecording(
+                                        currentUser: currentUser,
+                                        appUser: appUser,
+                                      );
+                                      log('stopped');
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(8.w),
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: colorF03.withOpacity(0.6)),
+                                    child: const Icon(
+                                      Icons.mic_none_sharp,
+                                      color: color221,
+                                    ),
+                                  ),
+                                )
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: chatProvider.messageController.text.isNotEmpty &&
+                          !chatProvider.isRecording,
+                      child: Row(
+                        children: [
+                          widthBox(12.w),
+                          GestureDetector(
+                            onTap: onTapSentMessage,
+                            child: Image.asset(
+                              imgSendComment,
+                              height: 38.h,
+                              width: 38.w,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -468,4 +432,72 @@ String formatTime(Duration duration) {
     minutes,
     seconds,
   ].join(':');
+}
+
+class VoiceRecordingWidget extends StatelessWidget {
+  const VoiceRecordingWidget(
+      {Key? key,
+      required this.isRecording,
+      required this.isRecordingSend,
+      required this.duration,
+      required this.onTapDelete,
+      required this.isRecorderLock,
+      required this.sendRecording})
+      : super(key: key);
+
+  final bool isRecording;
+  final bool isRecordingSend;
+  final String duration;
+  final VoidCallback onTapDelete;
+  final bool isRecorderLock;
+  final VoidCallback sendRecording;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isRecording) {
+      return Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            isRecorderLock
+                ? IconButton(
+                    onPressed: onTapDelete,
+                    icon: const Icon(Icons.delete, color: colorPrimaryA05))
+                : Container(),
+            Padding(
+              padding: EdgeInsets.only(left: isRecorderLock ? 50 : 0),
+              child: TextWidget(
+                text: duration,
+                fontWeight: FontWeight.w700,
+                fontSize: 16.sp,
+                color: colorPrimaryA05,
+              ),
+            ),
+            isRecorderLock
+                ? Container()
+                : TextWidget(
+                    text: 'Slide to Cancel',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16.sp,
+                    color: color221,
+                  ),
+            isRecorderLock
+                ? Container()
+                : const Icon(Icons.swipe_left_alt_rounded),
+          ],
+        ),
+      );
+    }
+    if (isRecordingSend) {
+      return Expanded(
+        child: Container(
+            height: 40.h,
+            decoration: BoxDecoration(
+                color: colorFF4, borderRadius: BorderRadius.circular(30)),
+            child: const Center(child: CircularProgressIndicator.adaptive())),
+      );
+    }
+    return Container();
+  }
 }

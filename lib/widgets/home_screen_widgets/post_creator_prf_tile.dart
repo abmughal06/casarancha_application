@@ -85,19 +85,33 @@ class PostCreatorProfileTile extends StatelessWidget {
                           InkWell(
                             onTap: () => navigateToAppUserScreen(
                                 post.creatorId, context),
-                            child: Container(
-                              height: 30.h,
-                              width: 30.h,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: CachedNetworkImageProvider(
-                                    appUser.imageStr,
+                            child: appUser.imageStr != ''
+                                ? Container(
+                                    height: 30.h,
+                                    width: 30.h,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: CachedNetworkImageProvider(
+                                          appUser.imageStr,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: 30.h,
+                                    width: 30.h,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: AssetImage(
+                                          imgUserPlaceHolder,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
                           ),
                           Visibility(
                             visible: appUser.isVerified,
