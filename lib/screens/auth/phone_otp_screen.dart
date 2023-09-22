@@ -14,11 +14,12 @@ import '../../widgets/common_widgets.dart';
 import '../../widgets/text_widget.dart';
 
 class PhoneOTPScreen extends StatelessWidget {
-  const PhoneOTPScreen({
+  PhoneOTPScreen({
     Key? key,
     required this.verificationId,
   }) : super(key: key);
   final String verificationId;
+  final TextEditingController otpController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,22 +61,22 @@ class PhoneOTPScreen extends StatelessWidget {
                         fontWeight: FontWeight.w400,
                       ),
                       heightBox(42.h),
-                      OtpFields(controller: prov.otpController),
+                      OtpFields(controller: otpController),
                       heightBox(20.h),
-                      CommonButton(
-                        showLoading:
-                            context.read<AuthenticationProvider>().isSigningIn,
-                        onTap: () {
-                          context
-                              .read<AuthenticationProvider>()
-                              .checkOtpVerification(
-                                prov.otpController.text,
-                                verificationId,
-                              );
-                        },
-                        text: 'Continue',
-                        width: double.infinity,
-                      ),
+                      Consumer<AuthenticationProvider>(
+                          builder: (context, auth, b) {
+                        return CommonButton(
+                          showLoading: auth.isSigningIn,
+                          onTap: () {
+                            auth.checkOtpVerification(
+                              otpController.text,
+                              verificationId,
+                            );
+                          },
+                          text: 'Continue',
+                          width: double.infinity,
+                        );
+                      }),
                     ],
                   ),
                 ),
@@ -121,12 +122,11 @@ class OtpFields extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           fieldHeight: height,
           fieldWidth: width,
-          // fieldOuterPadding: const EdgeInsets.all(5),
-          activeFillColor: colorFDF,
+          activeFillColor: colorF03,
           activeColor: colorFDF,
-          disabledColor: colorFDF,
+          disabledColor: colorF03,
           errorBorderColor: Colors.red,
-          inactiveFillColor: colorFDF,
+          inactiveFillColor: colorF03,
           selectedFillColor: colorFDF,
           selectedColor: colorFDF,
           inactiveColor: colorFDF,

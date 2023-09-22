@@ -57,7 +57,7 @@ class CustomPostHeader extends StatelessWidget {
             ),
             widthBox(5.w),
             Visibility(
-              visible: !postCreator.isVerified,
+              visible: postCreator.isVerified,
               child: SvgPicture.asset(
                 icVerifyBadge,
                 width: 17.w,
@@ -69,45 +69,110 @@ class CustomPostHeader extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Visibility(
+            //   visible: postCreator.work.isNotEmpty ||
+            //       postCreator.education.isNotEmpty,
+            //   child: RichText(
+            //     text: TextSpan(
+            //       style: TextStyle(
+            //         color: color55F,
+            //         fontFamily: strFontName,
+            //         fontSize: 11.sp,
+            //         fontWeight: FontWeight.w400,
+            //       ),
+            //       children: [
+            //         TextSpan(
+            //           text: postCreator.work.isNotEmpty
+            //               ? "${postCreator.work} "
+            //               : '',
+            //         ),
+            //         WidgetSpan(
+            //             child: Visibility(
+            //                 visible: postCreator.isWorkVerified,
+            //                 child: SvgPicture.asset(icVerifyBadge))),
+            //         TextSpan(
+            //             text: postCreator.work.isNotEmpty &&
+            //                     postCreator.education.isNotEmpty
+            //                 ? '   |   '
+            //                 : ''),
+            //         TextSpan(
+            //           text: postCreator.education.isEmpty
+            //               ? ''
+            //               : "${postCreator.education} ",
+            //         ),
+            //         WidgetSpan(
+            //             child: Visibility(
+            //                 visible: postCreator.isEducationVerified,
+            //                 child: SvgPicture.asset(icVerifyBadge))),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             Visibility(
-              visible: postCreator.work.isNotEmpty ||
-                  postCreator.education.isNotEmpty,
-              child: RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: color55F,
-                    fontFamily: strFontName,
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
+              visible: postCreator.education.isNotEmpty,
+              child: SelectableText.rich(
+                TextSpan(
                   children: [
-                    TextSpan(
-                      text: postCreator.work.isNotEmpty
-                          ? "${postCreator.work} "
-                          : '',
-                    ),
                     WidgetSpan(
-                        child: Visibility(
-                            visible: postCreator.isWorkVerified,
-                            child: SvgPicture.asset(icVerifyBadge))),
+                        child: Icon(
+                      Icons.school,
+                      size: 15.sp,
+                      color: color55F.withOpacity(0.7),
+                    )),
                     TextSpan(
-                        text: postCreator.work.isNotEmpty &&
-                                postCreator.education.isNotEmpty
-                            ? ' | '
-                            : ''),
-                    TextSpan(
-                      text: postCreator.education.isEmpty
-                          ? ''
-                          : "${postCreator.education} ",
+                      text: ' ${postCreator.education} ',
+                      style: TextStyle(
+                        color: color55F,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 11.sp,
+                        fontFamily: strFontName,
+                      ),
                     ),
                     WidgetSpan(
                         child: Visibility(
                             visible: postCreator.isEducationVerified,
-                            child: SvgPicture.asset(icVerifyBadge))),
+                            child: SvgPicture.asset(
+                              icVerifyBadge,
+                              height: 13,
+                            ))),
                   ],
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
+            Visibility(
+              visible: postCreator.work.isNotEmpty,
+              child: SelectableText.rich(
+                TextSpan(
+                  children: [
+                    WidgetSpan(
+                        child: Icon(
+                      Icons.work,
+                      size: 14.sp,
+                      color: color55F.withOpacity(0.7),
+                    )),
+                    TextSpan(
+                      text: ' ${postCreator.work} ',
+                      style: TextStyle(
+                        color: color55F,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 11.sp,
+                        fontFamily: strFontName,
+                      ),
+                    ),
+                    WidgetSpan(
+                        child: Visibility(
+                            visible: postCreator.isWorkVerified,
+                            child: SvgPicture.asset(
+                              icVerifyBadge,
+                              height: 13,
+                            ))),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
             Visibility(
               visible:
                   postModel.showPostTime || postModel.locationName.isNotEmpty,

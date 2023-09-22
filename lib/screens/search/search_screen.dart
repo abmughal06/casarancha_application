@@ -49,7 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: searchTextField(
                 context: context,
-                controller: search.searchController,
+                controller: searchController,
                 onChange: (value) {
                   search.searchText(value);
                 },
@@ -82,8 +82,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         );
                       }
 
-                      if (search.searchController.text.isEmpty ||
-                          search.searchController.text == '') {
+                      if (searchController.text.isEmpty ||
+                          searchController.text == '') {
                         return const Center(
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 60),
@@ -97,12 +97,10 @@ class _SearchScreenState extends State<SearchScreen> {
                       }
                       var filterList = users
                           .where((element) =>
-                              (element.name.toLowerCase().contains(search
-                                      .searchController.text
-                                      .toLowerCase()) ||
-                                  element.username.toLowerCase().contains(search
-                                      .searchController.text
-                                      .toLowerCase())) &&
+                              (element.name.toLowerCase().contains(
+                                      searchController.text.toLowerCase()) ||
+                                  element.username.toLowerCase().contains(
+                                      searchController.text.toLowerCase())) &&
                               element.id !=
                                   FirebaseAuth.instance.currentUser!.uid)
                           .toList();
@@ -149,12 +147,6 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class SearchProvider extends ChangeNotifier {
-  late TextEditingController searchController;
-
-  SearchProvider() {
-    searchController = TextEditingController();
-  }
-
   void searchText(value) {
     notifyListeners();
   }

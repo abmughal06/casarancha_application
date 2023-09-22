@@ -75,15 +75,18 @@ class ChatUserListTile extends StatelessWidget {
             messageDetails.unreadMessageCount == 0
                 ? const Icon(Icons.navigate_next)
                 : Container(
-                    padding: const EdgeInsets.all(3),
+                    height: 19.h,
+                    width: 19.w,
                     decoration: const BoxDecoration(
                         color: Color(0xff7BC246), shape: BoxShape.circle),
-                    child: TextWidget(
-                      text: messageDetails.unreadMessageCount.toString(),
-                      color: Colors.white,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
-                      onTap: ontapTile,
+                    child: Center(
+                      child: TextWidget(
+                        text: messageDetails.unreadMessageCount.toString(),
+                        color: Colors.white,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        onTap: ontapTile,
+                      ),
                     ),
                   ),
           ],
@@ -211,6 +214,7 @@ class GhostChatUserListTile extends StatelessWidget {
               : const Color(0xff000000),
         ),
         leading: CircleAvatar(
+          radius: 22.sp,
           backgroundColor: colorF03,
           child: Image.asset(
             imgGhostUser,

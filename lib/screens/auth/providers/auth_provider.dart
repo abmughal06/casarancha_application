@@ -12,14 +12,18 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../../resources/color_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../utils/app_constants.dart';
 import '../../../utils/snackbar.dart';
+import '../../../widgets/common_widgets.dart';
+import '../../../widgets/text_widget.dart';
 import '../phone_otp_screen.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
@@ -75,7 +79,7 @@ class AuthenticationProvider extends ChangeNotifier {
           !data.data()!.containsKey('isEducationVerified')) {
         ref.set({
           'isWorkVerified': false,
-          'isEducationVerified': true,
+          'isEducationVerified': false,
         }, SetOptions(merge: true));
       }
       Get.offAll(() => const DashBoard());
@@ -108,9 +112,25 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<void> verifyPhoneNumber(number) async {
+    Get.defaultDialog(
+      title: '',
+      titlePadding: EdgeInsets.zero,
+      barrierDismissible: false,
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator.adaptive(),
+          widthBox(15.w),
+          TextWidget(
+            text: 'Verifying number...',
+            color: color55F,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w400,
+          ),
+        ],
+      ),
+    );
     try {
-      isSigningIn = true;
-      notifyListeners();
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: number,
         verificationCompleted: (PhoneAuthCredential credential) {
@@ -119,11 +139,12 @@ class AuthenticationProvider extends ChangeNotifier {
         },
         verificationFailed: (FirebaseAuthException e) {
           dev.log('failed $e');
-          isSigningIn = false;
-          notifyListeners();
+          Get.back();
+          GlobalSnackBar.show(message: '${e.message}');
         },
         codeSent: (String verificationId, int? resendToken) {
           dev.log('code sent');
+          Get.back();
           Get.to(
             () => PhoneOTPScreen(
               verificationId: verificationId,
@@ -135,15 +156,11 @@ class AuthenticationProvider extends ChangeNotifier {
         },
       );
     } on FirebaseAuthException catch (e) {
-      isSigningIn = false;
-      notifyListeners();
-
       GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      Get.back();
     } catch (e) {
-      isSigningIn = false;
-      notifyListeners();
-
-      GlobalSnackBar.show(message: 'Google login cancelled');
+      GlobalSnackBar.show(message: 'Phone login cancelled');
+      Get.back();
     } finally {
       isSigningIn = false;
       notifyListeners();
@@ -151,24 +168,39 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<void> checkOtpVerification(smsCode, verifyId) async {
+    isSigningIn = true;
+    notifyListeners();
+    Get.defaultDialog(
+      title: '',
+      titlePadding: EdgeInsets.zero,
+      barrierDismissible: false,
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator.adaptive(),
+          widthBox(15.w),
+          TextWidget(
+            text: 'Verifying OTP ...',
+            color: color55F,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w400,
+          ),
+        ],
+      ),
+    );
+
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verifyId, smsCode: smsCode);
 
     try {
-      isSigningIn = true;
-      notifyListeners();
       await FirebaseAuth.instance.signInWithCredential(credential);
       saveTokenAndNavigateToNext();
     } on FirebaseAuthException catch (e) {
-      isSigningIn = false;
-      notifyListeners();
-
+      Get.back();
       GlobalSnackBar.show(message: 'Please enter ${e.message}');
     } catch (e) {
-      isSigningIn = false;
-      notifyListeners();
-
-      GlobalSnackBar.show(message: 'Google login cancelled');
+      Get.back();
+      GlobalSnackBar.show(message: 'Phone login cancelled');
     } finally {
       isSigningIn = false;
       notifyListeners();

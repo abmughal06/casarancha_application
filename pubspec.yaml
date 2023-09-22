@@ -48,6 +48,8 @@ dependencies:
   firebase_messaging: ^14.5.0
   flutter_local_notifications: ^9.2.0
 
+  flutter_cache_manager: ^3.3.1
+
   sign_in_with_apple: ^3.3.0
   email_validator: ^2.1.17
 
@@ -75,7 +77,7 @@ dependencies:
   shimmer: ^2.0.0
   story_view: ^0.14.0
   url_launcher: ^6.1.6
-  video_player: ^2.5.2
+  video_player: ^2.7.2
   audioplayers: ^3.0.1
   voice_message_package: ^1.0.41
   uuid: ^3.0.7

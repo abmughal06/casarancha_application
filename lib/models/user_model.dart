@@ -127,7 +127,7 @@ class UserModel {
       'username': username,
       'ghostName': ghostName,
       'blockIds': blockIds,
-      'isWordVerified': isWorkVerified,
+      'isWorkVerified': isWorkVerified,
       'isEducationVerified': isEducationVerified,
       'dob': dob,
       'name': name,

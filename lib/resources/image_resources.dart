@@ -91,7 +91,7 @@ const icManageNotification =
     "assets/images/img_profile_page/ic_manage_notification.svg";
 
 const icVideoPlayBtn = "assets/images/ic_video_play_btn.svg";
-const icVideoPauseBtn = "assets/images/ic_video_play_btn.svg";
+const icVideoPauseBtn = "assets/images/pause.svg";
 const icMusicPlayBtn = "assets/images/ic_music_play.svg";
 const icMusicPauseBtn = "assets/images/ic_music_pause.svg";
 const icVideoSoundOff = "assets/images/ic_video_sound_off.svg";

@@ -24,6 +24,7 @@ class PhoneLoginScreen extends StatelessWidget {
       mask: '### ### ####',
       filter: {"#": RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
+  final TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -67,28 +68,18 @@ class PhoneLoginScreen extends StatelessWidget {
                             fontWeight: FontWeight.w400,
                           ),
                           heightBox(42.h),
-                          Focus(
-                            focusNode: prov.phoneFocus,
-                            onFocusChange: (hasFocus) {
-                              prov.phoneFocusChange(context);
-                            },
-                            child: TextEditingWidget(
-                              controller: prov.phoneController,
-                              isShadowEnable: false,
-                              hint: 'Phone Number',
-                              color: prov.phoneFillClr ?? colorFF3,
-                              fieldBorderClr: prov.phoneBorderClr,
-                              prefixIcon: TextButton.icon(
+                          Row(
+                            children: [
+                              TextButton.icon(
                                 onPressed: () {
                                   try {
                                     prov.isLoading = true;
-                                    Get.bottomSheet(
-                                        const PhoneCountryCodeList());
+                                    Get.bottomSheet(PhoneCountryCodeList());
                                   } finally {
                                     prov.isLoading = false;
                                   }
                                 },
-                                icon: const Icon(Icons.arrow_drop_down),
+                                icon: const Icon(Icons.keyboard_arrow_down),
                                 label: TextWidget(
                                   text: prov.phoneDialCode,
                                   color: color239,
@@ -97,27 +88,41 @@ class PhoneLoginScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              textInputType: TextInputType.phone,
-                              textInputAction: TextInputAction.done,
-                              onEditingComplete: () =>
-                                  FocusScope.of(context).unfocus(),
-                              inputFormatters: [maskFormatter],
-                            ),
+                              Expanded(
+                                child: Focus(
+                                  focusNode: prov.phoneFocus,
+                                  onFocusChange: (hasFocus) {
+                                    prov.phoneFocusChange(context);
+                                  },
+                                  child: TextEditingWidget(
+                                    controller: phoneController,
+                                    isShadowEnable: false,
+                                    hint: 'Phone Number',
+                                    color: prov.phoneFillClr ?? colorFF3,
+                                    fieldBorderClr: prov.phoneBorderClr,
+                                    textInputType: TextInputType.phone,
+                                    textInputAction: TextInputAction.done,
+                                    onEditingComplete: () =>
+                                        FocusScope.of(context).unfocus(),
+                                    inputFormatters: [maskFormatter],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           heightBox(20.h),
-                          CommonButton(
-                            showLoading: context
-                                .read<AuthenticationProvider>()
-                                .isSigningIn,
-                            onTap: () async {
-                              context
-                                  .read<AuthenticationProvider>()
-                                  .verifyPhoneNumber(
-                                      '${prov.phoneDialCode} ${prov.phoneController.text.trim()}');
-                            },
-                            text: strSendNow,
-                            width: double.infinity,
-                          ),
+                          Consumer<AuthenticationProvider>(
+                              builder: (context, auth, b) {
+                            return CommonButton(
+                              showLoading: auth.isSigningIn,
+                              onTap: () async {
+                                auth.verifyPhoneNumber(
+                                    '${prov.phoneDialCode} ${phoneController.text.trim()}');
+                              },
+                              text: strSendNow,
+                              width: double.infinity,
+                            );
+                          }),
                         ],
                       ),
                     ),
@@ -127,20 +132,14 @@ class PhoneLoginScreen extends StatelessWidget {
             ),
           ],
         ),
-        Consumer<PhoneProvider>(
-          builder: (context, p, b) {
-            return p.isLoading
-                ? const Center(child: CircularProgressIndicator.adaptive())
-                : Container();
-          },
-        ),
       ],
     ));
   }
 }
 
 class PhoneCountryCodeList extends StatelessWidget {
-  const PhoneCountryCodeList({Key? key}) : super(key: key);
+  PhoneCountryCodeList({Key? key}) : super(key: key);
+  final searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +155,7 @@ class PhoneCountryCodeList extends StatelessWidget {
       child: Column(
         children: [
           TextEditingWidget(
-            controller: search.searchController,
+            controller: searchController,
             isShadowEnable: false,
             hint: 'Write here to search country code',
             color: colorFF3,
@@ -167,7 +166,7 @@ class PhoneCountryCodeList extends StatelessWidget {
           heightBox(12.h),
           Consumer<SearchProvider>(
             builder: (context, prov, b) {
-              if (prov.searchController.text.isEmpty) {
+              if (searchController.text.isEmpty) {
                 return Expanded(
                   child: ListView.builder(
                     physics: const BouncingScrollPhysics(),
@@ -197,13 +196,13 @@ class PhoneCountryCodeList extends StatelessWidget {
                   .where((element) =>
                       element.code!
                           .toLowerCase()
-                          .contains(prov.searchController.text.toLowerCase()) ||
+                          .contains(searchController.text.toLowerCase()) ||
                       element.name!
                           .toLowerCase()
-                          .contains(prov.searchController.text.toLowerCase()) ||
+                          .contains(searchController.text.toLowerCase()) ||
                       element.dialCode!
                           .toLowerCase()
-                          .contains(prov.searchController.text.toLowerCase()))
+                          .contains(searchController.text.toLowerCase()))
                   .toList();
 
               return Expanded(

@@ -28,7 +28,6 @@ class CheckMediaAndShowPost extends StatelessWidget {
     Key? key,
     required this.mediaData,
     required this.postId,
-    this.iniializedFuturePlay,
     required this.ondoubleTap,
     required this.postModel,
     required this.isPostDetail,
@@ -37,7 +36,6 @@ class CheckMediaAndShowPost extends StatelessWidget {
 
   final MediaDetails mediaData;
   final PostModel postModel;
-  final Future<void>? iniializedFuturePlay;
   final String postId;
   final VoidCallback ondoubleTap;
   final bool isPostDetail;
@@ -73,6 +71,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
               progressIndicatorBuilder: (context, url, progress) => Center(
                     child: SizedBox(
                       height: 30.h,
+                      width: 30.h,
                       child: const CircularProgressIndicator.adaptive(),
                     ),
                   ),
@@ -99,19 +98,18 @@ class CheckMediaAndShowPost extends StatelessWidget {
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
               : () => Get.to(() => PostDetailScreen(postModel: postModel)),
-          child: FutureBuilder(
-              future: iniializedFuturePlay,
-              builder: (context, snapshot) {
-                return VideoPlayerWidget(
-                  videoUrl: mediaData.link,
-                  postModel: postModel,
-                );
-              }),
+          child: VideoPlayerWidget(
+            key: ValueKey(mediaData.link),
+            videoUrl: mediaData.link,
+            postModel: postModel,
+            isPostDetailScreen: isFullScreen ? false : isPostDetail,
+          ),
         );
       case "Music":
         return InkWell(
           onDoubleTap: ondoubleTap,
           child: MusicPlayerUrl(
+            key: ValueKey(postModel.mediaData.first.link),
             postModel: postModel,
             border: 0,
             musicDetails: mediaData,
@@ -256,6 +254,13 @@ class PostFullScreenView extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: colorWhite),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            icIosBackArrow,
+            color: colorWhite,
+          ),
+          onPressed: () => Get.back(),
+        ),
         actions: [
           Visibility(
             visible: post.creatorId == FirebaseAuth.instance.currentUser!.uid,
@@ -292,25 +297,23 @@ class PostFullScreenView extends StatelessWidget {
                 );
               },
               child: Container(
-                height: 30.h,
-                width: 30.h,
                 decoration: const BoxDecoration(
                     color: Colors.white, shape: BoxShape.circle),
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-                child: SvgPicture.asset(icThreeDots),
+                padding: const EdgeInsets.all(4),
+                child: const Icon(
+                  Icons.more_horiz,
+                  color: colorBlack,
+                ),
               ),
             ),
           ),
           widthBox(12.w)
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 12),
-        child: PostMediaWidget(
-          isPostDetail: isPostDetail,
-          post: post,
-          isFullScreen: true,
-        ),
+      body: PostMediaWidget(
+        isPostDetail: isPostDetail,
+        post: post,
+        isFullScreen: true,
       ),
     );
   }

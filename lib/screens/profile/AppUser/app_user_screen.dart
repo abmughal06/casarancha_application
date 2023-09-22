@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/localization_text_strings.dart';
 
+import '../../../resources/strings.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/menu_user_button.dart';
 import '../../../widgets/profile_pic.dart';
@@ -71,7 +72,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
             leading: IconButton(
               onPressed: () => Get.back(),
               color: Colors.black,
-              icon: const Icon(Icons.keyboard_arrow_left_rounded),
+              icon: SvgPicture.asset(icIosBackArrow),
             ),
             actions: [
               menuUserButton(
@@ -109,105 +110,49 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                 } else {
                                   return Column(
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 45.w),
-                                        child: Row(
+                                      Card(
+                                        color: colorWhite,
+                                        shape: const CircleBorder(
+                                            side: BorderSide(
+                                                color: colorWhite, width: 3)),
+                                        elevation: 2,
+                                        child: ProfilePic(
+                                          pic: user.imageStr,
+                                          showBorder: false,
+                                          heightAndWidth: 105.h,
+                                        ),
+                                      ),
+                                      heightBox(15.w),
+                                      SelectableText.rich(
+                                        TextSpan(
                                           children: [
-                                            ProfilePic(
-                                              pic: user.imageStr,
-                                              showBorder: true,
+                                            TextSpan(
+                                              text: "${user.name} ",
+                                              style: TextStyle(
+                                                color: color13F,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16.sp,
+                                              ),
                                             ),
-                                            widthBox(13.w),
-                                            Expanded(
-                                              child: ListTile(
-                                                contentPadding: EdgeInsets.zero,
-                                                horizontalTitleGap: 0,
-                                                visualDensity:
-                                                    const VisualDensity(
-                                                        horizontal: 4,
-                                                        vertical: 4),
-                                                title: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        SelectableTextWidget(
-                                                          text: user.name,
-                                                          color: color13F,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize: 16.sp,
-                                                          textOverflow:
-                                                              TextOverflow
-                                                                  .ellipsis,
-                                                        ),
-                                                        Visibility(
-                                                            visible:
-                                                                user.isVerified,
-                                                            child: SvgPicture
-                                                                .asset(
-                                                                    icVerifyBadge))
-                                                      ],
-                                                    ),
-                                                    SelectableTextWidget(
-                                                      text: user.username,
-                                                      color: colorAA3,
-                                                      fontSize: 12.sp,
-                                                    ),
-                                                    Visibility(
-                                                      visible:
-                                                          user.work.isNotEmpty,
-                                                      child: Row(
-                                                        children: [
-                                                          SelectableTextWidget(
-                                                            text:
-                                                                'Works at ${user.work}',
-                                                            color: colorAA3,
-                                                            fontSize: 12.sp,
-                                                          ),
-                                                          Visibility(
-                                                            visible: user
-                                                                .isWorkVerified,
-                                                            child: SvgPicture
-                                                                .asset(
-                                                                    icVerifyBadge),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Visibility(
-                                                      visible: user
-                                                          .education.isNotEmpty,
-                                                      child: Row(
-                                                        children: [
-                                                          SelectableTextWidget(
-                                                            text:
-                                                                "studied from ${user.education}",
-                                                            color: colorAA3,
-                                                            fontSize: 12.sp,
-                                                          ),
-                                                          Visibility(
-                                                            visible: user
-                                                                .isEducationVerified,
-                                                            child: SvgPicture
-                                                                .asset(
-                                                                    icVerifyBadge),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
+                                            WidgetSpan(
+                                              child: Visibility(
+                                                visible: user.isVerified,
+                                                child: SvgPicture.asset(
+                                                  icVerifyBadge,
+                                                  height: 17,
                                                 ),
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                      heightBox(20.h),
+                                      SelectableTextWidget(
+                                        text: user.username,
+                                        color: colorAA3,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 13.sp,
+                                      ),
+                                      heightBox(8.h),
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -265,15 +210,94 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                           ),
                                         ],
                                       ),
-                                      heightBox(14.h),
+                                      heightBox(20.h),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
-                                            horizontal: 27.w),
-                                        child: SelectableTextWidget(
-                                          text: user.bio,
-                                          textAlign: TextAlign.center,
-                                          color: color55F,
-                                          fontSize: 12.sp,
+                                            horizontal: 40.w),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Visibility(
+                                              visible: user.work.isNotEmpty,
+                                              child: SelectableText.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    WidgetSpan(
+                                                      child: Icon(
+                                                        Icons.school,
+                                                        size: 16.sp,
+                                                        color: color55F,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: ' ${user.work} ',
+                                                      style: TextStyle(
+                                                        color: color55F,
+                                                        fontSize: 12.sp,
+                                                        fontFamily: strFontName,
+                                                      ),
+                                                    ),
+                                                    WidgetSpan(
+                                                        child: Visibility(
+                                                            visible: user
+                                                                .isWorkVerified,
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              icVerifyBadge,
+                                                              height: 15,
+                                                            ))),
+                                                  ],
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            Visibility(
+                                              visible:
+                                                  user.education.isNotEmpty,
+                                              child: SelectableText.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    WidgetSpan(
+                                                      child: Icon(
+                                                        Icons.work,
+                                                        size: 15.sp,
+                                                        color: color55F,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          ' ${user.education} ',
+                                                      style: TextStyle(
+                                                        color: color55F,
+                                                        fontFamily: strFontName,
+                                                        fontSize: 12.sp,
+                                                      ),
+                                                    ),
+                                                    WidgetSpan(
+                                                        child: Visibility(
+                                                            visible: user
+                                                                .isEducationVerified,
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              icVerifyBadge,
+                                                              height: 15,
+                                                            ))),
+                                                  ],
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            Visibility(
+                                              visible: user.bio.isNotEmpty,
+                                              child: SelectableTextWidget(
+                                                text: user.bio,
+                                                textAlign: TextAlign.center,
+                                                color: color55F,
+                                                fontSize: 12.sp,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       heightBox(user.bio.isEmpty ? 0 : 15.h),
