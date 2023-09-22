@@ -5,6 +5,7 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -97,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen>
         controller: ghostProvider.scrollController,
         key: const PageStorageKey(0),
         children: [
+          //story section
           SizedBox(
             height: 77.h,
             child: Consumer<List<Story>?>(
@@ -174,6 +176,7 @@ class _HomeScreenState extends State<HomeScreen>
               },
             ),
           ),
+          //post section
           Consumer<List<PostModel>?>(
             builder: (context, posts, b) {
               if (posts == null || users == null) {
@@ -182,7 +185,8 @@ class _HomeScreenState extends State<HomeScreen>
               var post = ghostProvider.checkGhostMode
                   ? posts.where((element) => (currentUser!.followersIds
                           .contains(element.creatorId) ||
-                      currentUser.followingsIds.contains(element.creatorId) &&
+                      currentUser.followingsIds.contains(element.creatorId) ||
+                      element.creatorId == currentUser.id &&
                           element.mediaData.isNotEmpty))
                   : posts
                       .where((element) => element.mediaData.isNotEmpty)
@@ -196,6 +200,14 @@ class _HomeScreenState extends State<HomeScreen>
                     postCreator.add(u);
                   }
                 }
+              }
+
+              if (filterList.isEmpty) {
+                return const Center(
+                  child: TextWidget(
+                    text: "You don't have any posts to show",
+                  ),
+                );
               }
 
               return ListView.builder(

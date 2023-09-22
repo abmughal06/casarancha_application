@@ -42,6 +42,7 @@ class MessageTiles extends StatelessWidget {
                     (index) => MediaDetails.fromMap(message.content[index])),
               )),
           child: ChatImageTile(
+            key: ValueKey(message.content[0]['link']),
             message: message,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
@@ -67,6 +68,7 @@ class MessageTiles extends StatelessWidget {
                 postModel: postModel,
               )),
           child: ChatPostTile(
+            key: ValueKey(postModel.mediaData.first.link),
             imageUrl: message.content['mediaData'][0]['link'],
             message: message,
             appUserId: message.sentToId,
@@ -82,6 +84,7 @@ class MessageTiles extends StatelessWidget {
                 postModel: postModel,
               )),
           child: ChatQouteTile(
+            key: ValueKey(postModel.mediaData.first.link),
             message: message,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
@@ -110,6 +113,7 @@ class MessageTiles extends StatelessWidget {
                 media: media,
               )),
           child: ChatVideoTile(
+            key: ValueKey(postModel.link),
             mediaLength: media.length > 1 ? media.length : null,
             link: postModel.link,
             appUserId: message.sentToId,
@@ -137,6 +141,7 @@ class MessageTiles extends StatelessWidget {
                 postModel: postModel,
               )),
           child: ChatVideoTile(
+            key: ValueKey(postModel.mediaData.first.link),
             link: postModel.mediaData[0].link,
             appUserId: message.sentToId,
             isSeen: message.isSeen,
@@ -159,6 +164,7 @@ class MessageTiles extends StatelessWidget {
                 });
           },
           child: ChatMusicTile(
+            key: ValueKey(music.link),
             appUserId: message.sentToId,
             isSeen: message.isSeen,
             isMe: isMe,
@@ -185,6 +191,7 @@ class MessageTiles extends StatelessWidget {
                 postModel: postModel,
               )),
           child: ChatMusicTile(
+            key: ValueKey(postModel.mediaData.first.link),
             appUserId: message.sentToId,
             isSeen: message.isSeen,
             isMe: isMe,
@@ -196,27 +203,56 @@ class MessageTiles extends StatelessWidget {
       case 'InChatDoc':
         final prePost = message.content[0];
         final postModel = MediaDetails.fromMap(prePost);
-        return ChatDocumentTile(
-          appUserId: message.sentToId,
-          isSeen: message.isSeen,
-          isMe: isMe,
-          date: message.createdAt,
-          media: postModel,
+        return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: postModel.link,
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
+          child: ChatDocumentTile(
+            key: ValueKey(postModel.link),
+            appUserId: message.sentToId,
+            isSeen: message.isSeen,
+            isMe: isMe,
+            date: message.createdAt,
+            media: postModel,
+          ),
         );
 
       case 'voice':
         final voice = MediaDetails.fromMap(message.content[0]);
-        return ChatVoiceTile(
-          appUserId: message.sentToId,
-          isSeen: message.isSeen,
-          isMe: isMe,
-          date: message.createdAt,
-          media: voice,
+        return InkWell(
+          onLongPress: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: voice.link,
+                    path:
+                        '${message.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(message.type)}',
+                  );
+                });
+          },
+          child: ChatVoiceTile(
+            key: ValueKey(voice.link),
+            appUserId: message.sentToId,
+            isSeen: message.isSeen,
+            isMe: isMe,
+            date: message.createdAt,
+            media: voice,
+          ),
         );
       case 'story-Video':
         final postModel = MediaDetails.fromMap(message.content);
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
             ? ChatVideoTile(
+                key: ValueKey(postModel.link),
                 link: postModel.link,
                 appUserId: message.sentToId,
                 isSeen: message.isSeen,
@@ -227,6 +263,7 @@ class MessageTiles extends StatelessWidget {
       case 'story-Photo':
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
             ? ChatStoryTile(
+                key: ValueKey(message.content),
                 message: message,
                 appUserId: message.sentToId,
                 isSeen: message.isSeen,
@@ -235,6 +272,7 @@ class MessageTiles extends StatelessWidget {
             : Container();
       case 'Text':
         return ChatTile(
+          key: ValueKey(message.content),
           message: message.content,
           appUserId: message.sentToId,
           isSeen: message.isSeen,

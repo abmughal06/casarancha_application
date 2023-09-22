@@ -17,6 +17,7 @@ class DashBoard extends StatelessWidget {
     final dashboardProvider = context.watch<DashboardProvider>();
     return Scaffold(
         body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
           pageSnapping: false,
           controller: dashboardProvider.pageController,
           onPageChanged: (value) {

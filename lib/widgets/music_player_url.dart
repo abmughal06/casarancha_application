@@ -143,6 +143,8 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
                         isPlaying ? audioPlayer.pause() : audioPlayer.resume();
                         postProvider.countVideoViews(
                             postModel: widget.postModel);
+
+                        audioPlayer.setReleaseMode(ReleaseMode.loop);
                       },
                       child: SvgPicture.asset(
                         isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
@@ -167,11 +169,11 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
                               activeColor: colorF03,
                               inactiveColor: colorEE5,
                               min: 0.0,
-                              max: duration.inSeconds.toDouble() + 1.0,
-                              value: position.inSeconds.toDouble() + 1.0,
+                              max: duration.inMicroseconds.toDouble(),
+                              value: position.inMicroseconds.toDouble(),
                               onChanged: (value) async {
                                 final position =
-                                    Duration(seconds: value.toInt());
+                                    Duration(microseconds: value.toInt());
                                 await audioPlayer.seek(position);
                               },
                             ),
@@ -292,7 +294,7 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
       height: 70,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
       decoration: BoxDecoration(
-        color: colorPrimaryA05,
+        color: widget.isMe ? colorPrimaryA05 : colorFF3,
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16.r),
             topRight: Radius.circular(16.r),
@@ -313,16 +315,17 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
           GestureDetector(
             onTap: () {
               isPlaying ? audioPlayer.pause() : audioPlayer.resume();
+              audioPlayer.setReleaseMode(ReleaseMode.loop);
             },
             child: SvgPicture.asset(
               isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
               width: 35,
               height: 35,
+              color: widget.isMe ? colorWhite : color221,
             ),
           ),
           widthBox(10.w),
           Expanded(
-            // flex: 1,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -330,16 +333,18 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
                 SliderTheme(
                   data: SliderThemeData(
                     overlayShape: SliderComponentShape.noThumb,
+                    trackHeight: 3.sp,
                   ),
                   child: Slider(
-                    thumbColor: colorF03,
-                    activeColor: colorF03,
-                    inactiveColor: colorEE5,
+                    thumbColor: widget.isMe ? colorF03 : color221,
+                    activeColor: widget.isMe ? colorF03 : color221,
+                    inactiveColor: widget.isMe ? colorEE5 : colorBBB,
                     min: 0.0,
-                    max: duration.inSeconds.toDouble(),
-                    value: position.inSeconds.toDouble(),
+                    max: duration.inMilliseconds.toDouble(),
+                    value: position.inMilliseconds.toDouble(),
                     onChanged: (value) async {
-                      final position = Duration(seconds: value.toInt());
+                      final position = Duration(
+                          milliseconds: (value / 1000).roundToDouble().round());
                       await audioPlayer.seek(position);
                     },
                   ),
@@ -354,13 +359,13 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
                         text: formatTime(position),
                         fontWeight: FontWeight.w500,
                         fontSize: 10.sp,
-                        color: colorWhite,
+                        color: widget.isMe ? colorWhite : color221,
                       ),
                       TextWidget(
                         text: formatTime(duration),
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w500,
-                        color: colorWhite,
+                        color: widget.isMe ? colorWhite : color221,
                       ),
                     ],
                   ),
@@ -373,3 +378,30 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
     );
   }
 }
+
+// class MusicPlayerProvider extends ChangeNotifier {
+//   late AudioPlayer audioPlayer;
+//   bool isPlaying = false;
+//   Duration duration = Duration.zero;
+//   Duration position = Duration.zero;
+
+//   MusicPlayerProvider() {
+//     audioPlayer = AudioPlayer();
+//     audioPlayer.onPlayerStateChanged.listen((event) {
+//       isPlaying = event == PlayerState.playing;
+//       notifyListeners();
+//     });
+//     audioPlayer.onDurationChanged.listen((event) {
+//       duration = event;
+//       notifyListeners();
+//     });
+//     audioPlayer.onPositionChanged.listen((event) {
+//       position = event;
+//       notifyListeners();
+//     });
+//   }
+
+//   setAudioUrl() {
+//     audioPlayer.audioCache.lo
+//   }
+// }

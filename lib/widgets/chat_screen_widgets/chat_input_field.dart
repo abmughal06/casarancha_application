@@ -18,19 +18,21 @@ import '../../../widgets/clip_pad_shadow.dart';
 import '../../../widgets/common_widgets.dart';
 
 class ChatInputField extends StatelessWidget {
-  const ChatInputField(
-      {Key? key,
-      required this.currentUser,
-      required this.appUser,
-      required this.onTapSentMessage})
-      : super(key: key);
+  const ChatInputField({
+    Key? key,
+    required this.currentUser,
+    required this.appUser,
+    required this.onTapSentMessage,
+  }) : super(key: key);
   final UserModel currentUser;
+
   final UserModel appUser;
   final VoidCallback onTapSentMessage;
 
   @override
   Widget build(BuildContext context) {
     bool isRecordingDelete = false;
+
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, b) {
         return chatProvider.photosList.isNotEmpty ||
@@ -68,6 +70,8 @@ class ChatInputField extends StatelessWidget {
                           sendRecording: () => chatProvider.stopRecording(
                                 currentUser: currentUser,
                                 appUser: appUser,
+                                firstMessageByWho: false,
+                                isGhostMessage: false,
                               ),
                           isRecorderLock: chatProvider.isRecorderLock,
                           onTapDelete: () => chatProvider.deleteRecording(),
@@ -86,6 +90,8 @@ class ChatInputField extends StatelessWidget {
                                     chatProvider.stopRecording(
                                       currentUser: currentUser,
                                       appUser: appUser,
+                                      firstMessageByWho: false,
+                                      isGhostMessage: false,
                                     );
                                   },
                                   child: Image.asset(
@@ -95,12 +101,14 @@ class ChatInputField extends StatelessWidget {
                                   ),
                                 )
                               : GestureDetector(
-                                  onLongPressStart: (c) async {
+                                  onLongPress: () async {
                                     if (await chatProvider.audioRecorder
                                         .hasPermission()) {
                                       chatProvider.startRecording();
+                                      isRecordingDelete = false;
+                                    } else {
+                                      return;
                                     }
-                                    isRecordingDelete = false;
                                   },
                                   onLongPressMoveUpdate: (details) {
                                     final dragDistanceHor =
@@ -110,6 +118,7 @@ class ChatInputField extends StatelessWidget {
 
                                     if (dragDistanceHor < -50) {
                                       chatProvider.deleteRecording();
+
                                       log('deleted');
                                       isRecordingDelete = true;
                                     }
@@ -122,18 +131,23 @@ class ChatInputField extends StatelessWidget {
                                       chatProvider.stopRecording(
                                         currentUser: currentUser,
                                         appUser: appUser,
+                                        firstMessageByWho: false,
+                                        isGhostMessage: false,
                                       );
-                                      log('stopped');
                                     }
+                                    if (chatProvider.isRecorderLock) {}
+                                    chatProvider.cancelTimer();
+                                    chatProvider.deleteRecording();
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.all(8.w),
+                                    padding: EdgeInsets.all(10.w),
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: colorF03.withOpacity(0.6)),
-                                    child: const Icon(
+                                    child: Icon(
                                       Icons.mic_none_sharp,
                                       color: color221,
+                                      size: 24.sp,
                                     ),
                                   ),
                                 )
@@ -353,65 +367,67 @@ class ShowMediaToSendInChat extends StatelessWidget {
                         ),
                       )
                     : widthBox(0),
-                GestureDetector(
-                  onTap: () {
-                    media.pickImageAndSentViaMessage(
-                      currentUser: currentUser,
-                      appUser: appUser,
-                      mediaType: media.photosList.isNotEmpty
-                          ? 'InChatPic'
-                          : media.videosList.isNotEmpty
-                              ? 'InChatVideo'
-                              : media.mediaList.isNotEmpty
-                                  ? 'InChatDoc'
-                                  : 'InChatMusic',
-                    );
+                media.isUploading
+                    ? centerLoader()
+                    : GestureDetector(
+                        onTap: () {
+                          media.pickImageAndSentViaMessage(
+                            currentUser: currentUser,
+                            appUser: appUser,
+                            mediaType: media.photosList.isNotEmpty
+                                ? 'InChatPic'
+                                : media.videosList.isNotEmpty
+                                    ? 'InChatVideo'
+                                    : media.mediaList.isNotEmpty
+                                        ? 'InChatDoc'
+                                        : 'InChatMusic',
+                          );
 
-                    Get.defaultDialog(
-                      title: 'Sending Attachments',
-                      titleStyle: TextStyle(
-                        fontSize: 14.sp,
-                        color: color221,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      content: Consumer<ChatProvider>(
-                        builder: (context, state, b) {
-                          if (state.mediaUploadTasks.isNotEmpty) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 15.w, vertical: 8.h),
-                              child: Column(
-                                children: [
-                                  LinearProgressIndicator(
-                                    value: state.tasksProgress,
-                                    minHeight: 10.h,
-                                  ),
-                                  heightBox(5.h),
-                                  TextWidget(
-                                    text:
-                                        '${(100 * state.tasksProgress).roundToDouble().toInt()}%',
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return ElevatedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              child: const Text('Done'),
-                            );
-                          }
+                          // Get.defaultDialog(
+                          //   title: 'Sending Attachments',
+                          //   titleStyle: TextStyle(
+                          //     fontSize: 14.sp,
+                          //     color: color221,
+                          //     fontWeight: FontWeight.w500,
+                          //   ),
+                          //   content: Consumer<ChatProvider>(
+                          //     builder: (context, state, b) {
+                          //       if (state.mediaUploadTasks.isNotEmpty) {
+                          //         return Padding(
+                          //           padding: EdgeInsets.symmetric(
+                          //               horizontal: 15.w, vertical: 8.h),
+                          //           child: Column(
+                          //             children: [
+                          //               LinearProgressIndicator(
+                          //                 value: state.tasksProgress,
+                          //                 minHeight: 10.h,
+                          //               ),
+                          //               heightBox(5.h),
+                          //               TextWidget(
+                          //                 text:
+                          //                     '${(100 * state.tasksProgress).roundToDouble().toInt()}%',
+                          //               ),
+                          //             ],
+                          //           ),
+                          //         );
+                          //       } else {
+                          //         return ElevatedButton(
+                          //           onPressed: () {
+                          //             Get.back();
+                          //           },
+                          //           child: const Text('Done'),
+                          //         );
+                          //       }
+                          //     },
+                          //   ),
+                          // );
                         },
-                      ),
-                    );
-                  },
-                  child: Image.asset(
-                    imgSendComment,
-                    height: 38.h,
-                    width: 38.w,
-                  ),
-                )
+                        child: Image.asset(
+                          imgSendComment,
+                          height: 38.h,
+                          width: 38.w,
+                        ),
+                      )
               ],
             ),
           ),
@@ -495,7 +511,7 @@ class VoiceRecordingWidget extends StatelessWidget {
             height: 40.h,
             decoration: BoxDecoration(
                 color: colorFF4, borderRadius: BorderRadius.circular(30)),
-            child: const Center(child: CircularProgressIndicator.adaptive())),
+            child: centerLoader(size: 20.w)),
       );
     }
     return Container();

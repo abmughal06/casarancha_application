@@ -5,22 +5,20 @@ import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
-import '../../resources/strings.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/custom_date_picker.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/profle_screen_widgets/setup_profile_textfield.dart';
 import '../../widgets/text_editing_widget.dart';
-import '../../widgets/text_widget.dart';
 
 class SetupProfileScreen extends StatefulWidget {
   const SetupProfileScreen({Key? key}) : super(key: key);
@@ -188,7 +186,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                           _educationController.text.length.toString();
                       setState(() {});
                     },
-                    limitfield: 100,
+                    limitfield: 150,
                     hintText: strEducation,
                     maxlines: 3,
                     countText: "${provider.educationTxtCount}/300",
@@ -203,7 +201,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                           _workController.text.length.toString();
                       setState(() {});
                     },
-                    limitfield: 100,
+                    limitfield: 150,
                     hintText: strWork,
                     maxlines: 3,
                     countText: "${provider.workTxtCount}/300",

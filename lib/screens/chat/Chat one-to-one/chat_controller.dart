@@ -34,6 +34,7 @@ class ChatProvider extends ChangeNotifier {
   ChatProvider() {
     messageController = TextEditingController();
     audioRecorder = Record();
+    audioRecorder.hasPermission();
   }
 
   final textFieldFocus = FocusNode();
@@ -432,6 +433,123 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
+  pickImageAndSentViaMessageGhost(
+      {UserModel? currentUser,
+      UserModel? appUser,
+      String? mediaType,
+      bool? firstMessage}) async {
+    try {
+      await uploadMediaFiles(recieverId: currentUser!.id);
+
+      final messageRefForCurrentUser = userRef
+          .doc(currentUser.id)
+          .collection('ghostMessageList')
+          .doc(appUser!.id)
+          .collection('messages')
+          .doc();
+
+      final messageRefForAppUser = userRef
+          .doc(appUser.id)
+          .collection('ghostMessageList')
+          .doc(currentUser.id)
+          .collection('messages')
+          .doc(
+            messageRefForCurrentUser.id,
+          );
+
+      final GhostMessageDetails appUserMessageDetails = GhostMessageDetails(
+        id: appUser.id,
+        lastMessage: mediaType == 'InChatVideo'
+            ? "Video"
+            : mediaType == 'InChatPic'
+                ? "Photo"
+                : mediaType == 'InChatDoc'
+                    ? "Doc"
+                    : 'Music',
+        unreadMessageCount: 0,
+        firstMessage: firstMessage! ? currentUser.id : appUser.id,
+        searchCharacters: [...appUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: appUser.name,
+          imageUrl: appUser.imageStr,
+          isVerified: appUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
+
+      final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
+        id: currentUser.id,
+        lastMessage: mediaType == 'InChatVideo'
+            ? "Video"
+            : mediaType == 'InChatPic'
+                ? "Photo"
+                : mediaType == 'InChatDoc'
+                    ? "Doc"
+                    : 'Music',
+        unreadMessageCount: unreadMessages + 1,
+        firstMessage: firstMessage ? currentUser.id : appUser.id,
+        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toIso8601String(),
+      );
+
+      // if (!isChatExits.value) {
+      await userRef
+          .doc(currentUser.id)
+          .collection('ghostMessageList')
+          .doc(appUser.id)
+          .set(
+            appUserMessageDetails.toMap(),
+          );
+
+      await userRef
+          .doc(appUser.id)
+          .collection('ghostMessageList')
+          .doc(currentUser.id)
+          .set(
+            currentUserMessageDetails.toMap(),
+          );
+
+      final Message message = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: mediaData.map((e) => e.toMap()).toList(),
+        caption: '',
+        type: '$mediaType',
+        createdAt: DateTime.now().toIso8601String(),
+        isSeen: false,
+      );
+      // log(message.toString());
+
+      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
+
+      messageRefForCurrentUser.set(message.toMap());
+      messageRefForAppUser.set(appUserMessage.toMap());
+
+      unreadMessages += 1;
+      var recieverRef = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUser.id)
+          .get();
+      var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: recieverRef.id,
+        devRegToken: recieverFCMToken,
+        msg: "has sent you a $unreadMessages attachment",
+      );
+      clearLists();
+
+      // messageController.clear();
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
   void clearLists() {
     photosList.clear();
     videosList.clear();
@@ -457,7 +575,11 @@ class ChatProvider extends ChangeNotifier {
 
   double tasksProgress = 0.0;
 
+  bool isUploading = false;
+
   Future<void> uploadMediaFiles({required String recieverId}) async {
+    isUploading = true;
+    notifyListeners();
     final allMediaFiles = [
       ...photosList,
       ...videosList,
@@ -546,13 +668,20 @@ class ChatProvider extends ChangeNotifier {
         mediaData.add(mediaDetails);
       }
     } on FirebaseException catch (e) {
+      isUploading = false;
+      notifyListeners();
       log("error 1 === ${e.code} ${e.message}");
 
-      GlobalSnackBar.show(message: e.toString());
+      GlobalSnackBar.show(message: e.message);
     } on PlatformException catch (e) {
+      isUploading = false;
+      notifyListeners();
       log("error 2  ${e.message}");
 
-      GlobalSnackBar.show(message: e.toString());
+      GlobalSnackBar.show(message: e.message);
+    } finally {
+      isUploading = false;
+      notifyListeners();
     }
   }
 
@@ -675,26 +804,40 @@ class ChatProvider extends ChangeNotifier {
         '${DateTime.now().millisecondsSinceEpoch}_${const Uuid().v4()}';
 
     log(filename);
-    if (await audioRecorder.hasPermission()) {
-      final dir = await getTemporaryDirectory();
-      await audioRecorder.start(
-        path: "${dir.path}/$filename.m4a",
-      );
-      isRecording = true;
-      notifyListeners();
-
-      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        durationInSeconds += const Duration(seconds: 1);
-        notifyListeners();
-      });
+    if (!await audioRecorder.hasPermission()) {
+      return;
     }
+    final dir = await getTemporaryDirectory();
+    await audioRecorder.start(
+      path: "${dir.path}/$filename.m4a",
+    );
+    isRecording = true;
+    notifyListeners();
+
+    startTimer();
   }
 
-  stopRecording(
-      {UserModel? currentUser,
-      UserModel? appUser,
-      bool? isGhostMessage,
-      bool? firstMessageByWho}) async {
+  startTimer() {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      durationInSeconds = durationInSeconds + const Duration(seconds: 1);
+      notifyListeners();
+    });
+  }
+
+  cancelTimer() {
+    timer.cancel();
+    durationInSeconds = Duration.zero;
+    print(timer.isActive);
+    print(durationInSeconds);
+    notifyListeners();
+  }
+
+  stopRecording({
+    UserModel? currentUser,
+    UserModel? appUser,
+    bool? isGhostMessage,
+    bool? firstMessageByWho,
+  }) async {
     try {
       String? path = await audioRecorder.stop();
       if (path == null) {
@@ -731,8 +874,7 @@ class ChatProvider extends ChangeNotifier {
     } catch (e) {
       log('Error: $e');
     } finally {
-      timer.cancel();
-      durationInSeconds = Duration.zero;
+      cancelTimer();
       isRecorderLock = false;
       notifyListeners();
     }
@@ -966,18 +1108,14 @@ class ChatProvider extends ChangeNotifier {
   deleteRecording() async {
     try {
       await audioRecorder.stop();
-      print('deleted');
       isRecording = false;
       clearRecorder();
+      cancelTimer();
       isRecorderLock = false;
       notifyListeners();
     } catch (e) {
       log('Error: $e');
-    } finally {
-      timer.cancel();
-      durationInSeconds = Duration.zero;
-      notifyListeners();
-    }
+    } finally {}
   }
 
   clearRecorder() {

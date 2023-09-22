@@ -1,13 +1,16 @@
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../../resources/color_resources.dart';
+import '../../../resources/image_resources.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
 import '../../../widgets/profle_screen_widgets/music_grid.dart';
+import '../../../widgets/profle_screen_widgets/profile_menu.dart';
 import '../../../widgets/profle_screen_widgets/profile_top_loader.dart';
 import '../../../widgets/profle_screen_widgets/qoutes_grid.dart';
 
@@ -28,6 +31,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          leading: const GhostModeBtn(),
+          elevation: 0,
+          backgroundColor: Colors.grey.shade50,
+          actions: [
+            IconButton(
+              onPressed: () {
+                bottomSheetProfile(context);
+              },
+              icon: Image.asset(
+                imgProfileOption,
+              ),
+            ),
+          ],
+        ),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(

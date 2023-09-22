@@ -89,7 +89,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                         ? icForumSelHome
                         : icForumDeSelHome,
                     color: provider.currentIndex == 3 ? null : Colors.white,
-                    height: 24.h,
+                    height: 22.h,
                   ),
                 ),
                 IconButton(

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
-import 'package:casarancha/widgets/chat_screen_widgets/chat_input_field.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/music_player_url.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
-import 'package:voice_message_package/voice_message_package.dart';
 
 import '../../models/media_details.dart';
 import '../../models/message.dart';
@@ -51,7 +49,7 @@ class ChatVideoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(
@@ -149,12 +147,12 @@ class ChatMusicTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(
             padding:
-                EdgeInsets.only(left: isMe ? 145 : 0, right: isMe ? 0 : 145),
+                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: MusicPlayerTile(
@@ -190,12 +188,12 @@ class ChatVoiceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(
             padding:
-                EdgeInsets.only(left: isMe ? 150 : 0, right: isMe ? 0 : 150),
+                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: MusicPlayerTile(
@@ -232,15 +230,13 @@ class ChatDocumentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<DownloadProvider>(builder: (c, downloadProgress, _) {
-      bool isDownloading = downloadProgress.isDownload(media.link);
-
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
           children: [
             Padding(
               padding:
-                  EdgeInsets.only(left: isMe ? 100 : 0, right: isMe ? 0 : 100),
+                  EdgeInsets.only(left: isMe ? 150 : 0, right: isMe ? 0 : 150),
               child: Align(
                 alignment: isMe ? Alignment.topRight : Alignment.topLeft,
                 child: InkWell(
@@ -251,46 +247,40 @@ class ChatDocumentTile extends StatelessWidget {
                     );
                   },
                   child: Container(
-                      // height: MediaQuery.of(context).size.height * .1,
-                      width: MediaQuery.of(context).size.width * .6,
+                      height: 70,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16.r),
+                          topRight: Radius.circular(16.r),
+                          bottomLeft: Radius.circular(
+                            isMe ? 16.r : 0,
+                          ),
+                          bottomRight: Radius.circular(
+                            isMe ? 0 : 16.r,
+                          ),
+                        ),
                         color: colorPrimaryA05,
                       ),
                       padding:
                           EdgeInsets.symmetric(horizontal: 12.w, vertical: 10),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.file_copy,
-                            color: colorWhite,
-                          ),
-                          widthBox(8.w),
-                          isMe
-                              ? widthBox(0.0)
-                              : isDownloading
-                                  ? CircularProgressIndicator(
-                                      color: Colors.white,
-                                      value: downloadProgress
-                                          .getProgress(media.link),
-                                      semanticsLabel:
-                                          '${(100 * downloadProgress.getProgress(media.link)).roundToDouble().toInt()}%',
-                                    )
-                                  : InkWell(
-                                      onTap: () {
-                                        downloadProgress.documentDownloading(
-                                            media.link, media.name, context);
-                                      },
-                                      child: const Icon(
-                                        Icons.download,
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                          downloadProgress.isDocOpening
+                              ? const CircularProgressIndicator.adaptive(
+                                  backgroundColor: colorWhite,
+                                )
+                              : Icon(
+                                  Icons.file_copy,
+                                  color: colorWhite,
+                                  size: 28.sp,
+                                ),
+                          widthBox(12.w),
                           Expanded(
                             child: TextWidget(
-                              // onTap: () {},
-                              color: Colors.white,
+                              color: colorWhite,
                               text: media.name.split('/').last,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           )
                         ],
@@ -328,7 +318,7 @@ class ChatPostTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(
@@ -380,7 +370,7 @@ class ChatImageTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = message.content.map((e) => MediaDetails.fromMap(e)).toList();
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(
@@ -453,7 +443,7 @@ class ChatQouteTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(

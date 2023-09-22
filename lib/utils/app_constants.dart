@@ -1,4 +1,6 @@
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../resources/localization_text_strings.dart';
 
@@ -32,25 +34,25 @@ class AppConstant {
   Widget emojiSize(String content, Color color) {
     final Iterable<Match> matches = regexEmoji.allMatches(content);
     if (matches.isEmpty) {
-      return SelectableText(
-        content,
-        style: const TextStyle(
-          fontSize: 14.0,
-          fontWeight: FontWeight.w500,
-          color: Colors.black,
-        ),
+      return SelectableTextWidget(
+        text: content,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
       );
     }
 
     return RichText(
         text: TextSpan(children: [
       for (var t in content.characters)
-        TextSpan(
+        WidgetSpan(
+          child: SelectableTextWidget(
             text: t,
-            style: TextStyle(
-                fontSize: regexEmoji.allMatches(t).isNotEmpty ? 24.0 : 12.0,
-                color: color,
-                fontWeight: FontWeight.w500)),
+            fontSize: regexEmoji.allMatches(t).isNotEmpty ? 24.sp : 14.sp,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
     ]));
   }
 

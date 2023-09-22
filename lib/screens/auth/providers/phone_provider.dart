@@ -4,8 +4,6 @@ import 'package:get/get.dart';
 import '../../../resources/color_resources.dart';
 
 class PhoneProvider extends ChangeNotifier {
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController otpController = TextEditingController();
   FocusNode phoneFocus = FocusNode();
   Color? phoneFillClr, phoneBorderClr;
   String phoneDialCode = '+1';

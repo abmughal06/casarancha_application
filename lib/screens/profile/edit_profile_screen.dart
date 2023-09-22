@@ -52,7 +52,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         edit.firstNameController =
             TextEditingController(text: user.name.split(" ").first);
         edit.lastNameController =
-            TextEditingController(text: user.name.split(" ").last);
+            TextEditingController(text: user.name.split(" ")[1]);
         edit.bioController = TextEditingController(text: user.bio);
         edit.educationController = TextEditingController(text: user.education);
         edit.workController = TextEditingController(text: user.work);
@@ -69,82 +69,80 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: ListView(
                 padding: EdgeInsets.all(20.w),
                 children: [
-                  GestureDetector(
-                    onTap: () => edit.getFromGallery(),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        height: 127.h,
-                        width: 127.w,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          fit: StackFit.passthrough,
-                          children: [
-                            edit.imageFilePicked != null
-                                ? Container(
-                                    height: 127.h,
-                                    width: 127.h,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                            image: FileImage(
-                                                edit.imageFilePicked!))),
-                                  )
-                                : edit.profileImage != null
-                                    ? edit.profileImage != ''
-                                        ? Container(
-                                            height: 127.h,
-                                            width: 127.h,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: NetworkImage(
-                                                    edit.profileImage!),
-                                              ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      height: 127.h,
+                      width: 127.w,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        fit: StackFit.passthrough,
+                        children: [
+                          edit.imageFilePicked != null
+                              ? Container(
+                                  height: 127.h,
+                                  width: 127.h,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: FileImage(
+                                              edit.imageFilePicked!))),
+                                )
+                              : edit.profileImage != null
+                                  ? edit.profileImage != ''
+                                      ? Container(
+                                          height: 127.h,
+                                          width: 127.h,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: NetworkImage(
+                                                  edit.profileImage!),
                                             ),
-                                          )
-                                        : Container(
-                                            height: 127.h,
-                                            width: 127.h,
-                                            alignment: Alignment.center,
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: AssetImage(
-                                                    imgUserPlaceHolder),
-                                              ),
+                                          ),
+                                        )
+                                      : Container(
+                                          height: 127.h,
+                                          width: 127.h,
+                                          alignment: Alignment.center,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: AssetImage(
+                                                  imgUserPlaceHolder),
                                             ),
-                                          )
-                                    : CircleAvatar(
-                                        radius: 20,
-                                        backgroundImage:
-                                            Image.asset(imgProfile).image,
-                                      ),
-                            Positioned(
-                              top: 0.h,
-                              right: 0.w,
-                              child: SvgPicture.asset(
-                                icProfileAdd,
-                                height: 30,
+                                          ),
+                                        )
+                                  : CircleAvatar(
+                                      radius: 20,
+                                      backgroundImage:
+                                          Image.asset(imgProfile).image,
+                                    ),
+                          Positioned(
+                            bottom: 0.h,
+                            right: 0.w,
+                            child: GestureDetector(
+                              onTap: () => edit.getFromGallery(),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: colorWhite,
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: EdgeInsets.all(3.w),
+                                child: SvgPicture.asset(
+                                  icProfileAdd,
+                                  height: 35.h,
+                                  width: 35.h,
+                                ),
                               ),
                             ),
-                            Positioned(
-                              bottom: 10.w,
-                              right: 5.w,
-                              child: Visibility(
-                                  visible: user.isVerified,
-                                  child: SvgPicture.asset(
-                                    icVerifyBadge,
-                                    height: 20,
-                                  )),
-                            )
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -186,23 +184,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextEditingWidget(
                     controller: edit.bioController,
                     hintColor: color080,
-                    maxLines: 5,
                     isShadowEnable: false,
-                    hint: strBio,
+                    hint: 'Bio',
                     maxLength: 300,
-                    color: colorFF4,
-                    textInputType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  ),
-                  heightBox(10.w),
-                  TextEditingWidget(
-                    controller: edit.workController,
-                    hintColor: color080,
-                    maxLines: 3,
-                    isShadowEnable: false,
-                    hint: strWork,
-                    maxLength: 100,
+                    maxLines: 5,
                     color: colorFF4,
                     textInputType: TextInputType.text,
                     textInputAction: TextInputAction.next,
@@ -212,10 +197,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextEditingWidget(
                     controller: edit.educationController,
                     hintColor: color080,
-                    maxLines: 3,
                     isShadowEnable: false,
-                    hint: strEducation,
-                    maxLength: 100,
+                    hint: 'Education',
+                    maxLength: 150,
+                    maxLines: 2,
+                    color: colorFF4,
+                    textInputType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  ),
+                  heightBox(10.w),
+                  TextEditingWidget(
+                    controller: edit.workController,
+                    hintColor: color080,
+                    isShadowEnable: false,
+                    hint: 'Work',
+                    maxLength: 150,
+                    maxLines: 2,
                     color: colorFF4,
                     textInputType: TextInputType.text,
                     textInputAction: TextInputAction.next,

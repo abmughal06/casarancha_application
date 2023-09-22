@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
@@ -105,23 +106,36 @@ class DownloadProvider extends ChangeNotifier {
   //   }
   // }
 
+  bool isDocOpening = false;
+
   Future<void> openDocument(String fileUrl, String fileName) async {
-    final response = await get(Uri.parse(fileUrl));
+    isDocOpening = true;
+    notifyListeners();
+    try {
+      final response = await get(Uri.parse(fileUrl));
 
-    if (response.statusCode == 200) {
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final localFilePath = join(appDocDir.path, fileName);
+      if (response.statusCode == 200) {
+        final appDocDir = await getApplicationDocumentsDirectory();
+        final localFilePath = join(appDocDir.path, fileName);
 
-      final file = File(localFilePath);
-      await file.writeAsBytes(response.bodyBytes);
+        final file = File(localFilePath);
+        await file.writeAsBytes(response.bodyBytes);
 
-      final result = await OpenFile.open(localFilePath);
+        final result = await OpenFile.open(localFilePath);
 
-      if (result.type != ResultType.done) {
-        log('File opening Failed +==========<<>>>>>>');
+        if (result.type != ResultType.done) {
+          log('File opening Failed +==========<<>>>>>> ${result.message}');
+        }
+      } else {
+        log('HTTP ERROR +==========<<>>>>>>');
       }
-    } else {
-      log('HTTP ERROR +==========<<>>>>>>');
+    } catch (e) {
+      isDocOpening = false;
+      notifyListeners();
+      GlobalSnackBar.show(message: '$e');
+    } finally {
+      isDocOpening = false;
+      notifyListeners();
     }
   }
 

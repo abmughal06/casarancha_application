@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
@@ -93,7 +95,7 @@ class _ChatScreenState extends State<ChatScreen>
         child: Consumer<List<Message>?>(
           builder: (context, messages, b) {
             if (messages == null) {
-              return const CircularProgressIndicator.adaptive();
+              return const Center(child: CircularProgressIndicator.adaptive());
             }
             return Column(
               children: [
@@ -101,9 +103,10 @@ class _ChatScreenState extends State<ChatScreen>
                   child: ListView.builder(
                     itemCount: messages.length,
                     reverse: true,
-                    addAutomaticKeepAlives: true,
+                    padding: const EdgeInsets.only(top: 12),
                     itemBuilder: (context, index) {
                       final message = messages[index];
+                      // log(message.content.toString());
 
                       final isMe = message.sentToId == widget.appUserId;
                       if (messages.isNotEmpty && message.type == 'Text') {
@@ -128,8 +131,11 @@ class _ChatScreenState extends State<ChatScreen>
                       currentUser: currentUser,
                       appUser: appUser,
                     );
+                    if (mounted) {
+                      setState(() {});
+                    }
                   },
-                )
+                ),
               ],
             );
           },
@@ -138,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen>
       floatingActionButton: Consumer<ChatProvider>(builder: (context, v, b) {
         if (v.isRecording && !v.isRecorderLock) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 50),
+            padding: EdgeInsets.only(bottom: Platform.isIOS ? 50 : 80),
             child: FloatingActionButton(
               mini: true,
               onPressed: () {},

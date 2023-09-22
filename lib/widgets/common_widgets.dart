@@ -333,11 +333,11 @@ Widget searchTextField(
   );
 }
 
-Widget centerLoader() {
+Widget centerLoader({double? size}) {
   return Center(
     child: SizedBox(
-        height: 30.w,
-        width: 30.w,
+        height: size ?? 30.w,
+        width: size ?? 30.w,
         child: const CircularProgressIndicator.adaptive()),
   );
 }
