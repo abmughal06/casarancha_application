@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../widgets/dashboard_widget/custom_bottom_nav.dart';
 import '../forum/forum.dart';
+import '../groups/my_groups_screen.dart';
 
 class DashBoard extends StatelessWidget {
   const DashBoard({Key? key}) : super(key: key);

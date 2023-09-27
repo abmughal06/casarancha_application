@@ -1,218 +1,123 @@
-// import 'package:casarancha/models/group_model.dart';
-// import 'package:casarancha/screens/groups/group_member_screen.dart';
-// import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
-// import 'package:casarancha/screens/profile/ProfileScreen/profile_screen_controller.dart';
-// import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/screens/groups/group_member_screen.dart';
+import 'package:casarancha/widgets/common_widgets.dart';
+import 'package:casarancha/widgets/text_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
-// import 'package:casarancha/widgets/common_button.dart';
-// import 'package:casarancha/widgets/custome_firebase_list_view.dart';
+import '../../models/group_model.dart';
+import '../../models/post_model.dart';
+import '../../models/user_model.dart';
+import '../../widgets/home_screen_widgets/post_card.dart';
+import '../../widgets/primary_Appbar.dart';
 
-// import 'package:casarancha/widgets/primary_Appbar.dart';
+class GroupPostScreen extends StatelessWidget {
+  const GroupPostScreen({Key? key, required this.group}) : super(key: key);
+  final GroupModel group;
 
-// import 'package:cloud_firestore/cloud_firestore.dart';
+  @override
+  Widget build(BuildContext context) {
+    final users = context.watch<List<UserModel>?>();
+    return Scaffold(
+      appBar: primaryAppbar(
+        title: group.name,
+        elevation: 0.2,
+        actions: [
+          GestureDetector(
+              onTap: () => Get.to(() => GroupMembersScreen(group: group)),
+              child: SvgPicture.asset(icGroupMember)),
+          widthBox(15.w),
+        ],
+      ),
+      body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        children: [
+          heightBox(15.h),
+          Container(
+            height: 43.07.h,
+            decoration: BoxDecoration(
+              border: Border.all(color: colorCC8, width: 1.h),
+              borderRadius: BorderRadius.circular(60.r),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: TextWidget(
+                    text: 'Post On Group',
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w400,
+                    color: color55F,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 3, right: 3),
+                  child: Image.asset(
+                    imgAddPost,
+                    height: 35.h,
+                    width: 35.h,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          StreamProvider.value(
+              value: DataProvider().groupsPosts(group.id),
+              initialData: null,
+              child: Consumer<List<PostModel>?>(
+                builder: (context, posts, b) {
+                  if (posts == null || users == null) {
+                    return Container();
+                  }
+                  var post = posts
+                      .where((element) => element.mediaData.isNotEmpty)
+                      .toList();
+                  List<PostModel> filterList = [];
+                  List<UserModel> postCreator = [];
+                  for (var p in post) {
+                    for (var u in users) {
+                      if (p.creatorId == u.id) {
+                        filterList.add(p);
+                        postCreator.add(u);
+                      }
+                    }
+                  }
 
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:flutter_svg/svg.dart';
+                  if (filterList.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Center(
+                        child: TextWidget(
+                          text: "You don't have any posts to show",
+                        ),
+                      ),
+                    );
+                  }
 
-// import 'package:get/get.dart';
-
-// import '../../models/post_model.dart';
-// import '../../resources/image_resources.dart';
-// import '../../widgets/PostCard/PostCardController.dart';
-
-// class GroupPostScreen extends StatefulWidget {
-//   const GroupPostScreen({Key? key, required this.group}) : super(key: key);
-
-//   final GroupModel group;
-
-//   @override
-//   State<GroupPostScreen> createState() => _GroupPostScreenState();
-// }
-
-// class _GroupPostScreenState extends State<GroupPostScreen> {
-//   late bool isJoined;
-//   late bool isCreater;
-//   bool isJoiningGroup = false;
-//   bool isDeletingGroup = false;
-//   final profileController = Get.find<ProfileScreenController>();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     isCreater = widget.group.creatorId == profileController.user.value.id;
-//     isJoined = widget.group.memberIds.contains(profileController.user.value.id);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: primaryAppbar(
-//         title: widget.group.name,
-//         actions: [
-//           isCreater
-//               ? TextButton(
-//                   onPressed: () async {
-//                     setState(() {
-//                       isDeletingGroup = true;
-//                     });
-//                     final userID = profileController.user.value.id;
-//                     try {
-//                       await FirebaseFirestore.instance
-//                           .collection('groups')
-//                           .doc(widget.group.id)
-//                           .delete();
-//                       Get.back();
-//                     } catch (e) {
-//                       GlobalSnackBar(message: e.toString());
-//                     }
-
-//                     setState(() {
-//                       isDeletingGroup = false;
-//                     });
-//                   },
-//                   child: isDeletingGroup
-//                       ? const CircularProgressIndicator.adaptive()
-//                       : Text('Delete'),
-//                 )
-//               : TextButton(
-//                   onPressed: () async {
-//                     setState(() {
-//                       isJoiningGroup = true;
-//                     });
-//                     final userID = profileController.user.value.id;
-//                     try {
-//                       if (isJoined) {
-//                         await FirebaseFirestore.instance
-//                             .collection('users')
-//                             .doc(userID)
-//                             .update({
-//                           'groupIds': FieldValue.arrayRemove([widget.group.id])
-//                         });
-//                         await FirebaseFirestore.instance
-//                             .collection('groups')
-//                             .doc(widget.group.id)
-//                             .update({
-//                           'memberIds': FieldValue.arrayRemove([userID])
-//                         });
-//                         isJoined = !isJoined;
-//                       } else {
-//                         if (!widget.group.isPublic) {
-//                           GlobalSnackBar.show(
-//                               message:
-//                                   'Your request to join the group has been send');
-//                           await FirebaseFirestore.instance
-//                               .collection('groups')
-//                               .doc(widget.group.id)
-//                               .update({
-//                             'joinRequestIds': FieldValue.arrayUnion([userID])
-//                           });
-//                         } else {
-//                           await FirebaseFirestore.instance
-//                               .collection('users')
-//                               .doc(userID)
-//                               .update({
-//                             'groupIds': FieldValue.arrayUnion([widget.group.id])
-//                           });
-//                           await FirebaseFirestore.instance
-//                               .collection('groups')
-//                               .doc(widget.group.id)
-//                               .update({
-//                             'memberIds': FieldValue.arrayUnion([userID])
-//                           });
-//                           isJoined = !isJoined;
-//                         }
-//                       }
-//                     } catch (e) {
-//                       GlobalSnackBar(message: e.toString());
-//                     }
-
-//                     setState(() {
-//                       isJoiningGroup = false;
-//                     });
-//                   },
-//                   child: isJoiningGroup
-//                       ? const CircularProgressIndicator.adaptive()
-//                       : Text(
-//                           isJoined ? 'Leave' : 'Join',
-//                         ),
-//                 ),
-//           if (isJoined)
-//             IconButton(
-//               onPressed: () {
-//                 Get.to(() => GroupMemberScreen(group: widget.group));
-//               },
-//               icon: SvgPicture.asset(
-//                 icGroupMember,
-//               ),
-//             ),
-//         ],
-//       ),
-//       body: ShowAllPost(
-//         query: FirebaseFirestore.instance
-//             .collection('groups')
-//             .doc(widget.group.id)
-//             .collection('posts')
-//             .orderBy(
-//               'createdAt',
-//               descending: true,
-//             ),
-//       ),
-//       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-//       floatingActionButton: isJoined
-//           ? Padding(
-//               padding: EdgeInsets.symmetric(
-//                 horizontal: 20.w,
-//                 vertical: 10.w,
-//               ),
-//               child: CommonButton(
-//                 height: 56.h,
-//                 text: 'Post on Group',
-//                 onTap: () {
-//                   Get.to(() => CreatePostScreen(
-//                         groupId: widget.group.id,
-//                       ));
-//                 },
-//               ),
-//             )
-//           : null,
-//     );
-//   }
-// }
-
-// class ShowAllPost extends StatelessWidget {
-//   const ShowAllPost({
-//     Key? key,
-//     required this.query,
-//     this.physics,
-//     this.shrinkWrap = false,
-//   }) : super(key: key);
-
-//   final Query<Map<String, dynamic>> query;
-//   final ScrollPhysics? physics;
-//   final bool shrinkWrap;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return CustomeFirestoreListView(
-//       shrinkWrap: shrinkWrap,
-//       physics: physics,
-//       query: query,
-//       itemBuilder: (context, QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-//         final post = PostModel.fromMap(doc.data());
-//         if ((post.reportCount ?? 0) <= 10) {
-//           final postCardController = Get.put(
-//             PostCardController(
-//               postdata: post,
-//             ),
-//             tag: post.id,
-//           );
-//           // return NewPostCard(
-//           //   postCardController: postCardController,
-//           // );
-//         }
-//         return const SizedBox(height: 0, width: 0);
-//       },
-//     );
-//   }
-// }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(bottom: 80.h),
+                    physics: const NeverScrollableScrollPhysics(),
+                    addAutomaticKeepAlives: true,
+                    itemCount: filterList.length,
+                    itemBuilder: (context, index) {
+                      return PostCard(
+                        post: filterList[index],
+                        postCreator: postCreator[index],
+                      );
+                    },
+                  );
+                },
+              ))
+        ],
+      ),
+    );
+  }
+}

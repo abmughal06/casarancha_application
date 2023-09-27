@@ -1,0 +1,10 @@
+const String cUsers = 'users';
+const String cPosts = 'posts';
+const String cGroups = 'groups';
+const String cGhostMessageList = 'ghostMessageList';
+const String cMessageList = 'messageList';
+const String cMessage = 'messages';
+const String cNotificationList = 'notificationList';
+const String cStories = 'stories';
+const String cReportUser = 'reportUser';
+const String cComments = 'comments';
