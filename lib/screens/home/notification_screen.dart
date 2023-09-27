@@ -60,7 +60,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
               ],
             ),
-            widthBox(8.h),
+            heightBox(8.h),
             Expanded(
               child: TabBarView(
                 physics: const NeverScrollableScrollPhysics(),

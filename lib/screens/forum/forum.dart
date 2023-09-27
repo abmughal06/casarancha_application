@@ -21,21 +21,3 @@ class ForumsScreen extends StatelessWidget {
     );
   }
 }
-
-class GroupScreen extends StatelessWidget {
-  const GroupScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GhostScaffold(
-      appBar: primaryAppbar(
-        title: 'Groups',
-        elevation: 0.1,
-        leading: const GhostModeBtn(),
-      ),
-      body: const Center(
-        child: Text('Group Screen'),
-      ),
-    );
-  }
-}

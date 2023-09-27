@@ -8,6 +8,7 @@ import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_controller.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
+import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
@@ -64,6 +65,10 @@ class ProviderApp extends StatelessWidget {
           value: userDataProvider.ghostChatListUsers,
           initialData: null,
         ),
+        StreamProvider.value(
+          value: userDataProvider.groups,
+          initialData: null,
+        ),
         ChangeNotifierProvider<LoginProvider>(create: (_) => LoginProvider()),
         ChangeNotifierProvider<RegisterProvider>(
             create: (_) => RegisterProvider()),
@@ -77,7 +82,8 @@ class ProviderApp extends StatelessWidget {
             create: (_) => ProfileProvider()),
         ChangeNotifierProvider<StoryProvider>(create: (_) => StoryProvider()),
         ChangeNotifierProvider<PostProvider>(create: (_) => PostProvider()),
-        // ChangeNotifierProvider<VoiceRecorder>(create: (_) => VoiceRecorder()),
+        ChangeNotifierProvider<NewGroupProvider>(
+            create: (_) => NewGroupProvider()),
         ChangeNotifierProvider<CreatePostMethods>(
             create: (_) => CreatePostMethods()),
         ChangeNotifierProvider<AddStoryProvider>(
