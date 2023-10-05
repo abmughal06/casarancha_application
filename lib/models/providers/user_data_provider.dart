@@ -55,17 +55,31 @@ class DataProvider extends ChangeNotifier {
         .map((event) => event.exists ? UserModel.fromMap(event.data()!) : null);
   }
 
-  Stream<List<PostModel>?> get posts {
-    return FirebaseFirestore.instance
-        .collection(cPosts)
-        .orderBy("createdAt", descending: true)
-        .snapshots()
-        .map((event) => event.docs
+  Stream<List<PostModel>?> posts(String? groupId) {
+    final ref = groupId == null
+        ? FirebaseFirestore.instance.collection('posts')
+        : FirebaseFirestore.instance
+            .collection('groups')
+            .doc(groupId)
+            .collection('posts');
+    return ref.orderBy("createdAt", descending: true).snapshots().map((event) =>
+        event.docs
             .where((element) =>
                 element.data().isNotEmpty &&
                 element.data()['mediaData'].isNotEmpty)
             .map((e) => PostModel.fromMap(e.data()))
             .toList());
+  }
+
+  Stream<PostModel?> singlePost({String? groupId, required String postId}) {
+    final ref = groupId == null
+        ? FirebaseFirestore.instance.collection('posts').doc(postId)
+        : FirebaseFirestore.instance
+            .collection('groups')
+            .doc(groupId)
+            .collection('posts')
+            .doc(postId);
+    return ref.snapshots().map((event) => PostModel.fromMap(event.data()!));
   }
 
   Stream<List<Story>?> get stories {
@@ -189,19 +203,32 @@ class DataProvider extends ChangeNotifier {
             .toList());
   }
 
-  Stream<List<PostModel>?>? groupsPosts(groupId) {
+  Stream<GroupModel>? singleGroup(groupId) {
     if (FirebaseAuth.instance.currentUser?.uid == null) {
       return null;
     }
     return FirebaseFirestore.instance
         .collection(cGroups)
         .doc(groupId)
-        .collection(cPosts)
         .snapshots()
-        .map((event) => event.docs
-            .map(
-              (e) => PostModel.fromMap(e.data()),
-            )
-            .toList());
+        .map(
+          (event) => GroupModel.fromMap(event.data()!),
+        );
   }
+
+  // Stream<List<PostModel>?>? groupsPosts(groupId) {
+  //   if (FirebaseAuth.instance.currentUser?.uid == null) {
+  //     return null;
+  //   }
+  //   return FirebaseFirestore.instance
+  //       .collection(cGroups)
+  //       .doc(groupId)
+  //       .collection(cPosts)
+  //       .snapshots()
+  //       .map((event) => event.docs
+  //           .map(
+  //             (e) => PostModel.fromMap(e.data()),
+  //           )
+  //           .toList());
+  // }
 }

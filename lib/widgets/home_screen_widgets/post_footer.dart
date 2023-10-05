@@ -26,6 +26,7 @@ class CustomPostFooter extends StatelessWidget {
   final bool? isPostDetail;
   final List<String> savepostIds;
   final PostModel postModel;
+  final String? groupId;
 
   const CustomPostFooter({
     Key? key,
@@ -37,6 +38,7 @@ class CustomPostFooter extends StatelessWidget {
     this.saveBtn,
     required this.postModel,
     required this.savepostIds,
+    this.groupId,
   }) : super(key: key);
 
   @override
@@ -67,7 +69,10 @@ class CustomPostFooter extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    Get.to(() => PostDetailScreen(postModel: postModel));
+                    Get.to(() => PostDetailScreen(
+                          postModel: postModel,
+                          groupId: groupId,
+                        ));
                     // context.read<MusicProvider>().pause();
                   },
                   icon: SvgPicture.asset(

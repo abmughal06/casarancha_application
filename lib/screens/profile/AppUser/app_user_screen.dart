@@ -16,6 +16,7 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:provider/provider.dart';
 
+import '../../../models/providers/user_data_provider.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/localization_text_strings.dart';
 
@@ -54,6 +55,7 @@ class AppUserScreen extends StatefulWidget {
 }
 
 class _AppUserScreenState extends State<AppUserScreen> {
+  int postCount = 0;
   @override
   Widget build(BuildContext context) {
     final post = context.watch<List<PostModel>?>();
@@ -161,16 +163,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                   count: 0,
                                                   countText: strProfilePost)
                                               : PostFollowCount(
-                                                  count: post
-                                                      .where((element) =>
-                                                          element.creatorId ==
-                                                              widget
-                                                                  .appUserId &&
-                                                          element.mediaData[0]
-                                                                  .type !=
-                                                              'Music')
-                                                      .toList()
-                                                      .length,
+                                                  count: postCount,
                                                   countText: strProfilePost,
                                                 ),
                                           verticalLine(
@@ -465,65 +458,121 @@ class _AppUserScreenState extends State<AppUserScreen> {
                             ],
                           ),
                           heightBox(10.w),
-                          Expanded(
-                            child: TabBarView(
-                              children: [
-                                //qoute
-                                post == null
-                                    ? const Center(
-                                        child: CircularProgressIndicator
-                                            .adaptive())
-                                    : QoutesGridView(
-                                        qoutesList: post
-                                            .where((element) =>
-                                                element.creatorId ==
-                                                    widget.appUserId &&
-                                                element.mediaData[0].type ==
-                                                    'Qoute')
-                                            .toList(),
-                                      ),
-                                post == null
-                                    ? const Center(
-                                        child: CircularProgressIndicator
-                                            .adaptive())
-                                    : ImageGridView(
-                                        imageList: post
-                                            .where((element) =>
-                                                element.creatorId ==
-                                                    widget.appUserId &&
-                                                element.mediaData[0].type ==
-                                                    'Photo')
-                                            .toList(),
-                                      ),
-                                post == null
-                                    ? const Center(
-                                        child: CircularProgressIndicator
-                                            .adaptive())
-                                    : VideoGridView(
-                                        videoList: post
-                                            .where((element) =>
-                                                element.creatorId ==
-                                                    widget.appUserId &&
-                                                element.mediaData[0].type ==
-                                                    'Video')
-                                            .toList(),
-                                      ),
-                                //story
-                                post == null
-                                    ? const Center(
-                                        child: CircularProgressIndicator
-                                            .adaptive())
-                                    : MusicGrid(
-                                        musicList: post
-                                            .where((element) =>
-                                                element.creatorId == user.id &&
-                                                element.mediaData.first.type ==
-                                                    'Music')
-                                            .toList(),
-                                      ),
-                              ],
-                            ),
+                          StreamProvider.value(
+                            initialData: null,
+                            value: DataProvider().posts(null),
+                            child: Consumer<List<PostModel>?>(
+                                builder: (context, post, b) {
+                              if (post == null) {
+                                return centerLoader();
+                              }
+                              postCount = post
+                                  .where(
+                                      (element) => element.creatorId == user.id)
+                                  .map((e) => e)
+                                  .toList()
+                                  .length;
+                              return Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    //qoute
+                                    QoutesGridView(
+                                      qoutesList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Qoute')
+                                          .toList(),
+                                    ),
+                                    ImageGridView(
+                                      imageList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Photo')
+                                          .toList(),
+                                    ),
+                                    VideoGridView(
+                                      videoList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Video')
+                                          .toList(),
+                                    ),
+                                    //music
+                                    MusicGrid(
+                                      musicList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Music')
+                                          .toList(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
                           )
+                          // Expanded(
+                          //   child: TabBarView(
+                          //     children: [
+                          //       //qoute
+                          //       post == null
+                          //           ? const Center(
+                          //               child: CircularProgressIndicator
+                          //                   .adaptive())
+                          //           : QoutesGridView(
+                          //               qoutesList: post
+                          //                   .where((element) =>
+                          //                       element.creatorId ==
+                          //                           widget.appUserId &&
+                          //                       element.mediaData[0].type ==
+                          //                           'Qoute')
+                          //                   .toList(),
+                          //             ),
+                          //       post == null
+                          //           ? const Center(
+                          //               child: CircularProgressIndicator
+                          //                   .adaptive())
+                          //           : ImageGridView(
+                          //               imageList: post
+                          //                   .where((element) =>
+                          //                       element.creatorId ==
+                          //                           widget.appUserId &&
+                          //                       element.mediaData[0].type ==
+                          //                           'Photo')
+                          //                   .toList(),
+                          //             ),
+                          //       post == null
+                          //           ? const Center(
+                          //               child: CircularProgressIndicator
+                          //                   .adaptive())
+                          //           : VideoGridView(
+                          //               videoList: post
+                          //                   .where((element) =>
+                          //                       element.creatorId ==
+                          //                           widget.appUserId &&
+                          //                       element.mediaData[0].type ==
+                          //                           'Video')
+                          //                   .toList(),
+                          //             ),
+                          //       //story
+                          //       post == null
+                          //           ? const Center(
+                          //               child: CircularProgressIndicator
+                          //                   .adaptive())
+                          //           : MusicGrid(
+                          //               musicList: post
+                          //                   .where((element) =>
+                          //                       element.creatorId == user.id &&
+                          //                       element.mediaData.first.type ==
+                          //                           'Music')
+                          //                   .toList(),
+                          //             ),
+                          //     ],
+                          //   ),
+                          // )
                         ],
                       ),
                     );

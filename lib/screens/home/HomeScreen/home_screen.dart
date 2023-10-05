@@ -1,5 +1,6 @@
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
@@ -177,53 +178,57 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           //post section
-          Consumer<List<PostModel>?>(
-            builder: (context, posts, b) {
-              if (posts == null || users == null) {
-                return Container();
-              }
-              var post = ghostProvider.checkGhostMode
-                  ? posts.where((element) => (currentUser!.followersIds
-                          .contains(element.creatorId) ||
-                      currentUser.followingsIds.contains(element.creatorId) ||
-                      element.creatorId == currentUser.id &&
-                          element.mediaData.isNotEmpty))
-                  : posts
-                      .where((element) => element.mediaData.isNotEmpty)
-                      .toList();
-              List<PostModel> filterList = [];
-              List<UserModel> postCreator = [];
-              for (var p in post) {
-                for (var u in users) {
-                  if (p.creatorId == u.id) {
-                    filterList.add(p);
-                    postCreator.add(u);
+          StreamProvider.value(
+            value: DataProvider().posts(null),
+            initialData: null,
+            child: Consumer<List<PostModel>?>(
+              builder: (context, posts, b) {
+                if (posts == null || users == null) {
+                  return Container();
+                }
+                var post = ghostProvider.checkGhostMode
+                    ? posts.where((element) => (currentUser!.followersIds
+                            .contains(element.creatorId) ||
+                        currentUser.followingsIds.contains(element.creatorId) ||
+                        element.creatorId == currentUser.id &&
+                            element.mediaData.isNotEmpty))
+                    : posts
+                        .where((element) => element.mediaData.isNotEmpty)
+                        .toList();
+                List<PostModel> filterList = [];
+                List<UserModel> postCreator = [];
+                for (var p in post) {
+                  for (var u in users) {
+                    if (p.creatorId == u.id) {
+                      filterList.add(p);
+                      postCreator.add(u);
+                    }
                   }
                 }
-              }
 
-              if (filterList.isEmpty) {
-                return const Center(
-                  child: TextWidget(
-                    text: "You don't have any posts to show",
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.only(bottom: 80.h),
-                physics: const NeverScrollableScrollPhysics(),
-                addAutomaticKeepAlives: true,
-                itemCount: filterList.length,
-                itemBuilder: (context, index) {
-                  return PostCard(
-                    post: filterList[index],
-                    postCreator: postCreator[index],
+                if (filterList.isEmpty) {
+                  return const Center(
+                    child: TextWidget(
+                      text: "You don't have any posts to show",
+                    ),
                   );
-                },
-              );
-            },
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.only(bottom: 80.h),
+                  physics: const NeverScrollableScrollPhysics(),
+                  addAutomaticKeepAlives: true,
+                  itemCount: filterList.length,
+                  itemBuilder: (context, index) {
+                    return PostCard(
+                      post: filterList[index],
+                      postCreator: postCreator[index],
+                    );
+                  },
+                );
+              },
+            ),
           )
         ],
       ),

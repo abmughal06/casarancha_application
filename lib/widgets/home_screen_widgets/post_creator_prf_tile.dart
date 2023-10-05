@@ -22,8 +22,10 @@ class PostCreatorProfileTile extends StatelessWidget {
   const PostCreatorProfileTile({
     Key? key,
     required this.post,
+    this.groupId,
   }) : super(key: key);
   final PostModel post;
+  final String? groupId;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +63,10 @@ class PostCreatorProfileTile extends StatelessWidget {
             isLike:
                 post.likesIds.contains(FirebaseAuth.instance.currentUser!.uid),
             isPostDetail: true,
-            ontapLike: () => postProvider.toggleLikeDislike(postModel: post),
+            ontapLike: () => postProvider.toggleLikeDislike(
+              postModel: post,
+              groupId: groupId,
+            ),
             ontapSave: () {
               ghostProvider.checkGhostMode
                   ? GlobalSnackBar.show(message: "Ghost Mode is enabled")

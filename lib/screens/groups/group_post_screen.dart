@@ -2,6 +2,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/groups/group_member_screen.dart';
+import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +36,10 @@ class GroupPostScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
         children: [
           heightBox(15.h),
           Container(
+            margin: EdgeInsets.symmetric(horizontal: 20.w),
             height: 43.07.h,
             decoration: BoxDecoration(
               border: Border.all(color: colorCC8, width: 1.h),
@@ -57,65 +58,72 @@ class GroupPostScreen extends StatelessWidget {
                     color: color55F,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 3, right: 3),
-                  child: Image.asset(
-                    imgAddPost,
-                    height: 35.h,
-                    width: 35.h,
+                GestureDetector(
+                  onTap: () {
+                    Get.to(() => CreatePostScreen(
+                          groupId: group.id,
+                        ));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 3, right: 3),
+                    child: Image.asset(
+                      imgAddPost,
+                      height: 35.h,
+                      width: 35.h,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+          heightBox(15.h),
           StreamProvider.value(
-              value: DataProvider().groupsPosts(group.id),
-              initialData: null,
-              child: Consumer<List<PostModel>?>(
-                builder: (context, posts, b) {
-                  if (posts == null || users == null) {
-                    return Container();
-                  }
-                  var post = posts
-                      .where((element) => element.mediaData.isNotEmpty)
-                      .toList();
-                  List<PostModel> filterList = [];
-                  List<UserModel> postCreator = [];
-                  for (var p in post) {
-                    for (var u in users) {
-                      if (p.creatorId == u.id) {
-                        filterList.add(p);
-                        postCreator.add(u);
-                      }
+            value: DataProvider().posts(group.id),
+            initialData: null,
+            child: Consumer<List<PostModel>?>(
+              builder: (context, posts, b) {
+                if (posts == null || users == null) {
+                  return Container();
+                }
+                var post = posts
+                    .where((element) => element.mediaData.isNotEmpty)
+                    .toList();
+                List<PostModel> filterList = [];
+                List<UserModel> postCreator = [];
+                for (var p in post) {
+                  for (var u in users) {
+                    if (p.creatorId == u.id) {
+                      filterList.add(p);
+                      postCreator.add(u);
                     }
                   }
+                }
 
-                  if (filterList.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Center(
-                        child: TextWidget(
-                          text: "You don't have any posts to show",
-                        ),
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.only(bottom: 80.h),
-                    physics: const NeverScrollableScrollPhysics(),
-                    addAutomaticKeepAlives: true,
-                    itemCount: filterList.length,
-                    itemBuilder: (context, index) {
-                      return PostCard(
-                        post: filterList[index],
-                        postCreator: postCreator[index],
-                      );
-                    },
+                if (filterList.isEmpty) {
+                  return const Center(
+                    child: TextWidget(
+                      text: "This group doesn't have any posts yet",
+                    ),
                   );
-                },
-              ))
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.only(bottom: 80.h),
+                  physics: const NeverScrollableScrollPhysics(),
+                  addAutomaticKeepAlives: true,
+                  itemCount: filterList.length,
+                  itemBuilder: (context, index) {
+                    return PostCard(
+                      groupId: group.id,
+                      post: filterList[index],
+                      postCreator: postCreator[index],
+                    );
+                  },
+                );
+              },
+            ),
+          )
         ],
       ),
     );

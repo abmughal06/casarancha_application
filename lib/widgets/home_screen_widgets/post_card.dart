@@ -25,12 +25,15 @@ class PostCard extends StatelessWidget {
       {Key? key,
       required this.post,
       this.initializedFuturePlay,
-      required this.postCreator})
+      required this.postCreator,
+      this.groupId})
       : super(key: key);
 
   final PostModel post;
   final Future<void>? initializedFuturePlay;
   final UserModel postCreator;
+
+  final String? groupId;
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +46,14 @@ class PostCard extends StatelessWidget {
           postCreator: postCreator,
           postModel: post,
           onVertItemClick: () {
-            Get.back();
-
             if (post.creatorId == curruentUser!.id) {
               Get.bottomSheet(
                 Container(
                   decoration: const BoxDecoration(color: Colors.red),
                   height: 80,
                   child: InkWell(
-                    onTap: () => postPorvider.deletePost(postModel: post),
+                    onTap: () => postPorvider.deletePost(
+                        postModel: post, groupId: groupId),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -97,15 +99,21 @@ class PostCard extends StatelessWidget {
             navigateToAppUserScreen(post.creatorId, context);
           },
         ),
-        PostMediaWidget(post: post, isPostDetail: false),
+        PostMediaWidget(
+          post: post,
+          isPostDetail: false,
+          groupId: groupId,
+        ),
         heightBox(10.h),
         CustomPostFooter(
+          groupId: groupId,
           isLike: post.likesIds.contains(curruentUser!.id),
           ontapLike: () {
             ghostProvider.checkGhostMode
                 ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
                 : postPorvider.toggleLikeDislike(
                     postModel: post,
+                    groupId: groupId,
                   );
           },
           ontapSave: () {

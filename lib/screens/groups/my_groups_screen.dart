@@ -14,7 +14,6 @@ import '../../widgets/group_widgets/group_tile.dart';
 import '../../widgets/primary_appbar.dart';
 import '../dashboard/ghost_mode_btn.dart';
 import '../dashboard/ghost_scaffold.dart';
-import 'group_post_screen.dart';
 
 class GroupScreen extends StatelessWidget {
   const GroupScreen({Key? key}) : super(key: key);
@@ -65,21 +64,24 @@ class GroupScreen extends StatelessWidget {
                       final filterList = groups
                           .where((element) =>
                               element.creatorId !=
-                              FirebaseAuth.instance.currentUser!.uid)
+                                  FirebaseAuth.instance.currentUser!.uid &&
+                              element.memberIds.contains(
+                                  FirebaseAuth.instance.currentUser!.uid))
                           .toList();
+
+                      if (filterList.isEmpty) {
+                        return const Center(
+                          child: TextWidget(
+                            text: "You didn't join any groups yet",
+                          ),
+                        );
+                      }
+
                       return ListView.builder(
                         itemCount: filterList.length,
                         itemBuilder: (context, index) {
-                          if (filterList.isEmpty) {
-                            return const Center(
-                              child: TextWidget(
-                                text: "You didn't join any groups yet",
-                              ),
-                            );
-                          }
                           return GroupTile(
-                            ontap: () => Get.to(() =>
-                                GroupPostScreen(group: filterList[index])),
+                            ontapTrailing: () {},
                             group: filterList[index],
                           );
                         },
@@ -98,20 +100,19 @@ class GroupScreen extends StatelessWidget {
                                   element.creatorId ==
                                   FirebaseAuth.instance.currentUser!.uid)
                               .toList();
+                          if (filterList.isEmpty) {
+                            return const Center(
+                              child: TextWidget(
+                                text: "You didn't create any groups yet",
+                              ),
+                            );
+                          }
                           return ListView.builder(
                             itemCount: filterList.length,
                             itemBuilder: (context, index) {
-                              if (filterList.isEmpty) {
-                                return const Center(
-                                  child: TextWidget(
-                                    text: "You didn't create any groups yet",
-                                  ),
-                                );
-                              }
                               return GroupTile(
                                 group: filterList[index],
-                                ontap: () => Get.to(() =>
-                                    GroupPostScreen(group: filterList[index])),
+                                ontapTrailing: () {},
                               );
                             },
                           );

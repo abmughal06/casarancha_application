@@ -69,45 +69,6 @@ class CustomPostHeader extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Visibility(
-            //   visible: postCreator.work.isNotEmpty ||
-            //       postCreator.education.isNotEmpty,
-            //   child: RichText(
-            //     text: TextSpan(
-            //       style: TextStyle(
-            //         color: color55F,
-            //         fontFamily: strFontName,
-            //         fontSize: 11.sp,
-            //         fontWeight: FontWeight.w400,
-            //       ),
-            //       children: [
-            //         TextSpan(
-            //           text: postCreator.work.isNotEmpty
-            //               ? "${postCreator.work} "
-            //               : '',
-            //         ),
-            //         WidgetSpan(
-            //             child: Visibility(
-            //                 visible: postCreator.isWorkVerified,
-            //                 child: SvgPicture.asset(icVerifyBadge))),
-            //         TextSpan(
-            //             text: postCreator.work.isNotEmpty &&
-            //                     postCreator.education.isNotEmpty
-            //                 ? '   |   '
-            //                 : ''),
-            //         TextSpan(
-            //           text: postCreator.education.isEmpty
-            //               ? ''
-            //               : "${postCreator.education} ",
-            //         ),
-            //         WidgetSpan(
-            //             child: Visibility(
-            //                 visible: postCreator.isEducationVerified,
-            //                 child: SvgPicture.asset(icVerifyBadge))),
-            //       ],
-            //     ),
-            //   ),
-            // ),
             Visibility(
               visible: postCreator.education.isNotEmpty,
               child: SelectableText.rich(
@@ -172,7 +133,6 @@ class CustomPostHeader extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-
             Visibility(
               visible:
                   postModel.showPostTime || postModel.locationName.isNotEmpty,

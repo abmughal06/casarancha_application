@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../models/media_details.dart';
 import '../../resources/color_resources.dart';
 import '../music_player_url.dart';
-import '../video_player_url.dart';
+import '../video_player.dart';
 
 class CheckMediaAndShow extends StatelessWidget {
   const CheckMediaAndShow({

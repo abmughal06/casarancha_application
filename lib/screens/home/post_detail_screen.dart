@@ -18,8 +18,10 @@ import '../../widgets/home_screen_widgets/post_comment_tile.dart';
 import '../../widgets/home_screen_widgets/post_detail_media.dart';
 
 class PostDetailScreen extends StatefulWidget {
-  const PostDetailScreen({Key? key, required this.postModel}) : super(key: key);
+  const PostDetailScreen({Key? key, required this.postModel, this.groupId})
+      : super(key: key);
   final PostModel postModel;
+  final String? groupId;
 
   @override
   State<PostDetailScreen> createState() => _PostDetailScreenState();
@@ -46,44 +48,52 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  Consumer<List<PostModel>?>(
-                    builder: (context, posts, b) {
-                      if (posts == null) {
-                        log(widget.postModel.id);
-                        return const CircularProgressIndicator.adaptive();
-                      } else {
-                        var post = posts
-                            .where(
-                                (element) => element.id == widget.postModel.id)
-                            .first;
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Stack(
-                              children: [
-                                PostMediaWidget(post: post, isPostDetail: true),
-                                Positioned(
-                                  top: 60,
-                                  left: 20,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.grey.shade50,
-                                    child: InkWell(
-                                      child: SvgPicture.asset(
-                                        icIosBackArrow,
-                                        color: Colors.black,
+                  StreamProvider.value(
+                    value: DataProvider().singlePost(
+                        postId: widget.postModel.id, groupId: widget.groupId),
+                    initialData: null,
+                    child: Consumer<PostModel?>(
+                      builder: (context, post, b) {
+                        if (post == null) {
+                          log(widget.postModel.id);
+                          return const CircularProgressIndicator.adaptive();
+                        } else {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  PostMediaWidget(
+                                    groupId: widget.groupId,
+                                    post: post,
+                                    isPostDetail: true,
+                                  ),
+                                  Positioned(
+                                    top: 60,
+                                    left: 20,
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.grey.shade50,
+                                      child: InkWell(
+                                        child: SvgPicture.asset(
+                                          icIosBackArrow,
+                                          color: Colors.black,
+                                        ),
+                                        onTap: () => Get.back(),
                                       ),
-                                      onTap: () => Get.back(),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            PostCreatorProfileTile(post: post),
-                          ],
-                        );
-                      }
-                    },
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              PostCreatorProfileTile(
+                                post: post,
+                                groupId: widget.groupId,
+                              ),
+                            ],
+                          );
+                        }
+                      },
+                    ),
                   ),
                   StreamProvider.value(
                     value: DataProvider().comment(widget.postModel.id),

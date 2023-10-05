@@ -25,13 +25,15 @@ class MusicPlayerUrl extends StatefulWidget {
       required this.ontap,
       required this.border,
       this.postModel,
-      required this.isPostDetail})
+      required this.isPostDetail,
+      this.groupId})
       : super(key: key);
   final MediaDetails musicDetails;
   final Function ontap;
   final double border;
   final PostModel? postModel;
   final bool isPostDetail;
+  final String? groupId;
 
   @override
   State<MusicPlayerUrl> createState() => _MusicPlayerWithFileState();
@@ -142,7 +144,9 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
                       onTap: () {
                         isPlaying ? audioPlayer.pause() : audioPlayer.resume();
                         postProvider.countVideoViews(
-                            postModel: widget.postModel);
+                          postModel: widget.postModel,
+                          groupId: widget.groupId,
+                        );
 
                         audioPlayer.setReleaseMode(ReleaseMode.loop);
                       },

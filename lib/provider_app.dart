@@ -41,10 +41,10 @@ class ProviderApp extends StatelessWidget {
           value: userDataProvider.currentUser,
           initialData: null,
         ),
-        StreamProvider.value(
-          value: userDataProvider.posts,
-          initialData: null,
-        ),
+        // StreamProvider.value(
+        //   value: userDataProvider.posts,
+        //   initialData: null,
+        // ),
         StreamProvider.value(
           value: userDataProvider.stories,
           initialData: null,

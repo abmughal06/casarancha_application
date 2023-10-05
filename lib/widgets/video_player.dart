@@ -19,11 +19,14 @@ class VideoPlayerWidget extends StatefulWidget {
       {Key? key,
       required this.videoUrl,
       this.postModel,
-      this.isPostDetailScreen = false})
+      this.isPostDetailScreen = false,
+      this.groupId})
       : super(key: key);
   final String? videoUrl;
   final PostModel? postModel;
   final bool? isPostDetailScreen;
+
+  final String? groupId;
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
 }
@@ -39,24 +42,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   Duration position = Duration.zero;
   bool isPlaying = false;
   bool showControlls = true;
-
-  // void toggleControls() {
-  //   if (mounted) {
-  //     setState(() {
-  //       showControlls = !showControlls;
-  //     });
-  //   }
-  //   if (showControlls) {
-  //     // Show controls for 3 seconds, then hide them
-  //     Future.delayed(const Duration(seconds: 1), () {
-  //       if (mounted) {
-  //         setState(() {
-  //           showControlls = false;
-  //         });
-  //       }
-  //     });
-  //   }
-  // }
 
   void checkIfVideoPlaying() {
     if (isPlaying) {
@@ -88,21 +73,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         });
       videoPlayerController.setVolume(0.0); // Mute the video initially
       videoPlayerController.setLooping(true);
-      // chewieController = ChewieController(
-      //   videoPlayerController: videoPlayerController,
-      //   showOptions: false,
-      //   autoPlay: false,
-      //   allowPlaybackSpeedChanging: true,
-      //   autoInitialize: true,
-      //   showControlsOnInitialize: true,
-      //   allowFullScreen: true,
-      //   deviceOrientationsOnEnterFullScreen: [DeviceOrientation.portraitUp],
-      //   deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
-      //   aspectRatio: 9 / 16,
-      //   looping: true,
-      //   allowMuting: true,
-      //   showControls: true,
-      // );
     }
 
     videoPlayerController.addListener(() {
@@ -113,10 +83,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         setState(() {});
       }
     });
-
-    // toggleControls();
-
-    // initializeVideoPlayer = videoPlayerController.initialize();
   }
 
   @override
@@ -127,7 +93,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       onVisibilityChanged: (visibilityInfo) {
         isVisible = visibilityInfo.visibleFraction > 0.6;
         if (isVisible) {
-          postProvider.countVideoViews(postModel: widget.postModel);
+          postProvider.countVideoViews(
+            postModel: widget.postModel,
+            groupId: widget.groupId,
+          );
           videoPlayerController.play();
           videoPlayerController.setVolume(0.0);
           // toggleControls();

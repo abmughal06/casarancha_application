@@ -189,9 +189,11 @@ reportUserDialog(context,
                             });
                             if (reportSuccess == true) {
                               Get.back();
+                              // ignore: use_build_context_synchronously
                               thanksForUserReportDialog(context, user);
                             } else if (reportSuccess == false) {
                               Get.back();
+                              // ignore: use_build_context_synchronously
                               alreadyUserReportDialog(context, user);
                             }
                           },

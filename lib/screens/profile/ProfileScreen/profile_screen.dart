@@ -1,4 +1,5 @@
 import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +25,20 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  int postCount = 0;
+
+  updatePostCount(id) {
+    if (mounted) {
+      setState(() {
+        postCount = id;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();
-    final post = context.watch<List<PostModel>?>();
+    // final post = context.watch<List<PostModel>?>();
 
     return SafeArea(
       child: Scaffold(
@@ -55,11 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return const ProfileTopLoader();
                   } else {
                     return ProfileTop(
-                      postFollowCout: post!
-                          .where((element) => element.creatorId == user.id)
-                          .map((e) => e)
-                          .toList()
-                          .length,
+                      postFollowCout: postCount,
                       user: user,
                     );
                   }
@@ -98,53 +105,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
                 heightBox(10.w),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      //qoute
-                      post == null
-                          ? const Center(
-                              child: CircularProgressIndicator.adaptive())
-                          : QoutesGridView(
-                              qoutesList: post
-                                  .where((element) =>
-                                      element.creatorId == user!.id &&
-                                      element.mediaData.first.type == 'Qoute')
-                                  .toList(),
-                            ),
-                      post == null
-                          ? const Center(
-                              child: CircularProgressIndicator.adaptive())
-                          : ImageGridView(
-                              imageList: post
-                                  .where((element) =>
-                                      element.creatorId == user!.id &&
-                                      element.mediaData.first.type == 'Photo')
-                                  .toList(),
-                            ),
-                      post == null
-                          ? const Center(
-                              child: CircularProgressIndicator.adaptive())
-                          : VideoGridView(
-                              videoList: post
-                                  .where((element) =>
-                                      element.creatorId == user!.id &&
-                                      element.mediaData.first.type == 'Video')
-                                  .toList(),
-                            ),
-                      //music
-                      post == null
-                          ? const Center(
-                              child: CircularProgressIndicator.adaptive())
-                          : MusicGrid(
-                              musicList: post
-                                  .where((element) =>
-                                      element.creatorId == user!.id &&
-                                      element.mediaData.first.type == 'Music')
-                                  .toList(),
-                            ),
-                    ],
-                  ),
+                StreamProvider.value(
+                  initialData: null,
+                  value: DataProvider().posts(null),
+                  child:
+                      Consumer<List<PostModel>?>(builder: (context, post, b) {
+                    if (post == null || user == null) {
+                      return centerLoader();
+                    }
+
+                    // updatePostCount(post
+                    //     .where((element) => element.creatorId == user.id)
+                    //     .map((e) => e)
+                    //     .toList()
+                    //     .length);
+
+                    return Expanded(
+                      child: TabBarView(
+                        children: [
+                          //qoute
+                          QoutesGridView(
+                            qoutesList: post
+                                .where((element) =>
+                                    element.creatorId == user.id &&
+                                    element.mediaData.first.type == 'Qoute')
+                                .toList(),
+                          ),
+                          ImageGridView(
+                            imageList: post
+                                .where((element) =>
+                                    element.creatorId == user.id &&
+                                    element.mediaData.first.type == 'Photo')
+                                .toList(),
+                          ),
+                          VideoGridView(
+                            videoList: post
+                                .where((element) =>
+                                    element.creatorId == user.id &&
+                                    element.mediaData.first.type == 'Video')
+                                .toList(),
+                          ),
+                          //music
+                          MusicGrid(
+                            musicList: post
+                                .where((element) =>
+                                    element.creatorId == user.id &&
+                                    element.mediaData.first.type == 'Music')
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 )
               ],
             ),

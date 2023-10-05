@@ -36,29 +36,28 @@ class NewGroupProvider extends ChangeNotifier {
       required bool isPublic,
       required UserModel currentUser,
       required List<String> membersIds}) async {
-    isCreating = true;
-    notifyListeners();
-    var groupName = gName;
-    var groupDescription = bio;
-    if (groupName.isEmpty) {
-      const GlobalSnackBar(message: 'Please write group name');
-      return;
-    }
-    if (groupDescription.isEmpty) {
-      const GlobalSnackBar(message: 'Please write group description');
-      return;
-    }
-    if (imageFilePicked == null) {
-      const GlobalSnackBar(message: 'Please provide group image');
-      return;
-    }
-
-    final groupRef = FirebaseFirestore.instance.collection('groups').doc();
-
-    final ref =
-        FirebaseStorage.instance.ref().child('groupImages/${groupRef.id}');
-
     try {
+      isCreating = true;
+      notifyListeners();
+      var groupName = gName;
+      var groupDescription = bio;
+      if (groupName.isEmpty) {
+        GlobalSnackBar.show(message: 'Please write group name');
+        return;
+      }
+      if (groupDescription.isEmpty) {
+        GlobalSnackBar.show(message: 'Please write group description');
+        return;
+      }
+      if (imageFilePicked == null) {
+        GlobalSnackBar.show(message: 'Please provide group image');
+        return;
+      }
+
+      final groupRef = FirebaseFirestore.instance.collection('groups').doc();
+
+      final ref =
+          FirebaseStorage.instance.ref().child('groupImages/${groupRef.id}');
       final imageRef = await ref.putFile(imageFilePicked!).whenComplete(() {});
 
       final imageUrl = await imageRef.ref.getDownloadURL();
@@ -88,5 +87,23 @@ class NewGroupProvider extends ChangeNotifier {
       isCreating = false;
       notifyListeners();
     }
+  }
+
+  addGroupMembers({id, groupId}) async {
+    await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+      {
+        'memberIds': FieldValue.arrayUnion([id])
+      },
+    );
+    notifyListeners();
+  }
+
+  removeGroupMembers({id, groupId}) async {
+    await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+      {
+        'memberIds': FieldValue.arrayRemove([id])
+      },
+    );
+    notifyListeners();
   }
 }

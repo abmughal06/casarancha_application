@@ -1,16 +1,25 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/screens/groups/group_post_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class GroupTile extends StatelessWidget {
-  const GroupTile({Key? key, required this.group, required this.ontap})
+  const GroupTile(
+      {Key? key,
+      required this.group,
+      required this.ontapTrailing,
+      this.isSearchScreen = false,
+      this.btnText = ''})
       : super(key: key);
   final GroupModel group;
-  final VoidCallback ontap;
+  final VoidCallback ontapTrailing;
+  final bool isSearchScreen;
+  final String btnText;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +31,7 @@ class GroupTile extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(15.h),
         child: InkWell(
-          onTap: ontap,
+          onTap: () => Get.to(() => GroupPostScreen(group: group)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -32,7 +41,7 @@ class GroupTile extends StatelessWidget {
                     pic: group.imageUrl,
                     heightAndWidth: 50.w,
                   ),
-                  widthBox(15.w),
+                  widthBox(12.w),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -42,6 +51,7 @@ class GroupTile extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: color221,
                       ),
+                      heightBox(3.h),
                       Row(
                         children: [
                           SelectableTextWidget(
@@ -51,7 +61,7 @@ class GroupTile extends StatelessWidget {
                             fontWeight: FontWeight.w400,
                             color: colorAA3,
                           ),
-                          widthBox(5.h),
+                          widthBox(2.h),
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: 8.w,
@@ -73,13 +83,20 @@ class GroupTile extends StatelessWidget {
                   ),
                 ],
               ),
-              InkWell(
-                onTap: () {},
-                child: const Icon(
-                  Icons.more_vert,
-                  color: colorAA3,
-                ),
-              ),
+              isSearchScreen
+                  ? TextWidget(
+                      text: btnText,
+                      color: colorPrimaryA05,
+                      fontWeight: FontWeight.w500,
+                      onTap: ontapTrailing,
+                    )
+                  : InkWell(
+                      onTap: ontapTrailing,
+                      child: const Icon(
+                        Icons.more_vert,
+                        color: colorAA3,
+                      ),
+                    ),
             ],
           ),
         ),

@@ -25,26 +25,43 @@ class PostProvider extends ChangeNotifier {
       .collection("users")
       .doc(FirebaseAuth.instance.currentUser!.uid);
 
-  final postRef = FirebaseFirestore.instance.collection("posts");
+  void toggleLikeDislike({PostModel? postModel, String? groupId}) async {
+    final postRef = groupId != null
+        ? FirebaseFirestore.instance
+            .collection("groups")
+            .doc(groupId)
+            .collection('posts')
+        : FirebaseFirestore.instance.collection("posts");
 
-  void toggleLikeDislike({PostModel? postModel}) async {
+    log(postModel!.id.toString());
     try {
+      log('1');
       var uid = fauth.currentUser!.uid;
-      if (postModel!.likesIds.contains(uid)) {
+      log('2');
+
+      if (postModel.likesIds.contains(uid)) {
+        log('3');
+
         await postRef.doc(postModel.id).update({
           'likesIds': FieldValue.arrayRemove([uid])
         });
       } else {
+        log('4');
+
         await postRef.doc(postModel.id).update({
           'likesIds': FieldValue.arrayUnion([uid])
         });
       }
+      log('5');
     } catch (e) {
       log("$e");
     }
   }
 
-  void onTapSave({UserModel? userModel, String? postId}) async {
+  void onTapSave({
+    UserModel? userModel,
+    String? postId,
+  }) async {
     try {
       if (userModel!.savedPostsIds.contains(postId)) {
         await currentUserRef.update({
@@ -60,7 +77,13 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void deletePost({PostModel? postModel}) async {
+  void deletePost({PostModel? postModel, String? groupId}) async {
+    final postRef = groupId != null
+        ? FirebaseFirestore.instance
+            .collection("groups")
+            .doc(groupId)
+            .collection('posts')
+        : FirebaseFirestore.instance.collection("posts");
     try {
       await postRef.doc(postModel!.id).delete().then((value) => Get.back());
     } catch (e) {
@@ -68,7 +91,13 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void countVideoViews({PostModel? postModel}) async {
+  void countVideoViews({PostModel? postModel, String? groupId}) async {
+    final postRef = groupId != null
+        ? FirebaseFirestore.instance
+            .collection("groups")
+            .doc(groupId)
+            .collection('posts')
+        : FirebaseFirestore.instance.collection("posts");
     try {
       if (!postModel!.videoViews.contains(fauth.currentUser!.uid)) {
         await postRef.doc(postModel.id).set({
@@ -80,20 +109,24 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void deletePostComment({String? postId}) async {
+  void deletePostComment({String? postId, String? groupId}) async {
+    final postRef = groupId != null
+        ? FirebaseFirestore.instance
+            .collection("groups")
+            .doc(groupId)
+            .collection('posts')
+        : FirebaseFirestore.instance.collection("posts");
     try {
-      // if (!postModel!.videoViews.contains(fauth.currentUser!.uid)) {
-      //   await postRef.doc(postModel.id).set({
-      //     'videoViews': FieldValue.arrayUnion([fauth.currentUser!.uid])
-      //   }, SetOptions(merge: true));
-      // }
       await postRef.doc(postId).collection("comments").get().then((value) {});
     } catch (e) {
       log('$e');
     }
   }
 
-  void blockUnblockUser({UserModel? currentUser, String? appUser}) async {
+  void blockUnblockUser({
+    UserModel? currentUser,
+    String? appUser,
+  }) async {
     try {
       var ref =
           FirebaseFirestore.instance.collection('users').doc(currentUser!.id);

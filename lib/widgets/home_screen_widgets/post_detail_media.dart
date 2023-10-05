@@ -21,7 +21,7 @@ import '../../resources/image_resources.dart';
 import '../../screens/dashboard/provider/download_provider.dart';
 import '../music_player_url.dart';
 import '../text_widget.dart';
-import '../video_player_url.dart';
+import '../video_player.dart';
 
 class CheckMediaAndShowPost extends StatelessWidget {
   const CheckMediaAndShowPost({
@@ -32,6 +32,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
     required this.postModel,
     required this.isPostDetail,
     this.isFullScreen = false,
+    required this.groupId,
   }) : super(key: key);
 
   final MediaDetails mediaData;
@@ -40,6 +41,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
   final VoidCallback ondoubleTap;
   final bool isPostDetail;
   final bool isFullScreen;
+  final String? groupId;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,10 @@ class CheckMediaAndShowPost extends StatelessWidget {
 
     switch (mediaData.type) {
       case "Photo":
-        postProvider.countVideoViews(postModel: postModel);
+        postProvider.countVideoViews(
+          postModel: postModel,
+          groupId: groupId,
+        );
         return InkWell(
           onDoubleTap: ondoubleTap,
           onLongPress: () {
@@ -66,7 +71,10 @@ class CheckMediaAndShowPost extends StatelessWidget {
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(postModel: postModel)),
+              : () => Get.to(() => PostDetailScreen(
+                    postModel: postModel,
+                    groupId: groupId,
+                  )),
           child: CachedNetworkImage(
               progressIndicatorBuilder: (context, url, progress) => Center(
                     child: SizedBox(
@@ -97,7 +105,10 @@ class CheckMediaAndShowPost extends StatelessWidget {
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(postModel: postModel)),
+              : () => Get.to(() => PostDetailScreen(
+                    postModel: postModel,
+                    groupId: groupId,
+                  )),
           child: VideoPlayerWidget(
             key: ValueKey(mediaData.link),
             videoUrl: mediaData.link,
@@ -119,12 +130,15 @@ class CheckMediaAndShowPost extends StatelessWidget {
         );
 
       default:
-        postProvider.countVideoViews(postModel: postModel);
+        postProvider.countVideoViews(postModel: postModel, groupId: groupId);
         return InkWell(
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(postModel: postModel)),
+              : () => Get.to(() => PostDetailScreen(
+                    postModel: postModel,
+                    groupId: groupId,
+                  )),
           child: Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.only(
@@ -169,12 +183,14 @@ class PostMediaWidget extends StatelessWidget {
       {Key? key,
       required this.post,
       required this.isPostDetail,
-      this.isFullScreen = false})
+      this.isFullScreen = false,
+      required this.groupId})
       : super(key: key);
 
   final PostModel post;
   final bool isPostDetail;
   final bool isFullScreen;
+  final String? groupId;
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +201,7 @@ class PostMediaWidget extends StatelessWidget {
             (e) => Stack(
               children: [
                 CheckMediaAndShowPost(
+                  groupId: groupId,
                   isPostDetail: isPostDetail,
                   postModel: post,
                   ondoubleTap: () => prov.toggleLikeDislike(postModel: post),
@@ -241,10 +258,11 @@ class PostMediaWidget extends StatelessWidget {
 
 class PostFullScreenView extends StatelessWidget {
   const PostFullScreenView(
-      {Key? key, required this.post, required this.isPostDetail})
+      {Key? key, required this.post, required this.isPostDetail, this.groupId})
       : super(key: key);
   final PostModel post;
   final bool isPostDetail;
+  final String? groupId;
 
   @override
   Widget build(BuildContext context) {
@@ -311,6 +329,7 @@ class PostFullScreenView extends StatelessWidget {
         ],
       ),
       body: PostMediaWidget(
+        groupId: groupId,
         isPostDetail: isPostDetail,
         post: post,
         isFullScreen: true,

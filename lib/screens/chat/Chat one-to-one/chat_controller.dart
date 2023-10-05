@@ -827,8 +827,8 @@ class ChatProvider extends ChangeNotifier {
   cancelTimer() {
     timer.cancel();
     durationInSeconds = Duration.zero;
-    print(timer.isActive);
-    print(durationInSeconds);
+    log(timer.isActive.toString());
+    log(durationInSeconds.toString());
     notifyListeners();
   }
 

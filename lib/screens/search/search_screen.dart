@@ -1,7 +1,9 @@
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
+import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
+import 'package:casarancha/widgets/group_widgets/group_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/group_model.dart';
 import '../../resources/color_resources.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/profle_screen_widgets/follow_following_tile.dart';
@@ -133,7 +136,64 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
 
                   /*group*/
-                  Container(),
+                  Consumer<List<GroupModel>?>(
+                    builder: (context, groups, b) {
+                      if (groups == null) {
+                        return const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        );
+                      }
+
+                      if (searchController.text.isEmpty ||
+                          searchController.text == '') {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 60),
+                            child: TextWidget(
+                              textAlign: TextAlign.center,
+                              text:
+                                  "Write user name above to search and follow them",
+                            ),
+                          ),
+                        );
+                      }
+                      var filterList = groups
+                          .where((element) =>
+                              (element.name.toLowerCase().contains(
+                                  searchController.text.toLowerCase())) &&
+                              element.creatorId !=
+                                  FirebaseAuth.instance.currentUser!.uid &&
+                              element.isPublic)
+                          .toList();
+
+                      return ListView.builder(
+                        itemCount: filterList.length,
+                        padding: const EdgeInsets.only(bottom: 100),
+                        itemBuilder: (context, index) {
+                          var groupSnap = filterList[index];
+
+                          var isCurrentUserGroupMember = groupSnap.memberIds
+                              .contains(FirebaseAuth.instance.currentUser!.uid);
+                          return GroupTile(
+                            group: groupSnap,
+                            ontapTrailing: () {
+                              if (!isCurrentUserGroupMember) {
+                                context
+                                    .read<NewGroupProvider>()
+                                    .addGroupMembers(
+                                        id: FirebaseAuth
+                                            .instance.currentUser!.uid,
+                                        groupId: groupSnap.id);
+                              }
+                            },
+                            isSearchScreen: true,
+                            btnText:
+                                isCurrentUserGroupMember ? 'Joined' : 'Join',
+                          );
+                        },
+                      );
+                    },
+                  ),
                   /*location*/
                   Container(),
                 ],
