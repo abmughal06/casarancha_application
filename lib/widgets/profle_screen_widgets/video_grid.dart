@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
-import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../models/post_model.dart';
+import '../shared/alert_text.dart';
 
 class VideoGridView extends StatelessWidget {
   const VideoGridView({Key? key, required this.videoList}) : super(key: key);
@@ -73,10 +73,8 @@ class VideoGridView extends StatelessWidget {
         Visibility(
           visible:
               videoList!.isEmpty && videoList!.map((e) => e.mediaData).isEmpty,
-          child: const Center(
-            child: TextWidget(
-              text: "No Videos are available to show",
-            ),
+          child: const AlertText(
+            text: "No Videos are available to show",
           ),
         )
       ],

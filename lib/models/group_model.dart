@@ -16,6 +16,7 @@ class GroupModel {
   List<String> memberIds;
   List<String> joinRequestIds;
   bool isPublic;
+  bool isVerified;
 
   GroupModel({
     required this.id,
@@ -28,6 +29,7 @@ class GroupModel {
     this.postIds = const [],
     this.memberIds = const [],
     required this.joinRequestIds,
+    required this.isVerified,
     required this.isPublic,
   });
 
@@ -36,6 +38,7 @@ class GroupModel {
     String? name,
     String? description,
     String? imageUrl,
+    bool? isVerified,
     String? creatorId,
     CreatorDetails? creatorDetails,
     String? createdAt,
@@ -56,6 +59,7 @@ class GroupModel {
       memberIds: memberIds ?? this.memberIds,
       joinRequestIds: joinRequestIds ?? this.joinRequestIds,
       isPublic: isPublic ?? this.isPublic,
+      isVerified: isVerified ?? this.isVerified,
     );
   }
 
@@ -72,6 +76,7 @@ class GroupModel {
       'memberIds': memberIds,
       'joinRequestIds': joinRequestIds,
       'isPublic': isPublic,
+      'isVerified': isVerified,
     };
   }
 
@@ -88,6 +93,7 @@ class GroupModel {
       memberIds: List<String>.from(map['memberIds']),
       joinRequestIds: List<String>.from(map['joinRequestIds']),
       isPublic: map['isPublic'] ?? false,
+      isVerified: map['isVerified'] ?? false,
     );
   }
 
@@ -98,7 +104,7 @@ class GroupModel {
 
   @override
   String toString() {
-    return 'GroupModel(id: $id, name: $name, description: $description, imageUrl: $imageUrl, creatorId: $creatorId, creatorDetails: $creatorDetails, createdAt: $createdAt, postIds: $postIds, memberIds: $memberIds, joinRequestIds: $joinRequestIds, isPublic: $isPublic)';
+    return 'GroupModel(id: $id, name: $name, isVerified: $isVerified,description: $description, imageUrl: $imageUrl, creatorId: $creatorId, creatorDetails: $creatorDetails, createdAt: $createdAt, postIds: $postIds, memberIds: $memberIds, joinRequestIds: $joinRequestIds, isPublic: $isPublic)';
   }
 
   @override
@@ -109,6 +115,7 @@ class GroupModel {
         other.id == id &&
         other.name == name &&
         other.description == description &&
+        other.isVerified == isVerified &&
         other.imageUrl == imageUrl &&
         other.creatorId == creatorId &&
         other.creatorDetails == creatorDetails &&
@@ -123,6 +130,7 @@ class GroupModel {
   int get hashCode {
     return id.hashCode ^
         name.hashCode ^
+        isVerified.hashCode ^
         description.hashCode ^
         imageUrl.hashCode ^
         creatorId.hashCode ^

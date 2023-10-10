@@ -1,9 +1,9 @@
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
-import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../models/post_model.dart';
+import '../shared/alert_text.dart';
 
 class QoutesGridView extends StatelessWidget {
   const QoutesGridView({Key? key, required this.qoutesList}) : super(key: key);
@@ -52,10 +52,8 @@ class QoutesGridView extends StatelessWidget {
         Visibility(
           visible: qoutesList!.isEmpty &&
               qoutesList!.map((e) => e.mediaData).isEmpty,
-          child: const Center(
-            child: TextWidget(
-              text: "No Quotes are available to show",
-            ),
+          child: const AlertText(
+            text: "No Quotes are available to show",
           ),
         )
       ],

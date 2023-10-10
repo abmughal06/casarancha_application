@@ -14,8 +14,8 @@ import 'package:provider/provider.dart';
 import '../../models/group_model.dart';
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
+import '../../resources/strings.dart';
 import '../../widgets/home_screen_widgets/post_card.dart';
-import '../../widgets/primary_Appbar.dart';
 
 class GroupPostScreen extends StatelessWidget {
   const GroupPostScreen({Key? key, required this.group}) : super(key: key);
@@ -25,8 +25,36 @@ class GroupPostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final users = context.watch<List<UserModel>?>();
     return Scaffold(
-      appBar: primaryAppbar(
-        title: group.name,
+      appBar: AppBar(
+        backgroundColor: Colors.grey.shade50,
+        centerTitle: true,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+        ),
+        title: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "${group.name} ",
+                style: TextStyle(
+                  color: color13F,
+                  fontFamily: strFontName,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.sp,
+                ),
+              ),
+              WidgetSpan(
+                child: Visibility(
+                  visible: group.isVerified,
+                  child: SvgPicture.asset(
+                    icVerifyBadge,
+                    height: 17,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
         elevation: 0.2,
         actions: [
           GestureDetector(

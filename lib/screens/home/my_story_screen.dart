@@ -65,7 +65,7 @@ class _MyStoryViewScreenState extends State<MyStoryViewScreen> {
                       ? StoryItem.pageImage(
                           key: ValueKey(e.key),
                           url: e.value.link,
-                          duration: const Duration(seconds: 5),
+                          duration: const Duration(seconds: 10),
                           controller: controller!,
                         )
                       : StoryItem.pageVideo(e.value.link,
@@ -116,7 +116,9 @@ class _MyStoryViewScreenState extends State<MyStoryViewScreen> {
                   InkWell(
                     onTap: () {
                       controller!.pause();
-                      Get.bottomSheet(storyViews(story: widget.story));
+                      Get.bottomSheet(storyViews(
+                          viwersIds:
+                              storyItems[currentIndex.value].storyViews!));
                     },
                     child: SizedBox(
                       width: 100.w,

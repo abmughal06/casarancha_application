@@ -256,7 +256,7 @@ class ProfileTop extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' ${user!.work} ',
+                        text: ' ${user!.education} ',
                         style: TextStyle(
                           color: color55F,
                           fontSize: 12.sp,
@@ -288,7 +288,7 @@ class ProfileTop extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' ${user!.education} ',
+                        text: ' ${user!.work} ',
                         style: TextStyle(
                           color: color55F,
                           fontFamily: strFontName,

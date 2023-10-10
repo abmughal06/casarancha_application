@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
@@ -6,9 +8,11 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
-import 'package:casarancha/widgets/text_widget.dart';
+import 'package:casarancha/utils/app_utils.dart';
+import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +21,7 @@ import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/home_screen_widgets/post_card.dart';
 import '../../../widgets/home_screen_widgets/story_widget.dart';
+import '../../../widgets/shared/alert_text.dart';
 import '../../dashboard/ghost_mode_btn.dart';
 import '../CreatePost/create_post_screen.dart';
 import '../CreateStory/add_story_screen.dart';
@@ -51,7 +56,32 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ),
         elevation: 0,
-        leading: const GhostModeBtn(),
+        leadingWidth: 100.w,
+        leading: Row(
+          children: [
+            widthBox(5.w),
+            InkWell(
+                onTap: () async {
+                  // Future<void> shareApp() async {
+                  try {
+                    await FlutterShare.share(
+                      title: 'Invite Friends',
+                      text:
+                          'Check out our awesome app on Play Store and App Store!',
+                      linkUrl: Platform.isAndroid
+                          ? 'https://play.google.com/store/apps/details?id=com.zb.casarancha'
+                          : "https://apps.apple.com/pk/app/casa-rancha/id1666539952", // Replace with your app's Play Store URL
+                      chooserTitle: 'Share via', // You can customize this title
+                    );
+                  } catch (e) {
+                    printLog('Error sharing: $e');
+                  }
+                  // }
+                },
+                child: const Icon(Icons.share, color: colorBlack)),
+            const GhostModeBtn(),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: () {
@@ -207,10 +237,8 @@ class _HomeScreenState extends State<HomeScreen>
                 }
 
                 if (filterList.isEmpty) {
-                  return const Center(
-                    child: TextWidget(
-                      text: "You don't have any posts to show",
-                    ),
+                  return const AlertText(
+                    text: "You don't have any posts to show",
                   );
                 }
 

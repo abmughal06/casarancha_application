@@ -1,35 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/story_model.dart';
 import '../../models/user_model.dart';
 import '../../resources/image_resources.dart';
 
-Widget storyViews({required Story story}) {
+Widget storyViews({required List viwersIds}) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
     decoration: const BoxDecoration(color: Colors.white),
     child: Consumer<List<UserModel>?>(
-      // stream: storyItems[provider.currentIndex].storyViews!.isEmpty
-      //     ? FirebaseFirestore.instance
-      //         .collection("users")
-      //         .where("id", arrayContains: widget.story.storyViews)
-      //         .snapshots()
-      //     : FirebaseFirestore.instance
-      //         .collection("users")
-      //         .where("id",
-      //             whereIn: storyItems[provider.currentIndex].storyViews)
-      //         .snapshots(),
       builder: (context, user, b) {
         if (user == null) {
           return const CircularProgressIndicator.adaptive();
         } else {
-          var viewers = user
-              .where((element) => story.storyViews.contains(element.id))
-              .toList();
+          var viewers =
+              user.where((element) => viwersIds.contains(element.id)).toList();
+          if (viewers.isEmpty) {
+            return const Center(
+              child: TextWidget(
+                text: 'No Views',
+              ),
+            );
+          }
           return ListView.builder(
             itemCount: viewers.length,
             itemBuilder: (context, index) {

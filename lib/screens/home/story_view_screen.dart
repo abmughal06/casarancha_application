@@ -88,7 +88,7 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                         ? StoryItem.pageImage(
                             key: ValueKey(e.key),
                             url: e.value.link,
-                            duration: const Duration(seconds: 5),
+                            duration: const Duration(seconds: 10),
                             controller: controller!,
                           )
                         : StoryItem.pageVideo(e.value.link,

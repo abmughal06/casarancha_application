@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -63,6 +64,7 @@ class NewGroupProvider extends ChangeNotifier {
       final imageUrl = await imageRef.ref.getDownloadURL();
 
       final GroupModel group = GroupModel(
+        isVerified: false,
         id: groupRef.id,
         name: groupName,
         description: groupDescription,
@@ -90,20 +92,43 @@ class NewGroupProvider extends ChangeNotifier {
   }
 
   addGroupMembers({id, groupId}) async {
-    await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
-      {
-        'memberIds': FieldValue.arrayUnion([id])
-      },
-    );
-    notifyListeners();
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'memberIds': FieldValue.arrayUnion([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
   }
 
   removeGroupMembers({id, groupId}) async {
-    await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
-      {
-        'memberIds': FieldValue.arrayRemove([id])
-      },
-    );
-    notifyListeners();
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'memberIds': FieldValue.arrayRemove([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  deleteGroup(groupId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(groupId)
+          .delete();
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
   }
 }

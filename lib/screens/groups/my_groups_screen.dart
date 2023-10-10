@@ -1,6 +1,8 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/screens/groups/create_group_screen.dart';
+import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
+import 'package:casarancha/widgets/shared/bottom_sheets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class GroupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel>();
+    final groupPovider = Provider.of<NewGroupProvider>(context);
     return GhostScaffold(
       appBar: primaryAppbar(
         title: 'My Groups',
@@ -81,13 +84,21 @@ class GroupScreen extends StatelessWidget {
                         itemCount: filterList.length,
                         itemBuilder: (context, index) {
                           return GroupTile(
-                            ontapTrailing: () {},
+                            ontapTrailing: () {
+                              deleteBottomSheet(
+                                  ontap: () => groupPovider.removeGroupMembers(
+                                      id: FirebaseAuth
+                                          .instance.currentUser!.uid,
+                                      groupId: filterList[index].id),
+                                  text: 'Leave Group');
+                            },
                             group: filterList[index],
                           );
                         },
                       );
                     },
                   ),
+                  //My Created Groups
                   Stack(
                     children: [
                       Consumer<List<GroupModel>?>(
@@ -112,7 +123,12 @@ class GroupScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               return GroupTile(
                                 group: filterList[index],
-                                ontapTrailing: () {},
+                                ontapTrailing: () {
+                                  deleteBottomSheet(
+                                      text: 'Delete Group',
+                                      ontap: () => groupPovider
+                                          .deleteGroup(filterList[index].id));
+                                },
                               );
                             },
                           );

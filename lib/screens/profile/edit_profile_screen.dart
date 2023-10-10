@@ -238,7 +238,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               padding: EdgeInsets.all(20.w),
               child: CommonButton(
                 height: 56.h,
-                text: 'Continue',
+                text: 'Save',
                 showLoading: edit.isLoading,
                 onTap: () => edit.updateData(currentUser: user),
                 width: double.infinity,

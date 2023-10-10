@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
-import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/custom_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -268,71 +267,82 @@ class PostFullScreenView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: colorWhite),
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            icIosBackArrow,
-            color: colorWhite,
-          ),
-          onPressed: () => Get.back(),
-        ),
-        actions: [
-          Visibility(
-            visible: post.creatorId == FirebaseAuth.instance.currentUser!.uid,
-            child: InkWell(
-              onTap: () {
-                Get.bottomSheet(
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.red),
-                    height: 80,
-                    child: InkWell(
-                      onTap: () async {
-                        await FirebaseFirestore.instance
-                            .collection("posts")
-                            .doc(post.id)
-                            .delete()
-                            .then((value) => Get.back())
-                            .whenComplete(() => Get.back());
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          TextWidget(
-                            text: "Delete Post",
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          )
-                        ],
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: PostMediaWidget(
+                groupId: groupId,
+                isPostDetail: isPostDetail,
+                post: post,
+                isFullScreen: true,
+              ),
+            ),
+            Positioned(
+              right: 20,
+              top: 30,
+              child: Visibility(
+                visible:
+                    post.creatorId == FirebaseAuth.instance.currentUser!.uid,
+                child: InkWell(
+                  onTap: () {
+                    Get.bottomSheet(
+                      Container(
+                        decoration: const BoxDecoration(color: Colors.red),
+                        height: 80,
+                        child: InkWell(
+                          onTap: () async {
+                            await FirebaseFirestore.instance
+                                .collection("posts")
+                                .doc(post.id)
+                                .delete()
+                                .then((value) => Get.back())
+                                .whenComplete(() => Get.back());
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              TextWidget(
+                                text: "Delete Post",
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              )
+                            ],
+                          ),
+                        ),
                       ),
+                      isScrollControlled: true,
+                    );
+                  },
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.white, shape: BoxShape.circle),
+                    padding: const EdgeInsets.all(4),
+                    child: const Icon(
+                      Icons.more_horiz,
+                      color: colorBlack,
                     ),
                   ),
-                  isScrollControlled: true,
-                );
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white, shape: BoxShape.circle),
-                padding: const EdgeInsets.all(4),
-                child: const Icon(
-                  Icons.more_horiz,
-                  color: colorBlack,
                 ),
               ),
             ),
-          ),
-          widthBox(12.w)
-        ],
-      ),
-      body: PostMediaWidget(
-        groupId: groupId,
-        isPostDetail: isPostDetail,
-        post: post,
-        isFullScreen: true,
+            Positioned(
+              left: 16,
+              top: 35,
+              child: InkWell(
+                onTap: () => Get.back(),
+                child: SvgPicture.asset(
+                  icIosBackArrow,
+                  height: 30,
+                  color: colorWhite,
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
