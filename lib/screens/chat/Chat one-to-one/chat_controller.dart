@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:casarancha/utils/app_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:casarancha/models/message.dart';
@@ -54,6 +56,9 @@ class ChatProvider extends ChangeNotifier {
       return;
     }
     try {
+      var textMessage = messageController.text;
+      messageController.clear();
+      notifyListeners();
       final messageRefForCurrentUser = userRef
           .doc(currentUser!.id)
           .collection('messageList')
@@ -72,7 +77,7 @@ class ChatProvider extends ChangeNotifier {
 
       final MessageDetails appUserMessageDetails = MessageDetails(
         id: appUser.id,
-        lastMessage: messageController.text,
+        lastMessage: textMessage,
         unreadMessageCount: 0,
         searchCharacters: [...appUser.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
@@ -80,12 +85,12 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: appUser.imageStr,
           isVerified: appUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       final MessageDetails currentUserMessageDetails = MessageDetails(
         id: currentUser.id,
-        lastMessage: messageController.text,
+        lastMessage: textMessage,
         unreadMessageCount: unreadMessages + 1,
         searchCharacters: [...currentUser.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
@@ -93,7 +98,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: currentUser.imageStr,
           isVerified: currentUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       // if (!isChatExits.value) {
@@ -117,10 +122,10 @@ class ChatProvider extends ChangeNotifier {
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
         sentById: currentUser.id,
-        content: messageController.text,
+        content: textMessage,
         caption: '',
         type: 'Text',
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
         isSeen: false,
       );
 
@@ -147,9 +152,6 @@ class ChatProvider extends ChangeNotifier {
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages message",
       );
-
-      messageController.clear();
-      notifyListeners();
     } catch (e) {
       GlobalSnackBar(message: e.toString());
     }
@@ -190,7 +192,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: appUser.imageStr,
           isVerified: appUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
@@ -204,7 +206,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: currentUser.imageStr,
           isVerified: currentUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       // if (!isChatExits.value) {
@@ -233,7 +235,7 @@ class ChatProvider extends ChangeNotifier {
         content: messageController.text,
         caption: '',
         type: 'Text',
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
         isSeen: false,
       );
 
@@ -277,15 +279,18 @@ class ChatProvider extends ChangeNotifier {
         .update({
       'unreadMessageCount': 0,
     });
-    await userRef
+    final ref = userRef
         .doc(appUserId)
         .collection('messageList')
         .doc(currentUserId)
         .collection("messages")
-        .doc(messageid)
-        .update({
-      'isSeen': true,
-    });
+        .doc(messageid);
+    final doc = await ref.get();
+    if (doc.exists) {
+      ref.update({
+        'isSeen': true,
+      });
+    }
   }
 
   Future<void> resetMessageCountGhost(
@@ -297,15 +302,18 @@ class ChatProvider extends ChangeNotifier {
         .update({
       'unreadMessageCount': 0,
     });
-    await userRef
+    final ref = userRef
         .doc(appUserId)
         .collection('ghostMessageList')
         .doc(currentUserId)
         .collection("messages")
-        .doc(messageid)
-        .update({
-      'isSeen': true,
-    });
+        .doc(messageid);
+    final doc = await ref.get();
+    if (doc.exists) {
+      ref.update({
+        'isSeen': true,
+      });
+    }
   }
 
   void clearMessageController() {
@@ -320,14 +328,27 @@ class ChatProvider extends ChangeNotifier {
   var voiceList = <File>[];
   var mediaUploadTasks = <UploadTask>[];
   var mediaData = <MediaDetails>[];
+  var allMediaFiles = <File>[];
 
   pickImageAndSentViaMessage(
       {UserModel? currentUser, UserModel? appUser, String? mediaType}) async {
-    try {
-      await uploadMediaFiles(recieverId: currentUser!.id);
+    allMediaFiles = [
+      ...photosList,
+      ...videosList,
+      ...musicList,
+      ...mediaList,
+      ...voiceList,
+    ];
 
+    photosList.clear();
+    videosList.clear();
+    musicList.clear();
+    mediaList.clear();
+    voiceList.clear();
+
+    try {
       final messageRefForCurrentUser = userRef
-          .doc(currentUser.id)
+          .doc(currentUser!.id)
           .collection('messageList')
           .doc(appUser!.id)
           .collection('messages')
@@ -358,7 +379,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: appUser.imageStr,
           isVerified: appUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       final MessageDetails currentUserMessageDetails = MessageDetails(
@@ -377,10 +398,20 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: currentUser.imageStr,
           isVerified: currentUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
-      // if (!isChatExits.value) {
+      final Message tempMessage = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: 'upload',
+        caption: 'uploading',
+        type: '$mediaType',
+        createdAt: DateTime.now().toUtc().toString(),
+        isSeen: false,
+      );
+
       await userRef
           .doc(currentUser.id)
           .collection('messageList')
@@ -388,6 +419,14 @@ class ChatProvider extends ChangeNotifier {
           .set(
             appUserMessageDetails.toMap(),
           );
+      messageRefForCurrentUser.set(tempMessage.toMap());
+
+      await uploadMediaFiles(recieverId: currentUser.id, fileType: mediaType!);
+
+      var message = tempMessage.copyWith(
+        caption: '',
+        content: mediaData.map((e) => e.toMap()).toList(),
+      );
 
       await userRef
           .doc(appUser.id)
@@ -397,21 +436,11 @@ class ChatProvider extends ChangeNotifier {
             currentUserMessageDetails.toMap(),
           );
 
-      final Message message = Message(
-        id: messageRefForCurrentUser.id,
-        sentToId: appUser.id,
-        sentById: currentUser.id,
-        content: mediaData.map((e) => e.toMap()).toList(),
-        caption: '',
-        type: '$mediaType',
-        createdAt: DateTime.now().toIso8601String(),
-        isSeen: false,
-      );
       // log(message.toString());
 
       final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-      messageRefForCurrentUser.set(message.toMap());
+      messageRefForCurrentUser.update(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
 
       unreadMessages += 1;
@@ -438,11 +467,22 @@ class ChatProvider extends ChangeNotifier {
       UserModel? appUser,
       String? mediaType,
       bool? firstMessage}) async {
-    try {
-      await uploadMediaFiles(recieverId: currentUser!.id);
+    allMediaFiles = [
+      ...photosList,
+      ...videosList,
+      ...musicList,
+      ...mediaList,
+      ...voiceList,
+    ];
 
+    photosList.clear();
+    videosList.clear();
+    musicList.clear();
+    mediaList.clear();
+    voiceList.clear();
+    try {
       final messageRefForCurrentUser = userRef
-          .doc(currentUser.id)
+          .doc(currentUser!.id)
           .collection('ghostMessageList')
           .doc(appUser!.id)
           .collection('messages')
@@ -474,7 +514,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: appUser.imageStr,
           isVerified: appUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
@@ -494,7 +534,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: currentUser.imageStr,
           isVerified: currentUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       // if (!isChatExits.value) {
@@ -506,6 +546,20 @@ class ChatProvider extends ChangeNotifier {
             appUserMessageDetails.toMap(),
           );
 
+      final Message tempMessage = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: 'uploading',
+        caption: 'uploading',
+        type: '$mediaType',
+        createdAt: DateTime.now().toUtc().toString(),
+        isSeen: false,
+      );
+      messageRefForCurrentUser.set(tempMessage.toMap());
+
+      await uploadMediaFiles(recieverId: currentUser.id, fileType: mediaType!);
+
       await userRef
           .doc(appUser.id)
           .collection('ghostMessageList')
@@ -514,17 +568,10 @@ class ChatProvider extends ChangeNotifier {
             currentUserMessageDetails.toMap(),
           );
 
-      final Message message = Message(
-        id: messageRefForCurrentUser.id,
-        sentToId: appUser.id,
-        sentById: currentUser.id,
-        content: mediaData.map((e) => e.toMap()).toList(),
-        caption: '',
-        type: '$mediaType',
-        createdAt: DateTime.now().toIso8601String(),
-        isSeen: false,
-      );
       // log(message.toString());
+
+      final message = tempMessage.copyWith(
+          caption: '', content: mediaData.map((e) => e.toMap()).toList());
 
       final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
@@ -557,6 +604,7 @@ class ChatProvider extends ChangeNotifier {
     mediaList.clear();
     voiceList.clear();
     mediaUploadTasks.clear();
+    allMediaFiles.clear();
     tasksProgress = 0.0;
     mediaData.clear();
     recordedFilePath = null;
@@ -577,39 +625,51 @@ class ChatProvider extends ChangeNotifier {
 
   bool isUploading = false;
 
-  Future<void> uploadMediaFiles({required String recieverId}) async {
-    isUploading = true;
+  Future<void> uploadMediaFiles(
+      {required String recieverId, required String fileType}) async {
+    isUploading = false;
     notifyListeners();
-    final allMediaFiles = [
-      ...photosList,
-      ...videosList,
-      ...musicList,
-      ...mediaList,
-      ...voiceList,
-    ];
+    // final allMediaFiles = [
+    //   ...photosList,
+    //   ...videosList,
+    //   ...musicList,
+    //   ...mediaList,
+    //   ...voiceList,
+    // ];
 
     log(allMediaFiles.toString());
 
     final storageRef = FirebaseStorage.instance.ref();
     try {
       for (var element in allMediaFiles) {
-        final String fileType;
+        // final String fileType;
         final String fileName = basename(element.path);
         Size? imageSize;
         double? videoAspectRatio;
 
-        if (photosList.contains(element)) {
-          fileType = 'Photo';
+        // log('===> 1 $photosList');
+        // log('===> 2 $voiceList');
+        // log('===> 3 $videosList');
+        // log('===> 4 $musicList');
+        // log('===> 5 $mediaList');
+
+        // if (photosList.contains(element)) {
+        //   fileType = 'Photo';
+        // } else if (videosList.contains(element)) {
+        //   fileType = 'Video';
+        // } else if (mediaList.contains(element)) {
+        //   fileType = 'Media';
+        // } else if (musicList.contains(element)) {
+        //   fileType = 'Music';
+        // } else {
+        //   fileType = 'voice';
+        // }
+
+        if (fileType == 'InChatPic') {
           imageSize = await getImageSize(element);
-        } else if (videosList.contains(element)) {
-          fileType = 'Video';
+        }
+        if (fileType == 'InChatVideo') {
           videoAspectRatio = await getVideoAspectRatio(element);
-        } else if (mediaList.contains(element)) {
-          fileType = 'Media';
-        } else if (musicList.contains(element)) {
-          fileType = 'Music';
-        } else {
-          fileType = 'voice';
         }
 
         final storageFileRef =
@@ -619,14 +679,19 @@ class ChatProvider extends ChangeNotifier {
 
         final uploadTask = storageFileRef.putData(await element.readAsBytes());
 
-        mediaUploadTasks.add(uploadTask);
         notifyListeners();
 
-        for (var i in mediaUploadTasks) {
-          tasksProgress += i.snapshot.bytesTransferred / i.snapshot.totalBytes;
-          notifyListeners();
-        }
-        tasksProgress = tasksProgress / mediaUploadTasks.length;
+        // mediaUploadTasks.map(
+        //   (e) => e.asStream().listen((event) {
+        //     tasksProgress =
+        //         e.snapshot.bytesTransferred / mediaUploadTasks.length;
+        //     printLog('${(tasksProgress * 100).toStringAsFixed(1)}%');
+        //     notifyListeners();
+        //   }),
+        // );
+
+        // tasksProgress = tasksProgress / mediaUploadTasks.length;
+        // printLog(tasksProgress.toString());
         notifyListeners();
 
         final mediaRef = await uploadTask.whenComplete(() {});
@@ -635,30 +700,25 @@ class ChatProvider extends ChangeNotifier {
 
         final MediaDetails mediaDetails;
 
-        if (fileType == 'Photo') {
+        if (fileType == 'InChatPic') {
           mediaDetails = MediaDetails(
-              id: DateTime.now().toIso8601String(),
+              id: DateTime.now().toUtc().toString(),
               name: fileName,
               type: fileType,
               link: fileUrl,
               imageHeight: imageSize?.height.toString(),
               imageWidth: imageSize?.width.toString());
-        } else if (fileType == 'Video') {
+        } else if (fileType == 'InChatVideo') {
           mediaDetails = MediaDetails(
-              id: DateTime.now().toIso8601String(),
-              name: fileName,
-              type: fileType,
-              link: fileUrl,
-              videoAspectRatio: videoAspectRatio?.toString());
-        } else if (fileType == 'Media') {
-          mediaDetails = MediaDetails(
-              id: DateTime.now().toIso8601String(),
-              name: fileName,
-              type: fileType,
-              link: fileUrl);
+            id: DateTime.now().toUtc().toString(),
+            name: fileName,
+            type: fileType,
+            link: fileUrl,
+            videoAspectRatio: videoAspectRatio.toString(),
+          );
         } else {
           mediaDetails = MediaDetails(
-            id: DateTime.now().toIso8601String(),
+            id: DateTime.now().toUtc().toString(),
             name: fileName,
             type: fileType,
             link: fileUrl,
@@ -697,6 +757,7 @@ class ChatProvider extends ChangeNotifier {
         var image = File(croppedImage!.path);
 
         photosList.add(image);
+        printLog(photosList.toString());
         notifyListeners();
       }
     } catch (e) {
@@ -838,6 +899,8 @@ class ChatProvider extends ChangeNotifier {
     bool? isGhostMessage,
     bool? firstMessageByWho,
   }) async {
+    cancelTimer();
+
     try {
       String? path = await audioRecorder.stop();
       if (path == null) {
@@ -874,7 +937,6 @@ class ChatProvider extends ChangeNotifier {
     } catch (e) {
       log('Error: $e');
     } finally {
-      cancelTimer();
       isRecorderLock = false;
       notifyListeners();
     }
@@ -884,15 +946,15 @@ class ChatProvider extends ChangeNotifier {
     isRecordingSend = true;
     notifyListeners();
 
-    try {
-      await uploadMediaFiles(recieverId: appUser!.id);
+    allMediaFiles = [...voiceList];
 
+    try {
       log('done');
 
       final messageRefForCurrentUser = userRef
           .doc(currentUser!.id)
           .collection('messageList')
-          .doc(appUser.id)
+          .doc(appUser!.id)
           .collection('messages')
           .doc();
 
@@ -915,7 +977,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: appUser.imageStr,
           isVerified: appUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       final MessageDetails currentUserMessageDetails = MessageDetails(
@@ -928,7 +990,18 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: currentUser.imageStr,
           isVerified: currentUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
+      );
+
+      final Message tempMessage = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: 'voice uploading',
+        caption: 'uploading',
+        type: 'voice',
+        createdAt: DateTime.now().toUtc().toString(),
+        isSeen: false,
       );
 
       // if (!isChatExits.value) {
@@ -939,6 +1012,12 @@ class ChatProvider extends ChangeNotifier {
           .set(
             appUserMessageDetails.toMap(),
           );
+      await messageRefForCurrentUser.set(tempMessage.toMap());
+
+      await uploadMediaFiles(recieverId: appUser.id, fileType: 'voice');
+
+      var message = tempMessage.copyWith(
+          caption: '', content: mediaData.map((e) => e.toMap()).toList());
 
       await userRef
           .doc(appUser.id)
@@ -948,23 +1027,9 @@ class ChatProvider extends ChangeNotifier {
             currentUserMessageDetails.toMap(),
           );
 
-      // log(mediaData.toString());
-
-      final Message message = Message(
-        id: messageRefForCurrentUser.id,
-        sentToId: appUser.id,
-        sentById: currentUser.id,
-        content: mediaData.map((e) => e.toMap()).toList(),
-        caption: '',
-        type: 'voice',
-        createdAt: DateTime.now().toIso8601String(),
-        isSeen: false,
-      );
-      // log(message.toString());
-
       final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-      messageRefForCurrentUser.set(message.toMap());
+      messageRefForCurrentUser.update(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
 
       unreadMessages += 1;
@@ -997,15 +1062,15 @@ class ChatProvider extends ChangeNotifier {
     isRecordingSend = true;
     notifyListeners();
 
-    try {
-      await uploadMediaFiles(recieverId: appUser!.id);
+    allMediaFiles = [...voiceList];
 
+    try {
       log('done');
 
       final messageRefForCurrentUser = userRef
           .doc(currentUser!.id)
           .collection('ghostMessageList')
-          .doc(appUser.id)
+          .doc(appUser!.id)
           .collection('messages')
           .doc();
 
@@ -1029,7 +1094,7 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: appUser.imageStr,
           isVerified: appUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
@@ -1043,10 +1108,21 @@ class ChatProvider extends ChangeNotifier {
           imageUrl: currentUser.imageStr,
           isVerified: currentUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
       );
 
       // if (!isChatExits.value) {
+
+      final Message tempMessage = Message(
+        id: messageRefForCurrentUser.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        content: 'uploaddign',
+        caption: 'uploading',
+        type: 'voice',
+        createdAt: DateTime.now().toUtc().toString(),
+        isSeen: false,
+      );
       await userRef
           .doc(currentUser.id)
           .collection('ghostMessageList')
@@ -1054,6 +1130,9 @@ class ChatProvider extends ChangeNotifier {
           .set(
             appUserMessageDetails.toMap(),
           );
+      messageRefForCurrentUser.set(tempMessage.toMap());
+
+      await uploadMediaFiles(recieverId: appUser.id, fileType: 'voice');
 
       await userRef
           .doc(appUser.id)
@@ -1065,17 +1144,10 @@ class ChatProvider extends ChangeNotifier {
 
       // log(mediaData.toString());
 
-      final Message message = Message(
-        id: messageRefForCurrentUser.id,
-        sentToId: appUser.id,
-        sentById: currentUser.id,
-        content: mediaData.map((e) => e.toMap()).toList(),
-        caption: '',
-        type: 'voice',
-        createdAt: DateTime.now().toIso8601String(),
-        isSeen: false,
-      );
       // log(message.toString());
+
+      final message = tempMessage.copyWith(
+          caption: '', content: mediaData.map((e) => e.toMap()).toList());
 
       final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
@@ -1121,5 +1193,21 @@ class ChatProvider extends ChangeNotifier {
   clearRecorder() {
     recordedFilePath = null;
     notifyListeners();
+  }
+
+  deleteChat({friendId, docId}) {
+    try {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('messageList')
+          .doc(friendId)
+          .collection('messages')
+          .doc(docId)
+          .delete();
+    } catch (e) {
+      GlobalSnackBar.show(message: e.toString());
+      printLog(e.toString());
+    } finally {}
   }
 }

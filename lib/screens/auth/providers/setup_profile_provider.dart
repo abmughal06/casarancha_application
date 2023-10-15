@@ -147,7 +147,7 @@ class SetupProfileProvider extends ChangeNotifier {
           dob: selectedDob.toString(),
           fcmToken: token,
           name: '${fname!.trim()} ${lname!.trim()} ',
-          createdAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toUtc().toString(),
           bio: bio!.trim(),
           work: work!.trim(),
           education: education!.trim(),

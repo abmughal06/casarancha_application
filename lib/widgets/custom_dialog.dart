@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -53,9 +55,63 @@ class CustomDownloadDialog extends StatelessWidget {
           TextButton(
             onPressed: () {
               download.startDownloading(url, path, context);
+              // if (!download.isDownloading) {
+              //   Get.back();
+              // }
             },
             child: const TextWidget(
               text: 'Yes',
+            ),
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class CustomDeleteDialog extends StatelessWidget {
+  const CustomDeleteDialog({
+    Key? key,
+    required this.friendId,
+    required this.docId,
+  }) : super(key: key);
+
+  final String? friendId;
+  final String? docId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ChatProvider>(builder: (context, chat, b) {
+      return CupertinoAlertDialog(
+        title: Align(
+          alignment: Alignment.center,
+          child: Text(
+            'Are you sure you want to delete the media',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.black,
+                fontWeight: FontWeight.w600),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const TextWidget(
+              text: 'Cancel',
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              chat.deleteChat(
+                friendId: friendId,
+                docId: docId,
+              );
+              Get.back();
+            },
+            child: const TextWidget(
+              text: 'Yes',
+              color: colorPrimaryA05,
             ),
           ),
         ],

@@ -4,6 +4,7 @@ import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../../resources/color_resources.dart';
@@ -25,20 +26,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int postCount = 0;
-
-  updatePostCount(id) {
-    if (mounted) {
-      setState(() {
-        postCount = id;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();
-    // final post = context.watch<List<PostModel>?>();
 
     return SafeArea(
       child: Scaffold(
@@ -66,7 +56,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return const ProfileTopLoader();
                   } else {
                     return ProfileTop(
-                      postFollowCout: postCount,
                       user: user,
                     );
                   }
@@ -119,6 +108,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //     .map((e) => e)
                     //     .toList()
                     //     .length);
+
+                    // postCount.value = post
+                    //     .where((element) => element.creatorId == user.id)
+                    //     .map((e) => e)
+                    //     .toList()
+                    //     .length;
 
                     return Expanded(
                       child: TabBarView(

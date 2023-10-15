@@ -1,5 +1,6 @@
 import 'package:casarancha/screens/chat/share_post_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_comment_tile.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
 import 'package:flutter/material.dart';
@@ -87,8 +88,12 @@ class CustomPostFooter extends StatelessWidget {
                   color: color221,
                 ),
                 IconButton(
-                  onPressed: () =>
-                      Get.to(() => SharePostScreen(postModel: postModel)),
+                  onPressed: groupId != null
+                      ? () {
+                          GlobalSnackBar.show(message: 'coming soon');
+                        }
+                      : () =>
+                          Get.to(() => SharePostScreen(postModel: postModel)),
                   icon: const Icon(Icons.share),
                   color: color887,
                 ),

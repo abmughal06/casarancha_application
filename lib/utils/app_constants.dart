@@ -61,6 +61,7 @@ class AppConstant {
     strSavedPosts,
     "Get Verified",
     strSettings,
+    'Invite Freinds',
     strAbout,
     strTermsCondition,
     strPrivacyPolicy,

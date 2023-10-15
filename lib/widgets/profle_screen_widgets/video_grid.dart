@@ -49,8 +49,8 @@ class VideoGridView extends StatelessWidget {
                   future: videoThumbnail(data.link),
                   builder: (context, snap) {
                     if (snap.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator.adaptive(),
+                      return Container(
+                        color: colorBlack.withOpacity(0.04),
                       );
                     }
                     return Container(

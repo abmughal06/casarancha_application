@@ -86,7 +86,7 @@ class CreatePostMethods extends ChangeNotifier {
         id: postId,
         creatorId: creatorId,
         creatorDetails: creatorDetails,
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
         description: captionController.text.trim(),
         locationName: locationController.text.trim(),
         tagsIds: tagsController.text.split(" ").map((e) => e).toList(),
@@ -120,7 +120,7 @@ class CreatePostMethods extends ChangeNotifier {
     if (qouteText.isNotEmpty) {
       mediaData.add(
         MediaDetails(
-          id: DateTime.now().toIso8601String(),
+          id: DateTime.now().toUtc().toString(),
           name: 'Nothing',
           type: 'Qoute',
           link: qouteText,
@@ -165,7 +165,7 @@ class CreatePostMethods extends ChangeNotifier {
 
         if (fileType == 'Photo') {
           mediaDetails = MediaDetails(
-              id: DateTime.now().toIso8601String(),
+              id: DateTime.now().toUtc().toString(),
               name: fileName,
               type: fileType,
               link: fileUrl,
@@ -173,14 +173,14 @@ class CreatePostMethods extends ChangeNotifier {
               imageWidth: imageSize?.width.toString());
         } else if (fileType == 'Video') {
           mediaDetails = MediaDetails(
-              id: DateTime.now().toIso8601String(),
+              id: DateTime.now().toUtc().toString(),
               name: fileName,
               type: fileType,
               link: fileUrl,
               videoAspectRatio: videoAspectRatio?.toString());
         } else {
           mediaDetails = MediaDetails(
-            id: DateTime.now().toIso8601String(),
+            id: DateTime.now().toUtc().toString(),
             name: fileName,
             type: fileType,
             link: fileUrl,

@@ -173,6 +173,7 @@ class GhostChatList extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filterList.length,
+                  padding: const EdgeInsets.only(bottom: 70),
                   itemBuilder: (context, index) {
                     return ChatUserListTileForNoChat(
                       userModel: filterList[index],
@@ -201,6 +202,7 @@ class GhostChatList extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: searchList.length,
+                padding: const EdgeInsets.only(bottom: 70),
                 itemBuilder: (context, index) {
                   return ChatUserListTileForNoChat(
                     userModel: searchList[index],

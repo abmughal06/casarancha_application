@@ -75,7 +75,7 @@ class NewGroupProvider extends ChangeNotifier {
           imageUrl: currentUser.imageStr,
           isVerified: currentUser.isVerified,
         ),
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now().toUtc().toString(),
         isPublic: isPublic,
         memberIds: membersIds,
         joinRequestIds: [],

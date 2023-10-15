@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
@@ -8,11 +6,9 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
-import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_share/flutter_share.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -56,32 +52,7 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ),
         elevation: 0,
-        leadingWidth: 100.w,
-        leading: Row(
-          children: [
-            widthBox(5.w),
-            InkWell(
-                onTap: () async {
-                  // Future<void> shareApp() async {
-                  try {
-                    await FlutterShare.share(
-                      title: 'Invite Friends',
-                      text:
-                          'Check out our awesome app on Play Store and App Store!',
-                      linkUrl: Platform.isAndroid
-                          ? 'https://play.google.com/store/apps/details?id=com.zb.casarancha'
-                          : "https://apps.apple.com/pk/app/casa-rancha/id1666539952", // Replace with your app's Play Store URL
-                      chooserTitle: 'Share via', // You can customize this title
-                    );
-                  } catch (e) {
-                    printLog('Error sharing: $e');
-                  }
-                  // }
-                },
-                child: const Icon(Icons.share, color: colorBlack)),
-            const GhostModeBtn(),
-          ],
-        ),
+        leading: const GhostModeBtn(),
         actions: [
           IconButton(
             onPressed: () {
@@ -135,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen>
             child: Consumer<List<Story>?>(
               builder: (context, provider, b) {
                 if (provider == null) {
-                  return Container();
+                  return const StorySkeleton();
                 } else {
                   var filterList = provider
                       .where((element) =>
@@ -208,13 +179,14 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           //post section
+
           StreamProvider.value(
             value: DataProvider().posts(null),
             initialData: null,
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, b) {
                 if (posts == null || users == null) {
-                  return Container();
+                  return const PostSkeleton();
                 }
                 var post = ghostProvider.checkGhostMode
                     ? posts.where((element) => (currentUser!.followersIds
@@ -265,4 +237,136 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class Skeleton extends StatelessWidget {
+  const Skeleton(
+      {Key? key,
+      required this.height,
+      required this.width,
+      this.radius,
+      this.padding})
+      : super(key: key);
+
+  final double height, width;
+  final double? radius;
+  final EdgeInsets? padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: padding,
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        color: colorBlack.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(radius ?? 10),
+      ),
+    );
+  }
+}
+
+class PostSkeleton extends StatelessWidget {
+  const PostSkeleton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+        itemCount: 10,
+        separatorBuilder: (context, index) => heightBox(10),
+        shrinkWrap: true,
+        padding: EdgeInsets.only(bottom: 80.h),
+        physics: const NeverScrollableScrollPhysics(),
+        addAutomaticKeepAlives: true,
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              Row(
+                children: [
+                  widthBox(7),
+                  Skeleton(
+                      height: 30.h,
+                      width: 30.h,
+                      radius: 1000,
+                      padding: const EdgeInsets.all(8)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Skeleton(
+                        height: 10.h,
+                        width: 130.w,
+                      ),
+                      heightBox(5.h),
+                      Skeleton(
+                        height: 10.h,
+                        width: 100.w,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const Skeleton(
+                height: 400,
+                width: double.infinity,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Skeleton(
+                          height: 20.h,
+                          width: 30.h,
+                          padding: const EdgeInsets.all(8)),
+                      Skeleton(
+                          height: 20.h,
+                          width: 30.h,
+                          padding: const EdgeInsets.all(8)),
+                      Skeleton(
+                          height: 20.h,
+                          width: 30.h,
+                          padding: const EdgeInsets.all(8)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Skeleton(
+                          height: 20.h,
+                          width: 30.h,
+                          padding: const EdgeInsets.all(8)),
+                      Skeleton(
+                          height: 20.h,
+                          width: 30.h,
+                          padding: const EdgeInsets.all(8)),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          );
+        });
+  }
+}
+
+class StorySkeleton extends StatelessWidget {
+  const StorySkeleton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 56.h,
+      child: ListView.separated(
+        padding: const EdgeInsets.only(left: 15),
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) => Skeleton(
+          height: 55.h,
+          width: 55.h,
+          radius: 1000,
+        ),
+        separatorBuilder: (context, index) => widthBox(10),
+        itemCount: 10,
+      ),
+    );
+  }
 }

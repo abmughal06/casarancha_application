@@ -161,6 +161,7 @@ class _FriendChatListState extends State<FriendChatList> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filterList.length,
+                  padding: const EdgeInsets.only(bottom: 70),
                   itemBuilder: (context, index) {
                     return ChatUserListTileForNoChat(
                       userModel: filterList[index],
@@ -187,6 +188,7 @@ class _FriendChatListState extends State<FriendChatList> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: searchList.length,
+                padding: const EdgeInsets.only(bottom: 70),
                 itemBuilder: (context, index) {
                   return ChatUserListTileForNoChat(
                     userModel: searchList[index],
@@ -208,14 +210,5 @@ class _FriendChatListState extends State<FriendChatList> {
         ),
       ],
     );
-  }
-}
-
-class DataCall extends StatelessWidget {
-  const DataCall({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }

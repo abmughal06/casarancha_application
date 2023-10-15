@@ -1,9 +1,11 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:casarancha/screens/profile/settings/settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,6 +15,7 @@ import '../../screens/auth/providers/auth_provider.dart';
 import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/saved_post_screen.dart';
 import '../../utils/app_constants.dart';
+import '../../utils/app_utils.dart';
 import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
 import '../home_page_widgets.dart';
@@ -56,7 +59,7 @@ bottomSheetProfile(context) {
                             padding: const EdgeInsets.symmetric(vertical: 14.0),
                             child: textMenuItem(
                                 text: AppConstant.profileBottomSheetList[index],
-                                color: index > 6 ? Colors.red : null,
+                                color: index > 7 ? Colors.red : null,
                                 onTap: () {
                                   Get.back();
                                   _onTapSheetItem(index: index);
@@ -85,21 +88,26 @@ _onTapSheetItem({required int index}) async {
       break;
 
     case 4:
+      //invite freinds
+      inviteFriends();
+      break;
+
+    case 5:
       //about
       launchUrls("https://casarancha.com/about/");
       break;
 
-    case 5:
+    case 6:
       //terms
 
       launchUrls("https://casarancha.com/terms-conditions/");
       break;
-    case 6:
+    case 7:
       //privacy
 
       launchUrls("https://casarancha.com/privacy-policy/");
       break;
-    case 7:
+    case 8:
       //logout
       // profileScreenController.logout();
       AuthenticationProvider(FirebaseAuth.instance).signOut().whenComplete(() {
@@ -110,7 +118,7 @@ _onTapSheetItem({required int index}) async {
       });
 
       break;
-    case 8:
+    case 9:
       //logout
 
       // showDialog(
@@ -133,5 +141,20 @@ void launchUrls(String url) async {
     }
   } else {
     log("$url is not valid");
+  }
+}
+
+inviteFriends() async {
+  try {
+    await FlutterShare.share(
+      title: 'Invite Friends',
+      text: 'Check out our awesome app on Play Store and App Store!',
+      linkUrl: Platform.isAndroid
+          ? 'https://play.google.com/store/apps/details?id=com.zb.casarancha'
+          : "https://apps.apple.com/us/app/casa-rancha/id1666539952", // Replace with your app's Play Store URL
+      chooserTitle: 'Share via', // You can customize this title
+    );
+  } catch (e) {
+    printLog('Error sharing: $e');
   }
 }

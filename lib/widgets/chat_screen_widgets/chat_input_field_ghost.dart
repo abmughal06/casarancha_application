@@ -6,7 +6,6 @@ import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -60,8 +59,7 @@ class ChatInputFieldGhost extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Visibility(
-                      visible: !chatProvider.isRecording &&
-                          !chatProvider.isRecordingSend,
+                      visible: !chatProvider.isRecording,
                       child: Expanded(
                         child: ChatTextFieldGhost(
                           chatController: chatProvider.messageController,
@@ -70,8 +68,7 @@ class ChatInputFieldGhost extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: chatProvider.isRecording ||
-                          chatProvider.isRecordingSend,
+                      visible: chatProvider.isRecording,
                       child: VoiceRecordingWidgetGhost(
                           sendRecording: () => chatProvider.stopRecording(
                                 currentUser: currentUser,
@@ -172,8 +169,7 @@ class ChatInputFieldGhost extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: chatProvider.messageController.text.isNotEmpty &&
-                          !chatProvider.isRecording,
+                      visible: chatProvider.messageController.text.isNotEmpty,
                       child: Row(
                         children: [
                           widthBox(12.w),
@@ -401,45 +397,6 @@ class ShowMediaToSendInChatGhost extends StatelessWidget {
                               : media.mediaList.isNotEmpty
                                   ? 'InChatDoc'
                                   : 'InChatMusic',
-                    );
-
-                    Get.defaultDialog(
-                      title: 'Sending Attachments',
-                      titleStyle: TextStyle(
-                        fontSize: 14.sp,
-                        color: color221,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      content: Consumer<ChatProvider>(
-                        builder: (context, state, b) {
-                          if (state.mediaUploadTasks.isNotEmpty) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 15.w, vertical: 8.h),
-                              child: Column(
-                                children: [
-                                  LinearProgressIndicator(
-                                    value: state.tasksProgress,
-                                    minHeight: 10.h,
-                                  ),
-                                  heightBox(5.h),
-                                  TextWidget(
-                                    text:
-                                        '${(100 * state.tasksProgress).roundToDouble().toInt()}%',
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return ElevatedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              child: const Text('Done'),
-                            );
-                          }
-                        },
-                      ),
                     );
                   },
                   child: Image.asset(

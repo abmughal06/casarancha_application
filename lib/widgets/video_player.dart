@@ -239,7 +239,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     )
                   ],
                 )
-              : const CircularProgressIndicator.adaptive(),
+              : Container(
+                  color: colorBlack.withOpacity(0.04),
+                ),
         ),
       ),
     );

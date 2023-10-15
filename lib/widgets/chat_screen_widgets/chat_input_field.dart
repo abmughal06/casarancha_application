@@ -53,8 +53,7 @@ class ChatInputField extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Visibility(
-                      visible: !chatProvider.isRecording &&
-                          !chatProvider.isRecordingSend,
+                      visible: !chatProvider.isRecording,
                       child: Expanded(
                         child: ChatTextField(
                           chatController: chatProvider.messageController,
@@ -63,8 +62,7 @@ class ChatInputField extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: chatProvider.isRecording ||
-                          chatProvider.isRecordingSend,
+                      visible: chatProvider.isRecording,
                       child: VoiceRecordingWidget(
                           sendRecording: () => chatProvider.stopRecording(
                                 currentUser: currentUser,
@@ -154,8 +152,7 @@ class ChatInputField extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: chatProvider.messageController.text.isNotEmpty &&
-                          !chatProvider.isRecording,
+                      visible: chatProvider.messageController.text.isNotEmpty,
                       child: Row(
                         children: [
                           widthBox(12.w),
@@ -350,9 +347,10 @@ class ShowMediaToSendInChat extends StatelessWidget {
                     },
                   ),
                 ),
-                media.photosList.isNotEmpty ||
-                        media.videosList.isNotEmpty ||
-                        media.mediaList.isNotEmpty
+                (media.photosList.isNotEmpty ||
+                            media.videosList.isNotEmpty ||
+                            media.mediaList.isNotEmpty) &&
+                        !media.isUploading
                     ? GestureDetector(
                         onTap: () => media.photosList.isNotEmpty
                             ? media.getPhoto()
@@ -381,45 +379,6 @@ class ShowMediaToSendInChat extends StatelessWidget {
                                         ? 'InChatDoc'
                                         : 'InChatMusic',
                           );
-
-                          // Get.defaultDialog(
-                          //   title: 'Sending Attachments',
-                          //   titleStyle: TextStyle(
-                          //     fontSize: 14.sp,
-                          //     color: color221,
-                          //     fontWeight: FontWeight.w500,
-                          //   ),
-                          //   content: Consumer<ChatProvider>(
-                          //     builder: (context, state, b) {
-                          //       if (state.mediaUploadTasks.isNotEmpty) {
-                          //         return Padding(
-                          //           padding: EdgeInsets.symmetric(
-                          //               horizontal: 15.w, vertical: 8.h),
-                          //           child: Column(
-                          //             children: [
-                          //               LinearProgressIndicator(
-                          //                 value: state.tasksProgress,
-                          //                 minHeight: 10.h,
-                          //               ),
-                          //               heightBox(5.h),
-                          //               TextWidget(
-                          //                 text:
-                          //                     '${(100 * state.tasksProgress).roundToDouble().toInt()}%',
-                          //               ),
-                          //             ],
-                          //           ),
-                          //         );
-                          //       } else {
-                          //         return ElevatedButton(
-                          //           onPressed: () {
-                          //             Get.back();
-                          //           },
-                          //           child: const Text('Done'),
-                          //         );
-                          //       }
-                          //     },
-                          //   ),
-                          // );
                         },
                         child: Image.asset(
                           imgSendComment,

@@ -7,6 +7,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/post_model.dart';
+import '../../models/providers/user_data_provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
@@ -149,15 +151,14 @@ class ProfileTopLoader extends StatelessWidget {
 }
 
 class ProfileTop extends StatelessWidget {
-  const ProfileTop({Key? key, this.user, required this.postFollowCout})
-      : super(key: key);
+  const ProfileTop({Key? key, this.user}) : super(key: key);
 
   final UserModel? user;
-  final int postFollowCout;
 
   @override
   Widget build(BuildContext context) {
     final appUsers = context.watch<List<UserModel>?>();
+
     return Column(
       children: [
         Card(
@@ -205,10 +206,23 @@ class ProfileTop extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            profileCounter(
-                ontap: null,
-                count: postFollowCout.toString(),
-                strText: strProfilePost),
+            StreamProvider.value(
+                initialData: null,
+                value: DataProvider().posts(null),
+                child: Consumer<List<PostModel>?>(builder: (context, post, b) {
+                  if (post == null || user == null) {
+                    return profileCounter(
+                        ontap: null, count: '0', strText: strProfilePost);
+                  }
+                  return profileCounter(
+                      ontap: null,
+                      count: post
+                          .where((element) => element.creatorId == user!.id)
+                          .toList()
+                          .length
+                          .toString(),
+                      strText: strProfilePost);
+                })),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
                 ontap: () =>
@@ -244,7 +258,7 @@ class ProfileTop extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Visibility(
-                visible: user!.work.isNotEmpty,
+                visible: user!.education.isNotEmpty,
                 child: SelectableText.rich(
                   TextSpan(
                     children: [
@@ -265,7 +279,7 @@ class ProfileTop extends StatelessWidget {
                       ),
                       WidgetSpan(
                           child: Visibility(
-                              visible: user!.isWorkVerified,
+                              visible: user!.isEducationVerified,
                               child: SvgPicture.asset(
                                 icVerifyBadge,
                                 height: 15,
@@ -276,7 +290,7 @@ class ProfileTop extends StatelessWidget {
                 ),
               ),
               Visibility(
-                visible: user!.education.isNotEmpty,
+                visible: user!.work.isNotEmpty,
                 child: SelectableText.rich(
                   TextSpan(
                     children: [
@@ -297,7 +311,7 @@ class ProfileTop extends StatelessWidget {
                       ),
                       WidgetSpan(
                           child: Visibility(
-                              visible: user!.isEducationVerified,
+                              visible: user!.isWorkVerified,
                               child: SvgPicture.asset(
                                 icVerifyBadge,
                                 height: 15,

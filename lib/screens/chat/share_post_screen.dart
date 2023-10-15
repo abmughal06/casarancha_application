@@ -1,12 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/message_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -16,16 +14,29 @@ import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/text_widget.dart';
 
-class SharePostScreen extends StatelessWidget {
+class SharePostScreen extends StatefulWidget {
   const SharePostScreen({Key? key, required this.postModel}) : super(key: key);
   final PostModel postModel;
 
   @override
-  Widget build(BuildContext context) {
-    final currentUser = context.watch<UserModel>();
-    final users = context.watch<List<UserModel>?>();
+  State<SharePostScreen> createState() => _SharePostScreenState();
+}
 
-    List<String> messageUserIds = [];
+class _SharePostScreenState extends State<SharePostScreen> {
+  late PostProvider postProvider;
+
+  @override
+  void dispose() {
+    postProvider.restoreReciverList();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // final currentUser = context.watch<UserModel>();
+    // final users = context.watch<List<UserModel>?>();
+    postProvider = Provider.of<PostProvider>(context);
+
     return Scaffold(
       body: ListView(
         children: [
@@ -54,35 +65,47 @@ class SharePostScreen extends StatelessWidget {
             ],
           ),
           SizedBox(height: 20.h),
-          Consumer<List<MessageDetails>?>(
-            builder: (context, msg1, b) {
-              if (msg1 == null || users == null) {
-                return const CircularProgressIndicator.adaptive();
-              }
-              List<MessageDetails> msg = [];
-              for (var m in msg1) {
-                for (var u in users) {
-                  if (m.id == u.id) {
-                    msg.add(m);
-                  }
-                }
-              }
-              messageUserIds = msg.map((e) => e.id).toList();
+          // Consumer<List<MessageDetails>?>(
+          //   builder: (context, msg1, b) {
+          //     if (msg1 == null || users == null) {
+          //       return const CircularProgressIndicator.adaptive();
+          //     }
+          //     List<MessageDetails> msg = [];
+          //     for (var m in msg1) {
+          //       for (var u in users) {
+          //         if (m.id == u.id) {
+          //           msg.add(m);
+          //         }
+          //       }
+          //     }
+          //     messageUserIds = msg.map((e) => e.id).toList();
 
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: msg.length,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return SharePostTile(
-                    appUserId: msg[index].id,
-                    currentUser: currentUser,
-                    postModel: postModel,
-                  );
-                },
-              );
-            },
-          ),
+          //     return ListView.builder(
+          //       shrinkWrap: true,
+          //       itemCount: msg.length,
+          //       physics: const NeverScrollableScrollPhysics(),
+          //       itemBuilder: (context, index) {
+          //         return SharePostTile(
+          //           appUser: users
+          //               .where((element) => element.id == msg[index].id)
+          //               .first,
+          //           currentUser: currentUser,
+          //           postModel: widget.postModel,
+          //           isSent: postProvider.recieverIds.contains(msg[index].id),
+          //           ontapSend: () {
+          //             postProvider.sharePostData(
+          //               currentUser: currentUser,
+          //               appUser: users
+          //                   .where((element) => element.id == msg[index].id)
+          //                   .first,
+          //               postModel: widget.postModel,
+          //             );
+          //           },
+          //         );
+          //       },
+          //     );
+          //   },
+          // ),
           // const Divider(),
           Consumer<List<UserModel>?>(
             builder: (context, users, b) {
@@ -93,15 +116,15 @@ class SharePostScreen extends StatelessWidget {
                     .where((element) =>
                         element.id == FirebaseAuth.instance.currentUser!.uid)
                     .first;
-                var followingAndFollowersList = users
+                var filterList = users
                     .where((element) =>
                         currentUser.followersIds.contains(element.id) ||
                         currentUser.followingsIds.contains(element.id))
                     .toList();
 
-                List<UserModel> filterList = followingAndFollowersList
-                    .where((element) => !messageUserIds.contains(element.id))
-                    .toList();
+                // List<UserModel> filterList = followingAndFollowersList
+                //     .where((element) => !messageUserIds.contains(element.id))
+                //     .toList();
 
                 return ListView.builder(
                   shrinkWrap: true,
@@ -110,9 +133,18 @@ class SharePostScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return SharePostTile(
                       // userModel: filterList[index],
-                      appUserId: filterList[index].id,
-                      postModel: postModel,
+                      appUser: filterList[index],
+                      postModel: widget.postModel,
                       currentUser: currentUser,
+                      isSent: postProvider.recieverIds
+                          .contains(filterList[index].id),
+                      ontapSend: () {
+                        postProvider.sharePostData(
+                          currentUser: currentUser,
+                          appUser: filterList[index],
+                          postModel: widget.postModel,
+                        );
+                      },
                     );
                   },
                 );
@@ -134,40 +166,24 @@ class SharePostScreen extends StatelessWidget {
   }
 }
 
-class SharePostTile extends StatefulWidget {
+class SharePostTile extends StatelessWidget {
   const SharePostTile({
     Key? key,
-    // required this.messageDetails,
     required this.postModel,
     required this.currentUser,
-    required this.appUserId,
+    required this.appUser,
+    required this.isSent,
+    required this.ontapSend,
   }) : super(key: key);
-  // final MessageDetails messageDetails;
+
   final PostModel postModel;
   final UserModel currentUser;
-  final String appUserId;
-
-  @override
-  State<SharePostTile> createState() => _SharePostTileState();
-}
-
-class _SharePostTileState extends State<SharePostTile> {
-  late PostProvider postProvider;
-
-  @override
-  void dispose() {
-    postProvider.disposeSendButton();
-    super.dispose();
-  }
-
-  bool isSent = false;
+  final UserModel appUser;
+  final bool isSent;
+  final VoidCallback ontapSend;
 
   @override
   Widget build(BuildContext context) {
-    postProvider = Provider.of<PostProvider>(context, listen: false);
-    final users = context.watch<List<UserModel>>();
-    final appUser =
-        users.where((element) => element.id == widget.appUserId).first;
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
       elevation: 1,
@@ -229,16 +245,7 @@ class _SharePostTileState extends State<SharePostTile> {
                 borderRadius: BorderRadius.circular(30),
               ),
               child: InkWell(
-                onTap: () {
-                  postProvider.sharePostData(
-                    currentUser: widget.currentUser,
-                    appUser: appUser,
-                    postModel: widget.postModel,
-                  );
-                  setState(() {
-                    isSent = true;
-                  });
-                },
+                onTap: ontapSend,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
@@ -253,102 +260,6 @@ class _SharePostTileState extends State<SharePostTile> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class SharePostTileForNewFreind extends StatefulWidget {
-  const SharePostTileForNewFreind({
-    Key? key,
-    required this.userModel,
-    required this.postModel,
-    required this.currentUser,
-  }) : super(key: key);
-
-  final UserModel userModel;
-  final PostModel postModel;
-  final UserModel currentUser;
-
-  @override
-  State<SharePostTileForNewFreind> createState() =>
-      _SharePostTileForNewFreindState();
-}
-
-class _SharePostTileForNewFreindState extends State<SharePostTileForNewFreind> {
-  late PostProvider postProvider;
-
-  @override
-  void dispose() {
-    postProvider.disposeSendButton();
-    super.dispose();
-  }
-
-  bool isSent = false;
-
-  @override
-  Widget build(BuildContext context) {
-    postProvider = Provider.of<PostProvider>(context, listen: false);
-
-    return SizedBox(
-      height: 70,
-      child: ListTile(
-        title: Row(
-          children: [
-            TextWidget(
-              text: widget.userModel.name,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xff222939),
-            ),
-            widthBox(5.w),
-            Visibility(
-                visible: widget.userModel.isVerified,
-                child: SvgPicture.asset(icVerifyBadge))
-          ],
-        ),
-        subtitle: TextWidget(
-          text: 'Start a conversation with ${widget.userModel.name}',
-          textOverflow: TextOverflow.ellipsis,
-          fontWeight: FontWeight.w400,
-          fontSize: 14.sp,
-          color: const Color(0xff8a8a8a),
-        ),
-        leading: CircleAvatar(
-          backgroundColor: Colors.yellow,
-          backgroundImage: CachedNetworkImageProvider(
-            widget.userModel.imageStr,
-          ),
-        ),
-        trailing: Container(
-          decoration: BoxDecoration(
-            color: isSent ? Colors.red.shade300 : Colors.red.shade900,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: InkWell(
-            onTap: () {
-              postProvider.sharePostData(
-                currentUser: widget.currentUser,
-                appUser: widget.userModel,
-                postModel: widget.postModel,
-              );
-              setState(() {
-                isSent = !isSent;
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
-              child: Text(
-                isSent ? "Sent" : "Send",
-                style: const TextStyle(
-                  letterSpacing: 0.7,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
         ),
       ),
     );

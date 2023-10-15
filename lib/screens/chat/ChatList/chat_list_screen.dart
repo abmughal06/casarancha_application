@@ -15,10 +15,12 @@ import '../../../widgets/chat_screen_widgets/ghost_chat_list.dart';
 import '../../dashboard/ghost_mode_btn.dart';
 
 String convertDateIntoTime(String date) {
-  final twentyFourHours = DateTime.now().subtract(const Duration(hours: 24));
-  final oneHourAgo = DateTime.now().subtract(const Duration(minutes: 59));
-  final oneWeekAgo = DateTime.now().subtract(const Duration(days: 7));
-  var dateFormat = DateTime.parse(date);
+  final twentyFourHours =
+      DateTime.now().toUtc().subtract(const Duration(hours: 24));
+  final oneHourAgo =
+      DateTime.now().toUtc().subtract(const Duration(minutes: 59));
+  final oneWeekAgo = DateTime.now().toUtc().subtract(const Duration(days: 7));
+  var dateFormat = DateTime.parse(date).toLocal();
   if (dateFormat.isAfter(oneHourAgo)) {
     return "${format(dateFormat, locale: 'en_short').split('~').last}  ${format(dateFormat, locale: 'en_short') == 'now' ? '' : 'ago'}";
   } else if (dateFormat.isAfter(twentyFourHours)) {

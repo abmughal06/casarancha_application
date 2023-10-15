@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:casarancha/utils/app_utils.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -21,6 +23,15 @@ class CheckMediaAndShow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (mediaData.type) {
+      case "InChatPic":
+        return CachedNetworkImage(
+            progressIndicatorBuilder: (context, url, progress) => Center(
+                  child: SizedBox(
+                    height: 30.h,
+                    child: const CircularProgressIndicator.adaptive(),
+                  ),
+                ),
+            imageUrl: mediaData.link);
       case "Photo":
         return CachedNetworkImage(
             progressIndicatorBuilder: (context, url, progress) => Center(
@@ -31,6 +42,14 @@ class CheckMediaAndShow extends StatelessWidget {
                 ),
             imageUrl: mediaData.link);
 
+      case "InChatVideo":
+        return FutureBuilder(
+            future: iniializedFuturePlay,
+            builder: (context, snapshot) {
+              return VideoPlayerWidget(
+                videoUrl: mediaData.link,
+              );
+            });
       case "Video":
         return FutureBuilder(
             future: iniializedFuturePlay,
@@ -39,6 +58,13 @@ class CheckMediaAndShow extends StatelessWidget {
                 videoUrl: mediaData.link,
               );
             });
+      case "InChatMusic":
+        return MusicPlayerUrl(
+          isPostDetail: false,
+          border: 0,
+          musicDetails: mediaData,
+          ontap: () {},
+        );
       case "Music":
         return MusicPlayerUrl(
           isPostDetail: false,
@@ -48,42 +74,12 @@ class CheckMediaAndShow extends StatelessWidget {
         );
 
       default:
-        return Container();
-      // postProvider.countVideoViews(postModel: postModel);
-      // return Container(
-      //   width: MediaQuery.of(context).size.width,
-      //   padding: EdgeInsets.only(
-      //     left: isPostDetail ? 20 : 15,
-      //     right: isPostDetail ? 20 : 15,
-      //     top: isPostDetail ? 110 : 10,
-      //     bottom: 20,
-      //   ),
-      //   child: SingleChildScrollView(
-      //     child: TextWidget(
-      //       text: mediaData.link,
-      //       textAlign: isFullScreen ? TextAlign.center : TextAlign.left,
-      //       fontSize: 16.sp,
-      //       fontWeight: FontWeight.w500,
-      //       color: isFullScreen ? colorFF3 : color221,
-      //     ),
-      //   ),
-      // );
-    }
-  }
-}
-
-double getQouteAspectRatio(String text, bool isPostDetail) {
-  if (isPostDetail) {
-    if (text.length > 400) {
-      return 9 / 13;
-    } else {
-      return 1 / 1;
-    }
-  } else {
-    if (text.length > 400) {
-      return 9 / 13;
-    } else {
-      return 17 / 9;
+        return const Center(
+          child: TextWidget(
+            text: 'Error Loading media',
+            color: colorWhite,
+          ),
+        );
     }
   }
 }
@@ -138,14 +134,7 @@ class ChatMediaWidget extends StatelessWidget {
           )
           .toList(),
       options: CarouselOptions(
-        aspectRatio: media.first.type == 'Qoute'
-            ? getQouteAspectRatio(media.first.link, false)
-            : media.first.type == 'Music'
-                ? 13 / 9
-                : media.first.type == 'Photo'
-                    ? double.parse(media.first.imageWidth!) /
-                        double.parse(media.first.imageHeight!)
-                    : 9 / 16,
+        aspectRatio: 9 / 16,
         viewportFraction: 1,
         enableInfiniteScroll: false,
       ),
@@ -160,6 +149,7 @@ class ChatMediaFullScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    printLog(media.toString());
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(

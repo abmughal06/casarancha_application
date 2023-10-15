@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -44,7 +45,8 @@ class FirebaseMessagingService {
 
     Map bodyNotification = {
       "title": ghostmode ? "Ghost----" : model.name,
-      "body": msg
+      "body": msg,
+      "sound": '',
     };
 
     Map dataMap = {
@@ -56,16 +58,26 @@ class FirebaseMessagingService {
 
     Map officialBodyFormat = {
       "notification": bodyNotification,
+      'android': {
+        'notification': {'sound': 'default'},
+      },
+      'apns': {
+        'payload': {
+          'aps': {'sound': 'default'},
+        },
+      },
       "priority": "high",
       "data": dataMap,
       "to": devRegToken,
     };
 
-    http.post(
+    var res = http.post(
       Uri.parse("https://fcm.googleapis.com/fcm/send"),
       headers: header,
       body: jsonEncode(officialBodyFormat),
     );
+    final result = await res;
+    printLog(result.statusCode.toString());
 
     final NotificationModel notification = NotificationModel(
       id: appUserId,
@@ -81,9 +93,8 @@ class FirebaseMessagingService {
           name: ghostmode ? "Ghost----" : model.name,
           imageUrl: ghostmode ? "" : model.imageStr,
           isVerified: model.isVerified),
-      createdAt: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now().toUtc().toString(),
     );
-    // log("===============>>>>>>>>$notification");
     FirebaseFirestore.instance
         .collection("users")
         .doc(appUserId)

@@ -1,14 +1,14 @@
-import 'dart:developer';
 import 'dart:io';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path/path.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DownloadProvider extends ChangeNotifier {
   Dio dio = Dio();
@@ -93,6 +93,7 @@ class DownloadProvider extends ChangeNotifier {
     } finally {
       isDownloading = false;
       progress = 0.0;
+      Get.back();
       notifyListeners();
     }
   }
@@ -112,22 +113,30 @@ class DownloadProvider extends ChangeNotifier {
     isDocOpening = true;
     notifyListeners();
     try {
+      printLog(fileUrl);
+      // if (await canLaunchUrl(Uri.parse(fileUrl))) {
+      // } else {
+      //   throw 'Could not launch $url';
+      // }
       final response = await get(Uri.parse(fileUrl));
 
       if (response.statusCode == 200) {
-        final appDocDir = await getApplicationDocumentsDirectory();
-        final localFilePath = join(appDocDir.path, fileName);
+        await launchUrl(Uri.parse(fileUrl),
+            mode: LaunchMode.externalApplication);
 
-        final file = File(localFilePath);
-        await file.writeAsBytes(response.bodyBytes);
+        // final appDocDir = await getApplicationDocumentsDirectory();
+        // final localFilePath = join(appDocDir.path, fileName);
 
-        final result = await OpenFile.open(localFilePath);
+        // final file = File(localFilePath);
+        // await file.writeAsBytes(response.bodyBytes);
 
-        if (result.type != ResultType.done) {
-          log('File opening Failed +==========<<>>>>>> ${result.message}');
-        }
+        // final result = await OpenFile.open(localFilePath);
+
+        // if (result.type != ResultType.done) {
+        //   log('File opening Failed +==========<<>>>>>> ${result.message}');
+        // }
       } else {
-        log('HTTP ERROR +==========<<>>>>>>');
+        printLog('HTTP ERROR +==========<<>>>>>>');
       }
     } catch (e) {
       isDocOpening = false;
@@ -156,6 +165,8 @@ String checkMediaTypeAndSetExtention(String media) {
     case 'InChatVideo':
       return '.mp4';
     case 'Music':
+      return '.mp3';
+    case 'voice':
       return '.mp3';
     case 'InChatMusic':
       return '.mp3';

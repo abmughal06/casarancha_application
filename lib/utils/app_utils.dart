@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +114,6 @@ class AppUtils {
 
 printLog(msg) {
   if (kDebugMode) {
-    print(msg);
+    dev.log(msg);
   }
 }

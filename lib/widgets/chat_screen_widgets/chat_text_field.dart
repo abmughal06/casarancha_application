@@ -66,10 +66,7 @@ class ChatTextField extends StatelessWidget {
                       CupertinoActionSheet(
                         actions: [
                           CupertinoActionSheetAction(
-                            onPressed: () {
-                              Get.back();
-                              chat.getPhoto();
-                            },
+                            onPressed: () {},
                             child: SizedBox(
                               height: 80,
                               child: Column(
@@ -222,9 +219,8 @@ class ChatTextFieldGhost extends StatelessWidget {
                 fontWeight: FontWeight.w400,
               ),
               suffixIcon: Visibility(
-                visible: chat.messageController.text.isEmpty &&
-                    !chat.isRecording &&
-                    !chat.isRecordingSend,
+                visible:
+                    chat.messageController.text.isEmpty && !chat.isRecording,
                 child: GestureDetector(
                   onTap: () {
                     ghost.checkGhostMode

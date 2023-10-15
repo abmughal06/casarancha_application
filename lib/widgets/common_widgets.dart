@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/widgets/text_editing_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -333,11 +336,18 @@ Widget searchTextField(
   );
 }
 
-Widget centerLoader({double? size}) {
+Widget centerLoader({double? size, Color? color}) {
   return Center(
     child: SizedBox(
         height: size ?? 30.w,
         width: size ?? 30.w,
-        child: const CircularProgressIndicator.adaptive()),
+        child: Platform.isAndroid
+            ? CircularProgressIndicator(
+                color: color ?? colorPrimaryA05,
+                strokeWidth: 1,
+              )
+            : CupertinoActivityIndicator(
+                color: color,
+              )),
   );
 }

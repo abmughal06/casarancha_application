@@ -32,12 +32,12 @@ class ChatVideoTile extends StatelessWidget {
   final bool isSeen;
   final String appUserId;
   final String date;
-  final String link;
+  final String? link;
   final int? mediaLength;
 
   Future<String?> initThumbnail() async {
     return await VideoThumbnail.thumbnailFile(
-      video: link,
+      video: link!,
       thumbnailPath: (await getTemporaryDirectory()).path,
       imageFormat: ImageFormat.PNG,
       maxHeight: 1024,
@@ -53,72 +53,92 @@ class ChatVideoTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding:
-                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            padding: EdgeInsets.only(
+                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
                 aspectRatio: 9 / 13,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: FutureBuilder<String?>(
-                    future: initThumbnail(),
-                    builder: (context, snapshot) {
-                      if (snapshot.data == null) {
-                        return const Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        );
-                      }
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: FileImage(
-                              File(snapshot.data!),
-                            ),
-                            fit: BoxFit.cover,
+                  child: link == null
+                      ? Container(
+                          decoration: BoxDecoration(
+                            color: colorBlack.withOpacity(0.1),
                           ),
-                        ),
-                        child: Stack(
-                          children: [
-                            Container(
-                              height: double.infinity,
-                              width: double.infinity,
-                              color: Colors.black.withOpacity(0.2),
-                              child: const Icon(
-                                Icons.play_arrow_rounded,
-                                size: 40,
-                                color: colorWhite,
+                          child: centerLoader(),
+                        )
+                      : FutureBuilder<String?>(
+                          future: initThumbnail(),
+                          builder: (context, snapshot) {
+                            if (snapshot.data == null) {
+                              return const Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              );
+                            }
+                            return Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: FileImage(
+                                    File(snapshot.data!),
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                            Positioned(
-                              right: 12,
-                              top: 12,
-                              child: mediaLength != null
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.6),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 8.w, vertical: 4.h),
-                                      child: TextWidget(
-                                        text: '1/$mediaLength',
-                                        fontSize: 9.sp,
-                                        color: colorWhite,
-                                      ),
-                                    )
-                                  : widthBox(0),
-                            )
-                          ],
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    height: double.infinity,
+                                    width: double.infinity,
+                                    color: Colors.black.withOpacity(0.2),
+                                    child: const Icon(
+                                      Icons.play_arrow_rounded,
+                                      size: 40,
+                                      color: colorWhite,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 12,
+                                    top: 12,
+                                    child: mediaLength != null
+                                        ? Container(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.w, vertical: 4.h),
+                                            child: TextWidget(
+                                              text: '1/$mediaLength',
+                                              fontSize: 9.sp,
+                                              color: colorWhite,
+                                            ),
+                                          )
+                                        : widthBox(0),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ),
             ),
           ),
-          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+          link == null
+              ? Align(
+                  alignment:
+                      isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                  child: Icon(
+                    Icons.update_outlined,
+                    color: color55F,
+                    size: 12.sp,
+                  ),
+                )
+              : DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
           const SizedBox(
             height: 8,
           )
@@ -142,7 +162,7 @@ class ChatMusicTile extends StatelessWidget {
   final bool isSeen;
   final String appUserId;
   final String date;
-  final MediaDetails media;
+  final MediaDetails? media;
 
   @override
   Widget build(BuildContext context) {
@@ -151,15 +171,54 @@ class ChatMusicTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding:
-                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            padding: EdgeInsets.only(
+                left: isMe ? MediaQuery.of(context).size.width * .4 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .4),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: MusicPlayerTile(
-                  musicDetails: media, ontap: () {}, border: 16, isMe: isMe),
+              child: media == null
+                  ? Container(
+                      height: 70,
+                      decoration: BoxDecoration(
+                          color: colorPrimaryA05,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16.r),
+                              topRight: Radius.circular(16.r),
+                              bottomLeft: Radius.circular(
+                                isMe ? 16.r : 0,
+                              ),
+                              bottomRight: Radius.circular(
+                                isMe ? 0 : 16.r,
+                              ))),
+                      child: Center(
+                        child: SizedBox(
+                          height: 35.h,
+                          width: 35.h,
+                          child: CircularProgressIndicator(
+                            color: colorWhite,
+                            strokeWidth: 1.w,
+                          ),
+                        ),
+                      ),
+                    )
+                  : MusicPlayerTile(
+                      musicDetails: media!,
+                      ontap: () {},
+                      border: 16,
+                      isMe: isMe),
             ),
           ),
-          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+          media == null
+              ? Align(
+                  alignment:
+                      isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                  child: Icon(
+                    Icons.update_outlined,
+                    color: color55F,
+                    size: 12.sp,
+                  ),
+                )
+              : DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
           const SizedBox(
             height: 8,
           )
@@ -183,7 +242,7 @@ class ChatVoiceTile extends StatelessWidget {
   final bool isSeen;
   final String appUserId;
   final String date;
-  final MediaDetails media;
+  final MediaDetails? media;
 
   @override
   Widget build(BuildContext context) {
@@ -192,15 +251,54 @@ class ChatVoiceTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding:
-                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            padding: EdgeInsets.only(
+                left: isMe ? MediaQuery.of(context).size.width * .4 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .4),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: MusicPlayerTile(
-                  musicDetails: media, ontap: () {}, border: 16, isMe: isMe),
+              child: media == null
+                  ? Container(
+                      height: 70,
+                      decoration: BoxDecoration(
+                          color: colorPrimaryA05,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16.r),
+                              topRight: Radius.circular(16.r),
+                              bottomLeft: Radius.circular(
+                                isMe ? 16.r : 0,
+                              ),
+                              bottomRight: Radius.circular(
+                                isMe ? 0 : 16.r,
+                              ))),
+                      child: Center(
+                        child: SizedBox(
+                          height: 35.h,
+                          width: 35.h,
+                          child: CircularProgressIndicator(
+                            color: colorWhite,
+                            strokeWidth: 1.w,
+                          ),
+                        ),
+                      ),
+                    )
+                  : MusicPlayerTile(
+                      musicDetails: media!,
+                      ontap: () {},
+                      border: 16,
+                      isMe: isMe),
             ),
           ),
-          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+          media == null
+              ? Align(
+                  alignment:
+                      isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                  child: Icon(
+                    Icons.update_outlined,
+                    color: color55F,
+                    size: 12.sp,
+                  ),
+                )
+              : DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
           const SizedBox(
             height: 8,
           )
@@ -210,7 +308,6 @@ class ChatVoiceTile extends StatelessWidget {
   }
 }
 
-// ignore: must_be_immutable
 class ChatDocumentTile extends StatelessWidget {
   const ChatDocumentTile({
     Key? key,
@@ -225,7 +322,7 @@ class ChatDocumentTile extends StatelessWidget {
   final bool isSeen;
   final String appUserId;
   final String date;
-  final MediaDetails media;
+  final MediaDetails? media;
 
   @override
   Widget build(BuildContext context) {
@@ -235,60 +332,96 @@ class ChatDocumentTile extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding:
-                  EdgeInsets.only(left: isMe ? 150 : 0, right: isMe ? 0 : 150),
+              padding: EdgeInsets.only(
+                  left: isMe ? MediaQuery.of(context).size.width * .4 : 0,
+                  right: isMe ? 0 : MediaQuery.of(context).size.width * .4),
               child: Align(
                 alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-                child: InkWell(
-                  onTap: () {
-                    downloadProgress.openDocument(
-                      media.link,
-                      media.name,
-                    );
-                  },
-                  child: Container(
-                      height: 70,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16.r),
-                          topRight: Radius.circular(16.r),
-                          bottomLeft: Radius.circular(
-                            isMe ? 16.r : 0,
-                          ),
-                          bottomRight: Radius.circular(
-                            isMe ? 0 : 16.r,
+                child: media == null
+                    ? Container(
+                        height: 70,
+                        decoration: BoxDecoration(
+                            color: colorPrimaryA05,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16.r),
+                                topRight: Radius.circular(16.r),
+                                bottomLeft: Radius.circular(
+                                  isMe ? 16.r : 0,
+                                ),
+                                bottomRight: Radius.circular(
+                                  isMe ? 0 : 16.r,
+                                ))),
+                        child: Center(
+                          child: SizedBox(
+                            height: 35.h,
+                            width: 35.h,
+                            child: CircularProgressIndicator(
+                              color: colorWhite,
+                              strokeWidth: 1.w,
+                            ),
                           ),
                         ),
-                        color: colorPrimaryA05,
-                      ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 10),
-                      child: Row(
-                        children: [
-                          downloadProgress.isDocOpening
-                              ? const CircularProgressIndicator.adaptive(
-                                  backgroundColor: colorWhite,
-                                )
-                              : Icon(
-                                  Icons.file_copy,
-                                  color: colorWhite,
-                                  size: 28.sp,
+                      )
+                    : InkWell(
+                        onTap: () {
+                          downloadProgress.openDocument(
+                            media!.link,
+                            media!.name,
+                          );
+                        },
+                        child: Container(
+                            height: 70,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16.r),
+                                topRight: Radius.circular(16.r),
+                                bottomLeft: Radius.circular(
+                                  isMe ? 16.r : 0,
                                 ),
-                          widthBox(12.w),
-                          Expanded(
-                            child: TextWidget(
-                              color: colorWhite,
-                              text: media.name.split('/').last,
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w500,
+                                bottomRight: Radius.circular(
+                                  isMe ? 0 : 16.r,
+                                ),
+                              ),
+                              color: colorPrimaryA05,
                             ),
-                          )
-                        ],
-                      )),
-                ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 10),
+                            child: Row(
+                              children: [
+                                downloadProgress.isDocOpening
+                                    ? const CircularProgressIndicator.adaptive(
+                                        backgroundColor: colorWhite,
+                                      )
+                                    : Icon(
+                                        Icons.file_copy,
+                                        color: colorWhite,
+                                        size: 28.sp,
+                                      ),
+                                widthBox(12.w),
+                                Expanded(
+                                  child: TextWidget(
+                                    color: colorWhite,
+                                    text: media!.name.split('/').last,
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              ],
+                            )),
+                      ),
               ),
             ),
-            DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+            media == null
+                ? Align(
+                    alignment:
+                        isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                    child: Icon(
+                      Icons.update_outlined,
+                      color: color55F,
+                      size: 12.sp,
+                    ),
+                  )
+                : DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
             const SizedBox(
               height: 8,
             )
@@ -322,8 +455,9 @@ class ChatPostTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding:
-                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            padding: EdgeInsets.only(
+                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
@@ -368,58 +502,75 @@ class ChatImageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final media = message.content.map((e) => MediaDetails.fromMap(e)).toList();
+    final media = message.caption.isEmpty
+        ? message.content.map((e) => MediaDetails.fromMap(e)).toList()
+        : null;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(
-            padding:
-                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            padding: EdgeInsets.only(
+                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
                 aspectRatio: 9 / 13,
                 child: Container(
                   decoration: BoxDecoration(
+                    color: colorBlack.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(15),
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: CachedNetworkImageProvider(
-                        media.first.link,
-                      ),
-                    ),
-                  ),
-                  child: media.length > 1
-                      ? Align(
-                          alignment:
-                              isMe ? Alignment.topRight : Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 8.w, vertical: 4.h),
-                              child: TextWidget(
-                                text: '1/${media.length}',
-                                fontSize: 9.sp,
-                                color: colorWhite,
-                              ),
+                    image: media != null
+                        ? DecorationImage(
+                            fit: BoxFit.cover,
+                            image: CachedNetworkImageProvider(
+                              media.first.link,
                             ),
-                          ),
-                        )
-                      : widthBox(0),
+                          )
+                        : null,
+                  ),
+                  child: media == null
+                      ? centerLoader()
+                      : media.length > 1
+                          ? Align(
+                              alignment:
+                                  isMe ? Alignment.topRight : Alignment.topLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8.w, vertical: 4.h),
+                                  child: TextWidget(
+                                    text: '1/${media.length}',
+                                    fontSize: 9.sp,
+                                    color: colorWhite,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : widthBox(0),
                 ),
               ),
             ),
           ),
-          DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: message.createdAt),
-          const SizedBox(
-            height: 8,
-          )
+          media == null
+              ? Align(
+                  alignment:
+                      isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                  child: Icon(
+                    Icons.update_outlined,
+                    color: color55F,
+                    size: 12.sp,
+                  ),
+                )
+              : DateAndSeenTile(
+                  isMe: isMe, isSeen: isSeen, date: message.createdAt),
+          heightBox(8)
         ],
       ),
     );
@@ -447,8 +598,9 @@ class ChatQouteTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding:
-                EdgeInsets.only(left: isMe ? 170 : 0, right: isMe ? 0 : 170),
+            padding: EdgeInsets.only(
+                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -99,10 +100,12 @@ class PostProvider extends ChangeNotifier {
             .collection('posts')
         : FirebaseFirestore.instance.collection("posts");
     try {
-      if (!postModel!.videoViews.contains(fauth.currentUser!.uid)) {
-        await postRef.doc(postModel.id).set({
-          'videoViews': FieldValue.arrayUnion([fauth.currentUser!.uid])
-        }, SetOptions(merge: true));
+      if (fauth.currentUser?.uid != null) {
+        if (!postModel!.videoViews.contains(fauth.currentUser!.uid)) {
+          await postRef.doc(postModel.id).set({
+            'videoViews': FieldValue.arrayUnion([fauth.currentUser!.uid])
+          }, SetOptions(merge: true));
+        }
       }
     } catch (e) {
       log('$e');
@@ -256,8 +259,13 @@ class PostProvider extends ChangeNotifier {
     });
   }
 
-  var isSent = false;
   var unreadMessages = 0;
+
+  List<String> recieverIds = [];
+
+  restoreReciverList() {
+    recieverIds.clear();
+  }
 
   void sharePostData(
       {UserModel? currentUser,
@@ -339,7 +347,10 @@ class PostProvider extends ChangeNotifier {
 
     messageRefForCurrentUser.set(message.toMap());
     messageRefForAppUser.set(appUserMessage.toMap());
-    isSent = true;
+
+    recieverIds.add(appUser.id);
+
+    printLog(recieverIds.toString());
     notifyListeners();
 
     var recieverFCMToken = appUser.fcmToken;
@@ -351,9 +362,5 @@ class PostProvider extends ChangeNotifier {
           ? postModel.mediaData[0].link
           : "",
     );
-  }
-
-  void disposeSendButton() {
-    isSent = false;
   }
 }

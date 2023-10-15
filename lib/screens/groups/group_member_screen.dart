@@ -72,7 +72,7 @@ class GroupMembersScreen extends StatelessWidget {
                         return ListView.builder(
                           itemCount: filterList.length,
                           itemBuilder: (context, index) {
-                            return FollowFollowingTile(
+                            return GroupMemberTile(
                               user: filterList[index],
                               ontapToggleFollow: () {
                                 if (isAdmin) {
@@ -81,6 +81,7 @@ class GroupMembersScreen extends StatelessWidget {
                                       groupId: group.id);
                                 }
                               },
+                              isAdmin: group.creatorId == filterList[index].id,
                               btnName: isAdmin ? 'Remove' : '',
                             );
                           },

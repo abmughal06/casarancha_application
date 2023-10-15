@@ -75,12 +75,8 @@ class CheckMediaAndShowPost extends StatelessWidget {
                     groupId: groupId,
                   )),
           child: CachedNetworkImage(
-              progressIndicatorBuilder: (context, url, progress) => Center(
-                    child: SizedBox(
-                      height: 30.h,
-                      width: 30.h,
-                      child: const CircularProgressIndicator.adaptive(),
-                    ),
+              progressIndicatorBuilder: (context, url, progress) => Container(
+                    color: colorBlack.withOpacity(0.04),
                   ),
               imageUrl: mediaData.link),
         );

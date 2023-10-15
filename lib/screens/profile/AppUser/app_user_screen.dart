@@ -58,7 +58,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
   int postCount = 0;
   @override
   Widget build(BuildContext context) {
-    final post = context.watch<List<PostModel>?>();
+    // final post = context.watch<List<PostModel>?>();
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
     final ghost = Provider.of<DashboardProvider>(context);
@@ -158,14 +158,28 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          post == null
-                                              ? const PostFollowCount(
-                                                  count: 0,
-                                                  countText: strProfilePost)
-                                              : PostFollowCount(
-                                                  count: postCount,
-                                                  countText: strProfilePost,
-                                                ),
+                                          StreamProvider.value(
+                                              initialData: null,
+                                              value: DataProvider().posts(null),
+                                              child: Consumer<List<PostModel>?>(
+                                                  builder: (context, post, b) {
+                                                if (post == null) {
+                                                  return profileCounter(
+                                                      ontap: null,
+                                                      count: '0',
+                                                      strText: strProfilePost);
+                                                }
+                                                return profileCounter(
+                                                    ontap: null,
+                                                    count: post
+                                                        .where((element) =>
+                                                            element.creatorId ==
+                                                            user.id)
+                                                        .toList()
+                                                        .length
+                                                        .toString(),
+                                                    strText: strProfilePost);
+                                              })),
                                           verticalLine(
                                               height: 24.h,
                                               horizontalMargin: 30.w),
@@ -212,7 +226,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Visibility(
-                                              visible: user.work.isNotEmpty,
+                                              visible:
+                                                  user.education.isNotEmpty,
                                               child: SelectableText.rich(
                                                 TextSpan(
                                                   children: [
@@ -224,7 +239,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text: ' ${user.work} ',
+                                                      text:
+                                                          ' ${user.education} ',
                                                       style: TextStyle(
                                                         color: color55F,
                                                         fontSize: 12.sp,
@@ -234,7 +250,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                     WidgetSpan(
                                                         child: Visibility(
                                                             visible: user
-                                                                .isWorkVerified,
+                                                                .isEducationVerified,
                                                             child: SvgPicture
                                                                 .asset(
                                                               icVerifyBadge,
@@ -246,8 +262,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                               ),
                                             ),
                                             Visibility(
-                                              visible:
-                                                  user.education.isNotEmpty,
+                                              visible: user.work.isNotEmpty,
                                               child: SelectableText.rich(
                                                 TextSpan(
                                                   children: [
@@ -259,8 +274,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text:
-                                                          ' ${user.education} ',
+                                                      text: ' ${user.work} ',
                                                       style: TextStyle(
                                                         color: color55F,
                                                         fontFamily: strFontName,
@@ -270,7 +284,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                     WidgetSpan(
                                                         child: Visibility(
                                                             visible: user
-                                                                .isEducationVerified,
+                                                                .isWorkVerified,
                                                             child: SvgPicture
                                                                 .asset(
                                                               icVerifyBadge,
@@ -514,65 +528,6 @@ class _AppUserScreenState extends State<AppUserScreen> {
                               );
                             }),
                           )
-                          // Expanded(
-                          //   child: TabBarView(
-                          //     children: [
-                          //       //qoute
-                          //       post == null
-                          //           ? const Center(
-                          //               child: CircularProgressIndicator
-                          //                   .adaptive())
-                          //           : QoutesGridView(
-                          //               qoutesList: post
-                          //                   .where((element) =>
-                          //                       element.creatorId ==
-                          //                           widget.appUserId &&
-                          //                       element.mediaData[0].type ==
-                          //                           'Qoute')
-                          //                   .toList(),
-                          //             ),
-                          //       post == null
-                          //           ? const Center(
-                          //               child: CircularProgressIndicator
-                          //                   .adaptive())
-                          //           : ImageGridView(
-                          //               imageList: post
-                          //                   .where((element) =>
-                          //                       element.creatorId ==
-                          //                           widget.appUserId &&
-                          //                       element.mediaData[0].type ==
-                          //                           'Photo')
-                          //                   .toList(),
-                          //             ),
-                          //       post == null
-                          //           ? const Center(
-                          //               child: CircularProgressIndicator
-                          //                   .adaptive())
-                          //           : VideoGridView(
-                          //               videoList: post
-                          //                   .where((element) =>
-                          //                       element.creatorId ==
-                          //                           widget.appUserId &&
-                          //                       element.mediaData[0].type ==
-                          //                           'Video')
-                          //                   .toList(),
-                          //             ),
-                          //       //story
-                          //       post == null
-                          //           ? const Center(
-                          //               child: CircularProgressIndicator
-                          //                   .adaptive())
-                          //           : MusicGrid(
-                          //               musicList: post
-                          //                   .where((element) =>
-                          //                       element.creatorId == user.id &&
-                          //                       element.mediaData.first.type ==
-                          //                           'Music')
-                          //                   .toList(),
-                          //             ),
-                          //     ],
-                          //   ),
-                          // )
                         ],
                       ),
                     );
