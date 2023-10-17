@@ -5,7 +5,6 @@ import 'package:casarancha/screens/groups/group_post_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/text_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';

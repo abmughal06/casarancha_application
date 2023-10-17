@@ -1,7 +1,6 @@
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:casarancha/widgets/shared/alert_text.dart';
-import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

@@ -9,9 +9,6 @@ import '../../../../models/user_model.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final postRef = FirebaseFirestore.instance.collection("posts");
-  final currentUserRef = FirebaseFirestore.instance
-      .collection("users")
-      .doc(FirebaseAuth.instance.currentUser!.uid);
 
   void deletePost(postId) async {
     await postRef
@@ -22,17 +19,23 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   void toggleFollowBtn({UserModel? userModel, String? appUserId}) async {
-    log('in metthod');
+    final currentUserRef = FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+    log(userModel!.id);
     try {
-      if (userModel!.followingsIds.contains(appUserId)) {
+      if (userModel.followingsIds.contains(appUserId)) {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayRemove([appUserId])
         });
-        log(userModel.name);
+        log('Follow hogya');
       } else {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayUnion([appUserId])
         });
+        log('Follow nai hwa');
+        var ref = await currentUserRef.get();
+        log(ref.id);
       }
     } catch (e) {
       log('$e');

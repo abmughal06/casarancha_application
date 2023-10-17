@@ -113,6 +113,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
         );
       case "Music":
         return InkWell(
+          key: ValueKey(postModel.mediaData.first.link),
           onDoubleTap: ondoubleTap,
           child: MusicPlayerUrl(
             key: ValueKey(postModel.mediaData.first.link),
@@ -236,14 +237,16 @@ class PostMediaWidget extends StatelessWidget {
           )
           .toList(),
       options: CarouselOptions(
-        aspectRatio: post.mediaData[0].type == 'Qoute'
-            ? getQouteAspectRatio(post.mediaData[0].link, isPostDetail)
-            : post.mediaData[0].type == 'Music'
-                ? 13 / 9
-                : post.mediaData[0].type == 'Photo'
-                    ? double.parse(post.mediaData[0].imageWidth!) /
-                        double.parse(post.mediaData[0].imageHeight!)
-                    : 9 / 16,
+        aspectRatio: post.mediaData.length > 1
+            ? 9 / 16
+            : post.mediaData.first.type == 'Qoute'
+                ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
+                : post.mediaData.first.type == 'Music'
+                    ? 13 / 9
+                    : post.mediaData.first.type == 'Photo'
+                        ? double.parse(post.mediaData.first.imageWidth!) /
+                            double.parse(post.mediaData.first.imageHeight!)
+                        : 9 / 16,
         viewportFraction: 1,
         enableInfiniteScroll: false,
       ),

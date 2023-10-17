@@ -29,6 +29,11 @@ class SetupProfileProvider extends ChangeNotifier {
   String educationTxtCount = "0";
   String workTxtCount = "0";
 
+  disposeImage() {
+    profileImage = null;
+    selectedDob = null;
+  }
+
   bool isLoading = false;
 
   getFromGallery() async {

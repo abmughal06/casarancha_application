@@ -82,6 +82,7 @@ class ProviderApp extends StatelessWidget {
             create: (_) => ProfileProvider()),
         ChangeNotifierProvider<StoryProvider>(create: (_) => StoryProvider()),
         ChangeNotifierProvider<PostProvider>(create: (_) => PostProvider()),
+
         ChangeNotifierProvider<NewGroupProvider>(
             create: (_) => NewGroupProvider()),
         ChangeNotifierProvider<CreatePostMethods>(

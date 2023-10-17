@@ -1,4 +1,4 @@
-import 'package:casarancha/utils/app_constants.dart';
+import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -48,8 +48,12 @@ class ChatTile extends StatelessWidget {
                   color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                child: AppConstant()
-                    .emojiSize(message, isMe ? color13F : color55F),
+                child: SelectableTextWidget(
+                  text: message,
+                  fontSize: calculateFontSize(message),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
@@ -85,5 +89,14 @@ class ChatTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+double calculateFontSize(String message) {
+  if (emojiRegex().allMatches(message).isNotEmpty &&
+      RegExp(r'[A-Za-z\s]').allMatches(message).isEmpty) {
+    return 27.sp;
+  } else {
+    return 14.sp;
   }
 }

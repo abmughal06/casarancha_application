@@ -4,7 +4,6 @@ import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../../resources/color_resources.dart';

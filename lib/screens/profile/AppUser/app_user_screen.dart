@@ -55,13 +55,15 @@ class AppUserScreen extends StatefulWidget {
 }
 
 class _AppUserScreenState extends State<AppUserScreen> {
+  late ProfileProvider profileProvider;
   int postCount = 0;
+
   @override
   Widget build(BuildContext context) {
     // final post = context.watch<List<PostModel>?>();
-    final profileProvider =
-        Provider.of<ProfileProvider>(context, listen: false);
+    profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     final ghost = Provider.of<DashboardProvider>(context);
+    var currentUser = context.watch<UserModel?>();
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -92,7 +94,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                         children: [
                           Consumer<List<UserModel>?>(
                             builder: (context, appUser, b) {
-                              if (appUser == null) {
+                              if (appUser == null || currentUser == null) {
                                 return const ProfileTopLoader();
                               } else {
                                 var userList = appUser
@@ -100,11 +102,11 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                         element.id == widget.appUserId)
                                     .toList();
 
-                                var currentUser = appUser
-                                    .where((element) =>
-                                        element.id ==
-                                        FirebaseAuth.instance.currentUser!.uid)
-                                    .first;
+                                // var currentUser = appUser
+                                //     .where((element) =>
+                                //         element.id ==
+                                //         FirebaseAuth.instance.currentUser!.uid)
+                                //     .first;
                                 UserModel? user =
                                     userList.isNotEmpty ? userList.first : null;
                                 if (user == null) {

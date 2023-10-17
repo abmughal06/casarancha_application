@@ -34,6 +34,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _educationController = TextEditingController();
   final TextEditingController _workController = TextEditingController();
+  late SetupProfileProvider provider;
 
   @override
   void initState() {
@@ -53,7 +54,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
       _userNameController.text = user.email!.split("@").first;
     }
 
-    final provider = Provider.of<SetupProfileProvider>(context, listen: false);
+    provider = Provider.of<SetupProfileProvider>(context, listen: false);
     if (user.photoURL != null) {
       provider.profileImage = user.photoURL;
     }
@@ -75,174 +76,234 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
               icon: const Icon(Icons.logout_rounded))
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Consumer<SetupProfileProvider>(builder: (context, provider, b) {
-            return Expanded(
-              child: ListView(
-                padding: EdgeInsets.all(20.w),
-                children: [
-                  GestureDetector(
-                    onTap: provider.getFromGallery,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      fit: StackFit.passthrough,
-                      children: [
-                        provider.imageFilePicked != null
-                            ? Container(
-                                height: 120,
-                                width: 120,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: FileImage(
-                                            provider.imageFilePicked!))),
-                              ) /* CircleAvatar(
-                                  radius: 20,s
-                                  backgroundImage:
-                                      Image.file(imageFilePicked!).image) */
-                            : provider.profileImage != null
-                                ? imgProVerified(
-                                    profileImg: provider.profileImage,
-                                    idIsVerified: false)
-                                : Container(
-                                    height: 120,
-                                    width: 120,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: colorPrimaryA05, width: 1.5),
-                                        image: const DecorationImage(
-                                            fit: BoxFit.fitHeight,
-                                            image: AssetImage(
-                                                imgUserPlaceHolder))),
-                                  ),
-                        Positioned(
-                          bottom: 5.h,
-                          right: 100.w,
-                          child: SvgPicture.asset(
-                            icProfileAdd,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  heightBox(20.w),
-                  TextEditingWidget(
-                    controller: _firstNameController,
-                    hintColor: color080,
-                    isShadowEnable: false,
-                    hint: strFirstName,
-                    color: colorFF4,
-                    textInputType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  ),
-                  heightBox(10.w),
-                  TextEditingWidget(
-                    controller: _lastNameController,
-                    hintColor: color080,
-                    isShadowEnable: false,
-                    hint: strLastName,
-                    color: colorFF4,
-                    textInputType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  ),
-                  heightBox(10.w),
-                  TextEditingWidget(
-                    controller: _userNameController,
-                    hintColor: color080,
-                    isShadowEnable: false,
-                    hint: strUserName,
-                    maxLength: 150,
-                    color: colorFF4,
-                    textInputType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  ),
-                  heightBox(10.w),
-                  SetupProfileTextField(
-                    controller: _bioController,
-                    sizeHeight: 156.h,
-                    onchange: (value) {
-                      provider.bioTxtCount =
-                          _bioController.text.length.toString();
-                      setState(() {});
-                    },
-                    limitfield: 300,
-                    hintText: strBio,
-                    maxlines: 5,
-                    countText: "${provider.bioTxtCount}/300",
-                    inputHeight: 150,
-                  ),
-                  heightBox(10.w),
-                  SetupProfileTextField(
-                    controller: _educationController,
-                    sizeHeight: 80.h,
-                    onchange: (value) {
-                      provider.educationTxtCount =
-                          _educationController.text.length.toString();
-                      setState(() {});
-                    },
-                    limitfield: 150,
-                    hintText: strEducation,
-                    maxlines: 3,
-                    countText: "${provider.educationTxtCount}/300",
-                    inputHeight: 100,
-                  ),
-                  heightBox(10.w),
-                  SetupProfileTextField(
-                    controller: _workController,
-                    sizeHeight: 80.h,
-                    onchange: (value) {
-                      provider.workTxtCount =
-                          _workController.text.length.toString();
-                      setState(() {});
-                    },
-                    limitfield: 150,
-                    hintText: strWork,
-                    maxlines: 3,
-                    countText: "${provider.workTxtCount}/300",
-                    inputHeight: 100,
-                  ),
-                  heightBox(10.w),
-                  CustomDatePicker2(
-                    getDateTime: provider.getDateTime,
-                    showSelected: provider.showSelectedDates,
-                    dateChangedCallback: (DateTime value) {
-                      provider.getDateTime = value;
-                      provider.selectedDob =
-                          "${value.year}-${AppUtils.instance.convertSingleToTwoDigit(value.month.toString())}-${AppUtils.instance.convertSingleToTwoDigit(value.day.toString())}";
-                      log("${provider.selectedDob}");
-                    },
-                  ),
-                ],
-              ),
-            );
-          }),
           Consumer<SetupProfileProvider>(builder: (context, provider, b) {
             return Padding(
               padding: EdgeInsets.all(20.w),
-              child: CommonButton(
-                height: 56.h,
-                text: 'Continue',
-                showLoading: provider.isLoading,
-                onTap: () async {
-                  await provider.setupProfileData(
-                    fname: _firstNameController.text,
-                    lname: _lastNameController.text,
-                    username: _userNameController.text,
-                    bio: _bioController.text,
-                    education: _educationController.text,
-                    work: _workController.text,
-                  );
-                },
-                width: double.infinity,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 120.h,
+                      width: 120.h,
+                      child: Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: provider.getFromGallery,
+                            child: Container(
+                                height: 120.h,
+                                width: 120.h,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: colorPrimaryA05, width: 1.5),
+                                    image: provider.imageFilePicked != null
+                                        ? DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: FileImage(
+                                                provider.imageFilePicked!))
+                                        : provider.profileImage != null
+                                            ? DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(
+                                                    provider.profileImage!))
+                                            : const DecorationImage(
+                                                fit: BoxFit.fitHeight,
+                                                image: AssetImage(
+                                                    imgUserPlaceHolder)))),
+                          ),
+                          Positioned(
+                            bottom: 2.h,
+                            right: 3.h,
+                            child: GestureDetector(
+                              onTap: provider.getFromGallery,
+                              child: SvgPicture.asset(
+                                icProfileAdd,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // GestureDetector(
+                    //   onTap: provider.getFromGallery,
+                    //   child: SizedBox(
+                    //     height: 120.h,
+                    //     width: 120.h,
+                    //     child: Stack(
+                    //       clipBehavior: Clip.none,
+                    //       fit: StackFit.passthrough,
+                    //       children: [
+                    //         provider.imageFilePicked != null
+                    //             ? Container(
+                    //                 height: 120,
+                    //                 width: 120,
+                    //                 alignment: Alignment.center,
+                    //                 decoration: BoxDecoration(
+                    //                     shape: BoxShape.circle,
+                    //                     image: DecorationImage(
+                    //                         image: FileImage(
+                    //                             provider.imageFilePicked!))),
+                    //               ) /* CircleAvatar(
+                    //                   radius: 20,s
+                    //                   backgroundImage:
+                    //                       Image.file(imageFilePicked!).image) */
+                    //             : provider.profileImage != null
+                    //                 ? imgProVerified(
+                    //                     profileImg: provider.profileImage,
+                    //                     idIsVerified: false)
+                    //                 : Container(
+                    //                     height: 120,
+                    //                     width: 120,
+                    //                     decoration: BoxDecoration(
+                    //                         shape: BoxShape.circle,
+                    //                         border: Border.all(
+                    //                             color: colorPrimaryA05, width: 1.5),
+                    //                         image: const DecorationImage(
+                    //                             fit: BoxFit.fitHeight,
+                    //                             image: AssetImage(
+                    //                                 imgUserPlaceHolder))),
+                    //                   ),
+                    //         Positioned(
+                    //           bottom: 5.h,
+                    //           right: 100.w,
+                    //           child: SvgPicture.asset(
+                    //             icProfileAdd,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    heightBox(20.w),
+                    TextEditingWidget(
+                      controller: _firstNameController,
+                      hintColor: color080,
+                      isShadowEnable: false,
+                      hint: strFirstName,
+                      color: colorFF4,
+                      textInputType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () =>
+                          FocusScope.of(context).nextFocus(),
+                    ),
+                    heightBox(10.w),
+                    TextEditingWidget(
+                      controller: _lastNameController,
+                      hintColor: color080,
+                      isShadowEnable: false,
+                      hint: strLastName,
+                      color: colorFF4,
+                      textInputType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () =>
+                          FocusScope.of(context).nextFocus(),
+                    ),
+                    heightBox(10.w),
+                    TextEditingWidget(
+                      controller: _userNameController,
+                      hintColor: color080,
+                      isShadowEnable: false,
+                      hint: strUserName,
+                      maxLength: 150,
+                      color: colorFF4,
+                      textInputType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () =>
+                          FocusScope.of(context).nextFocus(),
+                    ),
+                    heightBox(10.w),
+                    SetupProfileTextField(
+                      controller: _bioController,
+                      sizeHeight: 156.h,
+                      onchange: (value) {
+                        provider.bioTxtCount =
+                            _bioController.text.length.toString();
+                        setState(() {});
+                      },
+                      limitfield: 300,
+                      hintText: strBio,
+                      maxlines: 5,
+                      countText: "${provider.bioTxtCount}/300",
+                      inputHeight: 150,
+                    ),
+                    heightBox(10.w),
+                    SetupProfileTextField(
+                      controller: _educationController,
+                      sizeHeight: 80.h,
+                      onchange: (value) {
+                        provider.educationTxtCount =
+                            _educationController.text.length.toString();
+                        setState(() {});
+                      },
+                      limitfield: 150,
+                      hintText: strEducation,
+                      maxlines: 3,
+                      countText: "${provider.educationTxtCount}/300",
+                      inputHeight: 100,
+                    ),
+                    heightBox(10.w),
+                    SetupProfileTextField(
+                      controller: _workController,
+                      sizeHeight: 80.h,
+                      onchange: (value) {
+                        provider.workTxtCount =
+                            _workController.text.length.toString();
+                        setState(() {});
+                      },
+                      limitfield: 150,
+                      hintText: strWork,
+                      maxlines: 3,
+                      countText: "${provider.workTxtCount}/300",
+                      inputHeight: 100,
+                    ),
+                    heightBox(10.w),
+                    CustomDatePicker2(
+                      getDateTime: provider.getDateTime,
+                      showSelected: provider.showSelectedDates,
+                      dateChangedCallback: (DateTime value) {
+                        provider.getDateTime = value;
+                        provider.selectedDob =
+                            "${value.year}-${AppUtils.instance.convertSingleToTwoDigit(value.month.toString())}-${AppUtils.instance.convertSingleToTwoDigit(value.day.toString())}";
+                        log("${provider.selectedDob}");
+                      },
+                    ),
+                    heightBox(120.h)
+                  ],
+                ),
               ),
             );
           }),
+          Positioned(
+            bottom: 30,
+            right: 5,
+            left: 5,
+            child:
+                Consumer<SetupProfileProvider>(builder: (context, provider, b) {
+              return Padding(
+                padding: EdgeInsets.all(20.w),
+                child: CommonButton(
+                  height: 56.h,
+                  text: 'Continue',
+                  showLoading: provider.isLoading,
+                  onTap: () async {
+                    await provider.setupProfileData(
+                      fname: _firstNameController.text,
+                      lname: _lastNameController.text,
+                      username: _userNameController.text,
+                      bio: _bioController.text,
+                      education: _educationController.text,
+                      work: _workController.text,
+                    );
+                    provider.disposeImage();
+                  },
+                  width: double.infinity,
+                ),
+              );
+            }),
+          ),
           heightBox(10.w)
         ],
       ),

@@ -74,7 +74,7 @@ class CustomPostFooter extends StatelessWidget {
                           postModel: postModel,
                           groupId: groupId,
                         ));
-                    // context.read<MusicProvider>().pause();
+                    // music.audioPlayer.pause();
                   },
                   icon: SvgPicture.asset(
                     icCommentPost,

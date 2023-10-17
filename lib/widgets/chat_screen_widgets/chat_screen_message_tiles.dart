@@ -325,25 +325,54 @@ class MessageTiles extends StatelessWidget {
           ),
         );
       case 'story-Video':
-        final postModel = MediaDetails.fromMap(message.content);
+        final story = MediaDetails.fromMap(message.content);
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
-            ? ChatVideoTile(
-                key: ValueKey(postModel.link),
-                link: postModel.link,
-                appUserId: message.sentToId,
-                isSeen: message.isSeen,
-                isMe: isMe,
-                date: message.createdAt,
+            ? InkWell(
+                onLongPress: () {
+                  showMessageMennu(
+                    context: context,
+                    url: story.link,
+                    path: message.type,
+                    friendId: isMe ? message.sentToId : message.sentById,
+                    docId: message.id,
+                  );
+                },
+                onTap: () => Get.to(() => ChatMediaFullScreenView(
+                      media: [story],
+                    )),
+                child: ChatStoryVideoTile(
+                  key: ValueKey(story.link),
+                  link: story.link,
+                  appUserId: message.sentToId,
+                  isSeen: message.isSeen,
+                  isMe: isMe,
+                  date: message.createdAt,
+                  message: message.caption,
+                ),
               )
             : Container();
       case 'story-Photo':
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
-            ? ChatStoryTile(
-                key: ValueKey(message.content),
-                message: message,
-                appUserId: message.sentToId,
-                isSeen: message.isSeen,
-                isMe: isMe,
+            ? InkWell(
+                onLongPress: () {
+                  showMessageMennu(
+                    context: context,
+                    url: message.content['link'],
+                    path: message.type,
+                    friendId: isMe ? message.sentToId : message.sentById,
+                    docId: message.id,
+                  );
+                },
+                onTap: () => Get.to(() => ChatMediaFullScreenView(
+                      media: [MediaDetails.fromMap(message.content)],
+                    )),
+                child: ChatStoryTile(
+                  key: ValueKey(message.content),
+                  message: message,
+                  appUserId: message.sentToId,
+                  isSeen: message.isSeen,
+                  isMe: isMe,
+                ),
               )
             : Container();
       case 'Text':

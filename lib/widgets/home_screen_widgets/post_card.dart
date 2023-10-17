@@ -8,6 +8,7 @@ import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
 import 'package:casarancha/widgets/home_screen_widgets/report_sheet.dart';
+import 'package:casarancha/widgets/music_player_url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

@@ -3,6 +3,7 @@ import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_input_field.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:chewie/chewie.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -98,11 +99,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             groupId: widget.groupId,
           );
           videoPlayerController.play();
-          videoPlayerController.setVolume(0.0);
+          // videoPlayerController.setVolume(0.0);
           // toggleControls();
         } else {
           videoPlayerController.pause();
-          videoPlayerController.setVolume(0.0);
+          // videoPlayerController.setVolume(0.0);
         }
       },
       child: GestureDetector(
@@ -245,5 +246,56 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         ),
       ),
     );
+  }
+}
+
+class VideoControlProvieder extends ChangeNotifier {
+  late VideoPlayerController videoPlayerController;
+  bool isVisible = false;
+
+  late ChewieController chewieController;
+  late Future<void>? initializeVideoPlayer;
+
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
+  bool isPlaying = false;
+  bool showControlls = true;
+
+  void checkIfVideoPlaying() {
+    if (isPlaying) {
+      showControlls = true;
+      Future.delayed(const Duration(seconds: 1), () {
+        showControlls = false;
+        notifyListeners();
+      });
+    } else {
+      showControlls = true;
+    }
+  }
+
+  String? videoUrl;
+
+  assignUrl(url) {
+    videoUrl = url;
+  }
+
+  VideoControlProvieder() {
+    if (videoUrl != null) {
+      videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
+        videoUrl!,
+      ))
+        ..initialize().then((value) {
+          notifyListeners();
+        });
+      videoPlayerController.setVolume(0.0); // Mute the video initially
+      videoPlayerController.setLooping(true);
+    }
+
+    videoPlayerController.addListener(() {
+      duration = videoPlayerController.value.duration;
+      position = videoPlayerController.value.position;
+      isPlaying = videoPlayerController.value.isPlaying;
+      notifyListeners();
+    });
   }
 }

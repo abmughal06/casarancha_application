@@ -140,7 +140,7 @@ class AuthenticationProvider extends ChangeNotifier {
         verificationFailed: (FirebaseAuthException e) {
           dev.log('failed $e');
           Get.back();
-          GlobalSnackBar.show(message: '${e.message}');
+          GlobalSnackBar.show(message: 'Verification Failed Pleasy try later');
         },
         codeSent: (String verificationId, int? resendToken) {
           dev.log('code sent');
