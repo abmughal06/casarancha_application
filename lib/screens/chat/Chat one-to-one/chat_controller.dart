@@ -151,6 +151,7 @@ class ChatProvider extends ChangeNotifier {
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages message",
+        isMessage: true,
       );
     } catch (e) {
       GlobalSnackBar(message: e.toString());
@@ -262,6 +263,7 @@ class ChatProvider extends ChangeNotifier {
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
+        isMessage: true,
         msg: "has sent you a $unreadMessages message in ghost",
       );
 
@@ -453,6 +455,7 @@ class ChatProvider extends ChangeNotifier {
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages attachment",
+        isMessage: true,
       );
       clearLists();
 
@@ -586,6 +589,7 @@ class ChatProvider extends ChangeNotifier {
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
+        isMessage: true,
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages attachment",
       );
@@ -1041,6 +1045,7 @@ class ChatProvider extends ChangeNotifier {
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
+        isMessage: true,
         msg: "has sent you a $unreadMessages voice message",
       );
 
@@ -1162,6 +1167,7 @@ class ChatProvider extends ChangeNotifier {
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
+        isMessage: true,
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages voice message",
       );

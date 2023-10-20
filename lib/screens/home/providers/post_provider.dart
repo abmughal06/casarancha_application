@@ -253,6 +253,7 @@ class PostProvider extends ChangeNotifier {
         imageUrl: postModel.mediaData[0].type == 'Photo'
             ? postModel.mediaData[0].link
             : '',
+        isMessage: false,
         devRegToken: recieverFCMToken,
         msg: "has commented on your post.",
       );
@@ -358,6 +359,7 @@ class PostProvider extends ChangeNotifier {
       appUserId: appUser.id,
       devRegToken: recieverFCMToken,
       msg: "has sent you a post",
+      isMessage: false,
       imageUrl: postModel.mediaData[0].type == 'Photo'
           ? postModel.mediaData[0].link
           : "",

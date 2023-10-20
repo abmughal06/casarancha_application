@@ -34,6 +34,7 @@ class FirebaseMessagingService {
       {String? devRegToken,
       String? imageUrl,
       String? msg,
+      required bool isMessage,
       required String appUserId}) async {
     Map<String, String> header = {
       "Content-Type": "application/json",
@@ -43,32 +44,26 @@ class FirebaseMessagingService {
     var model = await getCurrentUserDetails();
     var ghostmode = await ghostModeOn();
 
-    Map bodyNotification = {
-      "title": ghostmode ? "Ghost----" : model.name,
-      "body": msg,
-      "sound": '',
-    };
-
-    Map dataMap = {
-      "click_action": "FLUTTER_NOTIFICATION_CLICK",
-      "id": "1",
-      "status": "done",
-      "userRequestId": appUserId,
-    };
-
     Map officialBodyFormat = {
-      "notification": bodyNotification,
-      'android': {
-        'notification': {'sound': 'default'},
+      "notification": {
+        "title": ghostmode ? "Ghost----" : model.name,
+        "body": msg,
+        "sound": "default"
       },
-      'apns': {
-        'payload': {
-          'aps': {'sound': 'default'},
-        },
+      "apns": {
+        "headers": {"aps-priority": "10"},
+        "payload": {
+          "apns": {"sound": "default"}
+        }
       },
       "priority": "high",
-      "data": dataMap,
-      "to": devRegToken,
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": "1",
+        "status": "done",
+        "userRequestId": appUserId,
+      },
+      "to": devRegToken
     };
 
     var res = http.post(
@@ -88,7 +83,7 @@ class FirebaseMessagingService {
               ? imageUrl
               : ''
           : '',
-      isRead: false,
+      isRead: isMessage,
       createdDetails: CreatorDetails(
           name: ghostmode ? "Ghost----" : model.name,
           imageUrl: ghostmode ? "" : model.imageStr,

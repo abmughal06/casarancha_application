@@ -22,16 +22,27 @@ class ProfileProvider extends ChangeNotifier {
     final currentUserRef = FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid);
+
+    final appUserRef =
+        FirebaseFirestore.instance.collection("users").doc(appUserId);
     log(userModel!.id);
     try {
       if (userModel.followingsIds.contains(appUserId)) {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayRemove([appUserId])
         });
+        await appUserRef.update({
+          'followersIds':
+              FieldValue.arrayRemove([FirebaseAuth.instance.currentUser!.uid])
+        });
         log('Follow hogya');
       } else {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayUnion([appUserId])
+        });
+        await appUserRef.update({
+          'followersIds':
+              FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
         });
         log('Follow nai hwa');
         var ref = await currentUserRef.get();

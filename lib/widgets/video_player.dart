@@ -2,7 +2,6 @@ import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_input_field.dart';
 import 'package:casarancha/widgets/text_widget.dart';
-import 'package:chewie/chewie.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,6 +13,8 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 import '../models/post_model.dart';
 import '../resources/color_resources.dart';
+
+bool isVideoMute = true;
 
 class VideoPlayerWidget extends StatefulWidget {
   const VideoPlayerWidget(
@@ -36,16 +37,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   late VideoPlayerController videoPlayerController;
   bool isVisible = false;
 
-  late ChewieController chewieController;
-  late Future<void>? initializeVideoPlayer;
-
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
-  bool isPlaying = false;
+
+  bool isVideoPlaying = false;
+
   bool showControlls = true;
 
   void checkIfVideoPlaying() {
-    if (isPlaying) {
+    if (isVideoPlaying) {
       showControlls = true;
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
@@ -72,14 +72,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
             setState(() {});
           }
         });
-      videoPlayerController.setVolume(0.0); // Mute the video initially
+
       videoPlayerController.setLooping(true);
     }
 
     videoPlayerController.addListener(() {
       duration = videoPlayerController.value.duration;
       position = videoPlayerController.value.position;
-      isPlaying = videoPlayerController.value.isPlaying;
+      isVideoPlaying = videoPlayerController.value.isPlaying;
       if (mounted) {
         setState(() {});
       }
@@ -94,21 +94,23 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       onVisibilityChanged: (visibilityInfo) {
         isVisible = visibilityInfo.visibleFraction > 0.6;
         if (isVisible) {
+          if (isVideoMute) {
+            videoPlayerController.setVolume(0.0); // Mute the video initially
+          } else {
+            videoPlayerController.setVolume(1.0);
+          }
           postProvider.countVideoViews(
             postModel: widget.postModel,
             groupId: widget.groupId,
           );
           videoPlayerController.play();
-          // videoPlayerController.setVolume(0.0);
-          // toggleControls();
         } else {
           videoPlayerController.pause();
-          // videoPlayerController.setVolume(0.0);
         }
       },
       child: GestureDetector(
         onTap: () {
-          if (isPlaying) {
+          if (isVideoPlaying) {
             videoPlayerController.pause();
           } else {
             videoPlayerController.play();
@@ -126,18 +128,18 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                   children: [
                     VideoPlayer(videoPlayerController),
                     Container(
-                      color: isPlaying
+                      color: isVideoPlaying
                           ? Colors.transparent
                           : Colors.black.withOpacity(0.3),
                     ),
                     AnimatedOpacity(
-                      opacity: isPlaying ? 0.0 : 1.0,
+                      opacity: isVideoPlaying ? 0.0 : 1.0,
                       duration: const Duration(milliseconds: 300),
                       child: Align(
                         alignment: Alignment.center,
                         child: GestureDetector(
                           onTap: () {
-                            if (isPlaying) {
+                            if (isVideoPlaying) {
                               videoPlayerController.pause();
                             } else {
                               videoPlayerController.play();
@@ -145,7 +147,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                           },
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 500),
-                            child: isPlaying
+                            child: isVideoPlaying
                                 ? SvgPicture.asset(
                                     icVideoPauseBtn,
                                     height: 45.h,
@@ -185,10 +187,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       right: 15.w,
                       child: GestureDetector(
                         onTap: () {
-                          if (videoPlayerController.value.volume == 0.0) {
+                          if (isVideoMute) {
                             videoPlayerController.setVolume(1.0);
+                            isVideoMute = false;
                           } else {
                             videoPlayerController.setVolume(0.0);
+                            isVideoMute = true;
                           }
                           if (mounted) {
                             setState(() {});
@@ -196,7 +200,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                         },
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 500),
-                          child: videoPlayerController.value.volume == 0.0
+                          child: isVideoMute
                               ? SvgPicture.asset(
                                   icVideoSoundOff,
                                   height: 22.h,
@@ -246,56 +250,5 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         ),
       ),
     );
-  }
-}
-
-class VideoControlProvieder extends ChangeNotifier {
-  late VideoPlayerController videoPlayerController;
-  bool isVisible = false;
-
-  late ChewieController chewieController;
-  late Future<void>? initializeVideoPlayer;
-
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
-  bool isPlaying = false;
-  bool showControlls = true;
-
-  void checkIfVideoPlaying() {
-    if (isPlaying) {
-      showControlls = true;
-      Future.delayed(const Duration(seconds: 1), () {
-        showControlls = false;
-        notifyListeners();
-      });
-    } else {
-      showControlls = true;
-    }
-  }
-
-  String? videoUrl;
-
-  assignUrl(url) {
-    videoUrl = url;
-  }
-
-  VideoControlProvieder() {
-    if (videoUrl != null) {
-      videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
-        videoUrl!,
-      ))
-        ..initialize().then((value) {
-          notifyListeners();
-        });
-      videoPlayerController.setVolume(0.0); // Mute the video initially
-      videoPlayerController.setLooping(true);
-    }
-
-    videoPlayerController.addListener(() {
-      duration = videoPlayerController.value.duration;
-      position = videoPlayerController.value.position;
-      isPlaying = videoPlayerController.value.isPlaying;
-      notifyListeners();
-    });
   }
 }

@@ -108,6 +108,7 @@ class StoryProvider extends ChangeNotifier {
       imageUrl: storyItems[currentIndex].type == 'Photo'
           ? storyItems[currentIndex].link
           : '',
+      isMessage: false,
       // creatorDetails: creatorDetails,
       devRegToken: recieverFCMToken,
 
