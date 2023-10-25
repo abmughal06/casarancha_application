@@ -438,7 +438,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                   if (user == null) {
                     return const Center(
                       child: TextWidget(
-                        text: "User no longer exists",
+                        text: strAlertUserNotExist,
                       ),
                     );
                   } else {
@@ -460,16 +460,16 @@ class _AppUserScreenState extends State<AppUserScreen> {
                             dividerColor: Colors.transparent,
                             tabs: const [
                               Tab(
-                                child: Text('Qoutes'),
+                                child: Text(strQuote),
                               ),
                               Tab(
-                                child: Text('Images'),
+                                child: Text(strImages),
                               ),
                               Tab(
-                                child: Text('Videos'),
+                                child: Text(strVideos),
                               ),
                               Tab(
-                                child: Text('Music'),
+                                child: Text(strMusic),
                               ),
                             ],
                           ),

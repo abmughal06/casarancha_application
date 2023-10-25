@@ -1,4 +1,5 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,7 +58,7 @@ class AddGroupMembers extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 60),
                         child: TextWidget(
                           textAlign: TextAlign.center,
-                          text: "Write user name above to add in group",
+                          text: strAlertAddGrpMem,
                         ),
                       ),
                     );
@@ -98,8 +99,8 @@ class AddGroupMembers extends StatelessWidget {
                           }
                         },
                         btnName: grp.memberIds.contains(userSnap.id)
-                            ? "Remove"
-                            : "Add",
+                            ? strRemove
+                            : strAdd,
                       );
                     },
                   );

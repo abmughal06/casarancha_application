@@ -1,4 +1,5 @@
 import 'package:casarancha/provider_app.dart';
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'utils/app_constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FirebaseMessagingService().updateUserFcmToken();
   runApp(const MyApp());
 }
 

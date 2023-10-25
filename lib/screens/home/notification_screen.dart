@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
@@ -35,7 +36,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: primaryAppbar(title: "Notifications", elevation: 0),
+      appBar: primaryAppbar(title: strNotifications, elevation: 0),
       body: DefaultTabController(
         length: 2,
         child: Column(
@@ -53,10 +54,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
               dividerColor: Colors.transparent,
               tabs: const [
                 Tab(
-                  text: 'Notification',
+                  text: strNotification,
                 ),
                 Tab(
-                  text: 'Friend Requests',
+                  text: strFollowRequest,
                 ),
               ],
             ),
@@ -75,7 +76,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       if (notifications.isEmpty) {
                         return const Center(
                           child: TextWidget(
-                            text: "No Notifications to show",
+                            text: strAlertNotification,
                           ),
                         );
                       }

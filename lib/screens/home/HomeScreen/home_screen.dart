@@ -105,12 +105,12 @@ class _HomeScreenState extends State<HomeScreen>
             height: 77.h,
             child: Consumer<List<Story>?>(
               builder: (context, provider, b) {
-                if (provider == null) {
+                if (provider == null || currentUser == null) {
                   return const StorySkeleton();
                 } else {
                   var filterList = provider
                       .where((element) =>
-                          currentUser!.followersIds.contains(element.id) ||
+                          currentUser.followersIds.contains(element.id) ||
                           currentUser.followingsIds.contains(element.id))
                       .toList();
                   return Padding(
@@ -121,13 +121,13 @@ class _HomeScreenState extends State<HomeScreen>
                       children: [
                         provider
                                 .where((element) =>
-                                    element.creatorId == currentUser!.id)
+                                    element.creatorId == currentUser.id)
                                 .toList()
                                 .isNotEmpty
                             ? MyStoryWidget(
                                 stories: provider
                                     .where((element) =>
-                                        element.creatorId == currentUser!.id)
+                                        element.creatorId == currentUser.id)
                                     .first,
                               )
                             : GestureDetector(
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                 if (filterList.isEmpty) {
                   return const AlertText(
-                    text: "You don't have any posts to show",
+                    text: strAlertPost,
                   );
                 }
 

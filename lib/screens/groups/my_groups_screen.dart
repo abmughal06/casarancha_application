@@ -1,4 +1,5 @@
 import 'package:casarancha/models/group_model.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/create_group_screen.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -26,7 +27,7 @@ class GroupScreen extends StatelessWidget {
     final groupPovider = Provider.of<NewGroupProvider>(context);
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: 'My Groups',
+        title: strMyGroups,
         elevation: 0.1,
         leading: const GhostModeBtn(),
       ),
@@ -47,10 +48,10 @@ class GroupScreen extends StatelessWidget {
               dividerColor: Colors.transparent,
               tabs: const [
                 Tab(
-                  text: 'My Groups',
+                  text: strMyGroups,
                 ),
                 Tab(
-                  text: 'My Created Groups',
+                  text: strMyCreatedGroups,
                 ),
               ],
             ),
@@ -75,7 +76,7 @@ class GroupScreen extends StatelessWidget {
                       if (filterList.isEmpty) {
                         return const Center(
                           child: TextWidget(
-                            text: "You didn't join any groups yet",
+                            text: strAlertGroup,
                           ),
                         );
                       }
@@ -90,7 +91,7 @@ class GroupScreen extends StatelessWidget {
                                       id: FirebaseAuth
                                           .instance.currentUser!.uid,
                                       groupId: filterList[index].id),
-                                  text: 'Leave Group');
+                                  text: strLeaveGrp);
                             },
                             group: filterList[index],
                           );
@@ -114,7 +115,7 @@ class GroupScreen extends StatelessWidget {
                           if (filterList.isEmpty) {
                             return const Center(
                               child: TextWidget(
-                                text: "You didn't create any groups yet",
+                                text: strAlertGroupCreated,
                               ),
                             );
                           }
@@ -125,7 +126,7 @@ class GroupScreen extends StatelessWidget {
                                 group: filterList[index],
                                 ontapTrailing: () {
                                   deleteBottomSheet(
-                                      text: 'Delete Group',
+                                      text: strDeleteGrp,
                                       ontap: () => groupPovider
                                           .deleteGroup(filterList[index].id));
                                 },

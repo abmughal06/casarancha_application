@@ -1,3 +1,4 @@
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
@@ -86,7 +87,7 @@ class BlockAccountsScreen extends StatelessWidget {
     final currentUser = context.watch<UserModel?>();
     final postProvider = Provider.of<PostProvider>(context, listen: false);
     return Scaffold(
-      appBar: primaryAppbar(title: 'Block Accounts', elevation: 0.2),
+      appBar: primaryAppbar(title: strBlockAccounts, elevation: 0.2),
       body: Consumer<List<UserModel>?>(builder: (context, users, b) {
         if (users == null || currentUser == null) {
           return centerLoader();
@@ -96,7 +97,7 @@ class BlockAccountsScreen extends StatelessWidget {
             .toList();
         if (filterList.isEmpty) {
           return const Center(
-            child: Text("You didn't block any account yet"),
+            child: Text(strAlertBlockAct),
           );
         }
         return ListView.builder(
@@ -109,7 +110,7 @@ class BlockAccountsScreen extends StatelessWidget {
                   user: filterList[index],
                   ontapToggleFollow: () => postProvider.blockUnblockUser(
                       currentUser: currentUser, appUser: filterList[index].id),
-                  btnName: 'Remove');
+                  btnName: strRemove);
             });
       }),
     );

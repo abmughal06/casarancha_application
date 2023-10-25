@@ -221,7 +221,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 ),
                 heightBox(15.h),
                 TextWidget(
-                  text: 'Add Members',
+                  text: strAddMember,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   color: color221,
@@ -277,8 +277,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         }
                       },
                       btnName: membersIds.contains(filterList[index].id)
-                          ? 'Remove'
-                          : 'Add',
+                          ? strRemove
+                          : strAdd,
                     );
                   },
                 );
@@ -308,8 +308,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       }
                     },
                     btnName: membersIds.contains(searchList[index].id)
-                        ? 'Remove'
-                        : 'Add',
+                        ? strRemove
+                        : strAdd,
                   );
                 },
               );

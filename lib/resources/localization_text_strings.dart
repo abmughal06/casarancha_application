@@ -30,7 +30,10 @@ const strBackToLogin = "Back to the";
 //forgot password
 const strEnterEmail =
     "Please Enter your email\nwhich associate to your account";
+
+const strResetPassword = 'Please! check your email to reset your password';
 const strSendNow = "Send Now";
+const strEnterEmailTxt = 'Please Enter Email Address';
 
 //Home Screen
 const strCasaRanch = "Casa Rancha";
@@ -58,14 +61,24 @@ const strDecline = "Decline";
 //Create Post
 const strNewPost = "New Post";
 const strPhotoVideo = "Photo/Video";
+const strWriteQuote = "Write Quote";
 const strMusic = "Music";
-const strQuote = "Quote";
+const strImages = 'Image';
+const strVideos = 'Videos';
+const strQuote = "Quotes";
 const strAddMoreMedia = "Add More Media";
 const strAddMusic = "Add Music";
+
+const strAddVideos = "Add Videos";
+const strAddPhotos = "Add Photos";
+const strAddMember = "Add Members";
+const strAdd = "Add";
+
 const strSongTitle = "Song Title";
 const strAlbumTitle = "Album Title";
 //share post
 const strShare = "Share";
+const strShowPstTime = "Show Post Time";
 
 // search
 const strSrcPeople = "People";
@@ -82,7 +95,6 @@ const strDeleteGrp = "Delete Group";
 const strPostOnGrp = "Post On Group";
 const strRemove = "Remove";
 const strJoinRequest = "Join Requests";
-const strAddMember = "Add Member";
 const strCreateGroup = "Create Group";
 const strGroupName = "Group Name";
 const strKeepInGrp = "Keep this Group";
@@ -129,7 +141,12 @@ const strCurrentPassword = "Current Password";
 const strFirstName = "First Name";
 const strLastName = "Last Name";
 const strBio = "Bio";
+const strFriends = "Friends";
 const strEducation = "Education";
+const strGetVerified = 'Get Verified';
+const strInviteFrnds = 'Invite Freinds';
+const strLogout = "Log out";
+const strDeleteAct = "Delete Account";
 const strWork = "Work";
 const strWriteCommentHere = "Write Comment here...";
 const strWriteCaption = "Write a caption...";
@@ -138,6 +155,7 @@ const strLocation = "Location";
 const strSearchHint = "Search";
 const strSrcFollow = "Follow";
 const strSrcJoin = "Join";
+const strJoined = "Joined";
 const strWriteComment = "Write Comment";
 const strSearchHere = "Search Here";
 const strSaySomething = "Say Something...";
@@ -151,8 +169,34 @@ const strMessages = "Messages";
 const strTermsCondition = "Terms & Conditions";
 const strPrivacyPolicy = "Privacy Policy";
 const strAbout = "About";
+const strLeaveGrp = 'Leave Group';
+
+//forums
+const strForum = 'Forums';
 
 /*temporory */
 const postDescription =
     "Hello everyone let me know how this picture looks like..";
 const strMinAgo = "2min ago";
+
+/*alert Texts */
+const strAlertPost = "You don't have any posts to show";
+const strAlertSearch = "Write user name above to search and follow them";
+const strAlertGroup = "You didn't join any groups yet";
+const strAlertGroupCreated = "You didn't create any groups yet";
+const strAlertGroupPost = "This group doesn't have any posts yet";
+const strAlertForum = "Forums doesn't have any posts yet";
+const strAlertQuote = "No Quotes are available to show";
+const strAlertImage = "No Images are available to show";
+const strAlertVideo = "No Videos are available to show";
+const strAlertMusic = "No Music are available to show";
+const strAlertSharePost = "Cannot post right now";
+const strAlertAddGrpMem = "Write user name above to add in group";
+const strAlertNoJoinReq = "No join requests yet";
+const strAlertNotification = "No notifications to show";
+const strAlertUserNotExist = "User no longer exists";
+const strAlertBlockAct = "You didn't block any account yet";
+const strAlertFollowing = "You don't have any followers right now";
+const strAlertFollow = "Start following people to see them here.";
+const strAlertAppUsrFollow = "This user didn't have any followers";
+const strAlertAppUsrFollowings = "This user didn't follow anyone yet";

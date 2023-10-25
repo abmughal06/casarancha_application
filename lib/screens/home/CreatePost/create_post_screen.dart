@@ -110,7 +110,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       keyboardType: TextInputType.multiline,
                       maxLength: 2000,
                       decoration: const InputDecoration.collapsed(
-                        hintText: 'Write Quote',
+                        hintText: strWriteQuote,
                       ),
                       textInputAction: TextInputAction.newline,
                     ),
@@ -128,7 +128,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       children: [
                         PrimaryTextButton(
                           onPressed: createPost.getPhoto,
-                          title: 'Add Photos',
+                          title: strAddPhotos,
                           icon: SvgPicture.asset(
                             icAddPostRed,
                           ),
@@ -211,7 +211,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       children: [
                         PrimaryTextButton(
                           onPressed: createPost.getVideo,
-                          title: 'Add Videos',
+                          title: strAddVideos,
                           icon: SvgPicture.asset(
                             icAddPostRed,
                           ),
@@ -289,7 +289,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       children: [
                         PrimaryTextButton(
                           onPressed: createPost.getMusic,
-                          title: 'Add Music',
+                          title: strAddMusic,
                           icon: SvgPicture.asset(
                             icAddPostRed,
                           ),
@@ -325,7 +325,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
             CommonButton(
-              text: 'Continue',
+              text: strContinue,
               height: 58.w,
               verticalOutMargin: 25.h,
               horizontalOutMargin: 30.w,

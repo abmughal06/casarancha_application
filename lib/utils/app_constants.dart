@@ -59,14 +59,14 @@ class AppConstant {
   static List<String> profileBottomSheetList = [
     strEditProfile,
     strSavedPosts,
-    "Get Verified",
+    strGetVerified,
     strSettings,
-    'Invite Freinds',
+    strInviteFrnds,
     strAbout,
     strTermsCondition,
     strPrivacyPolicy,
-    "Log out",
-    "Delete Account"
+    strLogout,
+    strDeleteAct,
   ];
 }
 

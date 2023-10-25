@@ -66,7 +66,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "You don't have any followers right now",
+                        text: strAlertFollowing,
                       ),
                     );
                   }
@@ -82,7 +82,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                             profileProvider.toggleFollowBtn(
                                 userModel: user,
                                 appUserId: filterList[index].id),
-                        btnName: isFriend ? "Friends" : "Follow",
+                        btnName: isFriend ? strFriends : strSrcFollow,
                       );
                     },
                   );
@@ -103,7 +103,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "Start following people to see them here.",
+                        text: strAlertFollow,
                       ),
                     );
                   }
@@ -116,7 +116,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                         ontapToggleFollow: () =>
                             profileProvider.toggleFollowBtn(
                                 userModel: currentUser, appUserId: user.id),
-                        btnName: "Remove",
+                        btnName: strRemove,
                       );
                     },
                   );
@@ -178,7 +178,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "This user didn't have any followers",
+                        text: strAlertAppUsrFollow,
                       ),
                     );
                   }
@@ -197,8 +197,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                         btnName: user.id == currentUser.id
                             ? ""
                             : isFriend
-                                ? "Friends"
-                                : "Follow",
+                                ? strFriends
+                                : strSrcFollow,
                       );
                     },
                   );
@@ -226,7 +226,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "This user didn't follow anyone yet",
+                        text: strAlertAppUsrFollowings,
                       ),
                     );
                   }
@@ -245,8 +245,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                         btnName: user.id == currentUser.id
                             ? ""
                             : !isFriend
-                                ? "Follow"
-                                : "Friends",
+                                ? strFriends
+                                : strSrcFollow,
                       );
                     },
                   );

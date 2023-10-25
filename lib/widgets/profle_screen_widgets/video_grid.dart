@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -74,7 +75,7 @@ class VideoGridView extends StatelessWidget {
           visible:
               videoList!.isEmpty && videoList!.map((e) => e.mediaData).isEmpty,
           child: const AlertText(
-            text: "No Videos are available to show",
+            text: strAlertVideo,
           ),
         )
       ],

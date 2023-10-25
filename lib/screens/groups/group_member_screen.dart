@@ -1,5 +1,6 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/add_group_members.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/widgets/common_button.dart';
@@ -45,10 +46,10 @@ class GroupMembersScreen extends StatelessWidget {
               dividerColor: Colors.transparent,
               tabs: const [
                 Tab(
-                  text: 'Members',
+                  text: strMembers,
                 ),
                 Tab(
-                  text: 'Join Requests',
+                  text: strJoinRequest,
                 ),
               ],
             ),
@@ -82,14 +83,14 @@ class GroupMembersScreen extends StatelessWidget {
                                 }
                               },
                               isAdmin: group.creatorId == filterList[index].id,
-                              btnName: isAdmin ? 'Remove' : '',
+                              btnName: isAdmin ? strRemove : '',
                             );
                           },
                         );
                       },
                     ),
                   ),
-                  const Center(child: TextWidget(text: 'No Join Requests Yet')),
+                  const Center(child: TextWidget(text: strAlertNoJoinReq)),
                 ],
               ),
             )
@@ -100,7 +101,7 @@ class GroupMembersScreen extends StatelessWidget {
       floatingActionButton: isAdmin
           ? CommonButton(
               onTap: () => Get.to(() => AddGroupMembers(group: group)),
-              text: 'Add Members',
+              text: strAddMembers,
               height: 58.w,
               verticalOutMargin: 10.w,
               horizontalOutMargin: 20.w,

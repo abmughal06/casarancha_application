@@ -30,19 +30,19 @@ class NewPostShareScreen extends StatelessWidget {
     final user = context.watch<UserModel?>();
     return Scaffold(
       appBar: primaryAppbar(
-        title: 'New Post',
+        title: strNewPost,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton:
           Consumer<CreatePostMethods>(builder: (context, state, b) {
         return CommonButton(
           showLoading: state.isSharingPost,
-          text: 'Share Post',
+          text: strSharePost,
           height: 58.w,
           verticalOutMargin: 10.w,
           horizontalOutMargin: 10.w,
           onTap: () => user == null
-              ? GlobalSnackBar.show(message: "Cannot post right now")
+              ? GlobalSnackBar.show(message: strAlertSharePost)
               : state.sharePost(
                   groupId: groupId,
                   user: user,
@@ -102,7 +102,7 @@ class NewPostShareScreen extends StatelessWidget {
                   builder: (context, m, b) {
                     return SwitchListTile(
                       visualDensity: const VisualDensity(horizontal: -3),
-                      title: const Text("Show post time"),
+                      title: const Text(strShowPstTime),
                       value: m.showPostTime,
                       onChanged: (value) {
                         // m.showPostTime = value;

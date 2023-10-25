@@ -1,4 +1,5 @@
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
@@ -25,9 +26,9 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final List<Widget> _myTabs = const [
-    Tab(text: 'People'),
-    Tab(text: 'Groups'),
-    Tab(text: 'Location'),
+    Tab(text: strSrcPeople),
+    Tab(text: strSrcGroup),
+    Tab(text: strSrcLocation),
   ];
 
   late TextEditingController searchController = TextEditingController();
@@ -39,7 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final search = Provider.of<SearchProvider>(context);
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: 'Search',
+        title: strSearch,
         elevation: 0,
         leading: const GhostModeBtn(),
       ),
@@ -92,8 +93,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 60),
                             child: TextWidget(
                               textAlign: TextAlign.center,
-                              text:
-                                  "Write user name above to search and follow them",
+                              text: strAlertSearch,
                             ),
                           ),
                         );
@@ -127,8 +127,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                             btnName:
                                 currentUser.followingsIds.contains(userSnap.id)
-                                    ? "Unfollow"
-                                    : "Follow",
+                                    ? strUnFollow
+                                    : strSrcFollow,
                           );
                         },
                       );
@@ -151,8 +151,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 60),
                             child: TextWidget(
                               textAlign: TextAlign.center,
-                              text:
-                                  "Write user name above to search and follow them",
+                              text: strAlertSearch,
                             ),
                           ),
                         );
@@ -187,8 +186,9 @@ class _SearchScreenState extends State<SearchScreen> {
                               }
                             },
                             isSearchScreen: true,
-                            btnText:
-                                isCurrentUserGroupMember ? 'Joined' : 'Join',
+                            btnText: isCurrentUserGroupMember
+                                ? strJoined
+                                : strSrcJoin,
                           );
                         },
                       );

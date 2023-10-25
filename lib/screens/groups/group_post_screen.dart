@@ -1,6 +1,7 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/group_member_screen.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -80,7 +81,7 @@ class GroupPostScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: TextWidget(
-                    text: 'Post On Group',
+                    text: strPostOnGrp,
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w400,
                     color: color55F,
@@ -130,7 +131,7 @@ class GroupPostScreen extends StatelessWidget {
                 if (filterList.isEmpty) {
                   return const Center(
                     child: TextWidget(
-                      text: "This group doesn't have any posts yet",
+                      text: strAlertGroupPost,
                     ),
                   );
                 }

@@ -110,6 +110,7 @@ class CommonButton extends StatelessWidget {
                   )
                 : isIcon
                     ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
                             padding:

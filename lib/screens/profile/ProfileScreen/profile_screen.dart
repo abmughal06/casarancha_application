@@ -1,6 +1,7 @@
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -79,16 +80,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   dividerColor: Colors.transparent,
                   tabs: const [
                     Tab(
-                      child: Text('Quotes'),
+                      child: Text(strQuote),
                     ),
                     Tab(
-                      child: Text('Images'),
+                      child: Text(strImages),
                     ),
                     Tab(
-                      child: Text('Videos'),
+                      child: Text(strVideos),
                     ),
                     Tab(
-                      child: Text('Music'),
+                      child: Text(strMusic),
                     ),
                   ],
                 ),
@@ -101,18 +102,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (post == null || user == null) {
                       return centerLoader();
                     }
-
-                    // updatePostCount(post
-                    //     .where((element) => element.creatorId == user.id)
-                    //     .map((e) => e)
-                    //     .toList()
-                    //     .length);
-
-                    // postCount.value = post
-                    //     .where((element) => element.creatorId == user.id)
-                    //     .map((e) => e)
-                    //     .toList()
-                    //     .length;
 
                     return Expanded(
                       child: TabBarView(

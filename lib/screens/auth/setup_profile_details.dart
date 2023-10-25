@@ -127,56 +127,6 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                         ],
                       ),
                     ),
-                    // GestureDetector(
-                    //   onTap: provider.getFromGallery,
-                    //   child: SizedBox(
-                    //     height: 120.h,
-                    //     width: 120.h,
-                    //     child: Stack(
-                    //       clipBehavior: Clip.none,
-                    //       fit: StackFit.passthrough,
-                    //       children: [
-                    //         provider.imageFilePicked != null
-                    //             ? Container(
-                    //                 height: 120,
-                    //                 width: 120,
-                    //                 alignment: Alignment.center,
-                    //                 decoration: BoxDecoration(
-                    //                     shape: BoxShape.circle,
-                    //                     image: DecorationImage(
-                    //                         image: FileImage(
-                    //                             provider.imageFilePicked!))),
-                    //               ) /* CircleAvatar(
-                    //                   radius: 20,s
-                    //                   backgroundImage:
-                    //                       Image.file(imageFilePicked!).image) */
-                    //             : provider.profileImage != null
-                    //                 ? imgProVerified(
-                    //                     profileImg: provider.profileImage,
-                    //                     idIsVerified: false)
-                    //                 : Container(
-                    //                     height: 120,
-                    //                     width: 120,
-                    //                     decoration: BoxDecoration(
-                    //                         shape: BoxShape.circle,
-                    //                         border: Border.all(
-                    //                             color: colorPrimaryA05, width: 1.5),
-                    //                         image: const DecorationImage(
-                    //                             fit: BoxFit.fitHeight,
-                    //                             image: AssetImage(
-                    //                                 imgUserPlaceHolder))),
-                    //                   ),
-                    //         Positioned(
-                    //           bottom: 5.h,
-                    //           right: 100.w,
-                    //           child: SvgPicture.asset(
-                    //             icProfileAdd,
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
                     heightBox(20.w),
                     TextEditingWidget(
                       controller: _firstNameController,
@@ -286,7 +236,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                 padding: EdgeInsets.all(20.w),
                 child: CommonButton(
                   height: 56.h,
-                  text: 'Continue',
+                  text: strContinue,
                   showLoading: provider.isLoading,
                   onTap: () async {
                     await provider.setupProfileData(

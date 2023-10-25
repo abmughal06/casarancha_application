@@ -15,6 +15,32 @@ var serverKey =
 class FirebaseMessagingService {
   FirebaseMessaging fcmMessage = FirebaseMessaging.instance;
 
+  updateUserFcmToken() async {
+    try {
+      if (FirebaseAuth.instance.currentUser != null) {
+        printLog('check1');
+        final token = await getFirebaseToken();
+        final ref = FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid);
+        final currentUser = await ref.get();
+
+        if (currentUser.data()!['fcmToken'] == token) {
+          printLog('check2');
+          return;
+        } else {
+          ref.update({
+            'fcmToken': token,
+          });
+        }
+      } else {
+        return;
+      }
+    } catch (e) {
+      printLog(e.toString());
+    }
+  }
+
   Future<UserModel> getCurrentUserDetails() async {
     var ref = FirebaseFirestore.instance
         .collection("users")
@@ -74,28 +100,30 @@ class FirebaseMessagingService {
     final result = await res;
     printLog(result.statusCode.toString());
 
-    final NotificationModel notification = NotificationModel(
-      id: appUserId,
-      appUserId: FirebaseAuth.instance.currentUser!.uid,
-      msg: msg,
-      imageUrl: imageUrl != null
-          ? imageUrl.isNotEmpty
-              ? imageUrl
-              : ''
-          : '',
-      isRead: isMessage,
-      createdDetails: CreatorDetails(
-          name: ghostmode ? "Ghost----" : model.name,
-          imageUrl: ghostmode ? "" : model.imageStr,
-          isVerified: model.isVerified),
-      createdAt: DateTime.now().toUtc().toString(),
-    );
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(appUserId)
-        .collection("notificationlist")
-        .doc()
-        .set(notification.toMap());
+    if (isMessage == false) {
+      final NotificationModel notification = NotificationModel(
+        id: appUserId,
+        appUserId: FirebaseAuth.instance.currentUser!.uid,
+        msg: msg,
+        imageUrl: imageUrl != null
+            ? imageUrl.isNotEmpty
+                ? imageUrl
+                : ''
+            : '',
+        isRead: false,
+        createdDetails: CreatorDetails(
+            name: ghostmode ? "Ghost----" : model.name,
+            imageUrl: ghostmode ? "" : model.imageStr,
+            isVerified: model.isVerified),
+        createdAt: DateTime.now().toUtc().toString(),
+      );
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(appUserId)
+          .collection("notificationlist")
+          .doc()
+          .set(notification.toMap());
+    }
   }
 
   Future<String?> getFirebaseToken() async {

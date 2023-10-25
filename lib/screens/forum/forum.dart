@@ -1,3 +1,4 @@
+import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +12,12 @@ class ForumsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: 'Forums',
+        title: strForum,
         elevation: 0.1,
         leading: const GhostModeBtn(),
       ),
       body: const Center(
-        child: Text('Forum Screen'),
+        child: Text(strAlertForum),
       ),
     );
   }
