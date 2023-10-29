@@ -203,7 +203,11 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void postComment({PostModel? postModel, UserModel? user, String? comment}) {
+  void postComment({
+    PostModel? postModel,
+    UserModel? user,
+    String? comment,
+  }) {
     var cmntRef = FirebaseFirestore.instance
         .collection("posts")
         .doc(postModel!.id)
@@ -250,6 +254,7 @@ class PostProvider extends ChangeNotifier {
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
+        notificationType: postModel.toMap(),
         imageUrl: postModel.mediaData[0].type == 'Photo'
             ? postModel.mediaData[0].link
             : '',
@@ -358,6 +363,7 @@ class PostProvider extends ChangeNotifier {
     FirebaseMessagingService().sendNotificationToUser(
       appUserId: appUser.id,
       devRegToken: recieverFCMToken,
+      notificationType: "msg",
       msg: "has sent you a post",
       isMessage: false,
       imageUrl: postModel.mediaData[0].type == 'Photo'

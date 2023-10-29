@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/utils/app_utils.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../models/user_model.dart';
+import '../../../../resources/firebase_cloud_messaging.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final postRef = FirebaseFirestore.instance.collection("posts");
@@ -29,9 +29,8 @@ class ProfileProvider extends ChangeNotifier {
 
     final appUserRef =
         FirebaseFirestore.instance.collection("users").doc(appUserId);
-    log(userModel!.id);
     try {
-      if (userModel.followingsIds.contains(appUserId)) {
+      if (userModel!.followingsIds.contains(appUserId)) {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayRemove([appUserId])
         });
@@ -39,7 +38,6 @@ class ProfileProvider extends ChangeNotifier {
           'followersIds':
               FieldValue.arrayRemove([FirebaseAuth.instance.currentUser!.uid])
         });
-        log('Follow hogya');
       } else {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayUnion([appUserId])
@@ -48,9 +46,13 @@ class ProfileProvider extends ChangeNotifier {
           'followersIds':
               FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
         });
-        log('Follow nai hwa');
-        var ref = await currentUserRef.get();
-        log(ref.id);
+        final appUserDevToken = await appUserRef.get();
+        FirebaseMessagingService().sendNotificationToUser(
+            isMessage: false,
+            appUserId: appUserId!,
+            notificationType: "simple",
+            devRegToken: appUserDevToken.data()!['fcmToken'],
+            msg: "follow you");
       }
     } catch (e) {
       log('$e');

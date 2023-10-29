@@ -320,6 +320,8 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                   imageUrl: storyItems[currentIndex.value].type == 'Photo'
                       ? storyItems[currentIndex.value].link
                       : '',
+                  notificationType: "msg",
+
                   isMessage: true,
                   // creatorDetails: creatorDetails,
                   devRegToken: recieverFCMToken,

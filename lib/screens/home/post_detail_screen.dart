@@ -5,6 +5,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_creator_prf_tile.dart';
+import 'package:casarancha/widgets/shared/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -56,7 +57,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       builder: (context, post, b) {
                         if (post == null) {
                           log(widget.postModel.id);
-                          return const CircularProgressIndicator.adaptive();
+                          return const Skeleton(
+                            height: 9 / 16,
+                            width: double.infinity,
+                            radius: 12,
+                          );
                         } else {
                           return Column(
                             mainAxisAlignment: MainAxisAlignment.start,

@@ -38,10 +38,10 @@ class PostCommentTile extends StatelessWidget {
           return Container();
         }
         return ListTile(
+          minVerticalPadding: 0,
           onTap: isFeedTile
               ? () => Get.to(() => PostDetailScreen(postModel: postModel!))
               : null,
-          isThreeLine: true,
           leading: InkWell(
             onTap: isFeedTile
                 ? null
@@ -53,11 +53,16 @@ class PostCommentTile extends StatelessWidget {
               width: 46.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.amber,
-                image: DecorationImage(
-                  image: CachedNetworkImageProvider(appUser.imageStr),
-                  fit: BoxFit.cover,
-                ),
+                color: Colors.grey.shade100,
+                image: appUser.imageStr.isEmpty
+                    ? const DecorationImage(
+                        image: AssetImage(imgUserPlaceHolder),
+                        fit: BoxFit.cover,
+                      )
+                    : DecorationImage(
+                        image: CachedNetworkImageProvider(appUser.imageStr),
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
           ),
