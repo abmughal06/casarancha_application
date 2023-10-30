@@ -207,12 +207,16 @@ class PostProvider extends ChangeNotifier {
     PostModel? postModel,
     UserModel? user,
     String? comment,
+    String? groupId,
   }) {
-    var cmntRef = FirebaseFirestore.instance
-        .collection("posts")
-        .doc(postModel!.id)
-        .collection("comments")
-        .doc();
+    var postRef = groupId == null
+        ? FirebaseFirestore.instance.collection("posts").doc(postModel!.id)
+        : FirebaseFirestore.instance
+            .collection('groups')
+            .doc(groupId)
+            .collection("posts")
+            .doc(postModel!.id);
+    var cmntRef = postRef.collection("comments").doc();
     cmntRef.set({});
     var cmntId = cmntRef.id;
 
@@ -228,23 +232,14 @@ class PostProvider extends ChangeNotifier {
       postId: postModel.id,
     );
 
-    FirebaseFirestore.instance
-        .collection("posts")
-        .doc(postModel.id)
+    postRef
         .collection("comments")
         .doc(cmntId)
         .set(cmnt.toMap(), SetOptions(merge: true))
         .then((value) async {
-      FirebaseFirestore.instance.collection("posts").doc(postModel.id).set({
+      postRef.set({
         "commentIds": FieldValue.arrayUnion([cmntId])
       }, SetOptions(merge: true));
-
-      // FirebaseFirestore.instance
-      //     .collection("posts")
-      //     .doc(postModel.id)
-      //     .collection('comments')
-      //     .doc(cmntId)
-      //     .set({"commentIds": listOfCommentsId}, SetOptions(merge: true));
 
       var recieverRef = await FirebaseFirestore.instance
           .collection("users")
@@ -254,13 +249,13 @@ class PostProvider extends ChangeNotifier {
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
-        notificationType: postModel.toMap(),
-        imageUrl: postModel.mediaData[0].type == 'Photo'
-            ? postModel.mediaData[0].link
-            : '',
+        notificationType: 'feed_post_cmnt',
+        content: postModel.toMap(),
+        groupId: groupId,
         isMessage: false,
         devRegToken: recieverFCMToken,
-        msg: "has commented on your post.",
+        msg:
+            "has commented on your ${groupId == null ? "post" : "group post"}.",
       );
     });
   }
@@ -366,7 +361,7 @@ class PostProvider extends ChangeNotifier {
       notificationType: "msg",
       msg: "has sent you a post",
       isMessage: false,
-      imageUrl: postModel.mediaData[0].type == 'Photo'
+      content: postModel.mediaData[0].type == 'Photo'
           ? postModel.mediaData[0].link
           : "",
     );

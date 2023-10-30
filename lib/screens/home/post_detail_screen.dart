@@ -101,7 +101,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                   ),
                   StreamProvider.value(
-                    value: DataProvider().comment(widget.postModel.id),
+                    value: DataProvider().comment(
+                        cmntId: widget.postModel.id, groupId: widget.groupId),
                     initialData: null,
                     child: Consumer<List<Comment>?>(
                       builder: (context, comment, b) {
@@ -137,6 +138,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             ),
             PostCommentField(
               postModel: widget.postModel,
+              groupId: widget.groupId,
               commentController: coommenController,
             )
           ],

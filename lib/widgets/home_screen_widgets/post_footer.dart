@@ -207,7 +207,8 @@ class CustomPostFooter extends StatelessWidget {
         Visibility(
           visible: isPostDetail! ? false : postModel.commentIds.isNotEmpty,
           child: StreamProvider.value(
-            value: DataProvider().comment(postModel.id),
+            value:
+                DataProvider().comment(cmntId: postModel.id, groupId: groupId),
             initialData: null,
             child: Consumer<List<Comment>?>(
               builder: (context, comment, b) {

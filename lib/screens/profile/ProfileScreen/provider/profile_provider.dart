@@ -50,7 +50,9 @@ class ProfileProvider extends ChangeNotifier {
         FirebaseMessagingService().sendNotificationToUser(
             isMessage: false,
             appUserId: appUserId!,
-            notificationType: "simple",
+            groupId: null,
+            content: null,
+            notificationType: "user_follow",
             devRegToken: appUserDevToken.data()!['fcmToken'],
             msg: "follow you");
       }

@@ -5,6 +5,7 @@ import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/app_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,8 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../screens/home/notification_screen.dart';
 
 var serverKey =
     "key=AAAAYo5xlRE:APA91bHxh2fiJpTazsOCH0k_iqbz9e-Ccg9EaQsXyJna163xViTcwevm04LvlIv7DUBWIboSvKFFsCQdJ9YQUEZHJVxM25zXaO9dash0eGp9dUGeBJu3-va9-zQ0S6LikRBskcdK5HDq";
@@ -72,10 +71,11 @@ class FirebaseMessagingService {
 
   sendNotificationToUser(
       {String? devRegToken,
-      String? imageUrl,
+      dynamic content,
       String? msg,
+      String? groupId,
       required bool isMessage,
-      required dynamic notificationType,
+      required String notificationType,
       required String appUserId}) async {
     Map<String, String> header = {
       "Content-Type": "application/json",
@@ -104,6 +104,7 @@ class FirebaseMessagingService {
         "status": "done",
         "userRequestId": model.id,
         "notification_type": notificationType,
+        "content": content,
       },
       "to": devRegToken
     };
@@ -118,14 +119,12 @@ class FirebaseMessagingService {
 
     if (isMessage == false) {
       final NotificationModel notification = NotificationModel(
-        id: appUserId,
-        appUserId: FirebaseAuth.instance.currentUser!.uid,
+        sentToId: appUserId,
+        sentById: model.id,
         msg: msg,
-        imageUrl: imageUrl != null
-            ? imageUrl.isNotEmpty
-                ? imageUrl
-                : ''
-            : '',
+        content: content,
+        groupId: groupId,
+        notificationType: notificationType,
         isRead: false,
         createdDetails: CreatorDetails(
             name: ghostmode ? "Ghost----" : model.name,
@@ -136,7 +135,7 @@ class FirebaseMessagingService {
       FirebaseFirestore.instance
           .collection("users")
           .doc(appUserId)
-          .collection("notificationlist")
+          .collection("notificationList")
           .doc()
           .set(notification.toMap());
     }
@@ -203,11 +202,10 @@ class FirebaseMessagingService {
               name: appUserData.name,
               imageUrl: appUserData.imageStr,
               isVerified: appUserData.isVerified)));
-    } else if (strNot == "simple") {
-      Get.to(() => const NotificationScreen());
+    } else if (strNot == "user_follow") {
+      navigateToAppUserScreen(notificationData['userRequestId'], context);
     } else {
-      print(strNot);
-      final post = PostModel.fromMap(jsonDecode(strNot));
+      final post = PostModel.fromMap(jsonDecode(notificationData['content']));
 
       Get.to(() => PostDetailScreen(postModel: post, groupId: null));
     }

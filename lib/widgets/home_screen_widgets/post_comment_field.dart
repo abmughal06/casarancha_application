@@ -16,10 +16,12 @@ class PostCommentField extends StatelessWidget {
     Key? key,
     required this.commentController,
     required this.postModel,
+    this.groupId,
   }) : super(key: key);
 
   final TextEditingController commentController;
   final PostModel postModel;
+  final String? groupId;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +66,7 @@ class PostCommentField extends StatelessWidget {
                         postProvider.postComment(
                           postModel: postModel,
                           comment: commentController.text,
+                          groupId: groupId,
                           user: user,
                         );
 
