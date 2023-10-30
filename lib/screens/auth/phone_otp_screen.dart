@@ -55,7 +55,7 @@ class PhoneOTPScreen extends StatelessWidget {
                       TextWidget(
                         textAlign: TextAlign.center,
                         text:
-                            "Please Enter your phone\nnumber below to continue login",
+                            "Please Enter your verification\ncode below to continue login",
                         fontSize: 16.sp,
                         color: color080,
                         fontWeight: FontWeight.w400,

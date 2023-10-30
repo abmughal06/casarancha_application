@@ -2,6 +2,7 @@ import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
+import 'package:casarancha/screens/dashboard/dashboard.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/profile_top_loader.dart';
@@ -34,6 +35,7 @@ void navigateToAppUserScreen(userId, context) {
   if (userId != FirebaseAuth.instance.currentUser!.uid) {
     Get.to(() => AppUserScreen(appUserId: userId));
   } else {
+    Get.off(() => const DashBoard());
     final dasboardController =
         Provider.of<DashboardProvider>(context, listen: false);
     dasboardController.changePage(5);

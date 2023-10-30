@@ -147,8 +147,10 @@ class ChatProvider extends ChangeNotifier {
           .doc(appUser.id)
           .get();
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      printLog(recieverRef.data()!['id']);
       FirebaseMessagingService().sendNotificationToUser(
-        appUserId: recieverRef.id,
+        appUserId: recieverRef.data()!['id'],
+        notificationType: "msg",
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages message",
         isMessage: true,
@@ -264,6 +266,7 @@ class ChatProvider extends ChangeNotifier {
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
         isMessage: true,
+        notificationType: "msg",
         msg: "has sent you a $unreadMessages message in ghost",
       );
 
@@ -452,6 +455,7 @@ class ChatProvider extends ChangeNotifier {
           .get();
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
       FirebaseMessagingService().sendNotificationToUser(
+        notificationType: "msg",
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages attachment",
@@ -591,6 +595,7 @@ class ChatProvider extends ChangeNotifier {
         appUserId: recieverRef.id,
         isMessage: true,
         devRegToken: recieverFCMToken,
+        notificationType: "msg",
         msg: "has sent you a $unreadMessages attachment",
       );
       clearLists();
@@ -1046,6 +1051,7 @@ class ChatProvider extends ChangeNotifier {
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
         isMessage: true,
+        notificationType: "msg",
         msg: "has sent you a $unreadMessages voice message",
       );
 
@@ -1168,6 +1174,7 @@ class ChatProvider extends ChangeNotifier {
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.id,
         isMessage: true,
+        notificationType: "msg",
         devRegToken: recieverFCMToken,
         msg: "has sent you a $unreadMessages voice message",
       );

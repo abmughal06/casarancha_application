@@ -317,9 +317,12 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
 
                 FirebaseMessagingService().sendNotificationToUser(
                   appUserId: recieverRef.id,
-                  imageUrl: storyItems[currentIndex.value].type == 'Photo'
+                  content: storyItems[currentIndex.value].type == 'Photo'
                       ? storyItems[currentIndex.value].link
                       : '',
+                  groupId: null,
+                  notificationType: "msg",
+
                   isMessage: true,
                   // creatorDetails: creatorDetails,
                   devRegToken: recieverFCMToken,
