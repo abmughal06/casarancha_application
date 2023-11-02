@@ -667,7 +667,7 @@ class PostCommentReplyTile extends StatelessWidget {
                                           TextWidget(
                                             onTap: () => Get.to(() =>
                                                 SharePostScreen(
-                                                    postModel: postModel!)),
+                                                    postModel: postModel)),
                                             text: "Share",
                                             fontWeight: FontWeight.w600,
                                           ),
