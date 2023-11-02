@@ -131,6 +131,31 @@ class DataProvider extends ChangeNotifier {
             .toList());
   }
 
+  Stream<List<Comment>?> commentReply({postId, groupId, cmntId}) {
+    var ref = groupId == null
+        ? FirebaseFirestore.instance
+            .collection(cPosts)
+            .doc(postId)
+            .collection(cComments)
+            .doc(cmntId)
+            .collection('reply')
+        : FirebaseFirestore.instance
+            .collection(cGroups)
+            .doc(groupId)
+            .collection(cPosts)
+            .doc(postId)
+            .collection(cComments)
+            .doc(cmntId)
+            .collection('reply');
+    return ref.orderBy("createdAt", descending: false).snapshots().map(
+        (event) => event.docs
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data().containsKey('postId'))
+            .map((e) => Comment.fromMap(e.data()))
+            .toList());
+  }
+
   Stream<Comment?>? getSingleComment({postId, cmntId}) {
     return FirebaseFirestore.instance
         .collection(cPosts)

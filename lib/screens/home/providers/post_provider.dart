@@ -1,7 +1,9 @@
 import 'dart:developer';
 
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/app_utils.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,10 @@ class PostProvider extends ChangeNotifier {
   final currentUserRef = FirebaseFirestore.instance
       .collection("users")
       .doc(FirebaseAuth.instance.currentUser!.uid);
+
+  final postCommentController = TextEditingController();
+  final FocusNode postCommentFocus = FocusNode();
+  String? repCommentId;
 
   void toggleLikeDislike({PostModel? postModel, String? groupId}) async {
     final postRef = groupId != null
@@ -209,55 +215,512 @@ class PostProvider extends ChangeNotifier {
     String? comment,
     String? groupId,
   }) {
-    var postRef = groupId == null
-        ? FirebaseFirestore.instance.collection("posts").doc(postModel!.id)
-        : FirebaseFirestore.instance
-            .collection('groups')
-            .doc(groupId)
-            .collection("posts")
-            .doc(postModel!.id);
-    var cmntRef = postRef.collection("comments").doc();
-    cmntRef.set({});
-    var cmntId = cmntRef.id;
+    if (repCommentId == null) {
+      try {
+        var postRef = groupId == null
+            ? FirebaseFirestore.instance.collection("posts").doc(postModel!.id)
+            : FirebaseFirestore.instance
+                .collection('groups')
+                .doc(groupId)
+                .collection("posts")
+                .doc(postModel!.id);
+        var cmntRef = postRef.collection("comments").doc();
+        cmntRef.set({});
+        var cmntId = cmntRef.id;
 
-    var cmnt = Comment(
-      id: cmntId,
-      creatorId: FirebaseAuth.instance.currentUser!.uid,
-      creatorDetails: CreatorDetails(
-          name: user!.name,
-          imageUrl: user.imageStr,
-          isVerified: user.isVerified),
-      createdAt: DateTime.now().toIso8601String(),
-      message: comment!,
-      postId: postModel.id,
-    );
+        var cmnt = Comment(
+          id: cmntId,
+          creatorId: FirebaseAuth.instance.currentUser!.uid,
+          creatorDetails: CreatorDetails(
+              name: user!.name,
+              imageUrl: user.imageStr,
+              isVerified: user.isVerified),
+          createdAt: DateTime.now().toIso8601String(),
+          message: comment!,
+          postId: postModel.id,
+          dislikeIds: [],
+          likeIds: [],
+          replyIds: [],
+        );
 
-    postRef
-        .collection("comments")
-        .doc(cmntId)
-        .set(cmnt.toMap(), SetOptions(merge: true))
-        .then((value) async {
-      postRef.set({
-        "commentIds": FieldValue.arrayUnion([cmntId])
-      }, SetOptions(merge: true));
+        postRef
+            .collection("comments")
+            .doc(cmntId)
+            .set(cmnt.toMap(), SetOptions(merge: true))
+            .then((value) async {
+          postRef.set({
+            "commentIds": FieldValue.arrayUnion([cmntId])
+          }, SetOptions(merge: true));
 
-      var recieverRef = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(postModel.creatorId)
-          .get();
+          var recieverRef = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(postModel.creatorId)
+              .get();
 
-      var recieverFCMToken = recieverRef.data()!['fcmToken'];
-      FirebaseMessagingService().sendNotificationToUser(
-        appUserId: recieverRef.id,
-        notificationType: 'feed_post_cmnt',
-        content: postModel.toMap(),
-        groupId: groupId,
-        isMessage: false,
-        devRegToken: recieverFCMToken,
-        msg:
-            "has commented on your ${groupId == null ? "post" : "group post"}.",
-      );
-    });
+          var recieverFCMToken = recieverRef.data()!['fcmToken'];
+          FirebaseMessagingService().sendNotificationToUser(
+            appUserId: recieverRef.id,
+            notificationType: 'feed_post_cmnt',
+            content: postModel.toMap(),
+            groupId: groupId,
+            isMessage: false,
+            devRegToken: recieverFCMToken,
+            msg:
+                "has commented on your ${groupId == null ? "post" : "group post"}.",
+          );
+        });
+      } catch (e) {
+        printLog(e.toString());
+      } finally {
+        postCommentFocus.unfocus();
+        postCommentController.clear();
+      }
+    }
+  }
+
+  void postCommentReply({
+    PostModel? postModel,
+    String? recieverId,
+    UserModel? user,
+    String? groupId,
+  }) {
+    if (repCommentId != null) {
+      try {
+        var cmntRef = groupId == null
+            ? FirebaseFirestore.instance
+                .collection("posts")
+                .doc(postModel!.id)
+                .collection("comments")
+                .doc(repCommentId)
+            : FirebaseFirestore.instance
+                .collection('groups')
+                .doc(groupId)
+                .collection("posts")
+                .doc(postModel!.id)
+                .collection("comments")
+                .doc(repCommentId);
+        var repRef = cmntRef.collection("reply").doc();
+        repRef.set({});
+        var repId = repRef.id;
+
+        var rep = Comment(
+          id: repId,
+          creatorId: FirebaseAuth.instance.currentUser!.uid,
+          creatorDetails: CreatorDetails(
+              name: user!.name,
+              imageUrl: user.imageStr,
+              isVerified: user.isVerified),
+          createdAt: DateTime.now().toIso8601String(),
+          message: postCommentController.text.trim(),
+          postId: postModel.id,
+          dislikeIds: [],
+          likeIds: [],
+          replyIds: [],
+        );
+
+        cmntRef
+            .collection("reply")
+            .doc(repId)
+            .set(rep.toMap(), SetOptions(merge: true))
+            .then((value) async {
+          cmntRef.set({
+            "replyIds": FieldValue.arrayUnion([repId])
+          }, SetOptions(merge: true));
+
+          var recieverRef = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(user.id)
+              .get();
+
+          var recieverFCMToken = recieverRef.data()!['fcmToken'];
+          FirebaseMessagingService().sendNotificationToUser(
+            appUserId: recieverRef.id,
+            notificationType: 'feed_post_cmnt',
+            content: postModel.toMap(),
+            groupId: groupId,
+            isMessage: false,
+            devRegToken: recieverFCMToken,
+            msg:
+                "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
+          );
+        });
+      } catch (e) {
+        printLog(e.toString());
+      } finally {
+        postCommentFocus.unfocus();
+        postCommentController.clear();
+        repCommentId = null;
+      }
+    }
+  }
+
+  void toggleLikeComment({
+    String? groupId,
+    String? postId,
+    String? cmntId,
+  }) async {
+    try {
+      var cmnt = groupId == null
+          ? FirebaseFirestore.instance
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+          : FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId);
+
+      var cmntRef = await cmnt.get();
+
+      if (cmntRef.data()!.containsKey('likeIds')) {
+        if (cmntRef.data()!['likeIds'].contains(currentUserUID)) {
+          await cmnt.set({
+            'likeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        } else {
+          await cmnt.set({
+            'likeIds': FieldValue.arrayUnion([currentUserUID])
+          }, SetOptions(merge: true));
+          await cmnt.set({
+            'dislikeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        }
+      } else {
+        await cmnt.set({
+          'likeIds': FieldValue.arrayUnion([currentUserUID])
+        }, SetOptions(merge: true));
+        await cmnt.set({
+          'dislikeIds': FieldValue.arrayRemove([currentUserUID])
+        }, SetOptions(merge: true));
+      }
+
+      //   var recieverRef = await FirebaseFirestore.instance
+      //       .collection("users")
+      //       .doc(user.id)
+      //       .get();
+
+      //   var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      //   FirebaseMessagingService().sendNotificationToUser(
+      //     appUserId: recieverRef.id,
+      //     notificationType: 'feed_post_cmnt',
+      //     content: postModel.toMap(),
+      //     groupId: groupId,
+      //     isMessage: false,
+      //     devRegToken: recieverFCMToken,
+      //     msg:
+      //         "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
+      //   );
+      // });
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      postCommentFocus.unfocus();
+      repCommentId = null;
+    }
+  }
+
+  void toggleDislikeComment({
+    String? groupId,
+    String? postId,
+    String? cmntId,
+  }) async {
+    try {
+      var cmnt = groupId == null
+          ? FirebaseFirestore.instance
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+          : FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId);
+
+      var cmntRef = await cmnt.get();
+
+      if (cmntRef.data()!.containsKey('dislikeIds')) {
+        if (cmntRef.data()!['dislikeIds'].contains(currentUserUID)) {
+          await cmnt.set({
+            'dislikeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        } else {
+          await cmnt.set({
+            'dislikeIds': FieldValue.arrayUnion([currentUserUID])
+          }, SetOptions(merge: true));
+          await cmnt.set({
+            'likeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        }
+      } else {
+        await cmnt.set({
+          'dislikeIds': FieldValue.arrayUnion([currentUserUID])
+        }, SetOptions(merge: true));
+        await cmnt.set({
+          'likeIds': FieldValue.arrayRemove([currentUserUID])
+        }, SetOptions(merge: true));
+      }
+
+      //   var recieverRef = await FirebaseFirestore.instance
+      //       .collection("users")
+      //       .doc(user.id)
+      //       .get();
+
+      //   var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      //   FirebaseMessagingService().sendNotificationToUser(
+      //     appUserId: recieverRef.id,
+      //     notificationType: 'feed_post_cmnt',
+      //     content: postModel.toMap(),
+      //     groupId: groupId,
+      //     isMessage: false,
+      //     devRegToken: recieverFCMToken,
+      //     msg:
+      //         "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
+      //   );
+      // });
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      postCommentFocus.unfocus();
+      repCommentId = null;
+    }
+  }
+
+  void toggleLikeCommentReply({
+    String? groupId,
+    String? postId,
+    String? cmntId,
+    String? repId,
+  }) async {
+    try {
+      var cmnt = groupId == null
+          ? FirebaseFirestore.instance
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .collection('reply')
+              .doc(repId)
+          : FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .collection('reply')
+              .doc(repId);
+
+      var cmntRef = await cmnt.get();
+
+      if (cmntRef.data()!.containsKey('likeIds')) {
+        if (cmntRef.data()!['likeIds'].contains(currentUserUID)) {
+          await cmnt.set({
+            'likeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        } else {
+          await cmnt.set({
+            'likeIds': FieldValue.arrayUnion([currentUserUID])
+          }, SetOptions(merge: true));
+          await cmnt.set({
+            'dislikeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        }
+      } else {
+        await cmnt.set({
+          'likeIds': FieldValue.arrayUnion([currentUserUID])
+        }, SetOptions(merge: true));
+        await cmnt.set({
+          'dislikeIds': FieldValue.arrayRemove([currentUserUID])
+        }, SetOptions(merge: true));
+      }
+
+      //   var recieverRef = await FirebaseFirestore.instance
+      //       .collection("users")
+      //       .doc(user.id)
+      //       .get();
+
+      //   var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      //   FirebaseMessagingService().sendNotificationToUser(
+      //     appUserId: recieverRef.id,
+      //     notificationType: 'feed_post_cmnt',
+      //     content: postModel.toMap(),
+      //     groupId: groupId,
+      //     isMessage: false,
+      //     devRegToken: recieverFCMToken,
+      //     msg:
+      //         "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
+      //   );
+      // });
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      postCommentFocus.unfocus();
+      repCommentId = null;
+    }
+  }
+
+  void toggleDislikeCommentReply({
+    String? groupId,
+    String? postId,
+    String? cmntId,
+    String? repId,
+  }) async {
+    try {
+      var cmnt = groupId == null
+          ? FirebaseFirestore.instance
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .collection('reply')
+              .doc(repId)
+          : FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .collection('reply')
+              .doc(repId);
+
+      var cmntRef = await cmnt.get();
+
+      if (cmntRef.data()!.containsKey('dislikeIds')) {
+        if (cmntRef.data()!['dislikeIds'].contains(currentUserUID)) {
+          await cmnt.set({
+            'dislikeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        } else {
+          await cmnt.set({
+            'dislikeIds': FieldValue.arrayUnion([currentUserUID])
+          }, SetOptions(merge: true));
+          await cmnt.set({
+            'likeIds': FieldValue.arrayRemove([currentUserUID])
+          }, SetOptions(merge: true));
+        }
+      } else {
+        await cmnt.set({
+          'dislikeIds': FieldValue.arrayUnion([currentUserUID])
+        }, SetOptions(merge: true));
+        await cmnt.set({
+          'likeIds': FieldValue.arrayRemove([currentUserUID])
+        }, SetOptions(merge: true));
+      }
+
+      //   var recieverRef = await FirebaseFirestore.instance
+      //       .collection("users")
+      //       .doc(user.id)
+      //       .get();
+
+      //   var recieverFCMToken = recieverRef.data()!['fcmToken'];
+      //   FirebaseMessagingService().sendNotificationToUser(
+      //     appUserId: recieverRef.id,
+      //     notificationType: 'feed_post_cmnt',
+      //     content: postModel.toMap(),
+      //     groupId: groupId,
+      //     isMessage: false,
+      //     devRegToken: recieverFCMToken,
+      //     msg:
+      //         "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
+      //   );
+      // });
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      postCommentFocus.unfocus();
+      repCommentId = null;
+    }
+  }
+
+  void deleteComment({String? postId, String? cmntId, String? groupId}) async {
+    try {
+      groupId == null
+          ? await FirebaseFirestore.instance
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .delete()
+          : await FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .delete();
+
+      var postRef = groupId == null
+          ? FirebaseFirestore.instance.collection("posts").doc(postId)
+          : FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId);
+
+      await postRef.update({
+        "commentIds": FieldValue.arrayRemove([cmntId])
+      });
+    } catch (e) {
+      GlobalSnackBar.show(message: e.toString());
+    } finally {
+      Get.back();
+    }
+  }
+
+  void deleteCommentReply(
+      {String? postId, String? cmntId, String? groupId, String? repId}) async {
+    try {
+      groupId == null
+          ? await FirebaseFirestore.instance
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .collection('reply')
+              .doc(repId)
+              .delete()
+          : await FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId)
+              .collection("comments")
+              .doc(cmntId)
+              .collection('reply')
+              .doc(repId)
+              .delete();
+
+      var cmntRef = groupId == null
+          ? FirebaseFirestore.instance
+              .collection("posts")
+              .doc(postId)
+              .collection('comments')
+              .doc(cmntId)
+          : FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection("posts")
+              .doc(postId)
+              .collection('comments')
+              .doc(cmntId);
+
+      await cmntRef.update({
+        "replyIds": FieldValue.arrayRemove([repId])
+      });
+    } catch (e) {
+      GlobalSnackBar.show(message: e.toString());
+    } finally {
+      Get.back();
+    }
   }
 
   var unreadMessages = 0;

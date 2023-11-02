@@ -239,10 +239,11 @@ class CustomPostFooter extends StatelessWidget {
                 var cmnt = data;
                 return cmnt.message.isEmpty
                     ? Container()
-                    : PostCommentTile(
+                    : FeedPostCommentTile(
                         cmnt: cmnt,
                         isFeedTile: true,
                         postModel: postModel,
+                        groupId: groupId,
                       );
               },
             ),

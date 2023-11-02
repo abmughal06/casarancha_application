@@ -139,6 +139,7 @@ class TextEditingWidget extends StatelessWidget {
         cursorColor: color239,
         onChanged: onChanged,
         onEditingComplete: onEditingComplete,
+        onTapOutside: (v) => FocusScope.of(context).unfocus(),
         decoration: InputDecoration(
           enabled: true,
           counterText: counterText ?? "",
