@@ -3,6 +3,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
 import '../../../widgets/common_widgets.dart';
+import '../../../widgets/profle_screen_widgets/dynamic_links.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
 import '../../../widgets/profle_screen_widgets/music_grid.dart';
 import '../../../widgets/profle_screen_widgets/profile_menu.dart';
@@ -26,6 +28,21 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  DynamicLinkHelper dhelper = DynamicLinkHelper();
+  @override
+  void initState() {
+    dhelper.initDynamicLinks((openLink) {
+      print(openLink);
+      if (openLink.link.path == FirebaseAuth.instance.currentUser!.uid) {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()));
+      } else {
+        print('===========================+> Link Error');
+      }
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();
