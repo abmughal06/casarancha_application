@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:developer' as dev;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -60,6 +63,17 @@ class AppUtils {
     );
   }
 
+  String generateRandomNumber() {
+    Random random = Random();
+    String result = '';
+
+    for (int i = 0; i < 6; i++) {
+      result += random.nextInt(10).toString();
+    }
+
+    return result;
+  }
+
   String convertSingleToTwoDigit(String singleDigit) {
     return (int.parse(singleDigit) < 10 ? "0$singleDigit" : singleDigit);
   }
@@ -100,6 +114,6 @@ class AppUtils {
 
 printLog(msg) {
   if (kDebugMode) {
-    print(msg);
+    dev.log(msg);
   }
 }

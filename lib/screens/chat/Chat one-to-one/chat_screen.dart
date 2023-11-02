@@ -1,23 +1,23 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/media_details.dart';
+import 'dart:io';
+
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/post_creator_details.dart';
-import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/utils/snackbar.dart';
-import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:video_player/video_player.dart';
+import 'package:provider/provider.dart';
 
+import '../../../models/user_model.dart';
+import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
-import '../../../widgets/chat_screen_widgets/chat_post_tile.dart';
-import '../../../widgets/chat_screen_widgets/chat_story_tile.dart';
-import '../../../widgets/chat_screen_widgets/chat_tile.dart';
+import '../../../widgets/chat_screen_widgets/chat_input_field.dart';
+import '../../../widgets/chat_screen_widgets/chat_screen_message_tiles.dart';
+import '../../../widgets/chat_screen_widgets/chat_user_app_bar.dart';
 import '../../../widgets/common_widgets.dart';
-import '../../home/post_detail_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final String appUserId;
@@ -35,66 +35,40 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class _ChatScreenState extends State<ChatScreen>
+    with AutomaticKeepAliveClientMixin<ChatScreen> {
+  late ChatProvider chatProvider;
 
-  TextEditingController chatController = TextEditingController();
+  @override
+  void dispose() {
+    chatProvider.clearMessageController();
+    chatProvider.clearListsondispose();
+    chatProvider.recordedFilePath = null;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    final currentUser = context.watch<UserModel>();
+    final users = context.watch<List<UserModel>>();
+    final appUser =
+        users.where((element) => element.id == widget.appUserId).first;
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(
-            Icons.keyboard_arrow_left,
-            color: Colors.black,
-          ),
+          icon: SvgPicture.asset(icIosBackArrow),
           onPressed: () {
             Get.back();
           },
         ),
+        elevation: 1,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        title: ListTile(
-          onTap: () {},
-          contentPadding: EdgeInsets.zero,
-          title: Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        WidgetSpan(
-                          child: Text(
-                            widget.creatorDetails.name,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        WidgetSpan(child: widthBox(5.w)),
-                        WidgetSpan(
-                          child: Visibility(
-                              visible: widget.creatorDetails.isVerified,
-                              child: SvgPicture.asset(icVerifyBadge)),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          subtitle: const Text('Live'),
-          leading: CircleAvatar(
-            backgroundImage: widget.creatorDetails.imageUrl.isNotEmpty
-                ? CachedNetworkImageProvider(
-                    widget.creatorDetails.imageUrl,
-                  )
-                : null,
-          ),
+        backgroundColor: colorWhite,
+        title: ChatScreenUserAppBar(
+          creatorDetails: widget.creatorDetails,
+          appUserId: widget.appUserId,
         ),
         actions: [
           Padding(
@@ -102,9 +76,6 @@ class _ChatScreenState extends State<ChatScreen> {
             child: svgImgButton(
                 svgIcon: icChatVideo,
                 onTap: () {
-                  // Get.to(
-                  //   () => const VideoCallScreen(),
-                  // );
                   GlobalSnackBar.show(message: "Comming Soon");
                 }),
           ),
@@ -113,127 +84,80 @@ class _ChatScreenState extends State<ChatScreen> {
             child: svgImgButton(
                 svgIcon: icChatCall,
                 onTap: () {
-                  // Get.to(
-                  //   () => const AudioCallScreen(),
-                  // );
                   GlobalSnackBar.show(message: "Comming Soon");
                 }),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          StreamBuilder<List<Message>?>(
-            stream: DataProvider().messages(widget.appUserId),
-            builder: (context, messages) {
-              if (messages.hasData) {
-                return Expanded(
+      body: StreamProvider.value(
+        value: DataProvider().messages(widget.appUserId, false),
+        initialData: null,
+        child: Consumer<List<Message>?>(
+          builder: (context, messages, b) {
+            if (messages == null) {
+              return const Center(child: CircularProgressIndicator.adaptive());
+            }
+            return Column(
+              children: [
+                Expanded(
                   child: ListView.builder(
-                    itemCount: messages.data!.length,
+                    itemCount: messages.length,
                     reverse: true,
+                    padding: const EdgeInsets.only(top: 12),
                     itemBuilder: (context, index) {
-                      final message = messages.data![index];
+                      final message = messages[index];
+                      // log(message.content.toString());
 
                       final isMe = message.sentToId == widget.appUserId;
-                      final isSeen = message.isSeen;
-
-                      if (message.type == "Photo" || message.type == "Qoute") {
-                        final prePost = message.content;
-                        final postModel = PostModel.fromMap(prePost);
-                        return InkWell(
-                          onTap: () => Get.to(() => PostDetailScreen(
-                                postModel: postModel,
-                              )),
-                          child: ChatPostTile(
-                            message: message,
-                            appUserId: widget.appUserId,
-                            isSeen: isSeen,
-                            isMe: isMe,
-                          ),
+                      if (messages.isNotEmpty) {
+                        chatProvider.resetMessageCount(
+                          currentUserId: currentUser.id,
+                          appUserId: appUser.id,
+                          messageid: message.id,
                         );
-                      } else if (message.type == "Text") {
-                        return ChatTile(
-                          message: message.content,
-                          appUserId: widget.appUserId,
-                          isSeen: message.isSeen,
-                          isMe: isMe,
-                          date: message.createdAt,
-                        );
-                      } else if (message.type == "Video") {
-                        final prePost = message.content;
-                        final postModel = PostModel.fromMap(prePost);
-                        VideoPlayerController videoPlayerController;
-                        videoPlayerController = VideoPlayerController.network(
-                            postModel.mediaData[0].link);
-                        videoPlayerController.initialize();
-                        videoPlayerController.pause();
-                        return InkWell(
-                          onTap: () => Get.to(() => PostDetailScreen(
-                                postModel: postModel,
-                              )),
-                          child: ChatVideoTile(
-                            aspectRatio:
-                                videoPlayerController.value.aspectRatio,
-                            appUserId: widget.appUserId,
-                            isSeen: message.isSeen,
-                            isMe: isMe,
-                            date: message.createdAt,
-                            videoPlayerController: videoPlayerController,
-                          ),
-                        );
-                      } else if (message.type == "Music") {
-                        final prePost = message.content;
-                        final postModel = PostModel.fromMap(prePost);
-
-                        return InkWell(
-                          onTap: () => Get.to(() => PostDetailScreen(
-                                postModel: postModel,
-                              )),
-                          child: ChatMusicTile(
-                            aspectRatio: 13 / 9,
-                            appUserId: widget.appUserId,
-                            isSeen: message.isSeen,
-                            isMe: isMe,
-                            date: message.createdAt,
-                            media: postModel.mediaData[0],
-                          ),
-                        );
-                      } else if (message.type == "story-Video") {
-                        final postModel = MediaDetails.fromMap(message.content);
-                        VideoPlayerController videoPlayerController;
-                        videoPlayerController =
-                            VideoPlayerController.network(postModel.link);
-                        videoPlayerController.initialize();
-                        videoPlayerController.pause();
-                        return ChatVideoTile(
-                          aspectRatio: videoPlayerController.value.aspectRatio,
-                          appUserId: widget.appUserId,
-                          isSeen: message.isSeen,
-                          isMe: isMe,
-                          date: message.createdAt,
-                          videoPlayerController: videoPlayerController,
-                        );
-                      } else if (message.type == "story-Photo") {
-                        return ChatStoryTile(
-                          message: message,
-                          appUserId: widget.appUserId,
-                          isSeen: isSeen,
-                          isMe: isMe,
-                        );
-                      } else {
-                        return Container();
                       }
+                      return MessageTiles(
+                        isMe: isMe,
+                        message: message,
+                      );
                     },
                   ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-          ChatTextField(ontapSend: () {}, chatController: chatController),
-        ],
+                ),
+                ChatInputField(
+                  currentUser: currentUser,
+                  appUser: appUser,
+                  onTapSentMessage: () {
+                    chatProvider.sentMessage(
+                      currentUser: currentUser,
+                      appUser: appUser,
+                    );
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        ),
       ),
+      floatingActionButton: Consumer<ChatProvider>(builder: (context, v, b) {
+        if (v.isRecording && !v.isRecorderLock) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: Platform.isIOS ? 50 : 80),
+            child: FloatingActionButton(
+              mini: true,
+              onPressed: () {},
+              backgroundColor: colorWhite,
+              child: SvgPicture.asset(icSelectLock),
+            ),
+          );
+        }
+        return Container();
+      }),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

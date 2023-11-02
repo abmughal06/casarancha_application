@@ -1,11 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:story_view/controller/story_controller.dart';
+
+import '../../../models/media_details.dart';
+import '../../../models/message.dart';
+import '../../../resources/firebase_cloud_messaging.dart';
 
 class StoryProvider extends ChangeNotifier {
   int currentIndex = 0;
 
+  final StoryController controller = StoryController();
   final FocusNode commentFocus = FocusNode();
+  TextEditingController commentController = TextEditingController();
+
+  List<MediaDetails> storyItems = [];
 
   changeIndex(value) {
     currentIndex = int.parse(value
@@ -14,14 +24,14 @@ class StoryProvider extends ChangeNotifier {
         .replaceAll("]", "")
         .replaceAll("<", "")
         .replaceAll(">", ""));
-    notifyListeners();
+    // notifyListeners();
   }
 
   removeFromStory({storyItems, storyId, controller}) async {
     if (storyItems[currentIndex].id == storyItems.last.id) {
       Get.back();
 
-      print("last");
+      // print("last");
       var ref1 = FirebaseFirestore.instance.collection("stories").doc(storyId);
       var ref = await ref1.get();
 
@@ -44,145 +54,84 @@ class StoryProvider extends ChangeNotifier {
     }
   }
 
-  changeFocus({bool? hasFocus, controller}) {
-    hasFocus! ? controller!.pause() : controller!.play();
+  changeFocus(bool hasFocus) {
+    hasFocus ? controller.pause() : controller.play();
     notifyListeners();
   }
 
-  // sentComment(){
-  //   print(
-  //                                       "comment == ${commentController.text}");
+  sentComment({String? creatorId}) async {
+    final messageRefForCurrentUser = FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('messageList')
+        .doc(creatorId)
+        .collection('messages')
+        .doc();
 
-  //                                   final messageRefForCurrentUser =
-  //                                       FirebaseFirestore.instance
-  //                                           .collection("users")
-  //                                           .doc(FirebaseAuth
-  //                                               .instance.currentUser!.uid)
-  //                                           .collection('messageList')
-  //                                           .doc(widget.story.creatorId)
-  //                                           .collection('messages')
-  //                                           .doc();
+    final messageRefForAppUser = FirebaseFirestore.instance
+        .collection("users")
+        .doc(creatorId)
+        .collection('messageList')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('messages')
+        .doc(
+          messageRefForCurrentUser.id,
+        );
 
-  //                                   final messageRefForAppUser =
-  //                                       FirebaseFirestore.instance
-  //                                           .collection("users")
-  //                                           .doc(widget.story.creatorId)
-  //                                           .collection('messageList')
-  //                                           .doc(FirebaseAuth
-  //                                               .instance.currentUser!.uid)
-  //                                           .collection('messages')
-  //                                           .doc(
-  //                                             messageRefForCurrentUser.id,
-  //                                           );
+    var story = storyItems;
+    var mediaDetail = story[currentIndex].toMap();
 
-  //                                   var story = storyItems.toList();
-  //                                   var mediaDetail =
-  //                                       story[provider.currentIndex].toMap();
+    final Message message = Message(
+      id: messageRefForCurrentUser.id,
+      sentToId: creatorId!,
+      sentById: FirebaseAuth.instance.currentUser!.uid,
+      content: mediaDetail,
+      caption: commentController.text,
+      type: "story-${story[currentIndex].type}",
+      createdAt: DateTime.now().toIso8601String(),
+      isSeen: false,
+    );
 
-  //                                   final Message message = Message(
-  //                                     id: messageRefForCurrentUser.id,
-  //                                     sentToId: widget.story.creatorId,
-  //                                     sentById: FirebaseAuth
-  //                                         .instance.currentUser!.uid,
-  //                                     content: mediaDetail,
-  //                                     caption: commentController.text,
-  //                                     type:
-  //                                         "story-${story[provider.currentIndex].type}",
-  //                                     createdAt:
-  //                                         DateTime.now().toIso8601String(),
-  //                                     isSeen: false,
-  //                                   );
-  //                                   print(
-  //                                       "============= ------------------- ------- --= ====== ==== $message");
-  //                                   final appUserMessage = message.copyWith(
-  //                                       id: messageRefForAppUser.id);
+    final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-  //                                   messageRefForCurrentUser
-  //                                       .set(message.toMap())
-  //                                       .then((value) => print(
-  //                                           "=========== XXXXXXXXXXXXXXXX ++++++++++ message sent success"));
-  //                                   messageRefForAppUser
-  //                                       .set(appUserMessage.toMap());
-  //                                   var recieverRef = await FirebaseFirestore
-  //                                       .instance
-  //                                       .collection("users")
-  //                                       .doc(widget.story.creatorId)
-  //                                       .get();
+    messageRefForCurrentUser.set(message.toMap());
+    messageRefForAppUser.set(appUserMessage.toMap());
+    var recieverRef = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(creatorId)
+        .get();
 
-  //                                   var recieverFCMToken =
-  //                                       recieverRef.data()!['fcmToken'];
-  //                                   print(
-  //                                       "=========> reciever fcm token = $recieverFCMToken");
-  //                                   FirebaseMessagingService()
-  //                                       .sendNotificationToUser(
-  //                                     appUserId: recieverRef.id,
-  //                                     imageUrl: storyItems[
-  //                                                     provider.currentIndex]
-  //                                                 .type ==
-  //                                             'Photo'
-  //                                         ? storyItems[provider.currentIndex]
-  //                                             .link
-  //                                         : '',
-  //                                     // creatorDetails: creatorDetails,
-  //                                     devRegToken: recieverFCMToken,
+    var recieverFCMToken = recieverRef.data()!['fcmToken'];
 
-  //                                     msg: "has commented on your story",
-  //                                   );
-  //                                   _commentFocus.unfocus();
-  //                                   commentController.text = "";
-  //                                   controller!.play();
-  // }
+    FirebaseMessagingService().sendNotificationToUser(
+      appUserId: recieverRef.id,
+      content: storyItems[currentIndex].type == 'Photo'
+          ? storyItems[currentIndex].link
+          : '',
+      notificationType: "story_cmnt",
+      groupId: null,
+      isMessage: false,
+      // creatorDetails: creatorDetails,
+      devRegToken: recieverFCMToken,
 
-  // countStoryViews() async {
-  //   log("story play");
-  //   var ref =
-  //       FirebaseFirestore.instance.collection("stories").doc(widget.story.id);
-  //   var data = await ref.get();
-  //   List<dynamic> array = data.data()!['mediaDetailsList'];
-  //   log("=========================> ${array.length}");
+      msg: "has commented on your story",
+    );
+    commentFocus.unfocus();
+    commentController.text = "";
+    controller.play();
+  }
 
-  //   for (var e = 0; e < array.length; e++) {
-  //     var media = MediaDetails.fromMap(array[e]);
-  //     if (media.id == storyItems[currentIndex.value].id) {
-  //       if (!media.storyViews!
-  //           .contains(FirebaseAuth.instance.currentUser!.uid)) {
-  //         log("----------------- barabar");
+  countStoryViews({String? storyId}) async {
+    var storyViewsList = storyItems[currentIndex].storyViews;
 
-  //         List prevId = media.storyViews!.toList();
-  //         List viewid = [FirebaseAuth.instance.currentUser!.uid];
-  //         media = media.type == 'Photo'
-  //             ? MediaDetails(
-  //                 id: media.id,
-  //                 name: media.name,
-  //                 type: media.type,
-  //                 link: media.link,
-  //                 imageHeight: media.imageHeight,
-  //                 imageWidth: media.imageWidth,
-  //                 storyViews: prevId + viewid,
-  //               )
-  //             : media.type == 'Video'
-  //                 ? MediaDetails(
-  //                     id: media.id,
-  //                     name: media.name,
-  //                     type: media.type,
-  //                     link: media.link,
-  //                     storyViews: prevId + viewid,
-  //                     videoAspectRatio: media.videoAspectRatio,
-  //                     videoViews: media.videoViews,
-  //                   )
-  //                 : MediaDetails(
-  //                     id: media.id,
-  //                     name: media.name,
-  //                     type: media.type,
-  //                     link: media.link,
-  //                     storyViews: prevId + viewid,
-  //                   );
-  //         print(media);
-  //         array[e] = media.toMap();
-  //       }
-  //     }
-  //   }
+    if (!storyViewsList!.contains(FirebaseAuth.instance.currentUser!.uid)) {
+      storyViewsList.add(FirebaseAuth.instance.currentUser!.uid);
+      storyItems[currentIndex].storyViews = storyViewsList;
 
-  //   ref.update({'mediaDetailsList': array});
-  // }
+      var ref = FirebaseFirestore.instance.collection("stories").doc(storyId);
+
+      var media = storyItems.map((e) => e.toMap()).toList();
+      ref.update({'mediaDetailsList': media});
+    }
+  }
 }

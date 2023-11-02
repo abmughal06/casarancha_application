@@ -1,7 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/widgets/text_editing_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -95,18 +97,32 @@ Widget imgProVerified(
     required String? profileImg,
     required bool idIsVerified}) {
   return Container(
-      height: 40,
-      width: 40,
+      height: 40.w,
+      width: 40.w,
+      margin: EdgeInsets.only(bottom: 12.w),
       alignment: Alignment.center,
       decoration: const BoxDecoration(shape: BoxShape.circle),
       child: AspectRatio(
         aspectRatio: 1,
-        child: ClipOval(
-          child: FadeInImage(
-            fit: BoxFit.cover,
-            image: NetworkImage(profileImg!),
-            placeholder: const AssetImage(imgUserPlaceHolder),
-          ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(3.w),
+              child: ClipOval(
+                child: FadeInImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(profileImg!),
+                  placeholder: const AssetImage(imgUserPlaceHolder),
+                ),
+              ),
+            ),
+            Positioned(
+                right: 0,
+                bottom: 0,
+                child: Visibility(
+                    visible: idIsVerified,
+                    child: SvgPicture.asset(icVerifyBadge)))
+          ],
         ),
       ));
 }
@@ -320,9 +336,18 @@ Widget searchTextField(
   );
 }
 
-Widget centerLoader() {
+Widget centerLoader({double? size, Color? color}) {
   return Center(
     child: SizedBox(
-        height: 30.h, width: 30.w, child: const CircularProgressIndicator()),
+        height: size ?? 30.w,
+        width: size ?? 30.w,
+        child: Platform.isAndroid
+            ? CircularProgressIndicator(
+                color: color ?? colorPrimaryA05,
+                strokeWidth: 1,
+              )
+            : CupertinoActivityIndicator(
+                color: color,
+              )),
   );
 }

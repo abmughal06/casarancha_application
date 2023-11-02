@@ -1,3 +1,4 @@
+import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/story_model.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/firebase_collection.dart';
 import '../comment_model.dart';
 import '../ghost_message_details.dart';
 import '../message_details.dart';
@@ -18,7 +20,7 @@ class DataProvider extends ChangeNotifier {
 
     if (FirebaseAuth.instance.currentUser?.uid != null) {
       return FirebaseFirestore.instance
-          .collection("users")
+          .collection(cUsers)
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .snapshots()
           .map((event) =>
@@ -29,19 +31,39 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<UserModel>?> get users {
-    return FirebaseFirestore.instance.collection("users").snapshots().map(
-        (event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+    return FirebaseFirestore.instance
+        .collection(cUsers)
+        .snapshots()
+        .map((event) => event.docs
+            .where(
+              (element) =>
+                  element.data().isNotEmpty &&
+                  element.data().containsKey('name') &&
+                  element.data().containsKey('username') &&
+                  element.data().containsKey('bio') &&
+                  element.data().containsKey('dob'),
+            )
             .map((e) => UserModel.fromMap(e.data()))
             .toList());
   }
 
-  Stream<List<PostModel>?> get posts {
+  Stream<UserModel?>? getSingleUser(id) {
     return FirebaseFirestore.instance
-        .collection("posts")
-        .orderBy("createdAt", descending: true)
+        .collection(cUsers)
+        .doc(id)
         .snapshots()
-        .map((event) => event.docs
+        .map((event) => event.exists ? UserModel.fromMap(event.data()!) : null);
+  }
+
+  Stream<List<PostModel>?> posts(String? groupId) {
+    final ref = groupId == null
+        ? FirebaseFirestore.instance.collection('posts')
+        : FirebaseFirestore.instance
+            .collection('groups')
+            .doc(groupId)
+            .collection('posts');
+    return ref.orderBy("createdAt", descending: true).snapshots().map((event) =>
+        event.docs
             .where((element) =>
                 element.data().isNotEmpty &&
                 element.data()['mediaData'].isNotEmpty)
@@ -49,8 +71,19 @@ class DataProvider extends ChangeNotifier {
             .toList());
   }
 
+  Stream<PostModel?> singlePost({String? groupId, required String postId}) {
+    final ref = groupId == null
+        ? FirebaseFirestore.instance.collection('posts').doc(postId)
+        : FirebaseFirestore.instance
+            .collection('groups')
+            .doc(groupId)
+            .collection('posts')
+            .doc(postId);
+    return ref.snapshots().map((event) => PostModel.fromMap(event.data()!));
+  }
+
   Stream<List<Story>?> get stories {
-    return FirebaseFirestore.instance.collection("stories").snapshots().map(
+    return FirebaseFirestore.instance.collection(cStories).snapshots().map(
         (event) => event.docs
             .where((element) => element.data().isNotEmpty)
             .map((e) => Story.fromMap(e.data()))
@@ -62,26 +95,75 @@ class DataProvider extends ChangeNotifier {
       return null;
     }
     return FirebaseFirestore.instance
-        .collection('users')
+        .collection(cUsers)
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("notificationlist")
+        .collection(cNotificationList)
+        .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data()['sentById'] != null &&
+                element.data()['sentById'] !=
+                    FirebaseAuth.instance.currentUser!.uid)
             .map((e) => NotificationModel.fromMap(e.data()))
             .toList());
   }
 
-  Future<List<Comment>>? comment(postId) {
-    return FirebaseFirestore.instance
-        .collection("posts")
-        .doc(postId)
-        .collection("comments")
-        .get()
-        .then((event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+  Stream<List<Comment>?> comment({cmntId, groupId}) {
+    var ref = groupId == null
+        ? FirebaseFirestore.instance
+            .collection(cPosts)
+            .doc(cmntId)
+            .collection(cComments)
+        : FirebaseFirestore.instance
+            .collection(cGroups)
+            .doc(groupId)
+            .collection(cPosts)
+            .doc(cmntId)
+            .collection(cComments);
+    return ref.orderBy("createdAt", descending: true).snapshots().map((event) =>
+        event.docs
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data().containsKey('postId'))
             .map((e) => Comment.fromMap(e.data()))
             .toList());
+  }
+
+  Stream<List<Comment>?> commentReply({postId, groupId, cmntId}) {
+    var ref = groupId == null
+        ? FirebaseFirestore.instance
+            .collection(cPosts)
+            .doc(postId)
+            .collection(cComments)
+            .doc(cmntId)
+            .collection('reply')
+        : FirebaseFirestore.instance
+            .collection(cGroups)
+            .doc(groupId)
+            .collection(cPosts)
+            .doc(postId)
+            .collection(cComments)
+            .doc(cmntId)
+            .collection('reply');
+    return ref.orderBy("createdAt", descending: false).snapshots().map(
+        (event) => event.docs
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data().containsKey('postId'))
+            .map((e) => Comment.fromMap(e.data()))
+            .toList());
+  }
+
+  Stream<Comment?>? getSingleComment({postId, cmntId}) {
+    return FirebaseFirestore.instance
+        .collection(cPosts)
+        .doc(postId)
+        .collection(cComments)
+        .doc(cmntId)
+        .snapshots()
+        .map((event) => Comment.fromMap(event.data()!));
   }
 
   Stream<List<MessageDetails>?>? get chatListUsers {
@@ -89,9 +171,9 @@ class DataProvider extends ChangeNotifier {
       return null;
     }
     return FirebaseFirestore.instance
-        .collection("users")
+        .collection(cUsers)
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("messageList")
+        .collection(cMessageList)
         .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
@@ -105,27 +187,29 @@ class DataProvider extends ChangeNotifier {
       return null;
     }
     return FirebaseFirestore.instance
-        .collection("users")
+        .collection(cUsers)
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("ghostMessageList")
+        .collection(cGhostMessageList)
         .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
-            .where((element) => element.data().isNotEmpty)
+            .where((element) =>
+                element.data().containsKey('firstMessage') &&
+                element.data().isNotEmpty)
             .map((e) => GhostMessageDetails.fromMap(e.data()))
             .toList());
   }
 
-  Stream<List<Message>?>? messages(userId) {
+  Stream<List<Message>?>? messages(userId, isGhost) {
     if (FirebaseAuth.instance.currentUser?.uid == null) {
       return null;
     }
     return FirebaseFirestore.instance
-        .collection("users")
+        .collection(cUsers)
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("messageList")
+        .collection(isGhost ? cGhostMessageList : cMessageList)
         .doc(userId)
-        .collection("messages")
+        .collection(cMessage)
         .orderBy("createdAt", descending: true)
         .snapshots()
         .map((event) => event.docs
@@ -135,4 +219,47 @@ class DataProvider extends ChangeNotifier {
             .map((e) => Message.fromMap(e.data()))
             .toList());
   }
+
+  Stream<List<GroupModel>?>? get groups {
+    if (FirebaseAuth.instance.currentUser?.uid == null) {
+      return null;
+    }
+    return FirebaseFirestore.instance
+        .collection(cGroups)
+        .snapshots()
+        .map((event) => event.docs
+            .map(
+              (e) => GroupModel.fromMap(e.data()),
+            )
+            .toList());
+  }
+
+  Stream<GroupModel>? singleGroup(groupId) {
+    if (FirebaseAuth.instance.currentUser?.uid == null) {
+      return null;
+    }
+    return FirebaseFirestore.instance
+        .collection(cGroups)
+        .doc(groupId)
+        .snapshots()
+        .map(
+          (event) => GroupModel.fromMap(event.data()!),
+        );
+  }
+
+  // Stream<List<PostModel>?>? groupsPosts(groupId) {
+  //   if (FirebaseAuth.instance.currentUser?.uid == null) {
+  //     return null;
+  //   }
+  //   return FirebaseFirestore.instance
+  //       .collection(cGroups)
+  //       .doc(groupId)
+  //       .collection(cPosts)
+  //       .snapshots()
+  //       .map((event) => event.docs
+  //           .map(
+  //             (e) => PostModel.fromMap(e.data()),
+  //           )
+  //           .toList());
+  // }
 }

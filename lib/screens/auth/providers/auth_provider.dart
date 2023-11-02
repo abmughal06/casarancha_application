@@ -5,22 +5,26 @@ import 'dart:developer' as dev;
 import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:twitter_login/entity/auth_result.dart';
-import 'package:twitter_login/twitter_login.dart';
 
+import '../../../resources/color_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../utils/app_constants.dart';
 import '../../../utils/snackbar.dart';
+import '../../../widgets/common_widgets.dart';
+import '../../../widgets/text_widget.dart';
+import '../phone_otp_screen.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   final FirebaseAuth firebaseAuth;
@@ -60,6 +64,24 @@ class AuthenticationProvider extends ChangeNotifier {
     if (data.exists) {
       var token = await message.getFirebaseToken();
       await ref.set({"fcmToken": token}, SetOptions(merge: true));
+
+      if (!data.data()!.containsKey("ghostName")) {
+        ref.set({
+          "ghostName": "Ghost---- ${AppUtils.instance.generateRandomNumber()}"
+        }, SetOptions(merge: true));
+      }
+      if (!data.data()!.containsKey("blockIds")) {
+        ref.set({
+          "blockIds": FieldValue.arrayUnion([]),
+        }, SetOptions(merge: true));
+      }
+      if (!data.data()!.containsKey('isWorkVerified') ||
+          !data.data()!.containsKey('isEducationVerified')) {
+        ref.set({
+          'isWorkVerified': false,
+          'isEducationVerified': false,
+        }, SetOptions(merge: true));
+      }
       Get.offAll(() => const DashBoard());
     } else {
       Get.offAll(() => const SetupProfileScreen());
@@ -89,6 +111,102 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> verifyPhoneNumber(number) async {
+    Get.defaultDialog(
+      title: '',
+      titlePadding: EdgeInsets.zero,
+      barrierDismissible: false,
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator.adaptive(),
+          widthBox(15.w),
+          TextWidget(
+            text: 'Verifying number...',
+            color: color55F,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w400,
+          ),
+        ],
+      ),
+    );
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: number,
+        verificationCompleted: (PhoneAuthCredential credential) {
+          dev.log('complete $credential');
+          saveTokenAndNavigateToNext();
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          dev.log('failed $e');
+          Get.back();
+          GlobalSnackBar.show(message: 'Verification Failed Pleasy try later');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          dev.log('code sent');
+          Get.back();
+          Get.to(
+            () => PhoneOTPScreen(
+              verificationId: verificationId,
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          dev.log(verificationId);
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      Get.back();
+    } catch (e) {
+      GlobalSnackBar.show(message: 'Phone login cancelled');
+      Get.back();
+    } finally {
+      isSigningIn = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> checkOtpVerification(smsCode, verifyId) async {
+    isSigningIn = true;
+    notifyListeners();
+    Get.defaultDialog(
+      title: '',
+      titlePadding: EdgeInsets.zero,
+      barrierDismissible: false,
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator.adaptive(),
+          widthBox(15.w),
+          TextWidget(
+            text: 'Verifying OTP ...',
+            color: color55F,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w400,
+          ),
+        ],
+      ),
+    );
+
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verifyId, smsCode: smsCode);
+
+    try {
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      saveTokenAndNavigateToNext();
+    } on FirebaseAuthException catch (e) {
+      Get.back();
+      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      Get.back();
+      GlobalSnackBar.show(message: 'Phone login cancelled');
+    } finally {
+      isSigningIn = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> callGoogleSignIn() async {
     GoogleSignIn googleSignIn = GoogleSignIn();
     GoogleSignInAccount? signInAccount = await googleSignIn.signIn();
@@ -110,6 +228,11 @@ class AuthenticationProvider extends ChangeNotifier {
         notifyListeners();
 
         GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      } catch (e) {
+        isSigningIn = false;
+        notifyListeners();
+
+        GlobalSnackBar.show(message: 'Google login cancelled');
       } finally {
         isSigningIn = false;
         notifyListeners();
@@ -136,6 +259,11 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
 
       GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Facebook login cancelled');
     } finally {
       isSigningIn = false;
       notifyListeners();
@@ -196,40 +324,45 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
 
       GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Apple login cancelled');
     } finally {
       isSigningIn = false;
       notifyListeners();
     }
   }
 
-  Future<void> callTwitterSignIn() async {
-    try {
-      isSigningIn = true;
-      notifyListeners();
+  // Future<void> callTwitterSignIn() async {
+  //   try {
+  //     isSigningIn = true;
+  //     notifyListeners();
 
-      TwitterLogin login = TwitterLogin(
-        apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
-        apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
-        redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler",
-      );
-      AuthResult authResult = await login.loginV2();
-      if (authResult.authToken != null && authResult.authTokenSecret != null) {
-        AuthCredential credential = TwitterAuthProvider.credential(
-            accessToken: authResult.authToken!,
-            secret: authResult.authTokenSecret!);
-        FirebaseAuth.instance.signInWithCredential(credential);
-        saveTokenAndNavigateToNext();
-      }
-    } on FirebaseAuthException catch (e) {
-      isSigningIn = false;
-      notifyListeners();
+  //     TwitterLogin login = TwitterLogin(
+  //       apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
+  //       apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
+  //       redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler",
+  //     );
+  //     AuthResult authResult = await login.loginV2();
+  //     if (authResult.authToken != null && authResult.authTokenSecret != null) {
+  //       AuthCredential credential = TwitterAuthProvider.credential(
+  //           accessToken: authResult.authToken!,
+  //           secret: authResult.authTokenSecret!);
+  //       FirebaseAuth.instance.signInWithCredential(credential);
+  //       saveTokenAndNavigateToNext();
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     isSigningIn = false;
+  //     notifyListeners();
 
-      GlobalSnackBar.show(message: 'Please enter ${e.message}');
-    } finally {
-      isSigningIn = false;
-      notifyListeners();
-    }
-  }
+  //     GlobalSnackBar.show(message: 'Please enter ${e.message}');
+  //   } finally {
+  //     isSigningIn = false;
+  //     notifyListeners();
+  //   }
+  // }
 
   bool checkValidDataLogin({String? email, String? password}) {
     if (email!.isEmpty) {

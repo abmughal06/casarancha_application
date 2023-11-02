@@ -1,23 +1,23 @@
-import 'dart:developer';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
-import 'package:casarancha/widgets/home_screen_widgets/story_views_widget.dart';
-import 'package:casarancha/widgets/text_widget.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:story_view/story_view.dart';
+import '../../models/ghost_message_details.dart';
 import '../../models/message.dart';
+import '../../models/message_details.dart';
+import '../../models/post_creator_details.dart';
+import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/firebase_cloud_messaging.dart';
-import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
-import '../../resources/strings.dart';
-import '../../widgets/common_widgets.dart';
 import '../../widgets/home_page_widgets.dart';
+import '../../widgets/home_screen_widgets/story_textt_field.dart';
 
 class StoryViewScreen extends StatefulWidget {
   const StoryViewScreen({Key? key, required this.story}) : super(key: key);
@@ -34,8 +34,6 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
   final FocusNode _commentFocus = FocusNode();
 
   List<MediaDetails> storyItems = [];
-  DateTime twentyFourHoursAgo =
-      DateTime.now().subtract(const Duration(hours: 24));
 
   countStoryViews({required List<MediaDetails> mediaList}) async {
     var storyViewsList = mediaList[currentIndex.value].storyViews;
@@ -68,56 +66,57 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
   }
 
   var currentIndex = 0.obs;
+  var unreadMessageCount = 0;
 
   @override
   Widget build(BuildContext context) {
     controller = StoryController();
+    final ghost = Provider.of<DashboardProvider>(context);
     storyItems = widget.story.mediaDetailsList
-        .where(
-            (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
+        .where((element) => isDateAfter24Hour(DateTime.parse(element.id)))
         .toList();
+    final currentUser = context.watch<UserModel>();
     return SafeArea(
       child: Scaffold(
         body: Stack(
           children: [
             StoryView(
-                storyItems: [
-                  ...storyItems.asMap().entries.map((e) {
-                    print("==============  ${e.value.type}");
+              storyItems: [
+                ...storyItems.asMap().entries.map(
+                  (e) {
                     return e.value.type == "Photo"
                         ? StoryItem.pageImage(
                             key: ValueKey(e.key),
                             url: e.value.link,
-                            duration: const Duration(seconds: 5),
+                            duration: const Duration(seconds: 10),
                             controller: controller!,
                           )
                         : StoryItem.pageVideo(e.value.link,
                             key: ValueKey(e.key),
                             controller: controller!,
                             duration: const Duration(seconds: 15));
-                  })
-                ],
-                controller: controller!,
-                onComplete: () {
+                  },
+                )
+              ],
+              controller: controller!,
+              onComplete: () {
+                Get.back();
+              },
+              onStoryShow: (s) async {
+                currentIndex.value = int.parse(s.view.key
+                    .toString()
+                    .replaceAll("[", "")
+                    .replaceAll("]", "")
+                    .replaceAll("<", "")
+                    .replaceAll(">", ""));
+                await countStoryViews(mediaList: storyItems);
+              },
+              onVerticalSwipeComplete: (direction) {
+                if (direction == Direction.down) {
                   Get.back();
-                },
-                onStoryShow: (s) async {
-                  currentIndex.value = int.parse(s.view.key
-                      .toString()
-                      .replaceAll("[", "")
-                      .replaceAll("]", "")
-                      .replaceAll("<", "")
-                      .replaceAll(">", ""));
-                  await countStoryViews(mediaList: storyItems);
-
-                  log("=============================== > ${s.view.key}");
-                },
-                onVerticalSwipeComplete: (direction) {
-                  if (direction == Direction.down) {
-                    Get.back();
-                    // currentIndex.value++;
-                  }
-                }),
+                }
+              },
+            ),
             Padding(
               padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h),
               child: Obx(
@@ -149,146 +148,192 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
               visible: !_commentFocus.hasFocus,
               child: Container(),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Focus(
-                  focusNode: _commentFocus,
-                  onFocusChange: (hasFocus) {
-                    hasFocus ? controller!.pause() : controller!.play();
-                    setState(() {});
-                  },
-                  child: TextFormField(
-                    controller: commentController,
-                    onChanged: (val) {
-                      controller!.pause();
-                    },
-                    style: TextStyle(
-                      color: color887,
-                      fontSize: 16.sp,
-                      fontFamily: strFontName,
-                      fontWeight: FontWeight.w500,
+            StoryTextField(
+              commentFocus: _commentFocus,
+              onfocusChange: (hasFocus) {
+                hasFocus ? controller!.pause() : controller!.play();
+                setState(() {});
+              },
+              textEditingController: commentController,
+              onchange: (c) {
+                controller!.pause();
+              },
+              onFieldSubmitted: (val) {
+                FocusScope.of(context).unfocus();
+                commentController.text = "";
+                controller!.play();
+              },
+              onEditCompleted: () {
+                FocusScope.of(context).unfocus();
+                commentController.text = "";
+                controller!.play();
+              },
+              ontapSend: () async {
+                if (ghost.checkGhostMode) {
+                  final GhostMessageDetails appUserMessageDetails =
+                      GhostMessageDetails(
+                    id: widget.story.creatorId,
+                    lastMessage: "Story",
+                    unreadMessageCount: 0,
+                    searchCharacters: [
+                      ...widget.story.creatorDetails.name
+                          .toLowerCase()
+                          .split('')
+                    ],
+                    creatorDetails: widget.story.creatorDetails,
+                    createdAt: DateTime.now().toIso8601String(),
+                    firstMessage: currentUser.id,
+                  );
+
+                  final GhostMessageDetails currentUserMessageDetails =
+                      GhostMessageDetails(
+                    id: currentUser.id,
+                    lastMessage: "Story",
+                    unreadMessageCount: unreadMessageCount + 1,
+                    searchCharacters: [
+                      ...currentUser.name.toLowerCase().split('')
+                    ],
+                    creatorDetails: CreatorDetails(
+                      name: currentUser.name,
+                      imageUrl: currentUser.imageStr,
+                      isVerified: currentUser.isVerified,
                     ),
-                    decoration: InputDecoration(
-                      hintText: strWriteCommentHere,
-                      hintStyle: TextStyle(
-                        color: color887,
-                        fontSize: 14.sp,
-                        fontFamily: strFontName,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      suffixIcon: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: svgImgButton(
-                          svgIcon: icStoryCmtSend,
-                          onTap: () async {
-                            print("comment == ${commentController.text}");
+                    createdAt: DateTime.now().toIso8601String(),
+                    firstMessage: currentUser.id,
+                  );
 
-                            final messageRefForCurrentUser = FirebaseFirestore
-                                .instance
-                                .collection("users")
-                                .doc(FirebaseAuth.instance.currentUser!.uid)
-                                .collection('messageList')
-                                .doc(widget.story.creatorId)
-                                .collection('messages')
-                                .doc();
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(currentUser.id)
+                      .collection('ghostMessageList')
+                      .doc(widget.story.creatorId)
+                      .set(
+                        appUserMessageDetails.toMap(),
+                      );
 
-                            final messageRefForAppUser = FirebaseFirestore
-                                .instance
-                                .collection("users")
-                                .doc(widget.story.creatorId)
-                                .collection('messageList')
-                                .doc(FirebaseAuth.instance.currentUser!.uid)
-                                .collection('messages')
-                                .doc(
-                                  messageRefForCurrentUser.id,
-                                );
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(widget.story.creatorId)
+                      .collection('ghostMessageList')
+                      .doc(currentUser.id)
+                      .set(
+                        currentUserMessageDetails.toMap(),
+                      );
+                } else {
+                  final MessageDetails appUserMessageDetails = MessageDetails(
+                    id: widget.story.creatorId,
+                    lastMessage: "Story",
+                    unreadMessageCount: 0,
+                    searchCharacters: [
+                      ...widget.story.creatorDetails.name
+                          .toLowerCase()
+                          .split('')
+                    ],
+                    creatorDetails: widget.story.creatorDetails,
+                    createdAt: DateTime.now().toIso8601String(),
+                  );
 
-                            var story = storyItems.toList();
-                            var mediaDetail = story[currentIndex.value].toMap();
-
-                            final Message message = Message(
-                              id: messageRefForCurrentUser.id,
-                              sentToId: widget.story.creatorId,
-                              sentById: FirebaseAuth.instance.currentUser!.uid,
-                              content: mediaDetail,
-                              caption: commentController.text,
-                              type: "story-${story[currentIndex.value].type}",
-                              createdAt: DateTime.now().toIso8601String(),
-                              isSeen: false,
-                            );
-                            print(
-                                "============= ------------------- ------- --= ====== ==== $message");
-                            final appUserMessage =
-                                message.copyWith(id: messageRefForAppUser.id);
-
-                            messageRefForCurrentUser.set(message.toMap()).then(
-                                (value) => print(
-                                    "=========== XXXXXXXXXXXXXXXX ++++++++++ message sent success"));
-                            messageRefForAppUser.set(appUserMessage.toMap());
-                            var recieverRef = await FirebaseFirestore.instance
-                                .collection("users")
-                                .doc(widget.story.creatorId)
-                                .get();
-
-                            var recieverFCMToken =
-                                recieverRef.data()!['fcmToken'];
-                            print(
-                                "=========> reciever fcm token = $recieverFCMToken");
-                            FirebaseMessagingService().sendNotificationToUser(
-                              appUserId: recieverRef.id,
-                              imageUrl:
-                                  storyItems[currentIndex.value].type == 'Photo'
-                                      ? storyItems[currentIndex.value].link
-                                      : '',
-                              // creatorDetails: creatorDetails,
-                              devRegToken: recieverFCMToken,
-
-                              msg: "has commented on your story",
-                            );
-                            _commentFocus.unfocus();
-                            commentController.text = "";
-                            controller!.play();
-                          },
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12.w, vertical: 12.h),
-                      filled: true,
-                      fillColor: Colors.transparent,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                          borderSide: BorderSide.none),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.r),
-                        borderSide: const BorderSide(
-                          color: color887,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.r),
-                        borderSide: const BorderSide(
-                          color: color887,
-                          width: 1.0,
-                        ),
-                      ),
+                  final MessageDetails currentUserMessageDetails =
+                      MessageDetails(
+                    id: currentUser.id,
+                    lastMessage: "Story",
+                    unreadMessageCount: unreadMessageCount + 1,
+                    searchCharacters: [
+                      ...currentUser.name.toLowerCase().split('')
+                    ],
+                    creatorDetails: CreatorDetails(
+                      name: currentUser.name,
+                      imageUrl: currentUser.imageStr,
+                      isVerified: currentUser.isVerified,
                     ),
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (val) {
-                      FocusScope.of(context).unfocus();
-                      commentController.text = "";
-                      controller!.play();
-                    },
-                    onEditingComplete: () {
-                      FocusScope.of(context).unfocus();
-                      commentController.text = "";
-                      controller!.play();
-                    },
-                  ),
-                ),
-              ),
-            ),
+                    createdAt: DateTime.now().toIso8601String(),
+                  );
+
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(currentUser.id)
+                      .collection('messageList')
+                      .doc(widget.story.creatorId)
+                      .set(
+                        appUserMessageDetails.toMap(),
+                      );
+
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(widget.story.creatorId)
+                      .collection('messageList')
+                      .doc(currentUser.id)
+                      .set(
+                        currentUserMessageDetails.toMap(),
+                      );
+                }
+                final messageRefForCurrentUser = FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .collection(ghost.checkGhostMode
+                        ? 'ghostMessageList'
+                        : 'messageList')
+                    .doc(widget.story.creatorId)
+                    .collection('messages')
+                    .doc();
+
+                final messageRefForAppUser = FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(widget.story.creatorId)
+                    .collection(ghost.checkGhostMode
+                        ? 'ghostMessageList'
+                        : 'messageList')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .collection('messages')
+                    .doc(
+                      messageRefForCurrentUser.id,
+                    );
+
+                var story = storyItems.toList();
+                var mediaDetail = story[currentIndex.value].toMap();
+
+                final Message message = Message(
+                  id: messageRefForCurrentUser.id,
+                  sentToId: widget.story.creatorId,
+                  sentById: FirebaseAuth.instance.currentUser!.uid,
+                  content: mediaDetail,
+                  caption: commentController.text,
+                  type: "story-${story[currentIndex.value].type}",
+                  createdAt: DateTime.now().toIso8601String(),
+                  isSeen: false,
+                );
+
+                final appUserMessage =
+                    message.copyWith(id: messageRefForAppUser.id);
+
+                messageRefForCurrentUser.set(message.toMap());
+                messageRefForAppUser.set(appUserMessage.toMap());
+                var recieverRef = await FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(widget.story.creatorId)
+                    .get();
+
+                var recieverFCMToken = recieverRef.data()!['fcmToken'];
+
+                FirebaseMessagingService().sendNotificationToUser(
+                  appUserId: recieverRef.id,
+                  content: storyItems[currentIndex.value].type == 'Photo'
+                      ? storyItems[currentIndex.value].link
+                      : '',
+                  groupId: null,
+                  notificationType: "msg",
+
+                  isMessage: true,
+                  // creatorDetails: creatorDetails,
+                  devRegToken: recieverFCMToken,
+
+                  msg: "has commented on your story",
+                );
+                _commentFocus.unfocus();
+                commentController.text = "";
+                controller!.play();
+              },
+            )
           ],
         ),
       ),
@@ -296,181 +341,11 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
   }
 }
 
-class MyStoryViewScreen extends StatefulWidget {
-  const MyStoryViewScreen({Key? key, required this.story}) : super(key: key);
-
-  final Story story;
-
-  @override
-  State<MyStoryViewScreen> createState() => _MyStoryViewScreenState();
-}
-
-class _MyStoryViewScreenState extends State<MyStoryViewScreen> {
-  StoryController? controller;
-  late TextEditingController commentController;
-  final FocusNode _commentFocus = FocusNode();
-
-  List<MediaDetails> storyItems = [];
+bool isDateAfter24Hour(DateTime date) {
   DateTime twentyFourHoursAgo =
       DateTime.now().subtract(const Duration(hours: 24));
-
-  @override
-  void initState() {
-    super.initState();
-    controller = StoryController();
-    commentController = TextEditingController();
+  if (date.isAfter(twentyFourHoursAgo)) {
+    return true;
   }
-
-  @override
-  void dispose() {
-    controller!.dispose();
-    commentController.dispose();
-    super.dispose();
-    currentIndex.value = 0;
-  }
-
-  var currentIndex = 0.obs;
-
-  @override
-  Widget build(BuildContext context) {
-    controller = StoryController();
-    storyItems = widget.story.mediaDetailsList
-        .where(
-            (element) => DateTime.parse(element.id).isAfter(twentyFourHoursAgo))
-        .toList();
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            StoryView(
-              storyItems: [
-                ...storyItems.asMap().entries.map((e) {
-                  print("==============  ${e.value.type}");
-                  return e.value.type == "Photo"
-                      ? StoryItem.pageImage(
-                          key: ValueKey(e.key),
-                          url: e.value.link,
-                          duration: const Duration(seconds: 5),
-                          controller: controller!,
-                        )
-                      : StoryItem.pageVideo(e.value.link,
-                          key: ValueKey(e.key),
-                          controller: controller!,
-                          duration: const Duration(seconds: 15));
-                })
-              ],
-              controller: controller!,
-              onComplete: () {
-                Get.back();
-              },
-              onStoryShow: (s) async {
-                currentIndex.value = int.parse(s.view.key
-                    .toString()
-                    .replaceAll("[", "")
-                    .replaceAll("]", "")
-                    .replaceAll("<", "")
-                    .replaceAll(">", ""));
-                log("=============================== > ${s.view.key}");
-              },
-              onVerticalSwipeComplete: (direction) {
-                if (direction == Direction.down) {
-                  Get.back();
-                }
-              },
-            ),
-            Visibility(
-              visible: _commentFocus.hasFocus,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-            Visibility(
-              visible: !_commentFocus.hasFocus,
-              child: Container(),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 1.5,
-                vertical: 10.0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      controller!.pause();
-                      Get.bottomSheet(storyViews(story: widget.story));
-                    },
-                    child: SizedBox(
-                      width: 100.w,
-                      child: Row(
-                        children: [
-                          widthBox(10.w),
-                          const Icon(
-                            Icons.visibility,
-                            color: color887,
-                          ),
-                          widthBox(5.w),
-                          TextWidget(
-                            text: storyItems[currentIndex.value]
-                                .storyViews!
-                                .length
-                                .toString(),
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
-                            color: color887,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      if (storyItems[currentIndex.value].id ==
-                          storyItems.last.id) {
-                        Get.back();
-
-                        print("last");
-                        var ref1 = FirebaseFirestore.instance
-                            .collection("stories")
-                            .doc(widget.story.creatorId);
-                        var ref = await ref1.get();
-
-                        List<dynamic> storyRef =
-                            ref.data()!['mediaDetailsList'];
-
-                        storyRef.removeWhere((element) =>
-                            element['id'] == storyItems[currentIndex.value].id);
-
-                        await ref1.update({"mediaDetailsList": storyRef});
-                      } else {
-                        var ref1 = FirebaseFirestore.instance
-                            .collection("stories")
-                            .doc(widget.story.creatorId);
-                        var ref = await ref1.get();
-
-                        List<dynamic> storyRef =
-                            ref.data()!['mediaDetailsList'];
-
-                        storyRef.removeWhere((element) =>
-                            element['id'] == storyItems[currentIndex.value].id);
-                        await ref1.update({"mediaDetailsList": storyRef});
-                        controller!.next();
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  return false;
 }

@@ -129,9 +129,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 email: _emailController.text.trim(),
                               );
                               GlobalSnackBar.show(
-                                context: context,
-                                message:
-                                    'Please! check your email to reset your password',
+                                message: strResetPassword,
                               );
                               Get.back();
                               setState(() {
@@ -146,7 +144,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           } else {
                             GlobalSnackBar.show(
                               context: context,
-                              message: "Please Enter $strEmailAddress",
+                              message: strEnterEmailTxt,
                             );
                           }
                         },

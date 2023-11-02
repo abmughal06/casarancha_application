@@ -1,45 +1,44 @@
-import 'dart:developer';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/screens/auth/login_screen.dart';
-import 'package:casarancha/screens/auth/providers/auth_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/widgets/profile_pic.dart';
+import 'package:casarancha/widgets/profle_screen_widgets/profile_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../models/post_model.dart';
+import '../../models/providers/user_data_provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../screens/profile/follower_following_screen.dart';
-import '../../utils/app_constants.dart';
-import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
-import '../home_page_widgets.dart';
 import '../text_widget.dart';
 
-Widget postFollowCount({required String count, required String strText}) {
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      TextWidget(
-        text: count,
-        color: color13F,
-        fontWeight: FontWeight.w500,
-        fontSize: 16.sp,
-      ),
-      heightBox(3.h),
-      TextWidget(
-        text: strText,
-        color: colorAA3,
-        fontWeight: FontWeight.w500,
-        fontSize: 12.sp,
-      ),
-    ],
+Widget profileCounter(
+    {required String count, required String strText, required ontap}) {
+  return GestureDetector(
+    onTap: ontap,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextWidget(
+          text: count,
+          color: color13F,
+          fontWeight: FontWeight.w500,
+          fontSize: 16.sp,
+        ),
+        heightBox(3.h),
+        TextWidget(
+          text: strText,
+          color: colorAA3,
+          fontWeight: FontWeight.w500,
+          fontSize: 12.sp,
+        ),
+      ],
+    ),
   );
 }
 
@@ -66,132 +65,6 @@ Widget postStoriesBtn(
   );
 }
 
-_bottomSheetProfile(context) {
-  showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(40.r), topRight: Radius.circular(40.r)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-            height: 550,
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisSize: MainAxisSize.min,
-                children: [
-                  heightBox(10.h),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                      height: 6.h,
-                      width: 78.w,
-                      decoration: BoxDecoration(
-                        color: colorDD9,
-                        borderRadius: BorderRadius.all(Radius.circular(30.r)),
-                      ),
-                    ),
-                  ),
-                  heightBox(10.h),
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: AppConstant.profileBottomSheetList.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                            child: textMenuItem(
-                                text: AppConstant.profileBottomSheetList[index],
-                                color: index > 6 ? Colors.red : null,
-                                onTap: () {
-                                  _onTapSheetItem(index: index);
-                                }),
-                          );
-                        }),
-                  )
-                ]));
-      });
-}
-
-_onTapSheetItem({required int index}) async {
-  switch (index) {
-    case 0:
-      // Get.to(() => EditProfileScreen(
-      //       currentUser: profileScreenController.user.value,
-      //     ));
-      break;
-    case 1:
-      // Get.to(() => SavedPostScreen());
-      break;
-    case 2:
-      //getVerify
-      Get.back();
-      GlobalSnackBar.show(message: 'Coming Soon');
-      break;
-    case 3:
-      Get.back();
-      GlobalSnackBar.show(message: 'Coming Soon');
-      break;
-
-    case 4:
-      //about
-      Get.back();
-      launchUrls("https://casarancha.com/about/");
-      break;
-
-    case 5:
-      //terms
-
-      Get.back();
-      launchUrls("https://casarancha.com/terms-conditions/");
-      break;
-    case 6:
-      //privacy
-
-      Get.back();
-      launchUrls("https://casarancha.com/privacy-policy/");
-      break;
-    case 7:
-      //logout
-      // profileScreenController.logout();
-      Get.back();
-      AuthenticationProvider(FirebaseAuth.instance).signOut().whenComplete(() {
-        User? user;
-        if (user == null) {
-          Get.offAll(() => const LoginScreen());
-        }
-      });
-
-      break;
-    case 8:
-      //logout
-
-      // showDialog(
-      //     context: context,
-      //     builder: (context) {
-      //       return deleteAccountDialog(context);
-      //     });
-
-      break;
-  }
-}
-
-void launchUrls(String url) async {
-  Uri? uri = Uri.tryParse(url);
-  if (uri != null) {
-    if (await canLaunchUrl(uri)) {
-      launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      log("Can't launch url => $url");
-    }
-  } else {
-    log("$url is not valid");
-  }
-}
-
 class ProfileTopLoader extends StatelessWidget {
   const ProfileTopLoader({Key? key}) : super(key: key);
 
@@ -206,7 +79,7 @@ class ProfileTopLoader extends StatelessWidget {
               alignment: Alignment.topRight,
               child: IconButton(
                 onPressed: () {
-                  _bottomSheetProfile(context);
+                  bottomSheetProfile(context);
                 },
                 icon: Image.asset(
                   imgProfileOption,
@@ -252,11 +125,13 @@ class ProfileTopLoader extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            postFollowCount(count: "0", strText: strProfilePost),
+            profileCounter(ontap: null, count: "0", strText: strProfilePost),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
-            postFollowCount(count: '0', strText: strProfileFollowers),
+            profileCounter(
+                ontap: null, count: '0', strText: strProfileFollowers),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
-            postFollowCount(count: '0', strText: strProfileFollowing),
+            profileCounter(
+                ontap: null, count: '0', strText: strProfileFollowing),
           ],
         ),
         heightBox(14.h),
@@ -276,127 +151,186 @@ class ProfileTopLoader extends StatelessWidget {
 }
 
 class ProfileTop extends StatelessWidget {
-  const ProfileTop({Key? key, this.user, required this.postFollowCout})
-      : super(key: key);
+  const ProfileTop({Key? key, this.user}) : super(key: key);
 
   final UserModel? user;
-  final int postFollowCout;
 
   @override
   Widget build(BuildContext context) {
     final appUsers = context.watch<List<UserModel>?>();
+
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              // child: ghostModeBtn(iconSize: 40),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                onPressed: () {
-                  _bottomSheetProfile(context);
-                },
-                icon: Image.asset(
-                  imgProfileOption,
-                  height: 35.h,
-                  width: 35.w,
-                ),
-              ),
-            ),
-          ],
-        ),
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: colorPrimaryA05, width: 1.5),
-              shape: BoxShape.circle),
-          height: 90.h,
-          width: 90.h,
-          alignment: Alignment.center,
-          child: AspectRatio(
-            aspectRatio: 1 / 1,
-            child: ClipOval(
-              child: FadeInImage(
-                fit: BoxFit.cover,
-                placeholder: const AssetImage(imgUserPlaceHolder),
-                image: CachedNetworkImageProvider(user!.imageStr),
-              ),
-            ),
+        Card(
+          color: colorWhite,
+          shape:
+              const CircleBorder(side: BorderSide(color: colorWhite, width: 3)),
+          elevation: 3,
+          child: ProfilePic(
+            pic: user!.imageStr,
+            showBorder: false,
+            heightAndWidth: 105.h,
           ),
         ),
-        heightBox(15.h),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextWidget(
-              text: user!.name,
-              color: color13F,
-              fontWeight: FontWeight.w600,
-              fontSize: 16.sp,
-            ),
-            widthBox(6.w),
-            if (user!.isVerified)
-              SvgPicture.asset(
-                icVerifyBadge,
-                width: 17.w,
-                height: 17.h,
-              )
-          ],
+        heightBox(15.w),
+        SelectableText.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: "${user!.name} ",
+                style: TextStyle(
+                  color: color13F,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.sp,
+                ),
+              ),
+              WidgetSpan(
+                child: Visibility(
+                  visible: user!.isVerified,
+                  child: SvgPicture.asset(
+                    icVerifyBadge,
+                    height: 17,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        TextWidget(
+        SelectableTextWidget(
           text: user!.username,
           color: colorAA3,
-          fontSize: 12.sp,
+          fontWeight: FontWeight.w400,
+          fontSize: 13.sp,
         ),
-        heightBox(12.h),
+        heightBox(8.h),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            postFollowCount(
-                count: postFollowCout.toString(), strText: strProfilePost),
-            verticalLine(height: 24.h, horizontalMargin: 30.w),
-            GestureDetector(
-              onTap: () =>
-                  Get.to(() => const CurruentUserFollowerFollowingScreen(
-                        follow: true,
-                      )),
-              child: postFollowCount(
-                  count: appUsers == null
-                      ? "0"
-                      : appUsers
-                          .where((element) =>
-                              user!.followersIds.contains(element.id))
+            StreamProvider.value(
+                initialData: null,
+                value: DataProvider().posts(null),
+                child: Consumer<List<PostModel>?>(builder: (context, post, b) {
+                  if (post == null || user == null) {
+                    return profileCounter(
+                        ontap: null, count: '0', strText: strProfilePost);
+                  }
+                  return profileCounter(
+                      ontap: null,
+                      count: post
+                          .where((element) => element.creatorId == user!.id)
+                          .toList()
                           .length
                           .toString(),
-                  strText: strProfileFollowers),
-            ),
+                      strText: strProfilePost);
+                })),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
-            GestureDetector(
-              onTap: () =>
-                  Get.to(() => const CurruentUserFollowerFollowingScreen()),
-              child: postFollowCount(
-                  count: appUsers == null
-                      ? "0"
-                      : appUsers
-                          .where((element) =>
-                              user!.followingsIds.contains(element.id))
-                          .length
-                          .toString(),
-                  strText: strProfileFollowing),
-            ),
+            profileCounter(
+                ontap: () =>
+                    Get.to(() => const CurruentUserFollowerFollowingScreen(
+                          follow: true,
+                        )),
+                count: appUsers == null
+                    ? "0"
+                    : appUsers
+                        .where((element) =>
+                            user!.followersIds.contains(element.id))
+                        .length
+                        .toString(),
+                strText: strProfileFollowers),
+            verticalLine(height: 24.h, horizontalMargin: 30.w),
+            profileCounter(
+                ontap: () =>
+                    Get.to(() => const CurruentUserFollowerFollowingScreen()),
+                count: appUsers == null
+                    ? "0"
+                    : appUsers
+                        .where((element) =>
+                            user!.followingsIds.contains(element.id))
+                        .length
+                        .toString(),
+                strText: strProfileFollowing),
           ],
         ),
-        heightBox(14.h),
+        heightBox(20.h),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 27.w),
-          child: TextWidget(
-            text: user!.bio,
-            textAlign: TextAlign.center,
-            color: color55F,
-            fontSize: 12.sp,
+          padding: EdgeInsets.symmetric(horizontal: 40.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Visibility(
+                visible: user!.education.isNotEmpty,
+                child: SelectableText.rich(
+                  TextSpan(
+                    children: [
+                      WidgetSpan(
+                        child: Icon(
+                          Icons.school,
+                          size: 16.sp,
+                          color: color55F,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' ${user!.education} ',
+                        style: TextStyle(
+                          color: color55F,
+                          fontSize: 12.sp,
+                          fontFamily: strFontName,
+                        ),
+                      ),
+                      WidgetSpan(
+                          child: Visibility(
+                              visible: user!.isEducationVerified,
+                              child: SvgPicture.asset(
+                                icVerifyBadge,
+                                height: 15,
+                              ))),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Visibility(
+                visible: user!.work.isNotEmpty,
+                child: SelectableText.rich(
+                  TextSpan(
+                    children: [
+                      WidgetSpan(
+                        child: Icon(
+                          Icons.work,
+                          size: 15.sp,
+                          color: color55F,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' ${user!.work} ',
+                        style: TextStyle(
+                          color: color55F,
+                          fontFamily: strFontName,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                      WidgetSpan(
+                          child: Visibility(
+                              visible: user!.isWorkVerified,
+                              child: SvgPicture.asset(
+                                icVerifyBadge,
+                                height: 15,
+                              ))),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Visibility(
+                visible: user!.bio.isNotEmpty,
+                child: SelectableTextWidget(
+                  text: user!.bio,
+                  textAlign: TextAlign.center,
+                  color: color55F,
+                  fontSize: 12.sp,
+                ),
+              ),
+            ],
           ),
         ),
         heightBox(20.h),

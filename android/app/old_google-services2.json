@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "423296603409",
+    "project_id": "casa-rancha",
+    "storage_bucket": "casa-rancha.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423296603409:android:28acadf5bafe1998f828b0",
+        "android_client_info": {
+          "package_name": "com.zb.casarancha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "423296603409-lechplsgug2dtpsa9r6hrkptihsl6tdn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7KFjL-YSF-faJ7oypwb8Y8cJkA9xNTng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "423296603409-lechplsgug2dtpsa9r6hrkptihsl6tdn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "423296603409-6uvc04rt06buro6i4488i6ta85n8nnr7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zb.casarancha"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

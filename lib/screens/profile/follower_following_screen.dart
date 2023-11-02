@@ -1,12 +1,16 @@
 import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
 import 'package:casarancha/widgets/text_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../resources/color_resources.dart';
 import '../../resources/localization_text_strings.dart';
 
 class CurruentUserFollowerFollowingScreen extends StatelessWidget {
@@ -22,6 +26,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     return DefaultTabController(
       length: _myTabs.length,
       initialIndex: follow! ? 0 : 1,
@@ -29,7 +35,17 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
         appBar: primaryAppbar(
           title: strFollowersFollowing,
           elevation: 0,
-          bottom: primaryTabBar(
+          bottom: TabBar(
+            labelColor: colorPrimaryA05,
+            unselectedLabelColor: colorAA3,
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14.sp,
+            ),
+            indicatorColor: colorF03,
+            indicatorPadding:
+                EdgeInsets.symmetric(vertical: 5.h, horizontal: 40.w),
+            dividerColor: Colors.transparent,
             tabs: _myTabs,
           ),
         ),
@@ -40,7 +56,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var filterList = users
                       .where((element) =>
@@ -49,7 +66,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "You don't have any followers right now",
+                        text: strAlertFollowing,
                       ),
                     );
                   }
@@ -61,8 +78,11 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                           currentUser!.followingsIds.contains(user.id);
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
-                        btnName: isFriend ? "Friends" : "Follow",
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: user,
+                                appUserId: filterList[index].id),
+                        btnName: isFriend ? strFriends : strSrcFollow,
                       );
                     },
                   );
@@ -73,7 +93,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var filterList = users
                       .where((element) =>
@@ -82,7 +103,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "Start following people to see them here.",
+                        text: strAlertFollow,
                       ),
                     );
                   }
@@ -92,8 +113,10 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                       final user = filterList[index];
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
-                        btnName: "Remove",
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: currentUser, appUserId: user.id),
+                        btnName: strRemove,
                       );
                     },
                   );
@@ -121,6 +144,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     return DefaultTabController(
       length: _myTabs.length,
       initialIndex: follow! ? 0 : 1,
@@ -137,7 +162,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var appUser =
                       users.where((element) => element.id == appUserid).first;
@@ -145,10 +171,14 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                       .where((element) =>
                           appUser.followersIds.contains(element.id))
                       .toList();
+                  var currentUser = users
+                      .where((element) =>
+                          element.id == FirebaseAuth.instance.currentUser!.uid)
+                      .first;
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "This user didn't have any followers",
+                        text: strAlertAppUsrFollow,
                       ),
                     );
                   }
@@ -156,11 +186,19 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     itemCount: filterList.length,
                     itemBuilder: (context, index) {
                       final user = filterList[index];
-                      final isFriend = appUser.followingsIds.contains(user.id);
+                      final isFriend =
+                          currentUser.followingsIds.contains(user.id);
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
-                        btnName: isFriend ? "Friends" : "Follow",
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: user,
+                                appUserId: filterList[index].id),
+                        btnName: user.id == currentUser.id
+                            ? ""
+                            : isFriend
+                                ? strFriends
+                                : strSrcFollow,
                       );
                     },
                   );
@@ -171,10 +209,16 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
             Consumer<List<UserModel>?>(
               builder: (context, users, b) {
                 if (users == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var appUser =
                       users.where((element) => element.id == appUserid).first;
+                  var currentUser = users
+                      .where((element) =>
+                          element.id == FirebaseAuth.instance.currentUser!.uid)
+                      .first;
+                  users.where((element) => element.id == appUserid).first;
                   var filterList = users
                       .where((element) =>
                           appUser.followingsIds.contains(element.id))
@@ -182,7 +226,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                   if (filterList.isEmpty) {
                     return const Center(
                       child: TextWidget(
-                        text: "This user didn't follow anyone yet",
+                        text: strAlertAppUsrFollowings,
                       ),
                     );
                   }
@@ -190,10 +234,19 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                     itemCount: filterList.length,
                     itemBuilder: (context, index) {
                       final user = filterList[index];
+                      final isFriend =
+                          currentUser.followingsIds.contains(user.id);
                       return FollowFollowingTile(
                         user: user,
-                        ontapToggleFollow: () {},
-                        btnName: "Remove",
+                        ontapToggleFollow: () =>
+                            profileProvider.toggleFollowBtn(
+                                userModel: user,
+                                appUserId: filterList[index].id),
+                        btnName: user.id == currentUser.id
+                            ? ""
+                            : !isFriend
+                                ? strFriends
+                                : strSrcFollow,
                       );
                     },
                   );

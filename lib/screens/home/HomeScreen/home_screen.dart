@@ -1,20 +1,26 @@
-import 'dart:developer';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_model.dart';
-import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import '../../../models/story_model.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/home_screen_widgets/post_card.dart';
 import '../../../widgets/home_screen_widgets/story_widget.dart';
+import '../../../widgets/shared/alert_text.dart';
+import '../../../widgets/shared/skeleton.dart';
 import '../../dashboard/ghost_mode_btn.dart';
+import '../CreatePost/create_post_screen.dart';
+import '../CreateStory/add_story_screen.dart';
 import '../notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,14 +30,17 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with AutomaticKeepAliveClientMixin<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
     final users = context.watch<List<UserModel>?>();
-    return Scaffold(
+    final ghostProvider = context.watch<DashboardProvider>();
+    super.build(context);
+    return GhostScaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey.shade50,
         centerTitle: true,
         title: Text(
           strCasaRanch,
@@ -47,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // Get.to(() => CreatePostScreen());
+              Get.to(() => const CreatePostScreen());
             },
             icon: Image.asset(
               imgAddPost,
@@ -87,19 +96,23 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: ListView(
-        shrinkWrap: true,
+        // shrinkWrap: true,
+        controller: ghostProvider.scrollController,
+        key: const PageStorageKey(0),
         children: [
+          //story section
           SizedBox(
             height: 77.h,
             child: Consumer<List<Story>?>(
               builder: (context, provider, b) {
-                if (provider == null) {
-                  return Container();
+                if (provider == null || currentUser == null) {
+                  return const StorySkeleton();
                 } else {
                   var filterList = provider
-                      .where((element) => element.creatorId != currentUser!.id)
+                      .where((element) =>
+                          currentUser.followersIds.contains(element.id) ||
+                          currentUser.followingsIds.contains(element.id))
                       .toList();
-                  log("${provider.where((element) => element.creatorId == currentUser!.id).isNotEmpty}");
                   return Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
@@ -108,18 +121,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         provider
                                 .where((element) =>
-                                    element.creatorId == currentUser!.id)
+                                    element.creatorId == currentUser.id)
                                 .toList()
                                 .isNotEmpty
                             ? MyStoryWidget(
                                 stories: provider
                                     .where((element) =>
-                                        element.creatorId == currentUser!.id)
+                                        element.creatorId == currentUser.id)
                                     .first,
                               )
                             : GestureDetector(
                                 onTap: () {
-                                  // Get.to(() => AddStoryScreen());
+                                  Get.to(() => const AddStoryScreen());
                                 },
                                 child: SvgPicture.asset(
                                   icProfileAdd,
@@ -165,38 +178,63 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
-          Consumer<List<PostModel>?>(
-            builder: (context, posts, b) {
-              if (posts == null) {
-                return Container();
-              } else {
-                var post = posts
-                    .where((element) => element.mediaData.isNotEmpty)
-                    .toList();
+          //post section
+
+          StreamProvider.value(
+            value: DataProvider().posts(null),
+            initialData: null,
+            child: Consumer<List<PostModel>?>(
+              builder: (context, posts, b) {
+                if (posts == null || users == null) {
+                  return const PostSkeleton();
+                }
+                var post = ghostProvider.checkGhostMode
+                    ? posts.where((element) => (currentUser!.followersIds
+                            .contains(element.creatorId) ||
+                        currentUser.followingsIds.contains(element.creatorId) ||
+                        element.creatorId == currentUser.id &&
+                            element.mediaData.isNotEmpty))
+                    : posts
+                        .where((element) => element.mediaData.isNotEmpty)
+                        .toList();
                 List<PostModel> filterList = [];
+                List<UserModel> postCreator = [];
                 for (var p in post) {
-                  for (var u in users!) {
+                  for (var u in users) {
                     if (p.creatorId == u.id) {
                       filterList.add(p);
+                      postCreator.add(u);
                     }
                   }
                 }
 
+                if (filterList.isEmpty) {
+                  return const AlertText(
+                    text: strAlertPost,
+                  );
+                }
+
                 return ListView.builder(
                   shrinkWrap: true,
+                  padding: EdgeInsets.only(bottom: 80.h),
                   physics: const NeverScrollableScrollPhysics(),
+                  addAutomaticKeepAlives: true,
                   itemCount: filterList.length,
                   itemBuilder: (context, index) {
                     return PostCard(
                       post: filterList[index],
+                      postCreator: postCreator[index],
                     );
                   },
                 );
-              }
-            },
+              },
+            ),
           )
         ],
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

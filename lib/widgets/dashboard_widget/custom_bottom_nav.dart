@@ -1,6 +1,7 @@
+import 'package:casarancha/models/ghost_message_details.dart';
+import 'package:casarancha/models/message_details.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,20 +9,23 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../screens/dashboard/provider/dashboard_provider.dart';
+import '../profile_pic.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.watch<UserModel?>();
+    final ghostMessage = context.watch<List<GhostMessageDetails>?>();
 
     return Consumer<DashboardProvider>(
       builder: (context, provider, b) {
         return Card(
+          color: Colors.transparent,
           margin: EdgeInsets.symmetric(
             horizontal: 20.w,
-            vertical: Platform.isAndroid ? 10.w : 0.w,
+            vertical:
+                provider.checkGhostMode || Platform.isAndroid ? 10.w : 0.w,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
@@ -34,14 +38,24 @@ class CustomBottomNavigationBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(
-                  onPressed: () {
-                    provider.changePage(0);
+                InkWell(
+                  onDoubleTap: () {
+                    provider.scrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeIn,
+                    );
                   },
-                  icon: SvgPicture.asset(
-                    provider.currentIndex == 0
-                        ? icBottomSelHome
-                        : icBottomDeSelHome,
+                  child: IconButton(
+                    onPressed: () {
+                      provider.changePage(0);
+                    },
+                    icon: SvgPicture.asset(
+                      provider.currentIndex == 0
+                          ? icBottomSelHome
+                          : icBottomDeSelHome,
+                      color: provider.currentIndex == 0 ? null : Colors.white,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -52,6 +66,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     provider.currentIndex == 1
                         ? icBottomSelSearch
                         : icBottomDeSelSearch,
+                    color: provider.currentIndex == 1 ? null : Colors.white,
                   ),
                 ),
                 IconButton(
@@ -62,6 +77,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     provider.currentIndex == 2
                         ? icBottomSelGrp
                         : icBottomDeSelGrp,
+                    color: provider.currentIndex == 2 ? null : Colors.white,
                   ),
                 ),
                 IconButton(
@@ -70,24 +86,64 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   },
                   icon: SvgPicture.asset(
                     provider.currentIndex == 3
-                        ? icBottomSelChat
-                        : icBottomDeSelChat,
+                        ? icForumSelHome
+                        : icForumDeSelHome,
+                    color: provider.currentIndex == 3 ? null : Colors.white,
+                    height: 22.h,
                   ),
                 ),
                 IconButton(
                   onPressed: () {
                     provider.changePage(4);
                   },
-                  icon: CircleAvatar(
-                    backgroundColor: Colors.red.withOpacity(
-                      0.1,
-                    ),
-                    backgroundImage: currentUser == null
-                        ? null
-                        : CachedNetworkImageProvider(
-                            currentUser.imageStr,
-                          ),
-                  ),
+                  icon: Consumer<List<MessageDetails>?>(
+                      builder: (context, msg, b) {
+                    if (msg == null || ghostMessage == null) {
+                      return SvgPicture.asset(
+                        provider.currentIndex == 4
+                            ? icBottomSelChat
+                            : icBottomDeSelChat,
+                        color: provider.currentIndex == 4 ? null : Colors.white,
+                      );
+                    }
+                    var filterList = msg
+                        .where((element) => element.unreadMessageCount > 0)
+                        .toList();
+                    var ghostFilter = ghostMessage
+                        .where((element) => element.unreadMessageCount > 0)
+                        .toList();
+
+                    int count = 0;
+                    for (var i in filterList) {
+                      count += i.unreadMessageCount;
+                    }
+                    for (var i in ghostFilter) {
+                      count += i.unreadMessageCount;
+                    }
+                    return Badge(
+                      label: Text(count.toString()),
+                      isLabelVisible: count > 0,
+                      child: SvgPicture.asset(
+                        provider.currentIndex == 4
+                            ? icBottomSelChat
+                            : icBottomDeSelChat,
+                        color: provider.currentIndex == 4 ? null : Colors.white,
+                      ),
+                    );
+                  }),
+                ),
+                IconButton(
+                  onPressed: () {
+                    provider.changePage(5);
+                  },
+                  icon: Consumer<UserModel?>(builder: (context, user, b) {
+                    if (user == null) {
+                      return const CircularProgressIndicator.adaptive();
+                    }
+                    return ProfilePic(
+                      pic: user.imageStr,
+                    );
+                  }),
                 ),
               ],
             ),

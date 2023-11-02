@@ -1,3 +1,4 @@
+import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,7 +27,7 @@ class ChatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
         children: [
           Padding(
@@ -34,25 +35,26 @@ class ChatTile extends StatelessWidget {
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16.r),
-                        topRight: Radius.circular(16.r),
-                        bottomLeft: Radius.circular(
-                          isMe ? 16.r : 0,
-                        ),
-                        bottomRight: Radius.circular(
-                          isMe ? 0 : 16.r,
-                        )),
-                    color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
-                  ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                  child: TextWidget(
-                    text: message,
-                    color: isMe ? color13F : color55F,
-                    fontWeight: FontWeight.w500,
-                  )),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16.r),
+                      topRight: Radius.circular(16.r),
+                      bottomLeft: Radius.circular(
+                        isMe ? 16.r : 0,
+                      ),
+                      bottomRight: Radius.circular(
+                        isMe ? 0 : 16.r,
+                      )),
+                  color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                child: SelectableTextWidget(
+                  text: message,
+                  fontSize: calculateFontSize(message),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
             ),
           ),
           Align(
@@ -87,5 +89,14 @@ class ChatTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+double calculateFontSize(String message) {
+  if (emojiRegex().allMatches(message).isNotEmpty &&
+      RegExp(r'[A-Za-z\s]').allMatches(message).isEmpty) {
+    return 27.sp;
+  } else {
+    return 14.sp;
   }
 }

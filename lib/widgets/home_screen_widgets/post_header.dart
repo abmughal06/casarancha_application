@@ -1,70 +1,63 @@
+import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../models/post_model.dart';
+import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../common_widgets.dart';
+import '../profile_pic.dart';
 import '../text_widget.dart';
 
 class CustomPostHeader extends StatelessWidget {
-  final String? name;
-  final String? image;
   final VoidCallback? ontap;
   final VoidCallback? headerOnTap;
-  final bool? isVerified;
-  final String? time;
+  final PostModel postModel;
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
-  final bool? showPostTime;
+  final UserModel postCreator;
 
   const CustomPostHeader(
       {Key? key,
-      this.name,
-      this.image,
       this.ontap,
       this.isVideoPost = false,
       this.headerOnTap,
-      this.isVerified = false,
       this.onVertItemClick,
-      this.time,
-      this.showPostTime = false})
+      required this.postCreator,
+      required this.postModel})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      minVerticalPadding: 0,
-      visualDensity: const VisualDensity(vertical: -2),
-      horizontalTitleGap: 10,
-      leading: InkWell(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
         onTap: headerOnTap,
-        child: Container(
-          height: 40.h,
-          width: 40.h,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.amber,
-            image: DecorationImage(
-              image: NetworkImage("$image"),
-              fit: BoxFit.cover,
-            ),
+        minVerticalPadding: 0,
+        visualDensity: const VisualDensity(vertical: -2),
+        horizontalTitleGap: 10,
+        leading: InkWell(
+          onTap: headerOnTap,
+          child: ProfilePic(
+            pic: postCreator.imageStr,
+            heightAndWidth: 40.h,
           ),
         ),
-      ),
-      title: InkWell(
-        onTap: headerOnTap,
-        child: Row(
+        title: Row(
           children: [
             TextWidget(
-              text: "$name",
+              onTap: headerOnTap,
+              text: postCreator.username,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
               color: isVideoPost! ? colorFF7 : color221,
             ),
             widthBox(5.w),
             Visibility(
-              visible: isVerified!,
+              visible: postCreator.isVerified,
               child: SvgPicture.asset(
                 icVerifyBadge,
                 width: 17.w,
@@ -73,23 +66,94 @@ class CustomPostHeader extends StatelessWidget {
             )
           ],
         ),
-      ),
-      subtitle: Visibility(
-        visible: showPostTime!,
-        child: TextWidget(
-          text: time,
-          fontSize: 11.sp,
-          fontWeight: FontWeight.w400,
-          color: isVideoPost!
-              ? colorFF7.withOpacity(0.6)
-              : const Color(0xff5f5f5f),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Visibility(
+              visible: postCreator.education.isNotEmpty,
+              child: SelectableText.rich(
+                TextSpan(
+                  children: [
+                    WidgetSpan(
+                        child: Icon(
+                      Icons.school,
+                      size: 15.sp,
+                      color: color55F.withOpacity(0.7),
+                    )),
+                    TextSpan(
+                      text: ' ${postCreator.education} ',
+                      style: TextStyle(
+                        color: color55F,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 11.sp,
+                        fontFamily: strFontName,
+                      ),
+                    ),
+                    WidgetSpan(
+                        child: Visibility(
+                            visible: postCreator.isEducationVerified,
+                            child: SvgPicture.asset(
+                              icVerifyBadge,
+                              height: 13,
+                            ))),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Visibility(
+              visible: postCreator.work.isNotEmpty,
+              child: SelectableText.rich(
+                TextSpan(
+                  children: [
+                    WidgetSpan(
+                        child: Icon(
+                      Icons.work,
+                      size: 14.sp,
+                      color: color55F.withOpacity(0.7),
+                    )),
+                    TextSpan(
+                      text: ' ${postCreator.work} ',
+                      style: TextStyle(
+                        color: color55F,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 11.sp,
+                        fontFamily: strFontName,
+                      ),
+                    ),
+                    WidgetSpan(
+                        child: Visibility(
+                            visible: postCreator.isWorkVerified,
+                            child: SvgPicture.asset(
+                              icVerifyBadge,
+                              height: 13,
+                            ))),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Visibility(
+              visible:
+                  postModel.showPostTime || postModel.locationName.isNotEmpty,
+              child: TextWidget(
+                text:
+                    "${postModel.showPostTime ? "${convertDateIntoTime(postModel.createdAt)} " : ""}${postModel.locationName.isEmpty ? "" : "at ${postModel.locationName}"}",
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w400,
+                color: isVideoPost!
+                    ? colorFF7.withOpacity(0.6)
+                    : const Color(0xff5f5f5f),
+              ),
+            ),
+          ],
         ),
-      ),
-      trailing: InkWell(
-        onTap: onVertItemClick,
-        child: Icon(
-          Icons.more_vert,
-          color: isVideoPost! ? colorFF7 : const Color(0xffafafaf),
+        trailing: InkWell(
+          onTap: onVertItemClick,
+          child: Icon(
+            Icons.more_vert,
+            color: isVideoPost! ? colorFF7 : const Color(0xffafafaf),
+          ),
         ),
       ),
     );

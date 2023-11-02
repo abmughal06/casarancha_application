@@ -1,8 +1,13 @@
+import 'package:casarancha/widgets/text_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../resources/localization_text_strings.dart';
 
 enum BottomSheetMenuType { isPostMenu, isReportPost, isDoneReport }
+
+String? get currentUserUID => FirebaseAuth.instance.currentUser!.uid;
 
 class AppConstant {
   static const int passwordMinText = 6;
@@ -26,16 +31,45 @@ class AppConstant {
   static const String userTokenPre = "userToken";
   static const String isLoggedInPre = "isLoggedIn";
 
+  static final RegExp regexEmoji = RegExp(
+      r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])');
+
+  Widget emojiSize(String content, Color color) {
+    final Iterable<Match> matches = regexEmoji.allMatches(content);
+    if (matches.isEmpty) {
+      return SelectableTextWidget(
+        text: content,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      );
+    }
+
+    return RichText(
+        text: TextSpan(children: [
+      for (var t in content.characters)
+        WidgetSpan(
+          child: SelectableTextWidget(
+            text: t,
+            fontSize: regexEmoji.allMatches(t).isNotEmpty ? 24.sp : 14.sp,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+    ]));
+  }
+
   static List<String> profileBottomSheetList = [
     strEditProfile,
     strSavedPosts,
-    "Get Verified",
+    strGetVerified,
     strSettings,
+    strInviteFrnds,
     strAbout,
     strTermsCondition,
     strPrivacyPolicy,
-    "Log out",
-    "Delete Account"
+    strLogout,
+    strDeleteAct,
   ];
 }
 

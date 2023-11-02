@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/resources/color_resources.dart';
 
-import 'package:casarancha/widgets/primary_textButton.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -103,14 +102,12 @@ List<String> reportList = [
 
 Widget textMenuItem(
     {required String text, required GestureTapCallback onTap, Color? color}) {
-  return GestureDetector(
+  return TextWidget(
     onTap: onTap,
-    child: TextWidget(
-      text: text,
-      color: color ?? color13F,
-      fontSize: 18.sp,
-      fontWeight: FontWeight.w500,
-    ),
+    text: text,
+    color: color ?? color13F,
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w500,
   );
 }
 

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
 import '../../../resources/localization_text_strings.dart';
+import '../../../utils/app_utils.dart';
 import '../../../utils/snackbar.dart';
 import '../../../view_models/profile_vm/edit_profie_view_model.dart';
 import '../../dashboard/dashboard.dart';
@@ -26,6 +26,13 @@ class SetupProfileProvider extends ChangeNotifier {
 
   File? imageFilePicked;
   String bioTxtCount = "0";
+  String educationTxtCount = "0";
+  String workTxtCount = "0";
+
+  disposeImage() {
+    profileImage = null;
+    selectedDob = null;
+  }
 
   bool isLoading = false;
 
@@ -88,11 +95,12 @@ class SetupProfileProvider extends ChangeNotifier {
       GlobalSnackBar.show(message: 'Please enter $strDateOfBirth');
 
       return false;
-    } else if (imageFilePicked == null && profileImage == null) {
-      GlobalSnackBar.show(message: 'Please select image');
-
-      return false;
     }
+    // else if (imageFilePicked == null && profileImage == null) {
+    //   GlobalSnackBar.show(message: 'Please select image');
+
+    //   return false;
+    // }
 
     return true;
   }
@@ -100,7 +108,12 @@ class SetupProfileProvider extends ChangeNotifier {
   FirebaseMessagingService message = FirebaseMessagingService();
 
   setupProfileData(
-      {String? fname, String? lname, String? username, String? bio}) async {
+      {String? fname,
+      String? lname,
+      String? username,
+      String? bio,
+      String? education,
+      String? work}) async {
     try {
       if (checkValidData(fname: fname, lname: lname, username: username)) {
         isLoading = true;
@@ -134,15 +147,19 @@ class SetupProfileProvider extends ChangeNotifier {
         final userModel = UserModel(
           id: userId,
           email: userEmail,
-          ghostName: "Ghost---- ${Random().nextInt(6)}",
+          ghostName: "Ghost---- ${AppUtils.instance.generateRandomNumber()}",
           username: username!,
           dob: selectedDob.toString(),
           fcmToken: token,
           name: '${fname!.trim()} ${lname!.trim()} ',
-          createdAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toUtc().toString(),
           bio: bio!.trim(),
-          imageStr: imageUrl ?? "",
+          work: work!.trim(),
+          education: education!.trim(),
+          imageStr: imageUrl ?? '',
           isOnline: false,
+          isEducationVerified: false,
+          isWorkVerified: false,
         );
 
         await FirebaseFirestore.instance

@@ -1,9 +1,12 @@
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
-import 'package:casarancha/widgets/primary_tabbar.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/profile_top_loader.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/qoutes_grid.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,87 +16,98 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:provider/provider.dart';
 
+import '../../../models/providers/user_data_provider.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/localization_text_strings.dart';
 
+import '../../../resources/strings.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/menu_user_button.dart';
+import '../../../widgets/profile_pic.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
+import '../../../widgets/profle_screen_widgets/music_grid.dart';
 import '../../../widgets/profle_screen_widgets/video_grid.dart';
 import '../../../widgets/text_widget.dart';
 import '../follower_following_screen.dart';
+
+void navigateToAppUserScreen(userId, context) {
+  if (userId != FirebaseAuth.instance.currentUser!.uid) {
+    Get.to(() => AppUserScreen(appUserId: userId));
+  } else {
+    // Get.off(() => const DashBoard());
+    final dasboardController =
+        Provider.of<DashboardProvider>(context, listen: false);
+    dasboardController.changePage(5);
+  }
+}
 
 class AppUserScreen extends StatefulWidget {
   const AppUserScreen({
     Key? key,
     required this.appUserId,
-    required this.appUserName,
+    // required this.appUserName,
   }) : super(key: key);
 
   final String appUserId;
-  final String appUserName;
+  // final String appUserName;
 
   @override
   State<AppUserScreen> createState() => _AppUserScreenState();
 }
 
 class _AppUserScreenState extends State<AppUserScreen> {
-  // RxBool isGhostModeOn = false.obs;
-
-  // @override
-  // void initState() {
-  //   getGhostValue();
-  //   super.initState();
-  // }
-
-  // void getGhostValue() async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //   isGhostModeOn.value = sharedPreferences.getBool('isGhostEnable')!;
-  //   log("======== $isGhostModeOn");
-  // }
+  late ProfileProvider profileProvider;
+  int postCount = 0;
 
   @override
   Widget build(BuildContext context) {
-    final post = context.watch<List<PostModel>?>();
-    return SafeArea(
+    // final post = context.watch<List<PostModel>?>();
+    profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final ghost = Provider.of<DashboardProvider>(context);
+    var currentUser = context.watch<UserModel?>();
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        bottom: false,
         top: false,
         child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.grey[50],
+            elevation: 0,
+            leading: IconButton(
+              onPressed: () => Get.back(),
+              color: Colors.black,
+              icon: SvgPicture.asset(icIosBackArrow),
+            ),
+            actions: [
+              menuUserButton(
+                context,
+                widget.appUserId,
+                "",
+              ),
+              widthBox(15.w),
+            ],
+          ),
           body: NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                     SliverToBoxAdapter(
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 5, right: 10, top: 40),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    Get.back();
-                                  },
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_left_rounded,
-                                  ),
-                                ),
-                                menuUserButton(
-                                  context,
-                                  widget.appUserId,
-                                  widget.appUserName,
-                                )
-                              ],
-                            ),
-                          ),
                           Consumer<List<UserModel>?>(
                             builder: (context, appUser, b) {
-                              if (appUser == null) {
+                              if (appUser == null || currentUser == null) {
                                 return const ProfileTopLoader();
                               } else {
                                 var userList = appUser
                                     .where((element) =>
                                         element.id == widget.appUserId)
                                     .toList();
+
+                                // var currentUser = appUser
+                                //     .where((element) =>
+                                //         element.id ==
+                                //         FirebaseAuth.instance.currentUser!.uid)
+                                //     .first;
                                 UserModel? user =
                                     userList.isNotEmpty ? userList.first : null;
                                 if (user == null) {
@@ -101,71 +115,74 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                 } else {
                                   return Column(
                                     children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: colorPrimaryA05,
-                                                width: 1.5),
-                                            shape: BoxShape.circle),
-                                        height: 90.h,
-                                        width: 90.h,
-                                        alignment: Alignment.center,
-                                        child: AspectRatio(
-                                            aspectRatio: 1 / 1,
-                                            child: ClipOval(
-                                                child: FadeInImage(
-                                                    fit: BoxFit.cover,
-                                                    placeholder:
-                                                        const AssetImage(
-                                                            imgUserPlaceHolder),
-                                                    image: NetworkImage(
-                                                        user.imageStr)))),
+                                      Card(
+                                        color: colorWhite,
+                                        shape: const CircleBorder(
+                                            side: BorderSide(
+                                                color: colorWhite, width: 3)),
+                                        elevation: 2,
+                                        child: ProfilePic(
+                                          pic: user.imageStr,
+                                          showBorder: false,
+                                          heightAndWidth: 105.h,
+                                        ),
                                       ),
-                                      heightBox(15.h),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          TextWidget(
-                                            text: user.name,
-                                            color: color13F,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16.sp,
-                                          ),
-                                          widthBox(6.w),
-                                          if (user.isVerified)
-                                            SvgPicture.asset(
-                                              icVerifyBadge,
-                                              width: 17.w,
-                                              height: 17.h,
-                                            )
-                                        ],
+                                      heightBox(15.w),
+                                      SelectableText.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "${user.name} ",
+                                              style: TextStyle(
+                                                color: color13F,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16.sp,
+                                              ),
+                                            ),
+                                            WidgetSpan(
+                                              child: Visibility(
+                                                visible: user.isVerified,
+                                                child: SvgPicture.asset(
+                                                  icVerifyBadge,
+                                                  height: 17,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      TextWidget(
+                                      SelectableTextWidget(
                                         text: user.username,
                                         color: colorAA3,
-                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 13.sp,
                                       ),
-                                      heightBox(12.h),
+                                      heightBox(8.h),
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          post == null
-                                              ? const PostFollowCount(
-                                                  count: 0,
-                                                  countText: strProfilePost)
-                                              : PostFollowCount(
-                                                  count: post
-                                                      .where((element) =>
-                                                          element.creatorId ==
-                                                              widget
-                                                                  .appUserId &&
-                                                          element.mediaData[0]
-                                                                  .type !=
-                                                              'Music')
-                                                      .toList()
-                                                      .length,
-                                                  countText: strProfilePost,
-                                                ),
+                                          StreamProvider.value(
+                                              initialData: null,
+                                              value: DataProvider().posts(null),
+                                              child: Consumer<List<PostModel>?>(
+                                                  builder: (context, post, b) {
+                                                if (post == null) {
+                                                  return profileCounter(
+                                                      ontap: null,
+                                                      count: '0',
+                                                      strText: strProfilePost);
+                                                }
+                                                return profileCounter(
+                                                    ontap: null,
+                                                    count: post
+                                                        .where((element) =>
+                                                            element.creatorId ==
+                                                            user.id)
+                                                        .toList()
+                                                        .length
+                                                        .toString(),
+                                                    strText: strProfilePost);
+                                              })),
                                           verticalLine(
                                               height: 24.h,
                                               horizontalMargin: 30.w),
@@ -203,34 +220,126 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                           ),
                                         ],
                                       ),
-                                      heightBox(14.h),
+                                      heightBox(20.h),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
-                                            horizontal: 27.w),
-                                        child: TextWidget(
-                                          text: user.bio,
-                                          textAlign: TextAlign.center,
-                                          color: color55F,
-                                          fontSize: 12.sp,
+                                            horizontal: 40.w),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Visibility(
+                                              visible:
+                                                  user.education.isNotEmpty,
+                                              child: SelectableText.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    WidgetSpan(
+                                                      child: Icon(
+                                                        Icons.school,
+                                                        size: 16.sp,
+                                                        color: color55F,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          ' ${user.education} ',
+                                                      style: TextStyle(
+                                                        color: color55F,
+                                                        fontSize: 12.sp,
+                                                        fontFamily: strFontName,
+                                                      ),
+                                                    ),
+                                                    WidgetSpan(
+                                                        child: Visibility(
+                                                            visible: user
+                                                                .isEducationVerified,
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              icVerifyBadge,
+                                                              height: 15,
+                                                            ))),
+                                                  ],
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            Visibility(
+                                              visible: user.work.isNotEmpty,
+                                              child: SelectableText.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    WidgetSpan(
+                                                      child: Icon(
+                                                        Icons.work,
+                                                        size: 15.sp,
+                                                        color: color55F,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: ' ${user.work} ',
+                                                      style: TextStyle(
+                                                        color: color55F,
+                                                        fontFamily: strFontName,
+                                                        fontSize: 12.sp,
+                                                      ),
+                                                    ),
+                                                    WidgetSpan(
+                                                        child: Visibility(
+                                                            visible: user
+                                                                .isWorkVerified,
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              icVerifyBadge,
+                                                              height: 15,
+                                                            ))),
+                                                  ],
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            Visibility(
+                                              visible: user.bio.isNotEmpty,
+                                              child: SelectableTextWidget(
+                                                text: user.bio,
+                                                textAlign: TextAlign.center,
+                                                color: color55F,
+                                                fontSize: 12.sp,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      heightBox(20.h),
+                                      heightBox(user.bio.isEmpty ? 0 : 15.h),
                                       Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 20.w),
                                         child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: [
                                             Expanded(
                                               child: GestureDetector(
-                                                // onTap: () =>
-                                                //     widget.appUserController.toggleFollowUser(),
+                                                onTap: () => profileProvider
+                                                    .toggleFollowBtn(
+                                                        userModel: currentUser,
+                                                        appUserId: user.id),
                                                 child: Container(
                                                   height: 45.h,
                                                   decoration: BoxDecoration(
-                                                    color: colorWhite,
+                                                    color: currentUser
+                                                            .followingsIds
+                                                            .contains(user.id)
+                                                        ? colorWhite
+                                                        : colorF03,
                                                     border: Border.all(
-                                                        width: 1.w,
-                                                        color: color221),
+                                                      width: 1.w,
+                                                      color: currentUser
+                                                              .followingsIds
+                                                              .contains(user.id)
+                                                          ? color221
+                                                          : Colors.transparent,
+                                                    ),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             12.r),
@@ -255,7 +364,11 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                   ),
                                                   child: Center(
                                                     child: TextWidget(
-                                                      text: strUnFollow,
+                                                      text: currentUser
+                                                              .followingsIds
+                                                              .contains(user.id)
+                                                          ? strUnFollow
+                                                          : strSrcFollow,
                                                       color: color13F,
                                                       fontSize: 18.sp,
                                                       fontWeight:
@@ -265,51 +378,35 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                                 ),
                                               ),
                                             ),
-                                            widthBox(10.w),
+                                            widthBox(8.w),
                                             GestureDetector(
-                                              // onTap: () => Get.to(() => isGhostModeOn.value
-                                              //     ? GhostChatScreen2(
-                                              //         appUserId: widget
-                                              //             .appUserController.appUserId,
-                                              //         creatorDetails: CreatorDetails(
-                                              //           name: widget.appUserController
-                                              //               .appUserData.value.name,
-                                              //           imageUrl: widget.appUserController
-                                              //               .appUserData.value.imageStr,
-                                              //           isVerified: widget.appUserController
-                                              //               .appUserData.value.isVerified,
-                                              //         ),
-                                              //         profileScreenController:
-                                              //             ProfileScreenController(),
-                                              //         val: "",
-                                              //       )
-                                              //     : ChatScreen(
-                                              //         appUserId: widget
-                                              //             .appUserController.appUserId,
-                                              //         creatorDetails: CreatorDetails(
-                                              //           name: widget.appUserController
-                                              //               .appUserData.value.name,
-                                              //           imageUrl: widget.appUserController
-                                              //               .appUserData.value.imageStr,
-                                              //           isVerified: widget.appUserController
-                                              //               .appUserData.value.isVerified,
-                                              //         ),
-                                              //         profileScreenController:
-                                              //             ProfileScreenController(),
-                                              //         val: "",
-                                              //       )),
                                               onTap: () {
                                                 Get.to(
-                                                  () => ChatScreen(
-                                                    appUserId: user.id,
-                                                    creatorDetails:
-                                                        CreatorDetails(
-                                                      name: user.name,
-                                                      imageUrl: user.imageStr,
-                                                      isVerified:
-                                                          user.isVerified,
-                                                    ),
-                                                  ),
+                                                  () => ghost.checkGhostMode
+                                                      ? GhostChatScreen2(
+                                                          appUserId: user.id,
+                                                          firstMessagebyMe:
+                                                              true,
+                                                          creatorDetails:
+                                                              CreatorDetails(
+                                                            name: user.name,
+                                                            imageUrl:
+                                                                user.imageStr,
+                                                            isVerified:
+                                                                user.isVerified,
+                                                          ),
+                                                        )
+                                                      : ChatScreen(
+                                                          appUserId: user.id,
+                                                          creatorDetails:
+                                                              CreatorDetails(
+                                                            name: user.name,
+                                                            imageUrl:
+                                                                user.imageStr,
+                                                            isVerified:
+                                                                user.isVerified,
+                                                          ),
+                                                        ),
                                                 );
                                               },
                                               child: Image.asset(
@@ -326,14 +423,14 @@ class _AppUserScreenState extends State<AppUserScreen> {
                               }
                             },
                           ),
-                          heightBox(15.h),
                         ],
                       ),
                     )
                   ],
               body: Consumer<List<UserModel>?>(builder: (context, appUser, b) {
                 if (appUser == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else {
                   var userList = appUser
                       .where((element) => element.id == widget.appUserId)
@@ -342,7 +439,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                   if (user == null) {
                     return const Center(
                       child: TextWidget(
-                        text: "User no longer exists",
+                        text: strAlertUserNotExist,
                       ),
                     );
                   } else {
@@ -351,66 +448,88 @@ class _AppUserScreenState extends State<AppUserScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          primaryTabBar(
+                          TabBar(
+                            labelColor: colorPrimaryA05,
+                            unselectedLabelColor: colorAA3,
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
+                            ),
+                            indicatorColor: colorF03,
+                            indicatorPadding: EdgeInsets.symmetric(
+                                vertical: 5.h, horizontal: 10.w),
+                            dividerColor: Colors.transparent,
                             tabs: const [
                               Tab(
-                                child: Text('Qoutes'),
+                                child: Text(strQuote),
                               ),
                               Tab(
-                                child: Text('Images'),
+                                child: Text(strImages),
                               ),
                               Tab(
-                                child: Text('Videos'),
+                                child: Text(strVideos),
                               ),
                               Tab(
-                                child: Text('Stories'),
+                                child: Text(strMusic),
                               ),
                             ],
                           ),
-                          Expanded(
-                            child: TabBarView(
-                              children: [
-                                //qoute
-                                post == null
-                                    ? const Center(
-                                        child: CircularProgressIndicator())
-                                    : QoutesGridView(
-                                        qoutesList: post
-                                            .where((element) =>
-                                                element.creatorId ==
-                                                    widget.appUserId &&
-                                                element.mediaData[0].type ==
-                                                    'Qoute')
-                                            .toList(),
-                                      ),
-                                post == null
-                                    ? const Center(
-                                        child: CircularProgressIndicator())
-                                    : ImageGridView(
-                                        imageList: post
-                                            .where((element) =>
-                                                element.creatorId ==
-                                                    widget.appUserId &&
-                                                element.mediaData[0].type ==
-                                                    'Photo')
-                                            .toList(),
-                                      ),
-                                post == null
-                                    ? const Center(
-                                        child: CircularProgressIndicator())
-                                    : VideoGridView(
-                                        videoList: post
-                                            .where((element) =>
-                                                element.creatorId ==
-                                                    widget.appUserId &&
-                                                element.mediaData[0].type ==
-                                                    'Video')
-                                            .toList(),
-                                      ),
-                                //story
-                                Container()
-                              ],
-                            ),
+                          heightBox(10.w),
+                          StreamProvider.value(
+                            initialData: null,
+                            value: DataProvider().posts(null),
+                            child: Consumer<List<PostModel>?>(
+                                builder: (context, post, b) {
+                              if (post == null) {
+                                return centerLoader();
+                              }
+                              postCount = post
+                                  .where(
+                                      (element) => element.creatorId == user.id)
+                                  .map((e) => e)
+                                  .toList()
+                                  .length;
+                              return Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    //qoute
+                                    QoutesGridView(
+                                      qoutesList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Qoute')
+                                          .toList(),
+                                    ),
+                                    ImageGridView(
+                                      imageList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Photo')
+                                          .toList(),
+                                    ),
+                                    VideoGridView(
+                                      videoList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Video')
+                                          .toList(),
+                                    ),
+                                    //music
+                                    MusicGrid(
+                                      musicList: post
+                                          .where((element) =>
+                                              element.creatorId == user.id &&
+                                              element.mediaData.first.type ==
+                                                  'Music')
+                                          .toList(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
                           )
                         ],
                       ),
@@ -418,7 +537,9 @@ class _AppUserScreenState extends State<AppUserScreen> {
                   }
                 }
               })),
-        ));
+        ),
+      ),
+    );
   }
 }
 

@@ -1,6 +1,6 @@
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
-import 'package:casarancha/screens/dashboard/provider/ghost_porvider.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
@@ -8,42 +8,45 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/dashboard_widget/custom_bottom_nav.dart';
+import '../forum/forum.dart';
+import '../groups/my_groups_screen.dart';
 
-class DashBoard extends StatelessWidget {
+class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
+
+  @override
+  State<DashBoard> createState() => _DashBoardState();
+}
+
+class _DashBoardState extends State<DashBoard> {
+  final _fcmServices = FirebaseMessagingService();
+  @override
+  void initState() {
+    _fcmServices.init(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final dashboardProvider = context.watch<DashboardProvider>();
-    final ghost = context.watch<GhostProvider>();
-    return SafeArea(
-      top: ghost.checkGhostMode,
-      bottom: ghost.checkGhostMode,
-      child: Scaffold(
-          body: Container(
-            decoration: ghost.checkGhostMode
-                ? BoxDecoration(
-                    border: Border.all(
-                      width: 2.5,
-                      color: Colors.red,
-                    ),
-                  )
-                : null,
-            child: PageView(
-              controller: dashboardProvider.pageController,
-              onPageChanged: (value) {},
-              children: const [
-                HomeScreen(),
-                SearchScreen(),
-                Scaffold(),
-                ChatListScreen(),
-                ProfileScreen(),
-              ],
-            ),
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
-          floatingActionButton: const CustomBottomNavigationBar()),
-    );
+    return Scaffold(
+        body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          pageSnapping: false,
+          controller: dashboardProvider.pageController,
+          onPageChanged: (value) {
+            dashboardProvider.changePage(value);
+          },
+          children: const [
+            HomeScreen(),
+            SearchScreen(),
+            GroupScreen(),
+            ForumsScreen(),
+            ChatListScreen(),
+            ProfileScreen(),
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: const CustomBottomNavigationBar());
   }
 }

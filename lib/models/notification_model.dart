@@ -1,41 +1,47 @@
-import 'dart:convert';
-
 import 'package:casarancha/models/post_creator_details.dart';
 
 class NotificationModel {
-  String? id;
-  String? appUserId;
+  String? sentToId;
+  String? sentById;
+  dynamic content;
+  String? notificationType;
+  String? groupId;
   CreatorDetails? createdDetails;
   String? msg;
   bool? isRead;
   String? createdAt;
-  String? imageUrl;
 
   NotificationModel({
-    this.id,
+    this.sentToId,
+    this.sentById,
+    this.content,
+    this.notificationType,
+    this.groupId,
     this.createdDetails,
     this.isRead,
-    this.appUserId,
     this.msg,
-    this.imageUrl,
     this.createdAt,
   });
 
   NotificationModel copyWith({
-    String? id,
+    String? sentToId,
+    String? sentById,
+    dynamic content,
+    String? notificationType,
+    String? groupId,
     CreatorDetails? createdDetails,
-    String? appUserId,
     dynamic msg,
-    String? imageUrl,
     bool? isRead,
     String? createdAt,
   }) {
     return NotificationModel(
-      id: id ?? this.id,
+      sentById: sentById ?? this.sentById,
+      sentToId: sentToId ?? this.sentToId,
+      content: content ?? this.content,
+      notificationType: notificationType ?? this.notificationType,
+      groupId: groupId ?? this.groupId,
       isRead: isRead ?? false,
       createdDetails: createdDetails ?? this.createdDetails,
-      appUserId: appUserId ?? this.appUserId,
-      imageUrl: imageUrl ?? this.imageUrl,
       msg: msg ?? this.msg,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -43,59 +49,29 @@ class NotificationModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'id': id,
+      'sentToId': sentToId,
+      'sentById': sentById,
+      'content': content,
+      'notificationType': notificationType,
+      'groupId': groupId,
       'isRead': isRead,
-      'imageUrl': imageUrl,
       'createdDetails': createdDetails!.toMap(),
-      'appUserId': appUserId,
-      'content': msg,
+      'msg': msg,
       'createdAt': createdAt
     };
   }
 
   factory NotificationModel.fromMap(Map<String, dynamic> map) {
     return NotificationModel(
-      id: map['id'],
+      groupId: map['groupId'],
+      notificationType: map['notificationType'],
+      sentById: map['sentById'],
+      sentToId: map['sentToId'],
+      content: map['content'] as dynamic,
       isRead: map['isRead'],
-      imageUrl: map['imageUrl'],
       createdDetails: CreatorDetails.fromMap(map['createdDetails']),
-      appUserId: map['appUserId'],
-      msg: map['content'] as dynamic,
+      msg: map['msg'],
       createdAt: map['createdAt'],
     );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory NotificationModel.fromJson(String source) =>
-      NotificationModel.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'NotificationModel(id: $id,imageUrl:$imageUrl, createdDetails: $createdDetails, appUserId: $appUserId, content: $msg, createdAt: $createdAt, isRead: $isRead)';
-  }
-
-  @override
-  bool operator ==(covariant NotificationModel other) {
-    if (identical(this, other)) return true;
-
-    return other.id == id &&
-        other.isRead == isRead &&
-        other.imageUrl == imageUrl &&
-        other.createdDetails == createdDetails &&
-        other.appUserId == appUserId &&
-        other.msg == msg &&
-        other.createdAt == createdAt;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        isRead.hashCode ^
-        imageUrl.hashCode ^
-        createdDetails.hashCode ^
-        appUserId.hashCode ^
-        msg.hashCode ^
-        createdAt.hashCode;
   }
 }

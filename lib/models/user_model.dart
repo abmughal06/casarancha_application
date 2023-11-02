@@ -11,6 +11,8 @@ class UserModel {
   String name;
   String createdAt;
   String bio;
+  String education;
+  String work;
   String imageStr;
   List<String> postsIds;
   List<String> storiesIds;
@@ -18,10 +20,13 @@ class UserModel {
   List<String> followingsIds;
   List<String> savedPostsIds;
   List<String> groupIds;
+  List<String> blockIds;
   bool isOnline;
   bool isdobShown;
   bool isEmailShown;
   bool isVerified;
+  bool isWorkVerified;
+  bool isEducationVerified;
   int? reportCount;
   String? fcmToken;
   UserModel({
@@ -33,17 +38,22 @@ class UserModel {
     required this.name,
     required this.createdAt,
     required this.bio,
+    required this.work,
+    required this.education,
     required this.imageStr,
     this.postsIds = const [],
     this.storiesIds = const [],
     this.followersIds = const [],
     this.followingsIds = const [],
     this.savedPostsIds = const [],
+    this.blockIds = const [],
     this.groupIds = const [],
     required this.isOnline,
     this.isdobShown = false,
     this.isEmailShown = false,
     this.isVerified = false,
+    required this.isWorkVerified,
+    required this.isEducationVerified,
     this.reportCount = 0,
     this.fcmToken,
   });
@@ -57,6 +67,8 @@ class UserModel {
     String? name,
     String? createdAt,
     String? bio,
+    String? work,
+    String? education,
     String? imageStr,
     List<String>? postsIds,
     List<String>? storiesIds,
@@ -64,15 +76,19 @@ class UserModel {
     List<String>? followingsIds,
     List<String>? savedPostsIds,
     List<String>? groupIds,
+    List<String>? blockIds,
     bool? isOnline,
     bool? isdobShown,
     bool? isEmailShown,
     bool? isVerified,
+    bool? isWorkVerified,
+    bool? isEducationVerified,
     int? reportCount,
     String? fcmToken,
   }) {
     return UserModel(
       id: id ?? this.id,
+      blockIds: blockIds ?? this.blockIds,
       email: email ?? this.email,
       username: username ?? this.username,
       ghostName: ghostName ?? this.ghostName,
@@ -80,6 +96,10 @@ class UserModel {
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
       bio: bio ?? this.bio,
+      work: work ?? this.work,
+      education: education ?? this.education,
+      isWorkVerified: isWorkVerified ?? this.isWorkVerified,
+      isEducationVerified: isEducationVerified ?? this.isEducationVerified,
       imageStr: imageStr ?? this.imageStr,
       postsIds: postsIds ?? this.postsIds,
       storiesIds: storiesIds ?? this.storiesIds,
@@ -106,10 +126,15 @@ class UserModel {
       'email': email,
       'username': username,
       'ghostName': ghostName,
+      'blockIds': blockIds,
+      'isWorkVerified': isWorkVerified,
+      'isEducationVerified': isEducationVerified,
       'dob': dob,
       'name': name,
       'createdAt': createdAt,
       'bio': bio,
+      'education': education,
+      'work': work,
       'imageStr': imageStr,
       'postsIds': postsIds,
       'storiesIds': storiesIds,
@@ -129,13 +154,20 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['id'] ?? '',
+      blockIds: map['blockIds'] == null
+          ? const []
+          : List<String>.from(map['blockIds']),
       email: map['email'] ?? '',
+      isEducationVerified: map['isEducationVerified'] ?? false,
+      isWorkVerified: map['isWorkVerified'] ?? false,
       username: map['username'] ?? '',
       ghostName: map['ghostName'] ?? '',
       dob: map['dob'] ?? '',
       name: map['name'] ?? '',
       createdAt: map['createdAt'] ?? '',
       bio: map['bio'] ?? '',
+      work: map['work'] ?? '',
+      education: map['education'] ?? '',
       imageStr: map['imageStr'] ?? '',
       postsIds: List<String>.from(map['postsIds']),
       storiesIds: List<String>.from(map['storiesIds']),
@@ -159,7 +191,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, username: $username, ghosName : $ghostName,dob: $dob, name: $name, createdAt: $createdAt, bio: $bio, imageStr: $imageStr, postsIds: $postsIds, storiesIds: $storiesIds, followersIds: $followersIds, followingsIds: $followingsIds, savedPostsIds: $savedPostsIds, groupIds: $groupIds, isOnline: $isOnline, isdobShown: $isdobShown, isEmailShown: $isEmailShown, isVerified: $isVerified,reportCount: $reportCount,fcmToken: $fcmToken )';
+    return 'UserModel(id: $id,blockIds: $blockIds, email: $email, isWorkVerified:$isWorkVerified,isEducationVerified:$isEducationVerified,username: $username, ghosName : $ghostName,dob: $dob, name: $name, createdAt: $createdAt, bio: $bio, education: $education, work: $work, imageStr: $imageStr, postsIds: $postsIds, storiesIds: $storiesIds, followersIds: $followersIds, followingsIds: $followingsIds, savedPostsIds: $savedPostsIds, groupIds: $groupIds, isOnline: $isOnline, isdobShown: $isdobShown, isEmailShown: $isEmailShown, isVerified: $isVerified,reportCount: $reportCount,fcmToken: $fcmToken )';
   }
 
   @override
@@ -168,6 +200,8 @@ class UserModel {
 
     return other is UserModel &&
         other.id == id &&
+        other.isEducationVerified == isEducationVerified &&
+        other.isWorkVerified == isWorkVerified &&
         other.email == email &&
         other.ghostName == ghostName &&
         other.username == username &&
@@ -175,7 +209,10 @@ class UserModel {
         other.name == name &&
         other.createdAt == createdAt &&
         other.bio == bio &&
+        other.work == work &&
+        other.education == education &&
         other.imageStr == imageStr &&
+        listEquals(other.blockIds, blockIds) &&
         listEquals(other.postsIds, postsIds) &&
         listEquals(other.storiesIds, storiesIds) &&
         listEquals(other.followersIds, followersIds) &&
@@ -195,13 +232,18 @@ class UserModel {
     return id.hashCode ^
         email.hashCode ^
         username.hashCode ^
+        isWorkVerified.hashCode ^
+        isEducationVerified.hashCode ^
         ghostName.hashCode ^
         dob.hashCode ^
         name.hashCode ^
         createdAt.hashCode ^
         bio.hashCode ^
+        work.hashCode ^
+        education.hashCode ^
         imageStr.hashCode ^
         postsIds.hashCode ^
+        blockIds.hashCode ^
         storiesIds.hashCode ^
         followersIds.hashCode ^
         followingsIds.hashCode ^
