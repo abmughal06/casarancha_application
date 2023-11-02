@@ -54,6 +54,7 @@ const strDone = "Done";
 //Notifications
 const strNotifications = "Notifications";
 const strFollowRequest = "Follow Requests";
+const strRecentlyFollowedYou = "Recently Followed You";
 const strLikeYourPic = "Like Your Photo";
 const strAccept = "Accept";
 const strDecline = "Decline";

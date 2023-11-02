@@ -16,6 +16,7 @@ import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../common_widgets.dart';
+import '../shared/skeleton.dart';
 import '../text_widget.dart';
 
 class CustomPostFooter extends StatelessWidget {
@@ -206,12 +207,29 @@ class CustomPostFooter extends StatelessWidget {
         Visibility(
           visible: isPostDetail! ? false : postModel.commentIds.isNotEmpty,
           child: StreamProvider.value(
-            value: DataProvider().comment(postModel.id),
+            value:
+                DataProvider().comment(cmntId: postModel.id, groupId: groupId),
             initialData: null,
             child: Consumer<List<Comment>?>(
               builder: (context, comment, b) {
                 if (comment == null || users == null) {
-                  return const CircularProgressIndicator.adaptive();
+                  return Row(
+                    children: [
+                      Skeleton(
+                        height: 44.w,
+                        width: 44.w,
+                        radius: 1000.r,
+                      ),
+                      widthBox(15.w),
+                      Column(
+                        children: [
+                          Skeleton(height: 10.h, width: 250.w, radius: 10),
+                          heightBox(10.h),
+                          Skeleton(height: 10.h, width: 180.w, radius: 10),
+                        ],
+                      )
+                    ],
+                  );
                 }
 
                 if (comment.isEmpty) {
@@ -221,10 +239,11 @@ class CustomPostFooter extends StatelessWidget {
                 var cmnt = data;
                 return cmnt.message.isEmpty
                     ? Container()
-                    : PostCommentTile(
+                    : FeedPostCommentTile(
                         cmnt: cmnt,
                         isFeedTile: true,
                         postModel: postModel,
+                        groupId: groupId,
                       );
               },
             ),

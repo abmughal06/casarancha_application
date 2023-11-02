@@ -1,3 +1,4 @@
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
@@ -10,8 +11,20 @@ import '../../widgets/dashboard_widget/custom_bottom_nav.dart';
 import '../forum/forum.dart';
 import '../groups/my_groups_screen.dart';
 
-class DashBoard extends StatelessWidget {
+class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
+
+  @override
+  State<DashBoard> createState() => _DashBoardState();
+}
+
+class _DashBoardState extends State<DashBoard> {
+  final _fcmServices = FirebaseMessagingService();
+  @override
+  void initState() {
+    _fcmServices.init(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

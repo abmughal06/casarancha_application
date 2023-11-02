@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_creator_prf_tile.dart';
+import 'package:casarancha/widgets/shared/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -33,6 +35,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final users = context.watch<List<UserModel>?>();
+    final postProvider = Provider.of<PostProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -56,7 +59,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       builder: (context, post, b) {
                         if (post == null) {
                           log(widget.postModel.id);
-                          return const CircularProgressIndicator.adaptive();
+                          return const Skeleton(
+                            height: 9 / 16,
+                            width: double.infinity,
+                            radius: 12,
+                          );
                         } else {
                           return Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -96,7 +103,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                   ),
                   StreamProvider.value(
-                    value: DataProvider().comment(widget.postModel.id),
+                    value: DataProvider().comment(
+                        cmntId: widget.postModel.id, groupId: widget.groupId),
                     initialData: null,
                     child: Consumer<List<Comment>?>(
                       builder: (context, comment, b) {
@@ -117,7 +125,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                               return cmnt.message.isEmpty
                                   ? Container()
                                   : PostCommentTile(
-                                      cmnt: cmnt, isFeedTile: false);
+                                      cmnt: cmnt,
+                                      postModel: widget.postModel,
+                                      isFeedTile: false,
+                                      groupId: widget.groupId,
+                                    );
                             } else {
                               return Container();
                             }
@@ -132,7 +144,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             ),
             PostCommentField(
               postModel: widget.postModel,
-              commentController: coommenController,
+              groupId: widget.groupId,
+              commentController: postProvider.postCommentController,
             )
           ],
         ),

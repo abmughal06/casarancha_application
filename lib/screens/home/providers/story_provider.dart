@@ -105,9 +105,11 @@ class StoryProvider extends ChangeNotifier {
 
     FirebaseMessagingService().sendNotificationToUser(
       appUserId: recieverRef.id,
-      imageUrl: storyItems[currentIndex].type == 'Photo'
+      content: storyItems[currentIndex].type == 'Photo'
           ? storyItems[currentIndex].link
           : '',
+      notificationType: "story_cmnt",
+      groupId: null,
       isMessage: false,
       // creatorDetails: creatorDetails,
       devRegToken: recieverFCMToken,

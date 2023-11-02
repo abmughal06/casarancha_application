@@ -16,10 +16,12 @@ class PostCommentField extends StatelessWidget {
     Key? key,
     required this.commentController,
     required this.postModel,
+    this.groupId,
   }) : super(key: key);
 
   final TextEditingController commentController;
   final PostModel postModel;
+  final String? groupId;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class PostCommentField extends StatelessWidget {
             ),
           ]),
           child: TextField(
+            focusNode: postProvider.postCommentFocus,
             controller: commentController,
             style: TextStyle(
               color: color239,
@@ -61,13 +64,22 @@ class PostCommentField extends StatelessWidget {
                   padding: const EdgeInsets.all(15.0),
                   child: GestureDetector(
                       onTap: () {
-                        postProvider.postComment(
-                          postModel: postModel,
-                          comment: commentController.text,
-                          user: user,
-                        );
-
-                        commentController.clear();
+                        if (postProvider.repCommentId == null) {
+                          postProvider.postComment(
+                            postModel: postModel,
+                            comment: commentController.text,
+                            groupId: groupId,
+                            user: user,
+                          );
+                        } else {
+                          postProvider.postCommentReply(
+                            postModel: postModel,
+                            groupId: groupId,
+                            user: user,
+                            recieverId: user.id,
+                          );
+                          postProvider.repCommentId = null;
+                        }
                       },
                       child: Image.asset(
                         imgSendComment,
@@ -88,6 +100,10 @@ class PostCommentField extends StatelessWidget {
             maxLines: 3,
             keyboardType: TextInputType.multiline,
             textInputAction: TextInputAction.newline,
+            onTapOutside: (v) {
+              FocusScope.of(context).unfocus();
+              postProvider.repCommentId = null;
+            },
             onEditingComplete: () => FocusScope.of(context).unfocus(),
           ),
         ),

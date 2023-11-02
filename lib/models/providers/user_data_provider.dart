@@ -103,21 +103,52 @@ class DataProvider extends ChangeNotifier {
         .map((event) => event.docs
             .where((element) =>
                 element.data().isNotEmpty &&
-                element.data()['appUserId'] != null &&
-                element.data()['appUserId'] !=
+                element.data()['sentById'] != null &&
+                element.data()['sentById'] !=
                     FirebaseAuth.instance.currentUser!.uid)
             .map((e) => NotificationModel.fromMap(e.data()))
             .toList());
   }
 
-  Stream<List<Comment>?> comment(id) {
-    return FirebaseFirestore.instance
-        .collection(cPosts)
-        .doc(id)
-        .collection(cComments)
-        .orderBy("createdAt", descending: true)
-        .snapshots()
-        .map((event) => event.docs
+  Stream<List<Comment>?> comment({cmntId, groupId}) {
+    var ref = groupId == null
+        ? FirebaseFirestore.instance
+            .collection(cPosts)
+            .doc(cmntId)
+            .collection(cComments)
+        : FirebaseFirestore.instance
+            .collection(cGroups)
+            .doc(groupId)
+            .collection(cPosts)
+            .doc(cmntId)
+            .collection(cComments);
+    return ref.orderBy("createdAt", descending: true).snapshots().map((event) =>
+        event.docs
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data().containsKey('postId'))
+            .map((e) => Comment.fromMap(e.data()))
+            .toList());
+  }
+
+  Stream<List<Comment>?> commentReply({postId, groupId, cmntId}) {
+    var ref = groupId == null
+        ? FirebaseFirestore.instance
+            .collection(cPosts)
+            .doc(postId)
+            .collection(cComments)
+            .doc(cmntId)
+            .collection('reply')
+        : FirebaseFirestore.instance
+            .collection(cGroups)
+            .doc(groupId)
+            .collection(cPosts)
+            .doc(postId)
+            .collection(cComments)
+            .doc(cmntId)
+            .collection('reply');
+    return ref.orderBy("createdAt", descending: false).snapshots().map(
+        (event) => event.docs
             .where((element) =>
                 element.data().isNotEmpty &&
                 element.data().containsKey('postId'))

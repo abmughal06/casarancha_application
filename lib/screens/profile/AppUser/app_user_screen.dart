@@ -34,6 +34,7 @@ void navigateToAppUserScreen(userId, context) {
   if (userId != FirebaseAuth.instance.currentUser!.uid) {
     Get.to(() => AppUserScreen(appUserId: userId));
   } else {
+    // Get.off(() => const DashBoard());
     final dasboardController =
         Provider.of<DashboardProvider>(context, listen: false);
     dasboardController.changePage(5);

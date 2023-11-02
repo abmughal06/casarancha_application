@@ -166,6 +166,7 @@ class ChatTextField extends StatelessWidget {
             ),
             keyboardType: TextInputType.multiline,
             textInputAction: TextInputAction.newline,
+            onTapOutside: (v) => FocusScope.of(context).unfocus(),
             onEditingComplete: () => FocusScope.of(context).unfocus(),
           ),
         );
@@ -345,6 +346,7 @@ class ChatTextFieldGhost extends StatelessWidget {
             ),
             keyboardType: TextInputType.multiline,
             textInputAction: TextInputAction.newline,
+            onTapOutside: (v) => FocusScope.of(context).unfocus(),
             onEditingComplete: () => FocusScope.of(context).unfocus(),
           ),
         );

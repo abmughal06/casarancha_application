@@ -3,6 +3,8 @@ import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
+import 'package:casarancha/screens/home/post_detail_screen.dart';
+import 'package:casarancha/utils/firebase_collection.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -11,8 +13,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import '../../models/post_model.dart';
 import '../../resources/color_resources.dart';
+import '../profile/AppUser/app_user_screen.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -26,7 +31,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     var ref = FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection("notificationlist");
+        .collection(cNotificationList);
     var docs = await ref.get();
     for (var d in docs.docs) {
       ref.doc(d.id).update({"isRead": true});
@@ -57,7 +62,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   text: strNotification,
                 ),
                 Tab(
-                  text: strFollowRequest,
+                  text: strRecentlyFollowedYou,
                 ),
               ],
             ),
@@ -69,9 +74,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   Consumer<List<NotificationModel>?>(
                     builder: (context, notifications, b) {
                       if (notifications == null) {
-                        return const Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        );
+                        return centerLoader();
                       }
                       if (notifications.isEmpty) {
                         return const Center(
@@ -81,20 +84,50 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         );
                       }
                       unreadNotification();
+                      var filterList = notifications
+                          .where(
+                            (element) =>
+                                element.notificationType != 'user_follow',
+                          )
+                          .toList();
 
                       return ListView.builder(
-                        itemCount: notifications.length,
+                        itemCount: filterList.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
-                          var notification = notifications[index];
+                          var notification = filterList[index];
 
-                          var isPostShow = notification.imageUrl != null
-                              ? notification.imageUrl!.isNotEmpty
+                          var isPostShow = notification.content != null
+                              ? notification.content!.isNotEmpty
                                   ? true
                                   : false
                               : false;
 
+                          PostModel? postModel =
+                              notification.notificationType == 'feed_post_cmnt'
+                                  ? PostModel.fromMap(notification.content)
+                                  : null;
+
+                          var contentImage =
+                              notification.notificationType == 'feed_post_cmnt'
+                                  ? postModel!.mediaData.first.link
+                                  : notification.content;
+
                           return ListTile(
+                            onTap: () {
+                              if (notification.notificationType ==
+                                  "feed_post_cmnt") {
+                                Get.to(() => PostDetailScreen(
+                                      postModel: postModel!,
+                                      groupId: notification.groupId,
+                                    ));
+                              }
+                              if (notification.notificationType ==
+                                  'user_follow') {
+                                navigateToAppUserScreen(
+                                    notification.sentById, context);
+                              }
+                            },
                             leading: Container(
                               height: 46.h,
                               width: 46.h,
@@ -175,7 +208,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 image: isPostShow
                                     ? DecorationImage(
                                         image: CachedNetworkImageProvider(
-                                            notification.imageUrl!),
+                                            contentImage),
                                         fit: BoxFit.cover,
                                       )
                                     : null,
@@ -186,8 +219,153 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       );
                     },
                   ),
-                  const Center(
-                    child: Text("No requests yet"),
+                  Consumer<List<NotificationModel>?>(
+                    builder: (context, notifications, b) {
+                      if (notifications == null) {
+                        return centerLoader();
+                      }
+                      if (notifications.isEmpty) {
+                        return const Center(
+                          child: TextWidget(
+                            text: strAlertNotification,
+                          ),
+                        );
+                      }
+                      var filterList = notifications
+                          .where(
+                            (element) =>
+                                element.notificationType == 'user_follow',
+                          )
+                          .toList();
+                      unreadNotification();
+
+                      return ListView.builder(
+                        itemCount: filterList.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          var notification = filterList[index];
+
+                          var isPostShow = notification.content != null
+                              ? notification.content!.isNotEmpty
+                                  ? true
+                                  : false
+                              : false;
+
+                          PostModel? postModel =
+                              notification.notificationType == 'feed_post_cmnt'
+                                  ? PostModel.fromMap(notification.content)
+                                  : null;
+
+                          var contentImage =
+                              notification.notificationType == 'feed_post_cmnt'
+                                  ? postModel!.mediaData.first.link
+                                  : notification.content;
+
+                          return ListTile(
+                            onTap: () {
+                              if (notification.notificationType ==
+                                  "feed_post_cmnt") {
+                                Get.to(() => PostDetailScreen(
+                                      postModel: postModel!,
+                                      groupId: notification.groupId,
+                                    ));
+                              }
+                              if (notification.notificationType ==
+                                  'user_follow') {
+                                navigateToAppUserScreen(
+                                    notification.sentById, context);
+                              }
+                            },
+                            leading: Container(
+                              height: 46.h,
+                              width: 46.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color:
+                                    notification.createdDetails!.imageUrl != ''
+                                        ? colorF03
+                                        : Colors.transparent,
+                                image: notification
+                                        .createdDetails!.imageUrl.isNotEmpty
+                                    ? DecorationImage(
+                                        image: CachedNetworkImageProvider(
+                                            notification
+                                                .createdDetails!.imageUrl),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : notification.createdDetails!.imageUrl !=
+                                            ''
+                                        ? const DecorationImage(
+                                            image: AssetImage(imgGhostUser),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : const DecorationImage(
+                                            image:
+                                                AssetImage(imgUserPlaceHolder),
+                                            fit: BoxFit.cover,
+                                          ),
+                              ),
+                            ),
+                            title: RichText(
+                              text: TextSpan(
+                                text: notification.createdDetails!.isVerified
+                                    ? notification.createdDetails!.name
+                                    : "${notification.createdDetails!.name} ",
+                                style: TextStyle(
+                                  color: const Color(0xff121F3F),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14.sp,
+                                ),
+                                children: [
+                                  WidgetSpan(
+                                    child: Visibility(
+                                      visible: notification
+                                          .createdDetails!.isVerified,
+                                      child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4.0),
+                                          child:
+                                              SvgPicture.asset(icVerifyBadge)),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                      text: " ${notification.msg!}",
+                                      style: TextStyle(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: color080,
+                                      ))
+                                ],
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: Text(
+                                convertDateIntoTime(notification.createdAt!),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12.sp,
+                                    color: const Color(0xff5F5F5F)),
+                              ),
+                            ),
+                            trailing: Container(
+                              height: isPostShow ? 50.h : 0,
+                              width: isPostShow ? 40.w : 0,
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                image: isPostShow
+                                    ? DecorationImage(
+                                        image: CachedNetworkImageProvider(
+                                            contentImage),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
