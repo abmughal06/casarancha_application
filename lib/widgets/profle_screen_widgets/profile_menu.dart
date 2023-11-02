@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/profile/get_verified.dart';
 import 'package:casarancha/screens/profile/settings/settings.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../resources/color_resources.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/providers/auth_provider.dart';
@@ -21,6 +19,7 @@ import '../../utils/app_constants.dart';
 import '../../utils/app_utils.dart';
 import '../common_widgets.dart';
 import '../home_page_widgets.dart';
+import 'dynamic_links.dart';
 
 bottomSheetProfile(context) {
   showModalBottomSheet(
@@ -93,6 +92,7 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
     case 4:
       //invite freinds
       inviteFriends();
+      // DynamicLinksProvider().createLink('123');
       break;
 
     case 5:
@@ -174,14 +174,19 @@ void launchUrls(String url) async {
 
 inviteFriends() async {
   try {
-    await FlutterShare.share(
-      title: 'Invite Friends',
-      text: 'Check out our awesome app on Play Store and App Store!',
-      linkUrl: Platform.isAndroid
-          ? 'https://play.google.com/store/apps/details?id=com.zb.casarancha'
-          : "https://apps.apple.com/us/app/casa-rancha/id1666539952", // Replace with your app's Play Store URL
-      chooserTitle: 'Share via', // You can customize this title
-    );
+    DynamicLinkHelper()
+        .createDynamicLink(FirebaseAuth.instance.currentUser!.uid);
+    // final link = await FirebaseDynamicLinkService.createDynamicLink(false);
+    // print(link);
+    // await FlutterShare.share(
+    //   title: 'Invite Friends',
+    //   text:
+    //       "I'm on CasaRancha as @. Install the app to follow my photos and videos.",
+    //   linkUrl: Platform.isAndroid
+    //       ? 'https://casarancha.com/profile?id=$user'
+    //       : "https://apps.apple.com/us/app/casa-rancha/id1666539952", // Replace with your app's Play Store URL
+    //   chooserTitle: 'Share via', // You can customize this title
+    // );
   } catch (e) {
     printLog('Error sharing: $e');
   }
