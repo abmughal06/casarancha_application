@@ -152,6 +152,12 @@ class FirebaseMessagingService {
     // Requesting permission for notifications
     await updateUserFcmToken();
 
+    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      badge: true,
+      sound: true,
+      alert: true,
+    );
+
     NotificationSettings settings = await fcmMessage.requestPermission(
       alert: true,
       announcement: true,

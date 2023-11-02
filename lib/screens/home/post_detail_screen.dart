@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_creator_prf_tile.dart';
 import 'package:casarancha/widgets/shared/skeleton.dart';
@@ -34,6 +35,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final users = context.watch<List<UserModel>?>();
+    final postProvider = Provider.of<PostProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -123,7 +125,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                               return cmnt.message.isEmpty
                                   ? Container()
                                   : PostCommentTile(
-                                      cmnt: cmnt, isFeedTile: false);
+                                      cmnt: cmnt,
+                                      postModel: widget.postModel,
+                                      isFeedTile: false,
+                                      groupId: widget.groupId,
+                                    );
                             } else {
                               return Container();
                             }
@@ -139,7 +145,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             PostCommentField(
               postModel: widget.postModel,
               groupId: widget.groupId,
-              commentController: coommenController,
+              commentController: postProvider.postCommentController,
             )
           ],
         ),
