@@ -8,7 +8,7 @@ import '../common_widgets.dart';
 import '../text_widget.dart';
 
 class BottomSheetWidget extends StatelessWidget {
-  BottomSheetWidget(
+  const BottomSheetWidget(
       {Key? key, this.ontapBlock, this.onTapDownload, required this.blockText})
       : super(key: key);
 
