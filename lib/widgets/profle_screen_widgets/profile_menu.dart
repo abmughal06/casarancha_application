@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/profile/get_verified.dart';
 import 'package:casarancha/screens/profile/settings/settings.dart';
-import 'package:casarancha/widgets/text_widget.dart';
+import 'package:casarancha/widgets/shared/alert_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -113,12 +113,20 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
     case 8:
       //logout
       // profileScreenController.logout();
-      AuthenticationProvider(FirebaseAuth.instance).signOut().whenComplete(() {
-        User? user;
-        if (user == null) {
-          Get.offAll(() => const LoginScreen());
-        }
-      });
+      showDialog(
+          context: context,
+          builder: (_) => CustomAdaptiveAlertDialog(
+              title: 'Logout',
+              alertMsg: 'Are you sure you want to logout to the application?',
+              actiionBtnName: 'Logout',
+              onAction: () => AuthenticationProvider(FirebaseAuth.instance)
+                      .signOut()
+                      .whenComplete(() {
+                    User? user;
+                    if (user == null) {
+                      Get.offAll(() => const LoginScreen());
+                    }
+                  })));
 
       break;
     case 9:
@@ -126,32 +134,16 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Delete your Account?'),
-            content: const Text(
+          return CustomAdaptiveAlertDialog(
+            title: 'Delete your Account?',
+            alertMsg:
                 '''If you select Delete we will delete your account on our server.
 
 Your app data will also be deleted and you won't be able to retrieve it.
 
-'''),
-            actions: [
-              TextButton(
-                child: const TextWidget(text: 'Cancel'),
-                onPressed: () {
-                  Get.back();
-                },
-              ),
-              TextButton(
-                child: const TextWidget(
-                  text: 'Delete',
-                  color: Colors.red,
-                ),
-                onPressed: () {
-                  // Call the delete account function
-                  ProfileProvider().deleteUserAccount();
-                },
-              ),
-            ],
+''',
+            actiionBtnName: 'Delete',
+            onAction: () => ProfileProvider().deleteUserAccount(),
           );
         },
       );

@@ -12,18 +12,20 @@ class CustomAdaptiveAlertDialog extends StatelessWidget {
       required this.alertMsg,
       required this.actiionBtnName,
       required this.onAction,
-      this.actionBtnColor})
+      this.actionBtnColor,
+      this.title})
       : super(key: key);
   final String alertMsg;
   final String actiionBtnName;
   final VoidCallback onAction;
   final Color? actionBtnColor;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
     if (Platform.isAndroid) {
       return AlertDialog(
-        title: const Text("Alert"),
+        title: Text(title ?? 'Alert'),
         content: Text(alertMsg),
         actions: [
           TextButton(
@@ -43,7 +45,7 @@ class CustomAdaptiveAlertDialog extends StatelessWidget {
       );
     } else {
       return CupertinoAlertDialog(
-        title: const Text('Alert'),
+        title: Text(title ?? 'Alert'),
         content: Text(alertMsg),
         actions: [
           TextButton(
