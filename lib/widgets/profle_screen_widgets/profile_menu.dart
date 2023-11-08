@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/profile/get_verified.dart';
 import 'package:casarancha/screens/profile/settings/settings.dart';
@@ -7,7 +6,6 @@ import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_share/flutter_share.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../resources/color_resources.dart';
@@ -174,8 +172,7 @@ void launchUrls(String url) async {
 
 inviteFriends() async {
   try {
-    DynamicLinkHelper()
-        .createDynamicLink(FirebaseAuth.instance.currentUser!.uid);
+    DynamicLinkHelper().createDynamicLink();
     // final link = await FirebaseDynamicLinkService.createDynamicLink(false);
     // print(link);
     // await FlutterShare.share(
@@ -184,8 +181,8 @@ inviteFriends() async {
     //       "I'm on CasaRancha as @. Install the app to follow my photos and videos.",
     //   linkUrl: Platform.isAndroid
     //       ? 'https://casarancha.com/profile?id=$user'
-    //       : "https://apps.apple.com/us/app/casa-rancha/id1666539952", // Replace with your app's Play Store URL
-    //   chooserTitle: 'Share via', // You can customize this title
+    //       : "https://apps.apple.com/us/app/casa-rancha/id1666539952",
+    //   chooserTitle: 'Share via',
     // );
   } catch (e) {
     printLog('Error sharing: $e');

@@ -1,13 +1,28 @@
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
+import 'package:casarancha/widgets/profle_screen_widgets/dynamic_links.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Authenticate extends StatelessWidget {
+class Authenticate extends StatefulWidget {
   const Authenticate({Key? key}) : super(key: key);
+
+  @override
+  State<Authenticate> createState() => _AuthenticateState();
+}
+
+class _AuthenticateState extends State<Authenticate> {
+  final _dhelper = DynamicLinkHelper();
+
+  @override
+  void initState() {
+    _dhelper.initDynamicLinks(context);
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
