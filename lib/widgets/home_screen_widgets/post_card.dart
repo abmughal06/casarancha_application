@@ -77,10 +77,12 @@ class PostCard extends StatelessWidget {
                       ? 'Unblock User'
                       : 'Block User',
                   ontapBlock: () {
+                    Get.back();
                     postPorvider.blockUnblockUser(
                         currentUser: curruentUser, appUser: post.creatorId);
                   },
                   onTapDownload: () async {
+                    Get.back();
                     showDialog(
                         context: context,
                         builder: (c) => CustomDownloadDialog(

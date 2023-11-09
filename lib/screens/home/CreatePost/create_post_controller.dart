@@ -18,6 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../utils/app_utils.dart';
+
 class CreatePostMethods extends ChangeNotifier {
   late TextEditingController quoteTextController;
   late TextEditingController captionController;
@@ -92,6 +94,7 @@ class CreatePostMethods extends ChangeNotifier {
         tagsIds: tagsController.text.split(" ").map((e) => e).toList(),
         shareLink: '',
         videoViews: [],
+        shareCount: [],
         showPostTime: showPostTime,
         mediaData: mediaData,
       );
@@ -202,16 +205,20 @@ class CreatePostMethods extends ChangeNotifier {
 
   Future<void> getPhoto() async {
     try {
-      final pickedPhoto =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
+      final pickedPhoto = await ImagePicker().pickMultiImage();
+      // .pickImage(source: ImageSource.gallery);
 
-      if (pickedPhoto != null) {
-        CroppedFile? croppedImage = await ImageCropper().cropImage(
-            sourcePath: pickedPhoto.path,
-            aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
-        var image = File(croppedImage!.path);
+      if (pickedPhoto.isNotEmpty) {
+        // CroppedFile? croppedImage = await ImageCropper().cropImage(
+        //     sourcePath: pickedPhoto.path,
+        //     aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
+        // var image = File(croppedImage!.path);
+        for (var i in pickedPhoto) {
+          var image = File(i.path);
+          photosList.add(image);
+        }
 
-        photosList.add(image);
+        printLog(photosList.toString());
         notifyListeners();
       }
     } catch (e) {

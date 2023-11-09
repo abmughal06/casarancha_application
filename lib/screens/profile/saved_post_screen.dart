@@ -1,7 +1,7 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

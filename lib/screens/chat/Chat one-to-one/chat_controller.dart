@@ -15,7 +15,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
@@ -756,16 +755,19 @@ class ChatProvider extends ChangeNotifier {
 
   Future<void> getPhoto() async {
     try {
-      final pickedPhoto =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
+      final pickedPhoto = await ImagePicker().pickMultiImage();
+      // .pickImage(source: ImageSource.gallery);
 
-      if (pickedPhoto != null) {
-        CroppedFile? croppedImage = await ImageCropper().cropImage(
-            sourcePath: pickedPhoto.path,
-            aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
-        var image = File(croppedImage!.path);
+      if (pickedPhoto.isNotEmpty) {
+        // CroppedFile? croppedImage = await ImageCropper().cropImage(
+        //     sourcePath: pickedPhoto.path,
+        //     aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
+        // var image = File(croppedImage!.path);
+        for (var i in pickedPhoto) {
+          var image = File(i.path);
+          photosList.add(image);
+        }
 
-        photosList.add(image);
         printLog(photosList.toString());
         notifyListeners();
       }

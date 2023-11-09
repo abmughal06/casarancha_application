@@ -61,7 +61,9 @@ class PhoneOTPScreen extends StatelessWidget {
                         fontWeight: FontWeight.w400,
                       ),
                       heightBox(42.h),
-                      OtpFields(controller: otpController),
+                      Align(
+                          alignment: Alignment.center,
+                          child: OtpFields(controller: otpController)),
                       heightBox(20.h),
                       Consumer<AuthenticationProvider>(
                           builder: (context, auth, b) {

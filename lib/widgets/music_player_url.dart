@@ -319,7 +319,7 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
           GestureDetector(
             onTap: () {
               isPlaying ? audioPlayer.pause() : audioPlayer.resume();
-              audioPlayer.setReleaseMode(ReleaseMode.loop);
+              audioPlayer.setReleaseMode(ReleaseMode.stop);
             },
             child: SvgPicture.asset(
               isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
