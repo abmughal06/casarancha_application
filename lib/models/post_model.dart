@@ -17,6 +17,7 @@ class PostModel {
   List<String> likesIds;
   List<String> commentIds;
   List<String> tagsIds;
+  List<dynamic> shareCount;
   bool showPostTime = true;
   bool isQuotaExpanded = false;
   int? reportCount;
@@ -31,6 +32,7 @@ class PostModel {
     required this.description,
     required this.locationName,
     required this.shareLink,
+    required this.shareCount,
     this.videoViews = const [],
     this.mediaData = const [],
     this.likesIds = const [],
@@ -55,25 +57,28 @@ class PostModel {
       List<String>? likesIds,
       List<String>? commentIds,
       List<String>? tagsIds,
+      List<dynamic>? shareCount,
       bool? showPostTime,
       int? reportCount,
       String? postBlockStatus}) {
     return PostModel(
-        videoViews: videoViews ?? this.videoViews,
-        id: id ?? this.id,
-        creatorId: creatorId ?? this.creatorId,
-        creatorDetails: creatorDetails ?? this.creatorDetails,
-        createdAt: createdAt ?? this.createdAt,
-        description: description ?? this.description,
-        locationName: locationName ?? this.locationName,
-        shareLink: shareLink ?? this.shareLink,
-        mediaData: mediaData ?? this.mediaData,
-        likesIds: likesIds ?? this.likesIds,
-        commentIds: commentIds ?? this.commentIds,
-        tagsIds: tagsIds ?? this.tagsIds,
-        showPostTime: showPostTime ?? this.showPostTime,
-        reportCount: reportCount ?? this.reportCount,
-        postBlockStatus: postBlockStatus ?? this.postBlockStatus);
+      videoViews: videoViews ?? this.videoViews,
+      id: id ?? this.id,
+      creatorId: creatorId ?? this.creatorId,
+      creatorDetails: creatorDetails ?? this.creatorDetails,
+      createdAt: createdAt ?? this.createdAt,
+      description: description ?? this.description,
+      locationName: locationName ?? this.locationName,
+      shareLink: shareLink ?? this.shareLink,
+      mediaData: mediaData ?? this.mediaData,
+      likesIds: likesIds ?? this.likesIds,
+      commentIds: commentIds ?? this.commentIds,
+      tagsIds: tagsIds ?? this.tagsIds,
+      showPostTime: showPostTime ?? this.showPostTime,
+      reportCount: reportCount ?? this.reportCount,
+      postBlockStatus: postBlockStatus ?? this.postBlockStatus,
+      shareCount: shareCount ?? this.shareCount,
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -85,6 +90,7 @@ class PostModel {
       'createdAt': createdAt,
       'description': description,
       'locationName': locationName,
+      'shareCount': shareCount,
       'shareLink': shareLink,
       'mediaData': mediaData.map((x) => x.toMap()).toList(),
       'likesIds': likesIds,
@@ -104,6 +110,7 @@ class PostModel {
         creatorDetails: CreatorDetails.fromMap(map['creatorDetails']),
         createdAt: map['createdAt'] ?? '',
         description: map['description'] ?? '',
+        shareCount: map['shareCount'] ?? [],
         locationName: map['locationName'] ?? '',
         shareLink: map['shareLink'] ?? '',
         mediaData: List<MediaDetails>.from(

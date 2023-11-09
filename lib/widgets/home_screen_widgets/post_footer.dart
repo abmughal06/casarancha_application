@@ -88,15 +88,54 @@ class CustomPostFooter extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                   color: color221,
                 ),
-                IconButton(
-                  onPressed: groupId != null
+                widthBox(12.w),
+                GestureDetector(
+                  onTap: groupId != null
                       ? () {
                           GlobalSnackBar.show(message: 'coming soon');
                         }
-                      : () =>
-                          Get.to(() => SharePostScreen(postModel: postModel)),
-                  icon: const Icon(Icons.share),
-                  color: color887,
+                      : () => Get.to(() => SharePostScreen(
+                            postModel: postModel,
+                            groupId: groupId,
+                          )),
+                  child: const Icon(
+                    Icons.share,
+                    color: color887,
+                  ),
+                ),
+                widthBox(10.w),
+                TextWidget(
+                  text: postModel.shareCount.length.toString(),
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                  color: color221,
+                  onTap: () {
+                    Get.bottomSheet(
+                      Consumer<List<UserModel>?>(
+                        builder: (context, value, child) {
+                          if (value == null) {
+                            return const CircularProgressIndicator.adaptive();
+                          }
+                          var filterList = value
+                              .where((element) =>
+                                  postModel.shareCount.contains(element.id))
+                              .toList();
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            itemCount: filterList.length,
+                            itemBuilder: (context, index) {
+                              return FollowFollowingTile(
+                                user: filterList[index],
+                                ontapToggleFollow: () {},
+                                btnName: "",
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      backgroundColor: Colors.white,
+                    );
+                  },
                 ),
               ],
             ),

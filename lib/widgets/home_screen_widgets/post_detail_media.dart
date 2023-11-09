@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/custom_dialog.dart';
@@ -191,64 +190,73 @@ class PostMediaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    return CarouselSlider(
-      items: post.mediaData
-          .map(
-            (e) => Stack(
-              children: [
-                CheckMediaAndShowPost(
-                  groupId: groupId,
-                  isPostDetail: isPostDetail,
-                  postModel: post,
-                  ondoubleTap: () => prov.toggleLikeDislike(postModel: post),
-                  mediaData: e,
-                  postId: post.id,
-                  isFullScreen: isFullScreen,
-                ),
-                Visibility(
-                  visible: post.mediaData.length > 1,
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: post.mediaData
-                            .map(
-                              (i) => Container(
-                                height: 8.h,
-                                width: 8.h,
-                                margin: EdgeInsets.all(3.w),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: i.id != e.id
-                                      ? colorDD9.withOpacity(0.3)
-                                      : colorFF7,
-                                ),
-                              ),
-                            )
-                            .toList(),
+    return AspectRatio(
+      aspectRatio: post.mediaData.first.type == 'Qoute'
+          ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
+          : post.mediaData.first.type == 'Music'
+              ? 13 / 9
+              : post.mediaData.first.type == 'Photo'
+                  ? double.parse(post.mediaData.first.imageWidth!) /
+                      double.parse(post.mediaData.first.imageHeight!)
+                  : 9 / 16,
+      child: PageView(
+        children: post.mediaData
+            .map(
+              (e) => Center(
+                child: AspectRatio(
+                  aspectRatio: e.type == 'Qoute'
+                      ? getQouteAspectRatio(e.link, isPostDetail)
+                      : e.type == 'Music'
+                          ? 13 / 9
+                          : e.type == 'Photo'
+                              ? double.parse(e.imageWidth!) /
+                                  double.parse(e.imageHeight!)
+                              : 9 / 16,
+                  child: Stack(
+                    children: [
+                      CheckMediaAndShowPost(
+                        groupId: groupId,
+                        isPostDetail: isPostDetail,
+                        postModel: post,
+                        ondoubleTap: () =>
+                            prov.toggleLikeDislike(postModel: post),
+                        mediaData: e,
+                        postId: post.id,
+                        isFullScreen: isFullScreen,
                       ),
-                    ),
+                      Visibility(
+                        visible: post.mediaData.length > 1,
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: post.mediaData
+                                  .map(
+                                    (i) => Container(
+                                      height: 8.h,
+                                      width: 8.h,
+                                      margin: EdgeInsets.all(3.w),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: i.id != e.id
+                                            ? colorDD9.withOpacity(0.3)
+                                            : colorFF7,
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
-            ),
-          )
-          .toList(),
-      options: CarouselOptions(
-        aspectRatio: post.mediaData.length > 1
-            ? 9 / 16
-            : post.mediaData.first.type == 'Qoute'
-                ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
-                : post.mediaData.first.type == 'Music'
-                    ? 13 / 9
-                    : post.mediaData.first.type == 'Photo'
-                        ? double.parse(post.mediaData.first.imageWidth!) /
-                            double.parse(post.mediaData.first.imageHeight!)
-                        : 9 / 16,
-        viewportFraction: 1,
-        enableInfiniteScroll: false,
+                ),
+              ),
+            )
+            .toList(),
       ),
     );
   }

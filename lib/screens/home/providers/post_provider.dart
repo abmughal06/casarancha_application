@@ -734,7 +734,8 @@ class PostProvider extends ChangeNotifier {
   void sharePostData(
       {UserModel? currentUser,
       UserModel? appUser,
-      PostModel? postModel}) async {
+      PostModel? postModel,
+      String? groupId}) async {
     final messageRefForCurrentUser = FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -813,6 +814,18 @@ class PostProvider extends ChangeNotifier {
     messageRefForAppUser.set(appUserMessage.toMap());
 
     recieverIds.add(appUser.id);
+
+    var postRef = groupId == null
+        ? firestore.collection('posts').doc(postModel.id)
+        : firestore
+            .collection('groups')
+            .doc(groupId)
+            .collection('posts')
+            .doc(postModel.id);
+
+    await postRef.update({
+      'shareCount': FieldValue.arrayUnion([currentUser.id])
+    });
 
     printLog(recieverIds.toString());
     notifyListeners();

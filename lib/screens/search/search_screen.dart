@@ -31,7 +31,7 @@ class _SearchScreenState extends State<SearchScreen> {
     Tab(text: strSrcLocation),
   ];
 
-  late TextEditingController searchController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
