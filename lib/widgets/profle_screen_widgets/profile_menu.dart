@@ -165,17 +165,6 @@ void launchUrls(String url) async {
 inviteFriends() async {
   try {
     DynamicLinkHelper().createDynamicLink();
-    // final link = await FirebaseDynamicLinkService.createDynamicLink(false);
-    // print(link);
-    // await FlutterShare.share(
-    //   title: 'Invite Friends',
-    //   text:
-    //       "I'm on CasaRancha as @. Install the app to follow my photos and videos.",
-    //   linkUrl: Platform.isAndroid
-    //       ? 'https://casarancha.com/profile?id=$user'
-    //       : "https://apps.apple.com/us/app/casa-rancha/id1666539952",
-    //   chooserTitle: 'Share via',
-    // );
   } catch (e) {
     printLog('Error sharing: $e');
   }

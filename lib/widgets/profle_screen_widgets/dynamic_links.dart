@@ -41,6 +41,7 @@ class DynamicLinkHelper {
     final ShortDynamicLink shortLink =
         await dynamicLinks.buildShortLink(parameters);
     url = shortLink.shortUrl;
-    Share.share(url.toString());
+    Share.share(
+        "I'm on CasaRancha. Install the app to follow my photos and videos. ${url.toString()}");
   }
 }

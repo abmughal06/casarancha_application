@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/resources/color_resources.dart';
@@ -6,28 +7,26 @@ import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-
 import '../models/post_model.dart';
 import '../screens/home/providers/post_provider.dart';
 import 'home_screen_widgets/post_detail_media.dart';
 
 class MusicPlayerUrl extends StatefulWidget {
-  const MusicPlayerUrl(
-      {Key? key,
-      required this.musicDetails,
-      required this.ontap,
-      required this.border,
-      this.postModel,
-      required this.isPostDetail,
-      this.groupId})
-      : super(key: key);
+  const MusicPlayerUrl({
+    Key? key,
+    required this.musicDetails,
+    required this.ontap,
+    required this.border,
+    this.postModel,
+    required this.isPostDetail,
+    this.groupId,
+  }) : super(key: key);
   final MediaDetails musicDetails;
   final Function ontap;
   final double border;
