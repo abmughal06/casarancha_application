@@ -17,7 +17,7 @@ import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../text_widget.dart';
 
-class ChatVideoTile extends StatelessWidget {
+class ChatVideoTile extends StatefulWidget {
   const ChatVideoTile({
     Key? key,
     required this.appUserId,
@@ -35,15 +35,36 @@ class ChatVideoTile extends StatelessWidget {
   final String? link;
   final int? mediaLength;
 
+  @override
+  State<ChatVideoTile> createState() => _ChatVideoTileState();
+}
+
+class _ChatVideoTileState extends State<ChatVideoTile> {
   Future<String?> initThumbnail() async {
     return await VideoThumbnail.thumbnailFile(
-      video: link!,
+      video: widget.link!,
       thumbnailPath: (await getTemporaryDirectory()).path,
       imageFormat: ImageFormat.PNG,
       maxHeight: 1024,
       maxWidth: 1024,
       quality: 10,
+      // timeMs: (_controller.value.duration.inMilliseconds / 2).toInt(),
     );
+  }
+
+  String? image;
+
+  initImage() async {
+    image = await initThumbnail();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    initImage();
+    super.initState();
   }
 
   @override
@@ -54,91 +75,130 @@ class ChatVideoTile extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.only(
-                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
-                right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
+                left: widget.isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                right:
+                    widget.isMe ? 0 : MediaQuery.of(context).size.width * .5),
             child: Align(
-              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              alignment: widget.isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
                 aspectRatio: 9 / 13,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: link == null
-                      ? Container(
-                          decoration: BoxDecoration(
-                            color: colorBlack.withOpacity(0.1),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: image == null
+                          ? null
+                          : DecorationImage(
+                              image: FileImage(
+                                File(image!),
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: double.infinity,
+                          width: double.infinity,
+                          color: Colors.black.withOpacity(0.2),
+                          child: const Icon(
+                            Icons.play_arrow_rounded,
+                            size: 40,
+                            color: colorWhite,
                           ),
-                          child: centerLoader(),
-                        )
-                      : FutureBuilder<String?>(
-                          future: initThumbnail(),
-                          builder: (context, snapshot) {
-                            if (snapshot.data == null) {
-                              return const Center(
-                                child: CircularProgressIndicator.adaptive(),
-                              );
-                            }
-                            return Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: FileImage(
-                                    File(snapshot.data!),
-                                  ),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    height: double.infinity,
-                                    width: double.infinity,
-                                    color: Colors.black.withOpacity(0.2),
-                                    child: const Icon(
-                                      Icons.play_arrow_rounded,
-                                      size: 40,
-                                      color: colorWhite,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 12,
-                                    top: 12,
-                                    child: mediaLength != null
-                                        ? Container(
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 8.w, vertical: 4.h),
-                                            child: TextWidget(
-                                              text: '1/$mediaLength',
-                                              fontSize: 9.sp,
-                                              color: colorWhite,
-                                            ),
-                                          )
-                                        : widthBox(0),
-                                  )
-                                ],
-                              ),
-                            );
-                          },
                         ),
+                        Positioned(
+                          right: 12,
+                          top: 12,
+                          child: widget.mediaLength != null
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8.w, vertical: 4.h),
+                                  child: TextWidget(
+                                    text: '1/${widget.mediaLength}',
+                                    fontSize: 9.sp,
+                                    color: colorWhite,
+                                  ),
+                                )
+                              : widthBox(0),
+                        )
+                      ],
+                    ),
+                  ),
+                  // FutureBuilder<String?>(
+                  //   future: initThumbnail(),
+                  //   builder: (context, snapshot) {
+                  //     if (snapshot.data == null) {
+                  //       return const Center(
+                  //         child: CircularProgressIndicator.adaptive(),
+                  //       );
+                  //     }
+                  //     return Container(
+                  //       decoration: BoxDecoration(
+                  //         image: DecorationImage(
+                  //           image: FileImage(
+                  //             File(snapshot.data!),
+                  //           ),
+                  //           fit: BoxFit.cover,
+                  //         ),
+                  //       ),
+                  //       child: Stack(
+                  //         children: [
+                  //           Container(
+                  //             height: double.infinity,
+                  //             width: double.infinity,
+                  //             color: Colors.black.withOpacity(0.2),
+                  //             child: const Icon(
+                  //               Icons.play_arrow_rounded,
+                  //               size: 40,
+                  //               color: colorWhite,
+                  //             ),
+                  //           ),
+                  //           Positioned(
+                  //             right: 12,
+                  //             top: 12,
+                  //             child: widget.mediaLength != null
+                  //                 ? Container(
+                  //                     decoration: BoxDecoration(
+                  //                       color: Colors.black.withOpacity(0.6),
+                  //                       borderRadius: BorderRadius.circular(20),
+                  //                     ),
+                  //                     padding: EdgeInsets.symmetric(
+                  //                         horizontal: 8.w, vertical: 4.h),
+                  //                     child: TextWidget(
+                  //                       text: '1/${widget.mediaLength}',
+                  //                       fontSize: 9.sp,
+                  //                       color: colorWhite,
+                  //                     ),
+                  //                   )
+                  //                 : widthBox(0),
+                  //           )
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                 ),
               ),
             ),
           ),
-          link == null
+          widget.link == null
               ? Align(
-                  alignment:
-                      isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                  alignment: widget.isMe
+                      ? Alignment.bottomRight
+                      : Alignment.bottomLeft,
                   child: Icon(
                     Icons.update_outlined,
                     color: color55F,
                     size: 12.sp,
                   ),
                 )
-              : DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
+              : DateAndSeenTile(
+                  isMe: widget.isMe, isSeen: widget.isSeen, date: widget.date),
           const SizedBox(
             height: 8,
           )

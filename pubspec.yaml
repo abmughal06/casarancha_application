@@ -101,6 +101,7 @@ dependencies:
   jwt_decoder: ^2.0.1
   encrypted_shared_preferences: ^3.0.1
   shared_preferences: ^2.0.15
+  dotted_border: ^2.1.0
 flutter_icons:
   android: "launcher_icon"
   ios: true

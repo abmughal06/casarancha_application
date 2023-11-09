@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,10 +13,13 @@ import '../../resources/image_resources.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/text_widget.dart';
+import '../search/search_screen.dart';
 
 class SharePostScreen extends StatefulWidget {
-  const SharePostScreen({Key? key, required this.postModel}) : super(key: key);
+  const SharePostScreen({Key? key, required this.postModel, this.groupId})
+      : super(key: key);
   final PostModel postModel;
+  final String? groupId;
 
   @override
   State<SharePostScreen> createState() => _SharePostScreenState();
@@ -31,90 +34,63 @@ class _SharePostScreenState extends State<SharePostScreen> {
     super.dispose();
   }
 
+  TextEditingController searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    // final currentUser = context.watch<UserModel>();
-    // final users = context.watch<List<UserModel>?>();
     postProvider = Provider.of<PostProvider>(context);
+    final search = Provider.of<SearchProvider>(context);
 
     return Scaffold(
-      body: ListView(
+      body: Column(
         children: [
-          SizedBox(height: 20.h),
-          Row(
-            children: [
-              const Expanded(flex: 6, child: SizedBox()),
-              Text(
-                "Share Post",
-                style: TextStyle(
-                    fontSize: 18.sp,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700),
-              ),
-              const Expanded(flex: 4, child: SizedBox()),
-              InkWell(
-                onTap: () => Get.back(),
-                child: Icon(
-                  Icons.close,
-                  size: 20.w,
+          SizedBox(
+            height: 100.h,
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 65.h),
+                    child: TextWidget(
+                      text: "Share Post",
+                      fontSize: 18.sp,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 20.w,
-              )
-            ],
+                Positioned(
+                  right: 20.w,
+                  top: 65.h,
+                  child: InkWell(
+                    onTap: () => Get.back(),
+                    child: Icon(
+                      Icons.close,
+                      size: 20.w,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: 20.h),
-          // Consumer<List<MessageDetails>?>(
-          //   builder: (context, msg1, b) {
-          //     if (msg1 == null || users == null) {
-          //       return const CircularProgressIndicator.adaptive();
-          //     }
-          //     List<MessageDetails> msg = [];
-          //     for (var m in msg1) {
-          //       for (var u in users) {
-          //         if (m.id == u.id) {
-          //           msg.add(m);
-          //         }
-          //       }
-          //     }
-          //     messageUserIds = msg.map((e) => e.id).toList();
-
-          //     return ListView.builder(
-          //       shrinkWrap: true,
-          //       itemCount: msg.length,
-          //       physics: const NeverScrollableScrollPhysics(),
-          //       itemBuilder: (context, index) {
-          //         return SharePostTile(
-          //           appUser: users
-          //               .where((element) => element.id == msg[index].id)
-          //               .first,
-          //           currentUser: currentUser,
-          //           postModel: widget.postModel,
-          //           isSent: postProvider.recieverIds.contains(msg[index].id),
-          //           ontapSend: () {
-          //             postProvider.sharePostData(
-          //               currentUser: currentUser,
-          //               appUser: users
-          //                   .where((element) => element.id == msg[index].id)
-          //                   .first,
-          //               postModel: widget.postModel,
-          //             );
-          //           },
-          //         );
-          //       },
-          //     );
-          //   },
-          // ),
-          // const Divider(),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: searchTextField(
+              context: context,
+              controller: searchController,
+              onChange: (value) {
+                search.searchText(value);
+              },
+            ),
+          ),
           Consumer<List<UserModel>?>(
             builder: (context, users, b) {
               if (users == null) {
                 return Container();
               } else {
                 var currentUser = users
-                    .where((element) =>
-                        element.id == FirebaseAuth.instance.currentUser!.uid)
+                    .where((element) => element.id == currentUserUID)
                     .first;
                 var filterList = users
                     .where((element) =>
@@ -122,36 +98,86 @@ class _SharePostScreenState extends State<SharePostScreen> {
                         currentUser.followingsIds.contains(element.id))
                     .toList();
 
-                // List<UserModel> filterList = followingAndFollowersList
-                //     .where((element) => !messageUserIds.contains(element.id))
-                //     .toList();
+                var appUsers = users
+                    .where((element) =>
+                        element.id != currentUserUID &&
+                        !currentUser.followersIds.contains(element.id) &&
+                        !currentUser.followingsIds.contains(element.id))
+                    .toList();
 
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filterList.length,
-                  itemBuilder: (context, index) {
-                    return SharePostTile(
-                      // userModel: filterList[index],
-                      appUser: filterList[index],
-                      postModel: widget.postModel,
-                      currentUser: currentUser,
-                      isSent: postProvider.recieverIds
-                          .contains(filterList[index].id),
-                      ontapSend: () {
-                        postProvider.sharePostData(
-                          currentUser: currentUser,
-                          appUser: filterList[index],
+                var newList = filterList + appUsers;
+
+                if (searchController.text.isEmpty) {
+                  return Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: 120.h),
+                      itemCount: newList.length,
+                      itemBuilder: (context, index) {
+                        return SharePostTile(
+                          appUser: newList[index],
                           postModel: widget.postModel,
+                          currentUser: currentUser,
+                          isSent: postProvider.recieverIds
+                              .contains(newList[index].id),
+                          ontapSend: () {
+                            postProvider.sharePostData(
+                              currentUser: currentUser,
+                              groupId: widget.groupId,
+                              appUser: newList[index],
+                              postModel: widget.postModel,
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                );
+                    ),
+                  );
+                }
+                if (searchController.text.isNotEmpty) {
+                  var searchList = newList
+                      .where((e) =>
+                          e.name
+                              .toLowerCase()
+                              .contains(searchController.text.toLowerCase()) ||
+                          e.username
+                              .toLowerCase()
+                              .contains(searchController.text.toLowerCase()))
+                      .toList();
+                  return Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: 120.h),
+                      itemCount: searchList.length,
+                      itemBuilder: (context, index) {
+                        return SharePostTile(
+                          appUser: searchList[index],
+                          postModel: widget.postModel,
+                          currentUser: currentUser,
+                          isSent: postProvider.recieverIds
+                              .contains(searchList[index].id),
+                          ontapSend: () {
+                            postProvider.sharePostData(
+                              currentUser: currentUser,
+                              groupId: widget.groupId,
+                              appUser: searchList[index],
+                              postModel: widget.postModel,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  );
+                }
+
+                if (newList.isEmpty) {
+                  return const Center(
+                    child: TextWidget(
+                      text: 'No user to share the app',
+                    ),
+                  );
+                }
+                return heightBox(1);
               }
             },
           ),
-          const SizedBox(height: 90)
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
