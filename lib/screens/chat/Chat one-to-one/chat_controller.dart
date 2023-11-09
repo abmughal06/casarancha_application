@@ -878,13 +878,14 @@ class ChatProvider extends ChangeNotifier {
       return;
     }
     final dir = await getTemporaryDirectory();
-    await audioRecorder.start(
-      path: "${dir.path}/$filename.m4a",
-    );
-    isRecording = true;
-    notifyListeners();
-
-    startTimer();
+    Timer(const Duration(seconds: 1), () async {
+      await audioRecorder.start(
+        path: "${dir.path}/$filename.m4a",
+      );
+      isRecording = true;
+      notifyListeners();
+      startTimer();
+    });
   }
 
   startTimer() {
