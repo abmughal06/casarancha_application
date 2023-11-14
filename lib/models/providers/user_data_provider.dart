@@ -71,6 +71,20 @@ class DataProvider extends ChangeNotifier {
             .toList());
   }
 
+  Stream<List<PostModel>?> forums() {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy("createdAt", descending: true)
+        .snapshots()
+        .map((event) => event.docs
+            .where((element) =>
+                element.data().isNotEmpty &&
+                element.data()['isForumPost'] == true &&
+                element.data()['mediaData'].isNotEmpty)
+            .map((e) => PostModel.fromMap(e.data()))
+            .toList());
+  }
+
   Stream<PostModel?> singlePost({String? groupId, required String postId}) {
     final ref = groupId == null
         ? FirebaseFirestore.instance.collection('posts').doc(postId)

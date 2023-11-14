@@ -10,6 +10,8 @@ class MediaDetails {
   String? videoAspectRatio;
   String? videoViews;
   List? storyViews;
+  String? pollQuestion;
+  List<dynamic>? pollOptions;
   MediaDetails(
       {required this.id,
       required this.name,
@@ -18,6 +20,8 @@ class MediaDetails {
       this.imageHeight,
       this.storyViews,
       this.videoViews,
+      this.pollOptions,
+      this.pollQuestion,
       this.imageWidth,
       this.videoAspectRatio});
 
@@ -27,6 +31,8 @@ class MediaDetails {
     String? type,
     String? link,
     List? storyViews,
+    String? pollQuestion,
+    List<dynamic>? pollOptions,
     String? imageHeight,
     String? imageWidth,
     String? videoAspectRatio,
@@ -38,6 +44,8 @@ class MediaDetails {
       name: name ?? this.name,
       type: type ?? this.type,
       link: link ?? this.link,
+      pollOptions: pollOptions ?? this.pollOptions,
+      pollQuestion: pollQuestion ?? this.pollQuestion,
       imageHeight: imageHeight ?? this.imageHeight,
       imageWidth: imageWidth ?? this.imageWidth,
       videoAspectRatio: videoAspectRatio ?? this.videoAspectRatio,
@@ -66,13 +74,23 @@ class MediaDetails {
                 'videoAspectRatio': videoAspectRatio,
                 'videoViews': videoViews,
               }
-            : {
-                'id': id,
-                'name': name,
-                'storyViews': storyViews,
-                'type': type,
-                'link': link,
-              };
+            : type.toLowerCase() == 'poll'
+                ? {
+                    'id': id,
+                    'name': name,
+                    'storyViews': storyViews,
+                    'type': type,
+                    'link': link,
+                    'pollQuestion': pollQuestion,
+                    'pollOptions': pollOptions,
+                  }
+                : {
+                    'id': id,
+                    'name': name,
+                    'storyViews': storyViews,
+                    'type': type,
+                    'link': link,
+                  };
   }
 
   factory MediaDetails.fromMap(Map<String, dynamic> map) {
@@ -82,6 +100,8 @@ class MediaDetails {
       storyViews: map['storyViews'] ?? [],
       type: map['type'] ?? '',
       link: map['link'] ?? '',
+      pollOptions: map['pollOptions'] ?? [],
+      pollQuestion: map['pollQuestion'] ?? '',
       imageHeight: map['imageHeight'] ?? '',
       imageWidth: map['imageWidth'] ?? '',
       videoAspectRatio: map['videoAspectRatio'] ?? '',
@@ -161,5 +181,36 @@ class MediaDetails {
           link.hashCode ^
           storyViews.hashCode;
     }
+  }
+}
+
+class PollOptions {
+  final String option;
+  final List<dynamic> votes;
+
+  PollOptions({required this.option, required this.votes});
+
+  factory PollOptions.fromMap(Map<String, dynamic> map) {
+    return PollOptions(
+      option: map['option'] ?? '',
+      votes: map['vote'] ?? [],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'option': option,
+      'votes': votes,
+    };
+  }
+
+  PollOptions copyWith(
+    String? option,
+    List<dynamic>? votes,
+  ) {
+    return PollOptions(
+      option: option ?? this.option,
+      votes: votes ?? this.votes,
+    );
   }
 }

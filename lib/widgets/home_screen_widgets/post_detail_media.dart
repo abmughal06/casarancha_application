@@ -18,6 +18,7 @@ import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/dashboard/provider/download_provider.dart';
 import '../music_player_url.dart';
+import '../poll.dart';
 import '../text_widget.dart';
 import '../video_player.dart';
 
@@ -124,6 +125,10 @@ class CheckMediaAndShowPost extends StatelessWidget {
           ),
         );
 
+      case 'poll':
+        return Container(
+            padding: EdgeInsets.all(12.h), child: Poll(postModel: postModel));
+
       default:
         postProvider.countVideoViews(postModel: postModel, groupId: groupId);
         return InkWell(
@@ -190,69 +195,70 @@ class PostMediaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    return AspectRatio(
-      aspectRatio: post.mediaData.first.type == 'Qoute'
-          ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
+    return SizedBox(
+      height: post.mediaData.first.type == 'Qoute'
+          ? 100
           : post.mediaData.first.type == 'Music'
-              ? 13 / 9
+              ? 300
               : post.mediaData.first.type == 'Photo'
-                  ? double.parse(post.mediaData.first.imageWidth!) /
-                      double.parse(post.mediaData.first.imageHeight!)
-                  : 9 / 16,
+                  ? 600
+                  : post.mediaData.first.type == 'poll'
+                      ? 300
+                      : 700,
+      // aspectRatio: post.mediaData.first.type == 'Qoute'
+      //     ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
+      //     : post.mediaData.first.type == 'Music'
+      //         ? 13 / 9
+      //         : post.mediaData.first.type == 'Photo'
+      //             ? double.parse(post.mediaData.first.imageWidth!) /
+      //                 double.parse(post.mediaData.first.imageHeight!)
+      //             : post.mediaData.first.type == 'poll'
+      //                 ? 1 / 1
+      //                 : 9 / 16,
       child: PageView(
         children: post.mediaData
             .map(
               (e) => Center(
-                child: AspectRatio(
-                  aspectRatio: e.type == 'Qoute'
-                      ? getQouteAspectRatio(e.link, isPostDetail)
-                      : e.type == 'Music'
-                          ? 13 / 9
-                          : e.type == 'Photo'
-                              ? double.parse(e.imageWidth!) /
-                                  double.parse(e.imageHeight!)
-                              : 9 / 16,
-                  child: Stack(
-                    children: [
-                      CheckMediaAndShowPost(
-                        groupId: groupId,
-                        isPostDetail: isPostDetail,
-                        postModel: post,
-                        ondoubleTap: () =>
-                            prov.toggleLikeDislike(postModel: post),
-                        mediaData: e,
-                        postId: post.id,
-                        isFullScreen: isFullScreen,
-                      ),
-                      Visibility(
-                        visible: post.mediaData.length > 1,
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: post.mediaData
-                                  .map(
-                                    (i) => Container(
-                                      height: 8.h,
-                                      width: 8.h,
-                                      margin: EdgeInsets.all(3.w),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: i.id != e.id
-                                            ? colorDD9.withOpacity(0.3)
-                                            : colorFF7,
-                                      ),
+                child: Stack(
+                  children: [
+                    CheckMediaAndShowPost(
+                      groupId: groupId,
+                      isPostDetail: isPostDetail,
+                      postModel: post,
+                      ondoubleTap: () =>
+                          prov.toggleLikeDislike(postModel: post),
+                      mediaData: e,
+                      postId: post.id,
+                      isFullScreen: isFullScreen,
+                    ),
+                    Visibility(
+                      visible: post.mediaData.length > 1,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: post.mediaData
+                                .map(
+                                  (i) => Container(
+                                    height: 8.h,
+                                    width: 8.h,
+                                    margin: EdgeInsets.all(3.w),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: i.id != e.id
+                                          ? colorDD9.withOpacity(0.3)
+                                          : colorFF7,
                                     ),
-                                  )
-                                  .toList(),
-                            ),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             )

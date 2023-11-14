@@ -43,6 +43,8 @@ class CreatePostMethods extends ChangeNotifier {
   var mediaUploadTasks = <UploadTask>[];
   var mediaData = <MediaDetails>[];
   var isSharingPost = false;
+  var question = '';
+  var options = <Map>[];
 
   bool showPostTime = false;
 
@@ -94,6 +96,7 @@ class CreatePostMethods extends ChangeNotifier {
         tagsIds: tagsController.text.split(" ").map((e) => e).toList(),
         shareLink: '',
         videoViews: [],
+        isForumPost: false,
         shareCount: [],
         showPostTime: showPostTime,
         mediaData: mediaData,
@@ -105,6 +108,66 @@ class CreatePostMethods extends ChangeNotifier {
       await userRef.update({"postsIds": userModel.postsIds});
 
       await postRef.set(post.toMap());
+      Get.back();
+      Get.back();
+    } catch (e) {
+      isSharingPost = false;
+      notifyListeners();
+      GlobalSnackBar(message: e.toString());
+    } finally {
+      isSharingPost = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> sharePollPost({
+    UserModel? user,
+  }) async {
+    isSharingPost = true;
+    notifyListeners();
+    final forumRef = fbinstance.collection('posts').doc();
+    final userRef = fbinstance.collection('users').doc(user!.id);
+    await forumRef.set({});
+    final postId = forumRef.id;
+    final creatorId = user.id;
+    final creatorDetails = CreatorDetails(
+      name: user.name,
+      imageUrl: user.imageStr,
+      isVerified: user.isVerified,
+    );
+
+    try {
+      final mediaDetails = MediaDetails(
+        id: DateTime.now().toUtc().toString(),
+        name: 'poll',
+        type: 'poll',
+        link: '',
+        pollQuestion: question,
+        pollOptions: options,
+      );
+
+      final post = PostModel(
+        id: postId,
+        creatorId: creatorId,
+        creatorDetails: creatorDetails,
+        createdAt: DateTime.now().toUtc().toString(),
+        description: captionController.text.trim(),
+        locationName: locationController.text.trim(),
+        tagsIds: tagsController.text.split(" ").map((e) => e).toList(),
+        shareLink: '',
+        isForumPost: true,
+        videoViews: [],
+        shareCount: [],
+        showPostTime: showPostTime,
+        mediaData: [mediaDetails],
+      );
+
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
+      UserModel userModel = UserModel.fromMap(userSnapshot.data() ?? {});
+      userModel.postsIds.add(postId);
+      await userRef.update({"postsIds": userModel.postsIds});
+
+      await forumRef.set(post.toMap());
       Get.back();
       Get.back();
     } catch (e) {
@@ -272,14 +335,6 @@ class CreatePostMethods extends ChangeNotifier {
     musicList.remove(musicFile);
     notifyListeners();
   }
-
-  // //OverRides
-  // @override
-  // void onInit() {
-
-  //   profileScreenController = Get.find<ProfileScreenController>();
-  //   super.onInit();
-  // }
 
   @override
   void dispose() {
