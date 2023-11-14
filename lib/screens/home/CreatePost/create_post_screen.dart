@@ -332,6 +332,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               onTap: () {
                 Get.to(
                   () => NewPostShareScreen(
+                    isPoll: false,
                     createPostController: createPost,
                     groupId: widget.groupId,
                   ),

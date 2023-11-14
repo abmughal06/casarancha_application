@@ -90,5 +90,10 @@
 	<false/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+    	<string>https://casarancha.page.link</string>
+    	<!-- <string>https://custom.domain.io/path2</string> -->
+	</array>
 </dict>
 </plist>

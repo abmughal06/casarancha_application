@@ -193,9 +193,12 @@ class _HomeScreenState extends State<HomeScreen>
                             .contains(element.creatorId) ||
                         currentUser.followingsIds.contains(element.creatorId) ||
                         element.creatorId == currentUser.id &&
-                            element.mediaData.isNotEmpty))
+                            element.mediaData.isNotEmpty &&
+                            element.isForumPost == false))
                     : posts
-                        .where((element) => element.mediaData.isNotEmpty)
+                        .where((element) =>
+                            element.mediaData.isNotEmpty &&
+                            element.isForumPost == false)
                         .toList();
                 List<PostModel> filterList = [];
                 List<UserModel> postCreator = [];

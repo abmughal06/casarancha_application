@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/app_utils.dart';
@@ -720,6 +721,33 @@ class PostProvider extends ChangeNotifier {
       GlobalSnackBar.show(message: e.toString());
     } finally {
       Get.back();
+    }
+  }
+
+  void updatePollData({required String postId, required int index}) async {
+    try {
+      final ref = firestore.collection('posts').doc(postId);
+      final data = await ref.get();
+      final media = MediaDetails.fromMap(data.data()!['mediaData'][0]);
+      final pollOptions =
+          media.pollOptions!.map((e) => PollOptions.fromMap(e)).toList();
+
+      // var votersIds = [];
+      // for (var i in pollOptions) {
+      //   votersIds += i.votes;
+      // }
+
+      // printLog(votersIds.toString());
+      pollOptions[index] = pollOptions[index]
+          .copyWith(pollOptions[index].option, [currentUserUID]);
+      var newMedia = media
+          .copyWith(pollOptions: pollOptions.map((e) => e.toMap()).toList())
+          .toMap();
+      firestore.collection('posts').doc(postId).update({
+        "mediaData": [newMedia]
+      });
+    } catch (e) {
+      GlobalSnackBar.show(message: 'unknown error occured, please try later');
     }
   }
 

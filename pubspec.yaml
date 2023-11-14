@@ -36,7 +36,7 @@ dependencies:
 
   flutter_file_downloader: ^1.1.2
   open_file: ^3.3.2
-  firebase_dynamic_links: ^5.4.2
+  firebase_dynamic_links: 
   share_plus: ^7.2.1
 
   cloud_firestore: ^4.3.1

@@ -19,9 +19,11 @@ class NewPostShareScreen extends StatelessWidget {
     Key? key,
     required this.createPostController,
     this.groupId,
+    required this.isPoll,
   }) : super(key: key);
 
   final String? groupId;
+  final bool isPoll;
 
   final CreatePostMethods createPostController;
 
@@ -43,10 +45,14 @@ class NewPostShareScreen extends StatelessWidget {
           horizontalOutMargin: 10.w,
           onTap: () => user == null
               ? GlobalSnackBar.show(message: strAlertSharePost)
-              : state.sharePost(
-                  groupId: groupId,
-                  user: user,
-                ),
+              : isPoll
+                  ? state.sharePollPost(
+                      user: user,
+                    )
+                  : state.sharePost(
+                      groupId: groupId,
+                      user: user,
+                    ),
         );
       }),
       body: Padding(
