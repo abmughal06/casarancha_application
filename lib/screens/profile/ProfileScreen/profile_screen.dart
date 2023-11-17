@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
+import '../../../utils/snackbar.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/profle_screen_widgets/image_grid.dart';
 import '../../../widgets/profle_screen_widgets/music_grid.dart';
@@ -97,6 +98,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 StreamProvider.value(
                   initialData: null,
                   value: DataProvider().posts(null),
+                  catchError: (context, error) =>
+                      GlobalSnackBar.show(message: error.toString()),
                   child:
                       Consumer<List<PostModel>?>(builder: (context, post, b) {
                     if (post == null || user == null) {

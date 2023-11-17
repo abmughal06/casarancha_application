@@ -91,6 +91,7 @@ class GroupPostScreen extends StatelessWidget {
                   onTap: () {
                     Get.to(() => CreatePostScreen(
                           groupId: group.id,
+                          isForum: false,
                         ));
                   },
                   child: Padding(

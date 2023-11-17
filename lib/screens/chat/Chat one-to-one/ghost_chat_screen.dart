@@ -120,6 +120,8 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
       body: StreamProvider.value(
         value: DataProvider().messages(widget.appUserId, true),
         initialData: null,
+        catchError: (context, error) =>
+            GlobalSnackBar.show(message: error.toString()),
         child: Consumer<List<Message>?>(
           builder: (context, messages, b) {
             if (messages == null) {

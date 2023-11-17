@@ -29,6 +29,7 @@ Future showMessageMennu({context, url, path, friendId, docId}) async {
                   message:
                       'Text message cannot be downloaded you can copy them');
             } else {
+              Get.back();
               showDialog(
                   context: context,
                   builder: (context) {
@@ -47,6 +48,7 @@ Future showMessageMennu({context, url, path, friendId, docId}) async {
           )),
       CupertinoActionSheetAction(
           onPressed: () {
+            Get.back();
             showDialog(
                 context: context,
                 builder: (context) {

@@ -21,6 +21,7 @@ import '../../../models/user_model.dart';
 import '../../../resources/localization_text_strings.dart';
 
 import '../../../resources/strings.dart';
+import '../../../utils/snackbar.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../widgets/menu_user_button.dart';
 import '../../../widgets/profile_pic.dart';
@@ -164,6 +165,10 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                           StreamProvider.value(
                                               initialData: null,
                                               value: DataProvider().posts(null),
+                                              catchError: (context, error) =>
+                                                  GlobalSnackBar.show(
+                                                      message:
+                                                          error.toString()),
                                               child: Consumer<List<PostModel>?>(
                                                   builder: (context, post, b) {
                                                 if (post == null) {
@@ -478,6 +483,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                           StreamProvider.value(
                             initialData: null,
                             value: DataProvider().posts(null),
+                            catchError: (context, error) =>
+                                GlobalSnackBar.show(message: error.toString()),
                             child: Consumer<List<PostModel>?>(
                                 builder: (context, post, b) {
                               if (post == null) {

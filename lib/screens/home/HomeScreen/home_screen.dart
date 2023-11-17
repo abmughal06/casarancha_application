@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import '../../../models/story_model.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
+import '../../../utils/snackbar.dart';
 import '../../../widgets/home_screen_widgets/post_card.dart';
 import '../../../widgets/home_screen_widgets/story_widget.dart';
 import '../../../widgets/shared/alert_text.dart';
@@ -56,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen>
         actions: [
           IconButton(
             onPressed: () {
-              Get.to(() => const CreatePostScreen());
+              Get.to(() => const CreatePostScreen(isForum: false));
             },
             icon: Image.asset(
               imgAddPost,
@@ -183,6 +184,8 @@ class _HomeScreenState extends State<HomeScreen>
           StreamProvider.value(
             value: DataProvider().posts(null),
             initialData: null,
+            catchError: (context, error) =>
+                GlobalSnackBar.show(message: error.toString()),
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, b) {
                 if (posts == null || users == null) {

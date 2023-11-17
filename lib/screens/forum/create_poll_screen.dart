@@ -153,6 +153,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
             Get.to(() => NewPostShareScreen(
                   createPostController: prov,
                   isPoll: true,
+                  isForum: true,
                 ));
           } else {
             GlobalSnackBar.show(

@@ -1,3 +1,4 @@
+import 'package:casarancha/firebase_options.dart';
 import 'package:casarancha/provider_app.dart';
 import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/utils/app_utils.dart';
@@ -13,12 +14,8 @@ import 'utils/app_constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await FirebaseMessagingService().updateUserFcmToken();
-  FirebaseMessaging.onMessageOpenedApp.listen((event) {
-    printLog('${event.data}');
-  });
-
+  await Firebase.initializeApp(
+      name: 'Casarancha', options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -33,6 +30,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (BuildContext context, Widget? child) {
         return StreamBuilder<User?>(
+          initialData: null,
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             return ProviderApp(

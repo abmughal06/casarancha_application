@@ -23,7 +23,7 @@ class GroupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.watch<UserModel>();
+    final currentUser = context.watch<UserModel?>();
     final groupPovider = Provider.of<NewGroupProvider>(context);
     return GhostScaffold(
       appBar: primaryAppbar(
@@ -141,7 +141,7 @@ class GroupScreen extends StatelessWidget {
                         child: GestureDetector(
                           onTap: () {
                             Get.to(() =>
-                                CreateGroupScreen(currentUser: currentUser));
+                                CreateGroupScreen(currentUser: currentUser!));
                           },
                           child: Container(
                             padding: EdgeInsets.all(8.h),

@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/comment_model.dart';
 import '../../models/user_model.dart';
+import '../../utils/snackbar.dart';
 import '../../widgets/home_screen_widgets/post_comment_field.dart';
 import '../../widgets/home_screen_widgets/post_comment_tile.dart';
 import '../../widgets/home_screen_widgets/post_detail_media.dart';
@@ -55,6 +56,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     value: DataProvider().singlePost(
                         postId: widget.postModel.id, groupId: widget.groupId),
                     initialData: null,
+                    catchError: (context, error) =>
+                        GlobalSnackBar.show(message: error.toString()),
                     child: Consumer<PostModel?>(
                       builder: (context, post, b) {
                         if (post == null) {
@@ -106,6 +109,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     value: DataProvider().comment(
                         cmntId: widget.postModel.id, groupId: widget.groupId),
                     initialData: null,
+                    catchError: (context, error) =>
+                        GlobalSnackBar.show(message: error.toString()),
                     child: Consumer<List<Comment>?>(
                       builder: (context, comment, b) {
                         if (comment == null || users == null) {

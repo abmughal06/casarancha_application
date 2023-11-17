@@ -249,6 +249,8 @@ class CustomPostFooter extends StatelessWidget {
             value:
                 DataProvider().comment(cmntId: postModel.id, groupId: groupId),
             initialData: null,
+            catchError: (context, error) =>
+                GlobalSnackBar.show(message: error.toString()),
             child: Consumer<List<Comment>?>(
               builder: (context, comment, b) {
                 if (comment == null || users == null) {

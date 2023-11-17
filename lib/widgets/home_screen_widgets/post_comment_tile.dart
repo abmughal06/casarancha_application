@@ -22,6 +22,7 @@ import '../../models/user_model.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../../screens/profile/AppUser/app_user_screen.dart';
+import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
 
@@ -56,6 +57,8 @@ class _PostCommentTileState extends State<PostCommentTile> {
     final postProvider = Provider.of<PostProvider>(context);
     return StreamProvider.value(
       initialData: null,
+      catchError: (context, error) =>
+          GlobalSnackBar.show(message: error.toString()),
       value: DataProvider().getSingleUser(widget.cmnt.creatorId),
       child: Consumer<UserModel?>(builder: (context, appUser, b) {
         if (appUser == null) {
@@ -371,6 +374,8 @@ class FeedPostCommentTile extends StatelessWidget {
     return StreamProvider.value(
       initialData: null,
       value: DataProvider().getSingleUser(cmnt.creatorId),
+      catchError: (context, error) =>
+          GlobalSnackBar.show(message: error.toString()),
       child: Consumer<UserModel?>(
         builder: (context, appUser, b) {
           if (appUser == null) {
@@ -443,6 +448,8 @@ class PostCommentReplyTile extends StatelessWidget {
 
     return StreamProvider.value(
       initialData: null,
+      catchError: (context, error) =>
+          GlobalSnackBar.show(message: error.toString()),
       value: DataProvider().commentReply(
           postId: comment.postId, cmntId: comment.id, groupId: groupId),
       child: Consumer<List<Comment>?>(
@@ -460,6 +467,8 @@ class PostCommentReplyTile extends StatelessWidget {
 
               return StreamProvider.value(
                 value: DataProvider().getSingleUser(rep.creatorId),
+                catchError: (context, error) =>
+                    GlobalSnackBar.show(message: error.toString()),
                 initialData: null,
                 child: Consumer<UserModel?>(
                   builder: (context, repUser, b) {

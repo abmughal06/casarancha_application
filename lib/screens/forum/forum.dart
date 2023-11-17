@@ -10,11 +10,13 @@ import 'package:casarancha/widgets/shared/skeleton.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
+import '../../utils/snackbar.dart';
 import '../../widgets/primary_appbar.dart';
 
 class ForumsScreen extends StatelessWidget {
@@ -36,7 +38,7 @@ class ForumsScreen extends StatelessWidget {
                       CupertinoActionSheetAction(
                         onPressed: () {
                           Get.back();
-                          Get.to(() => const CreatePostScreen());
+                          Get.to(() => const CreatePostScreen(isForum: true));
                         },
                         child: const TextWidget(text: 'Upload Post'),
                       ),
@@ -64,12 +66,16 @@ class ForumsScreen extends StatelessWidget {
         body: StreamProvider.value(
           value: DataProvider().forums(),
           initialData: null,
+          catchError: (context, error) =>
+              GlobalSnackBar.show(message: error.toString()),
           child: Consumer<List<PostModel>?>(builder: (context, posts, b) {
             if (posts == null) {
               return const PostSkeleton();
             }
             return ListView.builder(
+                shrinkWrap: true,
                 itemCount: posts.length,
+                padding: EdgeInsets.only(bottom: 100.h),
                 itemBuilder: (context, index) {
                   var post = posts[index];
                   if (posts.isEmpty) {

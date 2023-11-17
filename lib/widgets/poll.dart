@@ -25,7 +25,7 @@ class _PollState extends State<Poll> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Align(
           alignment: Alignment.topLeft,
@@ -39,6 +39,7 @@ class _PollState extends State<Poll> {
         heightBox(15.h),
         ListView.separated(
           shrinkWrap: true,
+          padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: widget.postModel.mediaData.first.pollOptions!.length,
           separatorBuilder: (context, index) => heightBox(12.h),
@@ -112,7 +113,7 @@ class _PollState extends State<Poll> {
               ),
             );
           },
-        )
+        ),
       ],
     );
   }

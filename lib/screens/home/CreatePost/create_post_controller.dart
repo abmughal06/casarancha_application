@@ -67,7 +67,8 @@ class CreatePostMethods extends ChangeNotifier {
     locationController.clear();
   }
 
-  Future<void> sharePost({String? groupId, UserModel? user}) async {
+  Future<void> sharePost(
+      {String? groupId, UserModel? user, required bool isForum}) async {
     isSharingPost = true;
     notifyListeners();
     final postRef = groupId != null
@@ -96,7 +97,7 @@ class CreatePostMethods extends ChangeNotifier {
         tagsIds: tagsController.text.split(" ").map((e) => e).toList(),
         shareLink: '',
         videoViews: [],
-        isForumPost: false,
+        isForumPost: isForum,
         shareCount: [],
         showPostTime: showPostTime,
         mediaData: mediaData,

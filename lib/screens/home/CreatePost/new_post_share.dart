@@ -20,10 +20,12 @@ class NewPostShareScreen extends StatelessWidget {
     required this.createPostController,
     this.groupId,
     required this.isPoll,
+    required this.isForum,
   }) : super(key: key);
 
   final String? groupId;
   final bool isPoll;
+  final bool isForum;
 
   final CreatePostMethods createPostController;
 
@@ -35,26 +37,28 @@ class NewPostShareScreen extends StatelessWidget {
         title: strNewPost,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton:
-          Consumer<CreatePostMethods>(builder: (context, state, b) {
-        return CommonButton(
-          showLoading: state.isSharingPost,
-          text: strSharePost,
-          height: 58.w,
-          verticalOutMargin: 10.w,
-          horizontalOutMargin: 10.w,
-          onTap: () => user == null
-              ? GlobalSnackBar.show(message: strAlertSharePost)
-              : isPoll
-                  ? state.sharePollPost(
-                      user: user,
-                    )
-                  : state.sharePost(
-                      groupId: groupId,
-                      user: user,
-                    ),
-        );
-      }),
+      floatingActionButton: Consumer<CreatePostMethods>(
+        builder: (context, state, b) {
+          return CommonButton(
+            showLoading: state.isSharingPost,
+            text: strSharePost,
+            height: 58.w,
+            verticalOutMargin: 10.w,
+            horizontalOutMargin: 10.w,
+            onTap: () => user == null
+                ? GlobalSnackBar.show(message: strAlertSharePost)
+                : isPoll
+                    ? state.sharePollPost(
+                        user: user,
+                      )
+                    : state.sharePost(
+                        groupId: groupId,
+                        user: user,
+                        isForum: isForum,
+                      ),
+          );
+        },
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 20.w,

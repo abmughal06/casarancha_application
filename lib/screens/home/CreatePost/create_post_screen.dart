@@ -28,8 +28,10 @@ import '../../../widgets/text_widget.dart';
 import 'new_post_share.dart';
 
 class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({Key? key, this.groupId}) : super(key: key);
+  const CreatePostScreen({Key? key, this.groupId, required this.isForum})
+      : super(key: key);
   final String? groupId;
+  final bool isForum;
 
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
@@ -333,6 +335,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 Get.to(
                   () => NewPostShareScreen(
                     isPoll: false,
+                    isForum: widget.isForum,
                     createPostController: createPost,
                     groupId: widget.groupId,
                   ),

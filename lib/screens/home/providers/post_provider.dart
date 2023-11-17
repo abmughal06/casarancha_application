@@ -30,6 +30,24 @@ class PostProvider extends ChangeNotifier {
       .doc(FirebaseAuth.instance.currentUser!.uid);
 
   final postCommentController = TextEditingController();
+  bool isMentionActive = false;
+
+  // commentMentionListner() {
+  //   postCommentController.addListener(() {
+  //     // Check if "@" is present at the beginning of a word (without space)
+  //     String text = postCommentController.text;
+  //     isMentionActive =
+  //         text.isNotEmpty && text.lastIndexOf('@') == text.length - 1;
+
+  //     printLog('hahahaha');
+  //     notifyListeners();
+  //   });
+  // }
+
+  // PostProvider() {
+  //   commentMentionListner();
+  // }
+
   final FocusNode postCommentFocus = FocusNode();
   String? repCommentId;
 
@@ -731,21 +749,22 @@ class PostProvider extends ChangeNotifier {
       final media = MediaDetails.fromMap(data.data()!['mediaData'][0]);
       final pollOptions =
           media.pollOptions!.map((e) => PollOptions.fromMap(e)).toList();
-
-      // var votersIds = [];
-      // for (var i in pollOptions) {
-      //   votersIds += i.votes;
-      // }
-
-      // printLog(votersIds.toString());
-      pollOptions[index] = pollOptions[index]
-          .copyWith(pollOptions[index].option, [currentUserUID]);
-      var newMedia = media
-          .copyWith(pollOptions: pollOptions.map((e) => e.toMap()).toList())
-          .toMap();
-      firestore.collection('posts').doc(postId).update({
-        "mediaData": [newMedia]
-      });
+      List list = [];
+      for (var i in pollOptions) {
+        list += i.votes;
+      }
+      printLog(list.toString());
+      if (!list.contains(currentUserUID)) {
+        pollOptions[index] = pollOptions[index].copyWith(
+            pollOptions[index].option,
+            pollOptions[index].votes + [currentUserUID]);
+        var newMedia = media
+            .copyWith(pollOptions: pollOptions.map((e) => e.toMap()).toList())
+            .toMap();
+        firestore.collection('posts').doc(postId).update({
+          "mediaData": [newMedia]
+        });
+      }
     } catch (e) {
       GlobalSnackBar.show(message: 'unknown error occured, please try later');
     }
