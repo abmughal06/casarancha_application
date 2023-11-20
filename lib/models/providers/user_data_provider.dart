@@ -2,7 +2,6 @@ import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/story_model.dart';
-import 'package:casarancha/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';

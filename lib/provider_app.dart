@@ -57,8 +57,8 @@ class ProviderApp extends StatelessWidget {
         StreamProvider.value(
           value: userDataProvider.users,
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          // catchError: (context, error) =>
+          //     GlobalSnackBar.show(message: error.toString()),
         ),
         StreamProvider.value(
           value: userDataProvider.notifications,

@@ -137,7 +137,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               });
                             } catch (e) {
                               GlobalSnackBar.show(
-                                context: context,
                                 message: e.toString(),
                               );
                             }

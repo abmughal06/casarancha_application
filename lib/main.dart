@@ -1,10 +1,7 @@
 import 'package:casarancha/firebase_options.dart';
 import 'package:casarancha/provider_app.dart';
-import 'package:casarancha/resources/firebase_cloud_messaging.dart';
-import 'package:casarancha/utils/app_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -18,6 +15,8 @@ void main() async {
       name: 'Casarancha', options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
+
+String? getToken = '';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);

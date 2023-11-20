@@ -4,7 +4,7 @@ import 'package:casarancha/screens/home/CreatePost/new_post_share.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_button.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_editing_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';

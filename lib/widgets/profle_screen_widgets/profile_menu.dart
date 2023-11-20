@@ -120,10 +120,8 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
               onAction: () => AuthenticationProvider(FirebaseAuth.instance)
                       .signOut()
                       .whenComplete(() {
-                    User? user;
-                    if (user == null) {
-                      Get.offAll(() => const LoginScreen());
-                    }
+                    // User? user;
+                    Get.offAll(() => const LoginScreen());
                   })));
 
       break;

@@ -6,6 +6,7 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,7 +15,6 @@ import 'package:provider/provider.dart';
 import '../../../models/story_model.dart';
 import '../../../resources/image_resources.dart';
 import '../../../resources/localization_text_strings.dart';
-import '../../../utils/snackbar.dart';
 import '../../../widgets/home_screen_widgets/post_card.dart';
 import '../../../widgets/home_screen_widgets/story_widget.dart';
 import '../../../widgets/shared/alert_text.dart';
@@ -184,13 +184,13 @@ class _HomeScreenState extends State<HomeScreen>
           StreamProvider.value(
             value: DataProvider().posts(null),
             initialData: null,
-            catchError: (context, error) =>
-                GlobalSnackBar.show(message: error.toString()),
+            // catchError: (context, error) => Text(error.toString()),
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, b) {
                 if (posts == null || users == null) {
                   return const PostSkeleton();
                 }
+                printLog(posts.toString());
                 var post = ghostProvider.checkGhostMode
                     ? posts.where((element) => (currentUser!.followersIds
                             .contains(element.creatorId) ||
