@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "423296603409-c50tml463f74ol2ebmb78jn9r4g8c2vj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zb.casarancha",
+            "certificate_hash": "2de3e06d9fa798c7e8cc6c4c267fc56e58cc6c95"
+          }
+        },
+        {
           "client_id": "423296603409-semoea73o5i9kvnn060d2lvrnbb5h5jd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

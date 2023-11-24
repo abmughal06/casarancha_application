@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/group_model.dart';
 import '../../models/user_model.dart';
-import '../../utils/snackbar.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/profle_screen_widgets/follow_following_tile.dart';
 import '../../widgets/text_widget.dart';
@@ -46,8 +45,7 @@ class AddGroupMembers extends StatelessWidget {
             child: StreamProvider.value(
               value: DataProvider().singleGroup(group.id),
               initialData: null,
-              catchError: (context, error) =>
-                  GlobalSnackBar.show(message: error.toString()),
+              catchError: (context, error) => null,
               child: Consumer<GroupModel?>(
                 builder: (context, grp, b) {
                   if (allUsers == null || grp == null || currentUser == null) {

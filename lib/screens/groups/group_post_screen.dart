@@ -110,6 +110,7 @@ class GroupPostScreen extends StatelessWidget {
           StreamProvider.value(
             value: DataProvider().posts(group.id),
             initialData: null,
+            catchError: (context, error) => null,
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, b) {
                 if (posts == null || users == null) {

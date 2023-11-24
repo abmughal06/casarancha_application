@@ -22,10 +22,10 @@ class _PollState extends State<Poll> {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+    return ListView(
+      // mainAxisAlignment: MainAxisAlignment.start,
+      // crossAxisAlignment: CrossAxisAlignment.start,
+      // mainAxisSize: MainAxisSize.min,
       children: [
         Align(
           alignment: Alignment.topLeft,

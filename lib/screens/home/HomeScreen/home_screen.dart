@@ -6,7 +6,6 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
-import 'package:casarancha/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -184,13 +183,12 @@ class _HomeScreenState extends State<HomeScreen>
           StreamProvider.value(
             value: DataProvider().posts(null),
             initialData: null,
-            // catchError: (context, error) => Text(error.toString()),
+            catchError: (context, error) => null,
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, b) {
                 if (posts == null || users == null) {
                   return const PostSkeleton();
                 }
-                printLog(posts.toString());
                 var post = ghostProvider.checkGhostMode
                     ? posts.where((element) => (currentUser!.followersIds
                             .contains(element.creatorId) ||

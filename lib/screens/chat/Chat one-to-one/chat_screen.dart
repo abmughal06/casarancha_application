@@ -92,8 +92,7 @@ class _ChatScreenState extends State<ChatScreen>
       body: StreamProvider.value(
         value: DataProvider().messages(widget.appUserId, false),
         initialData: null,
-        catchError: (context, error) =>
-            GlobalSnackBar.show(message: error.toString()),
+        catchError: (context, error) => null,
         child: Consumer<List<Message>?>(
           builder: (context, messages, b) {
             if (messages == null) {

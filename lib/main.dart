@@ -2,6 +2,7 @@ import 'package:casarancha/firebase_options.dart';
 import 'package:casarancha/provider_app.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -23,7 +24,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
+    return
+        //  MaterialApp(
+        //     debugShowCheckedModeBanner: false,
+        //     theme: ThemeData(
+        //       primarySwatch: Colors.red,
+        //     ),
+        //     home: const Test());
+        ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
@@ -45,6 +53,36 @@ class MyApp extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+class Test extends StatefulWidget {
+  const Test({Key? key}) : super(key: key);
+
+  @override
+  State<Test> createState() => _TestState();
+}
+
+class _TestState extends State<Test> {
+  String? name;
+
+  @override
+  void initState() {
+    DatabaseReference ref = FirebaseDatabase.instance.ref('user');
+    ref.onValue.listen((event) {
+      name = event.snapshot.value.toString();
+    });
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(name ?? "nope"),
+      ),
     );
   }
 }

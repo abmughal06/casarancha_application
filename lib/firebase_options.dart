@@ -50,20 +50,21 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD2NOqeUHxFWT9bTWvC3CHgrzEJhTziiHo',
-    appId: '1:956181357951:android:a881490c77add423b1a64a',
-    messagingSenderId: '956181357951',
-    projectId: 'casarancha-81b7c',
-    storageBucket: 'casarancha-81b7c.appspot.com',
+    apiKey: 'AIzaSyA7KFjL-YSF-faJ7oypwb8Y8cJkA9xNTng',
+    appId: '1:423296603409:android:28acadf5bafe1998f828b0',
+    messagingSenderId: '423296603409',
+    projectId: 'casa-rancha',
+    storageBucket: 'casa-rancha.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAUvF6ZcUoXKlpVlek9vPbefPxT8dsjQ0Q',
-    appId: '1:956181357951:ios:19b285386c0ca256b1a64a',
-    messagingSenderId: '956181357951',
-    projectId: 'casarancha-81b7c',
-    storageBucket: 'casarancha-81b7c.appspot.com',
-    iosClientId: '956181357951-rhnjsq4s97ghgv4m8cvtnt9cn3i5fc4o.apps.googleusercontent.com',
+    apiKey: 'AIzaSyDJ59xbsTgfDgdoK9cy1cGz--aL1266i-I',
+    appId: '1:423296603409:ios:51bc8fa4bdbdfab6f828b0',
+    messagingSenderId: '423296603409',
+    projectId: 'casa-rancha',
+    storageBucket: 'casa-rancha.appspot.com',
+    androidClientId: '423296603409-5hh1l47r8fadcvehk6p5jk7knn2d2k6n.apps.googleusercontent.com',
+    iosClientId: '423296603409-6uvc04rt06buro6i4488i6ta85n8nnr7.apps.googleusercontent.com',
     iosBundleId: 'com.zb.casarancha',
   );
 }

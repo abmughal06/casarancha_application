@@ -14,7 +14,6 @@ import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../screens/profile/follower_following_screen.dart';
-import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
 
@@ -209,8 +208,7 @@ class ProfileTop extends StatelessWidget {
           children: [
             StreamProvider.value(
                 initialData: null,
-                catchError: (context, error) =>
-                    GlobalSnackBar.show(message: error.toString()),
+                catchError: (context, error) => null,
                 value: DataProvider().posts(null),
                 child: Consumer<List<PostModel>?>(builder: (context, post, b) {
                   if (post == null || user == null) {

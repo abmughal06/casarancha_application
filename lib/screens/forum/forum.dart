@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
-import '../../utils/snackbar.dart';
 import '../../widgets/primary_appbar.dart';
 
 class ForumsScreen extends StatelessWidget {
@@ -66,8 +65,7 @@ class ForumsScreen extends StatelessWidget {
         body: StreamProvider.value(
           value: DataProvider().forums(),
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
           child: Consumer<List<PostModel>?>(builder: (context, posts, b) {
             if (posts == null) {
               return const PostSkeleton();
@@ -86,6 +84,7 @@ class ForumsScreen extends StatelessWidget {
                   return StreamProvider.value(
                     value: DataProvider().getSingleUser(post.creatorId),
                     initialData: null,
+                    catchError: (context, error) => null,
                     child: Consumer<UserModel?>(builder: (context, appUser, b) {
                       if (appUser == null) {
                         return const PostSkeleton();

@@ -57,8 +57,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
     final postProvider = Provider.of<PostProvider>(context);
     return StreamProvider.value(
       initialData: null,
-      catchError: (context, error) =>
-          GlobalSnackBar.show(message: error.toString()),
+      catchError: (context, error) => null,
       value: DataProvider().getSingleUser(widget.cmnt.creatorId),
       child: Consumer<UserModel?>(builder: (context, appUser, b) {
         if (appUser == null) {
@@ -374,8 +373,7 @@ class FeedPostCommentTile extends StatelessWidget {
     return StreamProvider.value(
       initialData: null,
       value: DataProvider().getSingleUser(cmnt.creatorId),
-      catchError: (context, error) =>
-          GlobalSnackBar.show(message: error.toString()),
+      catchError: (context, error) => null,
       child: Consumer<UserModel?>(
         builder: (context, appUser, b) {
           if (appUser == null) {
@@ -448,8 +446,7 @@ class PostCommentReplyTile extends StatelessWidget {
 
     return StreamProvider.value(
       initialData: null,
-      catchError: (context, error) =>
-          GlobalSnackBar.show(message: error.toString()),
+      catchError: (context, error) => null,
       value: DataProvider().commentReply(
           postId: comment.postId, cmntId: comment.id, groupId: groupId),
       child: Consumer<List<Comment>?>(

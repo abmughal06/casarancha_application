@@ -6,7 +6,6 @@ import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/post_model.dart';
-import '../../utils/snackbar.dart';
 import '../../widgets/shared/skeleton.dart';
 
 class SavedPostScreen extends StatelessWidget {
@@ -21,8 +20,7 @@ class SavedPostScreen extends StatelessWidget {
       body: StreamProvider.value(
         value: DataProvider().posts(null),
         initialData: null,
-        catchError: (context, error) =>
-            GlobalSnackBar.show(message: error.toString()),
+        catchError: (context, error) => null,
         child: Consumer<List<PostModel>?>(
           builder: (context, posts, child) {
             if (posts == null || users == null || currentUser == null) {

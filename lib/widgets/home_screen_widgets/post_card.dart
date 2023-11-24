@@ -41,6 +41,7 @@ class PostCard extends StatelessWidget {
     final postPorvider = Provider.of<PostProvider>(context, listen: false);
     final ghostProvider = context.watch<DashboardProvider>();
     return Column(
+      mainAxisSize: MainAxisSize.max,
       children: [
         CustomPostHeader(
           postCreator: postCreator,

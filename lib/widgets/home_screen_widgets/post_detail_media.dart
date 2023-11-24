@@ -195,30 +195,39 @@ class PostMediaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    return SizedBox(
-      height: post.mediaData.first.type == 'Qoute'
-          ? 100
-          : post.mediaData.first.type == 'Music'
-              ? 300
-              : post.mediaData.first.type == 'Photo'
-                  ? 600
-                  : post.mediaData.first.type == 'poll'
-                      ? 300
-                      : 700,
-      // aspectRatio: post.mediaData.first.type == 'Qoute'
-      //     ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
-      //     : post.mediaData.first.type == 'Music'
-      //         ? 13 / 9
-      //         : post.mediaData.first.type == 'Photo'
-      //             ? double.parse(post.mediaData.first.imageWidth!) /
-      //                 double.parse(post.mediaData.first.imageHeight!)
-      //             : post.mediaData.first.type == 'poll'
-      //                 ? 1 / 1
-      //                 : 9 / 16,
+    var e = post.mediaData.first;
+    return AspectRatio(
+      aspectRatio: e.type == 'Qoute'
+          ? getQouteAspectRatio(e.link, isPostDetail)
+          : e.type == 'Music'
+              ? 13 / 9
+              : e.type == 'Photo'
+                  ? double.parse(e.imageWidth!) / double.parse(e.imageHeight!)
+                  : e.type == 'poll'
+                      ? e.pollOptions!.length < 3
+                          ? 2 / 1
+                          : e.pollOptions!.length < 4
+                              ? 1.5 / 1
+                              : 1.5 / 1
+                      : 9 / 16,
       child: PageView(
         children: post.mediaData
             .map(
-              (e) => Center(
+              (v) => AspectRatio(
+                aspectRatio: v.type == 'Qoute'
+                    ? getQouteAspectRatio(v.link, isPostDetail)
+                    : v.type == 'Music'
+                        ? 13 / 9
+                        : v.type == 'Photo'
+                            ? double.parse(v.imageWidth!) /
+                                double.parse(v.imageHeight!)
+                            : v.type == 'poll'
+                                ? v.pollOptions!.length < 3
+                                    ? 2 / 1
+                                    : v.pollOptions!.length < 4
+                                        ? 1.5 / 1
+                                        : 1.5 / 1
+                                : 9 / 16,
                 child: Stack(
                   children: [
                     CheckMediaAndShowPost(

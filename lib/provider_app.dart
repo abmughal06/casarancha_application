@@ -17,7 +17,6 @@ import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_p
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
 import 'package:casarancha/utils/providers/date_picker_provider.dart';
-import 'package:casarancha/utils/snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,12 +36,12 @@ class ProviderApp extends StatelessWidget {
         StreamProvider(
           create: (context) => context.read<AuthenticationProvider>().authState,
           initialData: null,
+          catchError: (context, error) => null,
         ),
         StreamProvider.value(
           value: userDataProvider.currentUser,
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
         ),
         // StreamProvider.value(
         //   value: userDataProvider.posts,
@@ -51,38 +50,32 @@ class ProviderApp extends StatelessWidget {
         StreamProvider.value(
           value: userDataProvider.stories,
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
         ),
         StreamProvider.value(
           value: userDataProvider.users,
           initialData: null,
-          // catchError: (context, error) =>
-          //     GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
         ),
         StreamProvider.value(
           value: userDataProvider.notifications,
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
         ),
         StreamProvider.value(
           value: userDataProvider.chatListUsers,
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
         ),
         StreamProvider.value(
           value: userDataProvider.ghostChatListUsers,
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
         ),
         StreamProvider.value(
           value: userDataProvider.groups,
           initialData: null,
-          catchError: (context, error) =>
-              GlobalSnackBar.show(message: error.toString()),
+          catchError: (context, error) => null,
         ),
         ChangeNotifierProvider<LoginProvider>(create: (_) => LoginProvider()),
         ChangeNotifierProvider<RegisterProvider>(

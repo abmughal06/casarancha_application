@@ -14,7 +14,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
-import '../../utils/snackbar.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/text_widget.dart';
 
@@ -61,8 +60,7 @@ class GroupMembersScreen extends StatelessWidget {
                   StreamProvider.value(
                     value: DataProvider().singleGroup(group.id),
                     initialData: null,
-                    catchError: (context, error) =>
-                        GlobalSnackBar.show(message: error.toString()),
+                    catchError: (context, error) => null,
                     child: Consumer<GroupModel?>(
                       builder: (context, value, child) {
                         if (users == null || value == null) {
