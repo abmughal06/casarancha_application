@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -41,13 +42,15 @@ class MyApp extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             return ProviderApp(
-              app: GetMaterialApp(
-                navigatorKey: rootNavigatorKey,
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  primarySwatch: Colors.red,
+              app: Portal(
+                child: GetMaterialApp(
+                  navigatorKey: rootNavigatorKey,
+                  debugShowCheckedModeBanner: false,
+                  theme: ThemeData(
+                    primarySwatch: Colors.red,
+                  ),
+                  home: const Authenticate(),
                 ),
-                home: const Authenticate(),
               ),
             );
           },

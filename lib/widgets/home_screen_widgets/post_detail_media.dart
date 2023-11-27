@@ -127,7 +127,11 @@ class CheckMediaAndShowPost extends StatelessWidget {
 
       case 'poll':
         return Container(
-            padding: EdgeInsets.all(12.h), child: Poll(postModel: postModel));
+            padding: isPostDetail
+                ? EdgeInsets.only(
+                    top: 100.h, left: 12.h, right: 12.h, bottom: 12.h)
+                : EdgeInsets.all(12.h),
+            child: Poll(postModel: postModel));
 
       default:
         postProvider.countVideoViews(postModel: postModel, groupId: groupId);
@@ -197,36 +201,37 @@ class PostMediaWidget extends StatelessWidget {
     final prov = Provider.of<PostProvider>(context);
     var e = post.mediaData.first;
     return AspectRatio(
-      aspectRatio: e.type == 'Qoute'
-          ? getQouteAspectRatio(e.link, isPostDetail)
-          : e.type == 'Music'
+      aspectRatio: post.mediaData.first.type == 'Qoute'
+          ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
+          : post.mediaData.first.type == 'Music'
               ? 13 / 9
-              : e.type == 'Photo'
-                  ? double.parse(e.imageWidth!) / double.parse(e.imageHeight!)
-                  : e.type == 'poll'
-                      ? e.pollOptions!.length < 3
+              : post.mediaData.first.type == 'Photo'
+                  ? double.parse(post.mediaData.first.imageWidth!) /
+                      double.parse(post.mediaData.first.imageHeight!)
+                  : post.mediaData.first.type == 'poll'
+                      ? post.mediaData.first.pollOptions!.length < 3
                           ? 2 / 1
-                          : e.pollOptions!.length < 4
+                          : post.mediaData.first.pollOptions!.length < 4
                               ? 1.5 / 1
-                              : 1.5 / 1
+                              : 1 / 1
                       : 9 / 16,
       child: PageView(
         children: post.mediaData
             .map(
               (v) => AspectRatio(
-                aspectRatio: v.type == 'Qoute'
-                    ? getQouteAspectRatio(v.link, isPostDetail)
-                    : v.type == 'Music'
+                aspectRatio: e.type == 'Qoute'
+                    ? getQouteAspectRatio(e.link, isPostDetail)
+                    : e.type == 'Music'
                         ? 13 / 9
-                        : v.type == 'Photo'
-                            ? double.parse(v.imageWidth!) /
-                                double.parse(v.imageHeight!)
-                            : v.type == 'poll'
-                                ? v.pollOptions!.length < 3
+                        : e.type == 'Photo'
+                            ? double.parse(e.imageWidth!) /
+                                double.parse(e.imageHeight!)
+                            : e.type == 'poll'
+                                ? e.pollOptions!.length < 3
                                     ? 2 / 1
-                                    : v.pollOptions!.length < 4
+                                    : e.pollOptions!.length < 4
                                         ? 1.5 / 1
-                                        : 1.5 / 1
+                                        : 1 / 1
                                 : 9 / 16,
                 child: Stack(
                   children: [
