@@ -7,10 +7,13 @@ import 'package:casarancha/screens/chat/share_post_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/utils/app_constants.dart';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/home_screen_widgets/report_sheet.dart';
 import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/shared/alert_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -122,15 +125,29 @@ class _PostCommentTileState extends State<PostCommentTile> {
                               ),
                             ),
                           ),
-                          SelectableTextWidget(
-                            text: widget.cmnt.message.isEmpty
-                                ? "---"
-                                : widget.cmnt.message,
-                            fontSize: 12.sp,
-                            color: color55F,
-                            fontWeight: FontWeight.w400,
-                            textOverflow: TextOverflow.ellipsis,
-                          ),
+                          RichText(
+                            text: highlightMentions(
+                              text: widget.cmnt.message,
+                              context: context,
+                              onTap: () {
+                                printLog('============>>>>>>>>>comment');
+                                var username =
+                                    extractUsername(widget.cmnt.message);
+                                onUsernameTap(username!, context);
+                              },
+                            ),
+                          )
+
+                          // SelectableTextWidget(
+                          //   text: widget.cmnt.message.isEmpty
+                          //       ? "---"
+                          //       : widget.cmnt.message,
+                          //   fontSize: 12.sp,
+                          //   color: color55F,
+                          //   fontWeight: FontWeight.w400,
+                          //   textOverflow: TextOverflow.ellipsis,
+                          // ),
+                          ,
                           heightBox(5.h),
                           Row(
                             children: [
@@ -355,6 +372,102 @@ class _PostCommentTileState extends State<PostCommentTile> {
   }
 }
 
+Future<String> fetchUserId(String username) async {
+  try {
+    // Query Firestore for the user with the given username
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // If a user with the given username is found, return their user ID
+      return querySnapshot.docs.first.id;
+    } else {
+      throw Exception('User not found for username: $username');
+    }
+  } catch (error) {
+    printLog('Error fetching user id: $error');
+    // Handle error, show a message to the user, etc.
+    throw Exception('Error fetching user id');
+  }
+}
+
+void onUsernameTap(String username, context) async {
+  try {
+    // Simulate fetching user id from Firestore or another data source
+    String userId = await fetchUserId(username);
+
+    // Now you have the userId, and you can navigate to the user's profile page
+    navigateToAppUserScreen(userId, context);
+  } catch (error) {
+    printLog('Error fetching user id: $error');
+    // Handle error, show a message to the user, etc.
+  }
+}
+
+String? extractUsername(String tappedText) {
+  final mentionPattern = RegExp(r'@(\w+)');
+  final match = mentionPattern.firstMatch(tappedText);
+
+  if (match != null) {
+    return match.group(1);
+  } else {
+    return null;
+  }
+}
+
+TextSpan highlightMentions({
+  String? text,
+  BuildContext? context,
+  VoidCallback? onTap,
+}) {
+  final mentionPattern = RegExp(r'@(\w+)');
+
+  final segments = mentionPattern.allMatches(text!);
+
+  final spans = <TextSpan>[];
+  int currentIndex = 0;
+
+  for (final segment in segments) {
+    spans.add(TextSpan(
+      text: text.substring(currentIndex, segment.start),
+      style: TextStyle(
+        fontSize: 12.sp,
+        color: color55F,
+        fontWeight: FontWeight.w400,
+        overflow: TextOverflow.ellipsis,
+      ),
+    ));
+
+    spans.add(TextSpan(
+      text: segment.group(0),
+      style: TextStyle(
+        color: Colors.blue,
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        overflow: TextOverflow.ellipsis,
+      ),
+      recognizer: TapGestureRecognizer()
+        ..onTap = () {
+          // Extract the username from the tapped mention
+          var username = extractUsername(segment.group(0).toString());
+          onTap?.call();
+          onUsernameTap(username!, context);
+        },
+    ));
+
+    currentIndex = segment.end;
+  }
+
+  spans.add(TextSpan(
+    text: text.substring(currentIndex),
+    style: const TextStyle(color: Colors.black),
+  ));
+
+  return TextSpan(children: spans);
+}
+
 class FeedPostCommentTile extends StatelessWidget {
   const FeedPostCommentTile(
       {Key? key,
@@ -380,48 +493,69 @@ class FeedPostCommentTile extends StatelessWidget {
             return Container();
           }
           return ListTile(
-              minVerticalPadding: 0,
-              onTap: () => Get.to(() => PostDetailScreen(
-                    postModel: postModel!,
-                    groupId: groupId,
-                  )),
-              leading: ProfilePic(pic: appUser.imageStr, heightAndWidth: 46.h),
-              title: RichText(
-                text: TextSpan(
-                  text: appUser.username,
-                  style: TextStyle(
-                      fontSize: 14.sp,
+            minVerticalPadding: 0,
+            onTap: () => Get.to(() => PostDetailScreen(
+                  postModel: postModel!,
+                  groupId: groupId,
+                )),
+            leading: ProfilePic(pic: appUser.imageStr, heightAndWidth: 46.h),
+            title: RichText(
+              text: TextSpan(
+                text: appUser.username,
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    overflow: TextOverflow.ellipsis,
+                    color: const Color(0xff212121),
+                    fontWeight: FontWeight.w600),
+                children: [
+                  WidgetSpan(child: widthBox(4.w)),
+                  if (appUser.isVerified)
+                    WidgetSpan(child: SvgPicture.asset(icVerifyBadge)),
+                  WidgetSpan(child: widthBox(8.w)),
+                  TextSpan(
+                    text: convertDateIntoTime(cmnt.createdAt),
+                    style: TextStyle(
+                      fontSize: 12.sp,
                       overflow: TextOverflow.ellipsis,
-                      color: const Color(0xff212121),
-                      fontWeight: FontWeight.w600),
-                  children: [
-                    WidgetSpan(child: widthBox(4.w)),
-                    if (appUser.isVerified)
-                      WidgetSpan(child: SvgPicture.asset(icVerifyBadge)),
-                    WidgetSpan(child: widthBox(8.w)),
-                    TextSpan(
-                      text: convertDateIntoTime(cmnt.createdAt),
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        overflow: TextOverflow.ellipsis,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xff5c5c5c),
-                      ),
-                    )
-                  ],
-                ),
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xff5c5c5c),
+                    ),
+                  )
+                ],
               ),
-              subtitle: TextWidget(
-                onTap: () => Get.to(() => PostDetailScreen(
+            ),
+            subtitle: InkWell(
+                onTap: () {
+                  Get.to(
+                    () => PostDetailScreen(
                       postModel: postModel!,
                       groupId: groupId,
-                    )),
-                text: cmnt.message.isEmpty ? "---" : cmnt.message,
-                fontSize: 12.sp,
-                color: color55F,
-                fontWeight: FontWeight.w400,
-                textOverflow: TextOverflow.ellipsis,
-              ));
+                    ),
+                  );
+                },
+                child: RichText(
+                  text: highlightMentions(
+                    text: cmnt.message.isEmpty ? "---" : cmnt.message,
+                    context: context,
+                    onTap: () {
+                      printLog('============>>>>>>>>>comment');
+                      var username = extractUsername(cmnt.message);
+                      onUsernameTap(username!, context);
+                    },
+                  ),
+                )),
+            // TextWidget(
+            //   onTap: () => Get.to(() => PostDetailScreen(
+            //         postModel: postModel!,
+            //         groupId: groupId,
+            //       )),
+            //   text: cmnt.message.isEmpty ? "---" : cmnt.message,
+            //   fontSize: 12.sp,
+            //   color: color55F,
+            //   fontWeight: FontWeight.w400,
+            //   textOverflow: TextOverflow.ellipsis,
+            // )
+          );
         },
       ),
     );
@@ -535,15 +669,30 @@ class PostCommentReplyTile extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      SelectableTextWidget(
-                                        text: rep.message.isEmpty
-                                            ? "---"
-                                            : rep.message,
-                                        fontSize: 12.sp,
-                                        color: color55F,
-                                        fontWeight: FontWeight.w400,
-                                        textOverflow: TextOverflow.ellipsis,
+                                      RichText(
+                                        text: highlightMentions(
+                                          text: rep.message.isEmpty
+                                              ? '---'
+                                              : rep.message,
+                                          context: context,
+                                          onTap: () {
+                                            printLog(
+                                                '============>>>>>>>>>comment');
+                                            var username =
+                                                extractUsername(rep.message);
+                                            onUsernameTap(username!, context);
+                                          },
+                                        ),
                                       ),
+                                      // SelectableTextWidget(
+                                      //   text: rep.message.isEmpty
+                                      //       ? "---"
+                                      //       : rep.message,
+                                      //   fontSize: 12.sp,
+                                      //   color: color55F,
+                                      //   fontWeight: FontWeight.w400,
+                                      //   textOverflow: TextOverflow.ellipsis,
+                                      // ),
                                       heightBox(5.h),
                                       Row(
                                         children: [

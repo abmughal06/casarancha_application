@@ -233,6 +233,7 @@ class PostProvider extends ChangeNotifier {
     UserModel? user,
     String? comment,
     String? groupId,
+    List<String>? tagsId,
   }) {
     if (repCommentId == null) {
       try {
@@ -260,6 +261,7 @@ class PostProvider extends ChangeNotifier {
           dislikeIds: [],
           likeIds: [],
           replyIds: [],
+          tagIds: tagsId!,
         );
 
         postRef
@@ -302,6 +304,8 @@ class PostProvider extends ChangeNotifier {
     String? recieverId,
     UserModel? user,
     String? groupId,
+    String? reply,
+    List<String>? tagsId,
   }) {
     if (repCommentId != null) {
       try {
@@ -330,11 +334,12 @@ class PostProvider extends ChangeNotifier {
               imageUrl: user.imageStr,
               isVerified: user.isVerified),
           createdAt: DateTime.now().toIso8601String(),
-          message: postCommentController.text.trim(),
+          message: reply!,
           postId: postModel.id,
           dislikeIds: [],
           likeIds: [],
           replyIds: [],
+          tagIds: tagsId!,
         );
 
         cmntRef
