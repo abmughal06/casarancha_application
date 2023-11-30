@@ -1,4 +1,5 @@
 import 'package:casarancha/screens/home/providers/post_provider.dart';
+import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -30,7 +31,19 @@ class PostCommentField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> extractIds(String inputText) {
+      // Regular expression pattern to match the IDs
+      final RegExp regExp = RegExp(r"@\[__(\w+)__\]");
+
+      // Find all matches in the input text
+      Iterable<RegExpMatch> matches = regExp.allMatches(inputText);
+
+      // Extract and return the IDs from the matches
+      return matches.map((match) => match.group(1)!).toList();
+    }
+
     final postProvider = Provider.of<PostProvider>(context, listen: false);
+
     final user = context.watch<UserModel>();
     final users = context.watch<List<UserModel>>();
 
@@ -86,7 +99,9 @@ class PostCommentField extends StatelessWidget {
                           children: [
                             Text(data['full_name']),
                             heightBox(5.h),
-                            Text('@${data['display']}'),
+                            Text(
+                              '@${data['display']}',
+                            ),
                           ],
                         )
                       ],
@@ -114,18 +129,27 @@ class PostCommentField extends StatelessWidget {
                 padding: const EdgeInsets.all(15.0),
                 child: GestureDetector(
                   onTap: () {
+                    List<String>? ids = extractIds(
+                        mentionKey.currentState!.controller!.markupText);
+                    printLog(ids.toString());
                     if (postProvider.repCommentId == null) {
+                      postProvider.postCommentController.text =
+                          mentionKey.currentState!.controller!.text;
+                      mentionKey.currentState!.controller!.clear();
                       postProvider.postComment(
                         postModel: postModel,
                         comment: postProvider.postCommentController.text,
                         groupId: groupId,
+                        tagsId: ids,
                         user: user,
                       );
                     } else {
                       postProvider.postCommentReply(
                         postModel: postModel,
                         groupId: groupId,
+                        reply: postProvider.postCommentController.text,
                         user: user,
+                        tagsId: [],
                         recieverId: user.id,
                       );
                       postProvider.repCommentId = null;

@@ -10,6 +10,7 @@ class Comment {
   final CreatorDetails creatorDetails;
   final String createdAt;
   final String message;
+  final List<dynamic> tagIds;
   Comment({
     required this.likeIds,
     required this.dislikeIds,
@@ -20,6 +21,7 @@ class Comment {
     required this.creatorDetails,
     required this.createdAt,
     required this.message,
+    required this.tagIds,
   });
 
   Comment copyWith({
@@ -31,6 +33,7 @@ class Comment {
     String? creatorId,
     CreatorDetails? creatorDetails,
     String? createdAt,
+    List<dynamic>? tagIds,
     String? message,
   }) {
     return Comment(
@@ -43,6 +46,7 @@ class Comment {
       dislikeIds: dislikeIds ?? this.dislikeIds,
       likeIds: likeIds ?? this.likeIds,
       replyIds: replyIds ?? this.replyIds,
+      tagIds: tagIds ?? this.tagIds,
     );
   }
 
@@ -57,6 +61,7 @@ class Comment {
       'creatorDetails': creatorDetails.toMap(),
       'createdAt': createdAt,
       'message': message,
+      'tagIds': tagIds,
     };
   }
 
@@ -71,6 +76,7 @@ class Comment {
       creatorDetails: CreatorDetails.fromMap(map['creatorDetails']),
       createdAt: map['createdAt'] ?? '',
       message: map['message'] ?? '',
+      tagIds: map['tagIds'] ?? [],
     );
   }
 
