@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
+import '../../resources/firebase_cloud_messaging.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
@@ -143,14 +144,28 @@ class PostCommentField extends StatelessWidget {
                         tagsId: ids,
                         user: user,
                       );
+                      FirebaseMessagingService().sendNotificationToMutipleUsers(
+                        userIds: ids,
+                        isMessage: false,
+                        notificationType: "msg",
+                        msg: 'has mentioned you in a comment',
+                        content: "Has tagged you",
+                      );
                     } else {
                       postProvider.postCommentReply(
                         postModel: postModel,
                         groupId: groupId,
                         reply: postProvider.postCommentController.text,
                         user: user,
-                        tagsId: [],
+                        tagsId: ids,
                         recieverId: user.id,
+                      );
+                      FirebaseMessagingService().sendNotificationToMutipleUsers(
+                        userIds: ids,
+                        isMessage: false,
+                        msg: 'has mentioned you in a comment',
+                        notificationType: "msg",
+                        // content: "Has tagged you in a post ",
                       );
                       postProvider.repCommentId = null;
                     }
