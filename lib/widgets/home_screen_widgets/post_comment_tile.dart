@@ -126,18 +126,23 @@ class _PostCommentTileState extends State<PostCommentTile> {
                               ),
                             ),
                           ),
-                          RichText(
-                            text: highlightMentions(
-                              text: widget.cmnt.message,
-                              context: context,
-                              onTap: () {
-                                printLog('============>>>>>>>>>comment');
-                                var username =
-                                    extractUsername(widget.cmnt.message);
-                                onUsernameTap(username!, context);
-                              },
+                          Container(
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.69),
+                            child: RichText(
+                              text: highlightMentions(
+                                text: widget.cmnt.message,
+                                context: context,
+                                onTap: () {
+                                  printLog('============>>>>>>>>>comment');
+                                  var username =
+                                      extractUsername(widget.cmnt.message);
+                                  onUsernameTap(username!, context);
+                                },
+                              ),
                             ),
-                          )
+                          ),
 
                           // SelectableTextWidget(
                           //   text: widget.cmnt.message.isEmpty
@@ -148,7 +153,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                           //   fontWeight: FontWeight.w400,
                           //   textOverflow: TextOverflow.ellipsis,
                           // ),
-                          ,
+
                           heightBox(5.h),
                           Row(
                             children: [
