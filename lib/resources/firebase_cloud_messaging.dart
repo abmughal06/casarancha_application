@@ -141,6 +141,106 @@ class FirebaseMessagingService {
     }
   }
 
+  Future<void> sendNotificationToMutipleUsers({
+    List<String>? userIds,
+    dynamic content,
+    String? msg,
+    String? groupId,
+    required bool isMessage,
+    required String notificationType,
+  }) async {
+    // Fetch FCM tokens for the provided user IDs from your map or database
+    Map<String, String> userFCMTokens = await fetchUserFCMTokens(userIds);
+
+    // Iterate through each user and send a notification
+    userFCMTokens.forEach((appUserId, devRegToken) async {
+      var model = await getCurrentUserDetails();
+      var ghostmode = await ghostModeOn();
+
+      Map<String, String> header = {
+        "Content-Type": "application/json",
+        "Authorization": serverKey,
+      };
+
+      Map<String, dynamic> officialBodyFormat = {
+        "notification": {
+          "title": ghostmode ? "Ghost----" : model.name,
+          "body": msg,
+          "sound": "default",
+        },
+        "apns": {
+          "headers": {"aps-priority": "10"},
+          "payload": {
+            "apns": {"sound": "default"},
+          },
+        },
+        "priority": "high",
+        "data": {
+          "click_action": "FLUTTER_NOTIFICATION_CLICK",
+          "id": "1",
+          "status": "done",
+          "userRequestId": model.id,
+          "notification_type": notificationType,
+          "content": content,
+        },
+        "to": devRegToken,
+      };
+
+      var res = await http.post(
+        Uri.parse("https://fcm.googleapis.com/fcm/send"),
+        headers: header,
+        body: jsonEncode(officialBodyFormat),
+      );
+
+      printLog(res.statusCode.toString());
+
+      if (!isMessage) {
+        final NotificationModel notification = NotificationModel(
+          sentToId: appUserId,
+          sentById: model.id,
+          msg: msg,
+          content: content,
+          groupId: groupId,
+          notificationType: notificationType,
+          isRead: false,
+          createdDetails: CreatorDetails(
+            name: ghostmode ? "Ghost----" : model.name,
+            imageUrl: ghostmode ? "" : model.imageStr,
+            isVerified: model.isVerified,
+          ),
+          createdAt: DateTime.now().toUtc().toString(),
+        );
+
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(appUserId)
+            .collection("notificationList")
+            .doc()
+            .set(notification.toMap());
+      }
+    });
+  }
+
+  Future<Map<String, String>> fetchUserFCMTokens(List<String>? userIds) async {
+    Map<String, String> userFCMTokens = {};
+
+    for (String userId in userIds!) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(userId)
+          .get();
+
+      if (snapshot.exists) {
+        String? fcmToken = snapshot.get("fcmToken");
+        if (fcmToken != null) {
+          userFCMTokens[userId] = fcmToken;
+        }
+      }
+    }
+
+    return userFCMTokens;
+  }
+
   Future<String?> getFirebaseToken() async {
     fcmMessage.requestPermission();
     var token = await fcmMessage.getToken();
