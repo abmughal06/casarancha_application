@@ -32,17 +32,6 @@ class PostCommentField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> extractIds(String inputText) {
-      // Regular expression pattern to match the IDs
-      final RegExp regExp = RegExp(r"@\[__(\w+)__\]");
-
-      // Find all matches in the input text
-      Iterable<RegExpMatch> matches = regExp.allMatches(inputText);
-
-      // Extract and return the IDs from the matches
-      return matches.map((match) => match.group(1)!).toList();
-    }
-
     final postProvider = Provider.of<PostProvider>(context, listen: false);
 
     final user = context.watch<UserModel>();
@@ -198,6 +187,18 @@ class PostCommentField extends StatelessWidget {
     );
   }
 }
+
+List<String> extractIds(String inputText) {
+  // Regular expression pattern to match the IDs
+  final RegExp regExp = RegExp(r"@\[__(\w+)__\]");
+
+  // Find all matches in the input text
+  Iterable<RegExpMatch> matches = regExp.allMatches(inputText);
+
+  // Extract and return the IDs from the matches
+  return matches.map((match) => match.group(1)!).toList();
+}
+
 
 // TextField(
 //   focusNode: postProvider.postCommentFocus,

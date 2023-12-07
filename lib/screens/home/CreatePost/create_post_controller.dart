@@ -8,16 +8,13 @@ import 'package:path/path.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
-
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
-
 import '../../../utils/app_utils.dart';
 
 class CreatePostMethods extends ChangeNotifier {
@@ -34,6 +31,17 @@ class CreatePostMethods extends ChangeNotifier {
   }
 
   final fbinstance = FirebaseFirestore.instance;
+
+  List<UserModel> selectedUsers = []; // Store selected users in this list
+
+  updateTagList(userSnap) {
+    if (selectedUsers.contains(userSnap)) {
+      selectedUsers.remove(userSnap);
+    } else {
+      selectedUsers.add(userSnap);
+    }
+    notifyListeners();
+  }
 
   //Obserables
   var photosList = <File>[];
@@ -68,7 +76,10 @@ class CreatePostMethods extends ChangeNotifier {
   }
 
   Future<void> sharePost(
-      {String? groupId, UserModel? user, required bool isForum}) async {
+      {String? groupId,
+      UserModel? user,
+      required bool isForum,
+      List<String>? tagIds}) async {
     isSharingPost = true;
     notifyListeners();
     final postRef = groupId != null
@@ -94,7 +105,7 @@ class CreatePostMethods extends ChangeNotifier {
         createdAt: DateTime.now().toUtc().toString(),
         description: captionController.text.trim(),
         locationName: locationController.text.trim(),
-        tagsIds: tagsController.text.split(" ").map((e) => e).toList(),
+        tagsIds: tagIds!,
         shareLink: '',
         videoViews: [],
         isForumPost: isForum,
