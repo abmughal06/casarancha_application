@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
+import '../../resources/strings.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/custom_date_picker.dart';
 import '../../widgets/common_button.dart';
@@ -210,6 +211,18 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       inputHeight: 100,
                     ),
                     heightBox(10.w),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Birthday',
+                          style: TextStyle(
+                            color: const Color(0xFF3B3B3B).withOpacity(0.8),
+                            fontSize: 16.sp,
+                            fontFamily: strFontName,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        )),
+                    heightBox(5.w),
                     CustomDatePicker2(
                       getDateTime: provider.getDateTime,
                       showSelected: provider.showSelectedDates,
