@@ -7,6 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../models/media_details.dart';
 import '../../resources/color_resources.dart';
+import '../../screens/dashboard/provider/download_provider.dart';
+import '../custom_dialog.dart';
 import '../music_player_url.dart';
 import '../video_player.dart';
 
@@ -150,6 +152,8 @@ class ChatMediaFullScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     printLog(media.toString());
+    var link = media.map((e) => e.link).join(", ");
+    var name = media.map((e) => e.name).join(", ");
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -157,10 +161,21 @@ class ChatMediaFullScreenView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: colorWhite),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 12),
-        child: ChatMediaWidget(
-          media: media,
+      body: InkWell(
+        onLongPress: () {
+          showDialog(
+            context: context,
+            builder: (c) => CustomDownloadDialog(
+              path: name,
+              url: link,
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: ChatMediaWidget(
+            media: media,
+          ),
         ),
       ),
     );

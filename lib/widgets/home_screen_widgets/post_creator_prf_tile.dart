@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
+import 'package:casarancha/widgets/home_screen_widgets/post_comment_tile.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../../screens/profile/AppUser/app_user_screen.dart';
+import '../../utils/app_utils.dart';
 import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
@@ -178,19 +180,43 @@ class PostCreatorProfileTile extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Wrap(
-                      children: post.tagsIds
-                          .map(
-                            (e) => Padding(
-                              padding: EdgeInsets.only(right: 6.w),
-                              child: TextWidget(
-                                text: e,
-                                fontSize: 13.sp,
-                                color: Colors.blue.shade900,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                      children: post.tagsIds.map((userId) {
+                        return Consumer<List<UserModel>?>(
+                          builder: (context, tagusers, child) {
+                            if (tagusers == null) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else {
+                              var userList = tagusers
+                                  .where((element) => element.id == userId)
+                                  .toList();
+
+                              if (userList.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+
+                              var username =
+                                  userList.map((e) => e.username).join(", ");
+                              return Container(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.69,
+                                ),
+                                child: RichText(
+                                  text: highlightMentions(
+                                    text: "@$username ",
+                                    context: context,
+                                    onTap: () {
+                                      printLog('============>>>>>>>>>tagged');
+                                      onUsernameTap(username, context);
+                                    },
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
