@@ -57,7 +57,7 @@ class TextEditingWidget extends StatelessWidget {
   final double? contentPadding;
 
   const TextEditingWidget(
-      {Key? key,
+      {super.key,
       this.hint,
       this.suffixText,
       this.suffixWidget,
@@ -105,8 +105,7 @@ class TextEditingWidget extends StatelessWidget {
       this.fieldBorderClr,
       this.borderRadius,
       this.textHeight,
-      this.contentPadding})
-      : super(key: key);
+      this.contentPadding});
 
   @override
   Widget build(BuildContext context) {

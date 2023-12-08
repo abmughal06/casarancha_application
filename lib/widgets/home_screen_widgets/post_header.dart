@@ -21,14 +21,13 @@ class CustomPostHeader extends StatelessWidget {
   final UserModel postCreator;
 
   const CustomPostHeader(
-      {Key? key,
+      {super.key,
       this.ontap,
       this.isVideoPost = false,
       this.headerOnTap,
       this.onVertItemClick,
       required this.postCreator,
-      required this.postModel})
-      : super(key: key);
+      required this.postModel});
 
   @override
   Widget build(BuildContext context) {

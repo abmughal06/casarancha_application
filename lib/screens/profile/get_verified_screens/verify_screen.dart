@@ -19,14 +19,14 @@ import '../../../widgets/primary_appbar.dart';
 
 class VerifyScreen extends StatefulWidget {
   const VerifyScreen({
-    Key? key,
+    super.key,
     this.isEducation = false,
     this.isUsername = false,
     this.isOrganization = false,
     this.isGroup = false,
     this.isForum = false,
     this.isWork = false,
-  }) : super(key: key);
+  });
 
   final bool isEducation;
   final bool isUsername;

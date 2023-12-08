@@ -17,11 +17,11 @@ import '../profile_pic.dart';
 
 class PostCommentField extends StatelessWidget {
   PostCommentField({
-    Key? key,
+    super.key,
     required this.commentController,
     required this.postModel,
     this.groupId,
-  }) : super(key: key);
+  });
 
   final TextEditingController commentController;
   final PostModel postModel;
@@ -136,9 +136,9 @@ class PostCommentField extends StatelessWidget {
                       FirebaseMessagingService().sendNotificationToMutipleUsers(
                         userIds: ids,
                         isMessage: false,
-                        notificationType: "msg",
+                        notificationType: "post",
                         msg: 'has mentioned you in a comment',
-                        content: "Has tagged you",
+                        content: postModel,
                       );
                     } else {
                       postProvider.postCommentReply(
@@ -153,8 +153,8 @@ class PostCommentField extends StatelessWidget {
                         userIds: ids,
                         isMessage: false,
                         msg: 'has mentioned you in a comment',
-                        notificationType: "msg",
-                        // content: "Has tagged you in a post ",
+                        notificationType: "post",
+                        content: postModel,
                       );
                       postProvider.repCommentId = null;
                     }

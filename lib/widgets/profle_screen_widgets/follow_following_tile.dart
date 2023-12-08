@@ -12,11 +12,10 @@ import '../text_widget.dart';
 
 class FollowFollowingTile extends StatelessWidget {
   const FollowFollowingTile(
-      {Key? key,
+      {super.key,
       required this.user,
       required this.ontapToggleFollow,
-      required this.btnName})
-      : super(key: key);
+      required this.btnName});
   final UserModel user;
   final VoidCallback ontapToggleFollow;
   final String btnName;
@@ -92,12 +91,11 @@ class FollowFollowingTile extends StatelessWidget {
 
 class GroupMemberTile extends StatelessWidget {
   const GroupMemberTile(
-      {Key? key,
+      {super.key,
       required this.user,
       required this.ontapToggleFollow,
       required this.btnName,
-      required this.isAdmin})
-      : super(key: key);
+      required this.isAdmin});
   final UserModel user;
   final VoidCallback ontapToggleFollow;
   final String btnName;

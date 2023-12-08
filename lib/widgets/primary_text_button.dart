@@ -6,11 +6,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PrimaryTextButton extends StatelessWidget {
   const PrimaryTextButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.title,
     this.icon,
-  }) : super(key: key);
+  });
 
   final GestureTapCallback onPressed;
   final String title;

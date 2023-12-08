@@ -22,12 +22,11 @@ import '../text_widget.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard(
-      {Key? key,
+      {super.key,
       required this.post,
       this.initializedFuturePlay,
       required this.postCreator,
-      this.groupId})
-      : super(key: key);
+      this.groupId});
 
   final PostModel post;
   final Future<void>? initializedFuturePlay;

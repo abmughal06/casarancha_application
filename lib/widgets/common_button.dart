@@ -31,7 +31,7 @@ class CommonButton extends StatelessWidget {
   final FontWeight? txtFontWeight;
 
   const CommonButton(
-      {Key? key,
+      {super.key,
       this.width,
       this.height,
       this.text,
@@ -53,8 +53,7 @@ class CommonButton extends StatelessWidget {
       this.iconWidget,
       this.txtFontWeight,
       this.isShadowEnable = true,
-      this.isTrailingIcon = false})
-      : super(key: key);
+      this.isTrailingIcon = false});
 
   @override
   Widget build(BuildContext context) {

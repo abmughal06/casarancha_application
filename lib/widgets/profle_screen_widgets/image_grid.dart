@@ -8,7 +8,7 @@ import '../../models/post_model.dart';
 import '../shared/alert_text.dart';
 
 class ImageGridView extends StatelessWidget {
-  const ImageGridView({Key? key, required this.imageList}) : super(key: key);
+  const ImageGridView({super.key, required this.imageList});
 
   final List<PostModel>? imageList;
 

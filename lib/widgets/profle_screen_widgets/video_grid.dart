@@ -12,7 +12,7 @@ import '../../models/post_model.dart';
 import '../shared/alert_text.dart';
 
 class VideoGridView extends StatelessWidget {
-  const VideoGridView({Key? key, required this.videoList}) : super(key: key);
+  const VideoGridView({super.key, required this.videoList});
 
   final List<PostModel>? videoList;
 

@@ -10,8 +10,7 @@ import 'package:provider/provider.dart';
 import '../screens/dashboard/provider/download_provider.dart';
 
 class CustomDownloadDialog extends StatelessWidget {
-  const CustomDownloadDialog({Key? key, required this.path, required this.url})
-      : super(key: key);
+  const CustomDownloadDialog({super.key, required this.path, required this.url});
 
   final String path;
   final String url;
@@ -36,10 +35,10 @@ class CustomDownloadDialog extends StatelessWidget {
 
 class CustomDeleteDialog extends StatelessWidget {
   const CustomDeleteDialog({
-    Key? key,
+    super.key,
     required this.friendId,
     required this.docId,
-  }) : super(key: key);
+  });
 
   final String? friendId;
   final String? docId;

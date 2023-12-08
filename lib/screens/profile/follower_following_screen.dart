@@ -14,8 +14,7 @@ import '../../resources/color_resources.dart';
 import '../../resources/localization_text_strings.dart';
 
 class CurruentUserFollowerFollowingScreen extends StatelessWidget {
-  const CurruentUserFollowerFollowingScreen({Key? key, this.follow = false})
-      : super(key: key);
+  const CurruentUserFollowerFollowingScreen({super.key, this.follow = false});
 
   final bool? follow;
   final List<Widget> _myTabs = const [
@@ -133,8 +132,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
 class AppUserFollowerFollowingScreen extends StatelessWidget {
   final String? appUserid;
   const AppUserFollowerFollowingScreen(
-      {Key? key, this.follow = false, this.appUserid})
-      : super(key: key);
+      {super.key, this.follow = false, this.appUserid});
 
   final bool? follow;
   final List<Widget> _myTabs = const [

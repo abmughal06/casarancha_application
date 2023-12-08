@@ -10,8 +10,7 @@ import '../profile_pic.dart';
 
 class ChatScreenUserAppBar extends StatelessWidget {
   const ChatScreenUserAppBar(
-      {Key? key, required this.creatorDetails, this.appUserId})
-      : super(key: key);
+      {super.key, required this.creatorDetails, this.appUserId});
   final CreatorDetails creatorDetails;
   final String? appUserId;
 

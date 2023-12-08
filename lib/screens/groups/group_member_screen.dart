@@ -18,7 +18,7 @@ import '../../widgets/common_widgets.dart';
 import '../../widgets/text_widget.dart';
 
 class GroupMembersScreen extends StatelessWidget {
-  const GroupMembersScreen({Key? key, required this.group}) : super(key: key);
+  const GroupMembersScreen({super.key, required this.group});
   final GroupModel group;
 
   @override

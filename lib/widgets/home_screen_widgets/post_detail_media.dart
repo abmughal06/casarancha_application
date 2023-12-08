@@ -24,7 +24,7 @@ import '../video_player.dart';
 
 class CheckMediaAndShowPost extends StatelessWidget {
   const CheckMediaAndShowPost({
-    Key? key,
+    super.key,
     required this.mediaData,
     required this.postId,
     required this.ondoubleTap,
@@ -32,7 +32,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
     required this.isPostDetail,
     this.isFullScreen = false,
     required this.groupId,
-  }) : super(key: key);
+  });
 
   final MediaDetails mediaData;
   final PostModel postModel;
@@ -184,12 +184,11 @@ double getQouteAspectRatio(String text, bool isPostDetail) {
 
 class PostMediaWidget extends StatelessWidget {
   const PostMediaWidget(
-      {Key? key,
+      {super.key,
       required this.post,
       required this.isPostDetail,
       this.isFullScreen = false,
-      required this.groupId})
-      : super(key: key);
+      required this.groupId});
 
   final PostModel post;
   final bool isPostDetail;
@@ -284,8 +283,7 @@ class PostMediaWidget extends StatelessWidget {
 
 class PostFullScreenView extends StatelessWidget {
   const PostFullScreenView(
-      {Key? key, required this.post, required this.isPostDetail, this.groupId})
-      : super(key: key);
+      {super.key, required this.post, required this.isPostDetail, this.groupId});
   final PostModel post;
   final bool isPostDetail;
   final String? groupId;

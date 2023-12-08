@@ -9,8 +9,7 @@ import '../text_widget.dart';
 
 class BottomSheetWidget extends StatelessWidget {
   const BottomSheetWidget(
-      {Key? key, this.ontapBlock, this.onTapDownload, required this.blockText})
-      : super(key: key);
+      {super.key, this.ontapBlock, this.onTapDownload, required this.blockText});
 
   final VoidCallback? ontapBlock;
   final VoidCallback? onTapDownload;
@@ -56,7 +55,7 @@ class BottomSheetWidget extends StatelessWidget {
 }
 
 class ReportPostorComment extends StatelessWidget {
-  ReportPostorComment({Key? key, required this.btnName}) : super(key: key);
+  ReportPostorComment({super.key, required this.btnName});
 
   final String btnName;
   final List reportList = [

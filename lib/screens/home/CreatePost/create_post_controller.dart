@@ -15,6 +15,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
+import '../../../resources/firebase_cloud_messaging.dart';
 import '../../../utils/app_utils.dart';
 
 class CreatePostMethods extends ChangeNotifier {
@@ -120,8 +121,18 @@ class CreatePostMethods extends ChangeNotifier {
       await userRef.update({"postsIds": userModel.postsIds});
 
       await postRef.set(post.toMap());
+
       Get.back();
       Get.back();
+      if (tagIds.isNotEmpty) {
+        FirebaseMessagingService().sendNotificationToMutipleUsers(
+          userIds: tagIds,
+          isMessage: false,
+          msg: 'has tagged you in a post',
+          notificationType: "post",
+          content: post,
+        );
+      }
     } catch (e) {
       isSharingPost = false;
       notifyListeners();

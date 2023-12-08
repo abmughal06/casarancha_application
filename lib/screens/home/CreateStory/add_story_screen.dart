@@ -15,7 +15,7 @@ import '../../../models/user_model.dart';
 import '../../../widgets/common_button.dart';
 
 class AddStoryScreen extends StatefulWidget {
-  const AddStoryScreen({Key? key}) : super(key: key);
+  const AddStoryScreen({super.key});
 
   @override
   State<AddStoryScreen> createState() => _AddStoryScreenState();

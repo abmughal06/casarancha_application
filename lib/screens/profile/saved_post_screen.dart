@@ -9,7 +9,7 @@ import '../../models/post_model.dart';
 import '../../widgets/shared/skeleton.dart';
 
 class SavedPostScreen extends StatelessWidget {
-  const SavedPostScreen({Key? key}) : super(key: key);
+  const SavedPostScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

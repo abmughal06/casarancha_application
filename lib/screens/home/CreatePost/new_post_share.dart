@@ -13,7 +13,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/color_resources.dart';
-import '../../../resources/firebase_cloud_messaging.dart';
 import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/common_button.dart';
 import '../../../widgets/text_editing_widget.dart';
@@ -22,12 +21,12 @@ import '../../search/search_screen.dart';
 
 class NewPostShareScreen extends StatefulWidget {
   const NewPostShareScreen({
-    Key? key,
+    super.key,
     required this.createPostController,
     this.groupId,
     required this.isPoll,
     required this.isForum,
-  }) : super(key: key);
+  });
 
   final String? groupId;
   final bool isPoll;
@@ -76,16 +75,6 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                             tagIds: userIds,
                           );
                 widget.createPostController.selectedUsers = [];
-
-                if (userIds.isNotEmpty) {
-                  FirebaseMessagingService().sendNotificationToMutipleUsers(
-                    userIds: userIds,
-                    isMessage: false,
-                    msg: 'has tagged you in a post',
-                    notificationType: "msg",
-                    // content: "Has tagged you in a post ",
-                  );
-                }
               });
         },
       ),
@@ -264,7 +253,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
 }
 
 class TagUserListDialog extends StatelessWidget {
-  const TagUserListDialog({Key? key}) : super(key: key);
+  const TagUserListDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

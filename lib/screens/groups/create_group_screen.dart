@@ -18,8 +18,7 @@ import '../../widgets/common_widgets.dart';
 import '../../widgets/text_editing_widget.dart';
 
 class CreateGroupScreen extends StatefulWidget {
-  const CreateGroupScreen({Key? key, required this.currentUser})
-      : super(key: key);
+  const CreateGroupScreen({super.key, required this.currentUser});
   final UserModel currentUser;
 
   @override

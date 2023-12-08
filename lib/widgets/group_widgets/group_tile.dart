@@ -12,12 +12,11 @@ import 'package:get/get.dart';
 
 class GroupTile extends StatelessWidget {
   const GroupTile(
-      {Key? key,
+      {super.key,
       required this.group,
       required this.ontapTrailing,
       this.isSearchScreen = false,
-      this.btnText = ''})
-      : super(key: key);
+      this.btnText = ''});
   final GroupModel group;
   final VoidCallback ontapTrailing;
   final bool isSearchScreen;

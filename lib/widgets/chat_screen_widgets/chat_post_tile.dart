@@ -19,14 +19,14 @@ import '../text_widget.dart';
 
 class ChatVideoTile extends StatefulWidget {
   const ChatVideoTile({
-    Key? key,
+    super.key,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
     required this.date,
     required this.link,
     this.mediaLength,
-  }) : super(key: key);
+  });
 
   final bool isMe;
   final bool isSeen;
@@ -210,13 +210,13 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
 
 class ChatMusicTile extends StatelessWidget {
   const ChatMusicTile({
-    Key? key,
+    super.key,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
     required this.date,
     required this.media,
-  }) : super(key: key);
+  });
 
   final bool isMe;
   final bool isSeen;
@@ -290,13 +290,13 @@ class ChatMusicTile extends StatelessWidget {
 
 class ChatVoiceTile extends StatelessWidget {
   const ChatVoiceTile({
-    Key? key,
+    super.key,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
     required this.date,
     required this.media,
-  }) : super(key: key);
+  });
 
   final bool isMe;
   final bool isSeen;
@@ -370,13 +370,13 @@ class ChatVoiceTile extends StatelessWidget {
 
 class ChatDocumentTile extends StatelessWidget {
   const ChatDocumentTile({
-    Key? key,
+    super.key,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
     required this.date,
     required this.media,
-  }) : super(key: key);
+  });
 
   final bool isMe;
   final bool isSeen;
@@ -494,13 +494,13 @@ class ChatDocumentTile extends StatelessWidget {
 
 class ChatPostTile extends StatelessWidget {
   const ChatPostTile({
-    Key? key,
+    super.key,
     required this.message,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
     required this.imageUrl,
-  }) : super(key: key);
+  });
 
   final Message message;
   final String imageUrl;
@@ -548,12 +548,12 @@ class ChatPostTile extends StatelessWidget {
 
 class ChatImageTile extends StatelessWidget {
   const ChatImageTile({
-    Key? key,
+    super.key,
     required this.message,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
-  }) : super(key: key);
+  });
 
   final Message message;
   final bool isMe;
@@ -639,12 +639,12 @@ class ChatImageTile extends StatelessWidget {
 
 class ChatQouteTile extends StatelessWidget {
   const ChatQouteTile({
-    Key? key,
+    super.key,
     required this.message,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
-  }) : super(key: key);
+  });
 
   final Message message;
   final bool isMe;
@@ -689,8 +689,7 @@ class ChatQouteTile extends StatelessWidget {
 
 class DateAndSeenTile extends StatelessWidget {
   const DateAndSeenTile(
-      {Key? key, required this.isMe, required this.isSeen, required this.date})
-      : super(key: key);
+      {super.key, required this.isMe, required this.isSeen, required this.date});
   final bool isMe;
   final bool isSeen;
   final String date;

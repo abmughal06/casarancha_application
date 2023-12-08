@@ -16,7 +16,7 @@ import '../../resources/color_resources.dart';
 import '../../screens/chat/ChatList/chat_list_controller.dart';
 
 class MessageListGhost extends StatefulWidget {
-  const MessageListGhost({Key? key}) : super(key: key);
+  const MessageListGhost({super.key});
 
   @override
   State<MessageListGhost> createState() => _MessageListGhostState();
@@ -46,7 +46,7 @@ class _MessageListGhostState extends State<MessageListGhost> {
 }
 
 class GhostChatList extends StatelessWidget {
-  const GhostChatList({Key? key}) : super(key: key);
+  const GhostChatList({super.key});
 
   @override
   Widget build(BuildContext context) {

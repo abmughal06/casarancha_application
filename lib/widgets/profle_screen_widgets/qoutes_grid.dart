@@ -7,7 +7,7 @@ import '../../models/post_model.dart';
 import '../shared/alert_text.dart';
 
 class QoutesGridView extends StatelessWidget {
-  const QoutesGridView({Key? key, required this.qoutesList}) : super(key: key);
+  const QoutesGridView({super.key, required this.qoutesList});
 
   final List<PostModel>? qoutesList;
 

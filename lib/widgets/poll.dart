@@ -10,7 +10,7 @@ import '../resources/color_resources.dart';
 import 'common_widgets.dart';
 
 class Poll extends StatefulWidget {
-  const Poll({Key? key, required this.postModel}) : super(key: key);
+  const Poll({super.key, required this.postModel});
 
   final PostModel postModel;
 

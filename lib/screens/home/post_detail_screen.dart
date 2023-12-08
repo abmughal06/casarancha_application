@@ -20,8 +20,7 @@ import '../../widgets/home_screen_widgets/post_comment_tile.dart';
 import '../../widgets/home_screen_widgets/post_detail_media.dart';
 
 class PostDetailScreen extends StatefulWidget {
-  const PostDetailScreen({Key? key, required this.postModel, this.groupId})
-      : super(key: key);
+  const PostDetailScreen({super.key, required this.postModel, this.groupId});
   final PostModel postModel;
   final String? groupId;
 

@@ -19,7 +19,7 @@ import '../../models/user_model.dart';
 import '../../widgets/primary_appbar.dart';
 
 class ForumsScreen extends StatelessWidget {
-  const ForumsScreen({Key? key}) : super(key: key);
+  const ForumsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

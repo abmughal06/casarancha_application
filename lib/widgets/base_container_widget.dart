@@ -5,7 +5,7 @@ import '../resources/color_resources.dart';
 
 class BaseContainerWidget extends StatelessWidget {
   final Widget childWidget;
-  const BaseContainerWidget({Key? key, required this.childWidget}) : super(key: key);
+  const BaseContainerWidget({super.key, required this.childWidget});
 
   @override
   Widget build(BuildContext context) {

@@ -7,9 +7,9 @@ class MyTooltip extends StatelessWidget {
   final String message;
   final Color backGndColor = colorBlack.withOpacity(0.7);
   MyTooltip({
-    Key? key,
+    super.key,
     required this.message,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

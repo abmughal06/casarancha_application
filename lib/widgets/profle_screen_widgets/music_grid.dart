@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import '../../models/post_model.dart';
 
 class MusicGrid extends StatelessWidget {
-  const MusicGrid({Key? key, required this.musicList}) : super(key: key);
+  const MusicGrid({super.key, required this.musicList});
 
   final List<PostModel> musicList;
 

@@ -8,13 +8,12 @@ import '../text_widget.dart';
 
 class CustomAdaptiveAlertDialog extends StatelessWidget {
   const CustomAdaptiveAlertDialog(
-      {Key? key,
+      {super.key,
       required this.alertMsg,
       required this.actiionBtnName,
       required this.onAction,
       this.actionBtnColor,
-      this.title})
-      : super(key: key);
+      this.title});
   final String alertMsg;
   final String actiionBtnName;
   final VoidCallback onAction;

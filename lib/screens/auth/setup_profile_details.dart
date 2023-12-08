@@ -22,7 +22,7 @@ import '../../widgets/profle_screen_widgets/setup_profile_textfield.dart';
 import '../../widgets/text_editing_widget.dart';
 
 class SetupProfileScreen extends StatefulWidget {
-  const SetupProfileScreen({Key? key}) : super(key: key);
+  const SetupProfileScreen({super.key});
 
   @override
   State<SetupProfileScreen> createState() => _SetupProfileScreenState();

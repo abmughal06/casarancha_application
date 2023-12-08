@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class GhostModeBtn extends StatefulWidget {
-  const GhostModeBtn({Key? key}) : super(key: key);
+  const GhostModeBtn({super.key});
 
   @override
   State<GhostModeBtn> createState() => _GhostModeBtnState();

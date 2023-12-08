@@ -21,7 +21,7 @@ class TextWidget extends StatelessWidget {
   final List<Shadow>? shadow;
 
   const TextWidget(
-      {Key? key,
+      {super.key,
       this.text,
       this.color = colorBlack,
       this.fontSize,
@@ -35,8 +35,7 @@ class TextWidget extends StatelessWidget {
       this.textHeight,
       this.textStyle,
       this.decoration,
-      this.shadow})
-      : super(key: key);
+      this.shadow});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +80,7 @@ class SelectableTextWidget extends StatelessWidget {
   final TextDecoration? decoration;
   final List<Shadow>? shadow;
   const SelectableTextWidget(
-      {Key? key,
+      {super.key,
       this.text,
       this.color,
       this.fontSize,
@@ -94,8 +93,7 @@ class SelectableTextWidget extends StatelessWidget {
       this.textHeight,
       this.textStyle,
       this.decoration,
-      this.shadow})
-      : super(key: key);
+      this.shadow});
 
   @override
   Widget build(BuildContext context) {

@@ -16,8 +16,7 @@ import '../../widgets/text_widget.dart';
 import '../search/search_screen.dart';
 
 class SharePostScreen extends StatefulWidget {
-  const SharePostScreen({Key? key, required this.postModel, this.groupId})
-      : super(key: key);
+  const SharePostScreen({super.key, required this.postModel, this.groupId});
   final PostModel postModel;
   final String? groupId;
 
@@ -194,13 +193,13 @@ class _SharePostScreenState extends State<SharePostScreen> {
 
 class SharePostTile extends StatelessWidget {
   const SharePostTile({
-    Key? key,
+    super.key,
     required this.postModel,
     required this.currentUser,
     required this.appUser,
     required this.isSent,
     required this.ontapSend,
-  }) : super(key: key);
+  });
 
   final PostModel postModel;
   final UserModel currentUser;

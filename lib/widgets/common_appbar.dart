@@ -29,7 +29,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actionsWidget;
 
   const CommonAppBar(
-      {Key? key,
+      {super.key,
       required this.title,
       this.shouldShowBackButton = true,
       this.bottom,
@@ -47,8 +47,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.systemNavigationBarIconBrightness,
       this.statusBarBrightness,
       this.heightToolBar,
-      this.actionsWidget})
-      : super(key: key);
+      this.actionsWidget});
 
   @override
   Widget build(BuildContext context) {

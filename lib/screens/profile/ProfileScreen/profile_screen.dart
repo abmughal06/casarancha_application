@@ -19,7 +19,7 @@ import '../../../widgets/profle_screen_widgets/qoutes_grid.dart';
 import '../../../widgets/profle_screen_widgets/video_grid.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();

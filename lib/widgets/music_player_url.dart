@@ -19,14 +19,14 @@ import 'home_screen_widgets/post_detail_media.dart';
 
 class MusicPlayerUrl extends StatefulWidget {
   const MusicPlayerUrl({
-    Key? key,
+    super.key,
     required this.musicDetails,
     required this.ontap,
     required this.border,
     this.postModel,
     required this.isPostDetail,
     this.groupId,
-  }) : super(key: key);
+  });
   final MediaDetails musicDetails;
   final Function ontap;
   final double border;
@@ -218,12 +218,11 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
 
 class MusicPlayerTile extends StatefulWidget {
   const MusicPlayerTile(
-      {Key? key,
+      {super.key,
       required this.musicDetails,
       required this.ontap,
       required this.border,
-      required this.isMe})
-      : super(key: key);
+      required this.isMe});
   final MediaDetails musicDetails;
   final Function ontap;
   final double border;

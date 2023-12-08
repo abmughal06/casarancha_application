@@ -10,11 +10,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class AppUserTile extends StatelessWidget {
   const AppUserTile({
-    Key? key,
+    super.key,
     required this.appUser,
     this.trailingWidget,
     required this.currentUser,
-  }) : super(key: key);
+  });
 
   final UserModel appUser;
   final UserModel currentUser;

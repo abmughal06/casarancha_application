@@ -10,13 +10,13 @@ import '../text_widget.dart';
 
 class ChatTile extends StatelessWidget {
   const ChatTile({
-    Key? key,
+    super.key,
     required this.message,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
     required this.date,
-  }) : super(key: key);
+  });
 
   final String message;
   final bool isMe;

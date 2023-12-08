@@ -28,8 +28,7 @@ import '../../../widgets/text_widget.dart';
 import 'new_post_share.dart';
 
 class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({Key? key, this.groupId, required this.isForum})
-      : super(key: key);
+  const CreatePostScreen({super.key, this.groupId, required this.isForum});
   final String? groupId;
   final bool isForum;
 
@@ -350,8 +349,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 }
 
 class VideoPlayerWithFile extends StatefulWidget {
-  const VideoPlayerWithFile({Key? key, required this.videoFile})
-      : super(key: key);
+  const VideoPlayerWithFile({super.key, required this.videoFile});
 
   final File videoFile;
 
@@ -415,8 +413,7 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
 }
 
 class MusicPlayerWithFile extends StatefulWidget {
-  const MusicPlayerWithFile({Key? key, required this.musicFile})
-      : super(key: key);
+  const MusicPlayerWithFile({super.key, required this.musicFile});
   final File musicFile;
 
   @override

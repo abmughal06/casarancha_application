@@ -10,7 +10,7 @@ import '../../screens/home/my_story_screen.dart';
 import '../../screens/home/story_view_screen.dart';
 
 class MyStoryWidget extends StatelessWidget {
-  MyStoryWidget({Key? key, required this.stories}) : super(key: key);
+  MyStoryWidget({super.key, required this.stories});
   final Story? stories;
   final twentyFourHoursAgo = DateTime.now().subtract(const Duration(hours: 24));
 
@@ -80,7 +80,7 @@ class MyStoryWidget extends StatelessWidget {
 }
 
 class AppUserStoryWidget extends StatelessWidget {
-  const AppUserStoryWidget({Key? key, required this.story}) : super(key: key);
+  const AppUserStoryWidget({super.key, required this.story});
   final Story story;
 
   @override

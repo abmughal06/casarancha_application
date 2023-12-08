@@ -8,15 +8,14 @@ import '../../widgets/common_widgets.dart';
 
 class StoryTextField extends StatelessWidget {
   const StoryTextField(
-      {Key? key,
+      {super.key,
       required this.commentFocus,
       required this.onfocusChange,
       required this.textEditingController,
       required this.onchange,
       required this.onFieldSubmitted,
       required this.onEditCompleted,
-      required this.ontapSend})
-      : super(key: key);
+      required this.ontapSend});
   final FocusNode commentFocus;
   final Function(bool) onfocusChange;
   final TextEditingController textEditingController;

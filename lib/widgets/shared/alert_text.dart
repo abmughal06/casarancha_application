@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AlertText extends StatelessWidget {
-  const AlertText({Key? key, required this.text}) : super(key: key);
+  const AlertText({super.key, required this.text});
   final String text;
 
   @override

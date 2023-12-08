@@ -10,7 +10,7 @@ import '../../models/user_model.dart';
 import '../../widgets/common_widgets.dart';
 
 class BlockAccountsScreen extends StatelessWidget {
-  const BlockAccountsScreen({Key? key}) : super(key: key);
+  const BlockAccountsScreen({super.key});
 
   // bottomSheetBlockAccount(context) {
   //   showModalBottomSheet(

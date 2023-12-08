@@ -8,7 +8,7 @@ import '../text_widget.dart';
 
 class SetupProfileTextField extends StatelessWidget {
   const SetupProfileTextField(
-      {Key? key,
+      {super.key,
       required this.controller,
       required this.onchange,
       required this.limitfield,
@@ -16,8 +16,7 @@ class SetupProfileTextField extends StatelessWidget {
       required this.hintText,
       required this.maxlines,
       required this.sizeHeight,
-      required this.inputHeight})
-      : super(key: key);
+      required this.inputHeight});
 
   final TextEditingController controller;
   final Function(String) onchange;

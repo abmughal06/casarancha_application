@@ -5,12 +5,11 @@ import '../common_widgets.dart';
 
 class Skeleton extends StatelessWidget {
   const Skeleton(
-      {Key? key,
+      {super.key,
       required this.height,
       required this.width,
       this.radius,
-      this.padding})
-      : super(key: key);
+      this.padding});
 
   final double height, width;
   final double? radius;
@@ -30,7 +29,7 @@ class Skeleton extends StatelessWidget {
 }
 
 class PostSkeleton extends StatelessWidget {
-  const PostSkeleton({Key? key}) : super(key: key);
+  const PostSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +111,7 @@ class PostSkeleton extends StatelessWidget {
 }
 
 class StorySkeleton extends StatelessWidget {
-  const StorySkeleton({Key? key}) : super(key: key);
+  const StorySkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {

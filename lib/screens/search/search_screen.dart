@@ -18,7 +18,7 @@ import '../../widgets/common_widgets.dart';
 import '../../widgets/profle_screen_widgets/follow_following_tile.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();

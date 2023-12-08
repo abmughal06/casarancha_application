@@ -18,12 +18,11 @@ bool isVideoMute = true;
 
 class VideoPlayerWidget extends StatefulWidget {
   const VideoPlayerWidget(
-      {Key? key,
+      {super.key,
       required this.videoUrl,
       this.postModel,
       this.isPostDetailScreen = false,
-      this.groupId})
-      : super(key: key);
+      this.groupId});
   final String? videoUrl;
   final PostModel? postModel;
   final bool? isPostDetailScreen;

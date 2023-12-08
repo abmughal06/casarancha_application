@@ -20,7 +20,7 @@ import '../../widgets/home_page_widgets.dart';
 import '../../widgets/home_screen_widgets/story_textt_field.dart';
 
 class StoryViewScreen extends StatefulWidget {
-  const StoryViewScreen({Key? key, required this.story}) : super(key: key);
+  const StoryViewScreen({super.key, required this.story});
 
   final Story story;
 

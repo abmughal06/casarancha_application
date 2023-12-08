@@ -10,7 +10,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 class ProfileSettings extends StatelessWidget {
-  const ProfileSettings({Key? key}) : super(key: key);
+  const ProfileSettings({super.key});
 
   @override
   Widget build(BuildContext context) {

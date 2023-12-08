@@ -18,12 +18,12 @@ import 'chat_post_tile.dart';
 
 class ChatStoryTile extends StatelessWidget {
   const ChatStoryTile({
-    Key? key,
+    super.key,
     required this.message,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
-  }) : super(key: key);
+  });
 
   final Message message;
   final bool isMe;
@@ -116,7 +116,7 @@ class ChatStoryTile extends StatelessWidget {
 
 class ChatStoryVideoTile extends StatelessWidget {
   const ChatStoryVideoTile({
-    Key? key,
+    super.key,
     required this.appUserId,
     required this.isMe,
     required this.isSeen,
@@ -124,7 +124,7 @@ class ChatStoryVideoTile extends StatelessWidget {
     required this.link,
     this.mediaLength,
     required this.message,
-  }) : super(key: key);
+  });
 
   final bool isMe;
   final bool isSeen;

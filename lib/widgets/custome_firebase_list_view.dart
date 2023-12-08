@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
@@ -8,10 +7,10 @@ class CustomeFirestoreListView<Document>
     extends FirestoreQueryBuilder<Document> {
   /// {@macro flutterfire_ui.firestorelistview}
   CustomeFirestoreListView({
-    Key? key,
-    required Query<Document> query,
+    super.key,
+    required super.query,
     required FirestoreItemBuilder<Document> itemBuilder,
-    int pageSize = 10,
+    super.pageSize,
     FirestoreLoadingBuilder? loadingBuilder,
     FirestoreErrorBuilder? errorBuilder,
     Axis scrollDirection = Axis.vertical,
@@ -34,9 +33,6 @@ class CustomeFirestoreListView<Document>
     String? restorationId,
     Clip clipBehavior = Clip.hardEdge,
   }) : super(
-          key: key,
-          query: query,
-          pageSize: pageSize,
           builder: (context, snapshot, _) {
             if (snapshot.isFetching) {
               return loadingBuilder?.call(context) ??

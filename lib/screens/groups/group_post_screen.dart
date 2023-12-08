@@ -19,7 +19,7 @@ import '../../resources/strings.dart';
 import '../../widgets/home_screen_widgets/post_card.dart';
 
 class GroupPostScreen extends StatelessWidget {
-  const GroupPostScreen({Key? key, required this.group}) : super(key: key);
+  const GroupPostScreen({super.key, required this.group});
   final GroupModel group;
 
   @override

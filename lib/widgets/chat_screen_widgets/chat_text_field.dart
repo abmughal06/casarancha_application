@@ -15,8 +15,7 @@ import '../../resources/strings.dart';
 
 class ChatTextField extends StatelessWidget {
   const ChatTextField(
-      {Key? key, required this.ontapSend, required this.chatController})
-      : super(key: key);
+      {super.key, required this.ontapSend, required this.chatController});
   final VoidCallback ontapSend;
   final TextEditingController chatController;
 
@@ -177,8 +176,7 @@ class ChatTextField extends StatelessWidget {
 
 class ChatTextFieldGhost extends StatelessWidget {
   const ChatTextFieldGhost(
-      {Key? key, required this.ontapSend, required this.chatController})
-      : super(key: key);
+      {super.key, required this.ontapSend, required this.chatController});
   final VoidCallback ontapSend;
   final TextEditingController chatController;
 

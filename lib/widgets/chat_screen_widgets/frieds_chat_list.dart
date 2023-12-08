@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import '../../screens/chat/ChatList/chat_list_controller.dart';
 
 class MessageList extends StatefulWidget {
-  const MessageList({Key? key}) : super(key: key);
+  const MessageList({super.key});
 
   @override
   State<MessageList> createState() => _MessageListState();
@@ -47,7 +47,7 @@ class _MessageListState extends State<MessageList> {
 }
 
 class FriendChatList extends StatefulWidget {
-  const FriendChatList({Key? key}) : super(key: key);
+  const FriendChatList({super.key});
 
   @override
   State<FriendChatList> createState() => _FriendChatListState();

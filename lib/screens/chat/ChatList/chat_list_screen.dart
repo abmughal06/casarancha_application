@@ -33,7 +33,7 @@ String convertDateIntoTime(String date) {
 }
 
 class ChatListScreen extends StatelessWidget {
-  const ChatListScreen({Key? key}) : super(key: key);
+  const ChatListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

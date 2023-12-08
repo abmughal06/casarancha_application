@@ -77,8 +77,7 @@ Future showMessageMennu({context, url, path, friendId, docId}) async {
 }
 
 class MessageTiles extends StatelessWidget {
-  const MessageTiles({Key? key, required this.message, required this.isMe})
-      : super(key: key);
+  const MessageTiles({super.key, required this.message, required this.isMe});
 
   final Message message;
   final bool isMe;

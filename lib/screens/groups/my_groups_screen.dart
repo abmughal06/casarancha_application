@@ -19,7 +19,7 @@ import '../dashboard/ghost_mode_btn.dart';
 import '../dashboard/ghost_scaffold.dart';
 
 class GroupScreen extends StatelessWidget {
-  const GroupScreen({Key? key}) : super(key: key);
+  const GroupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -15,7 +15,7 @@ import '../../widgets/text_widget.dart';
 import '../search/search_screen.dart';
 
 class AddGroupMembers extends StatelessWidget {
-  AddGroupMembers({Key? key, required this.group}) : super(key: key);
+  AddGroupMembers({super.key, required this.group});
   final GroupModel group;
   final TextEditingController searchController = TextEditingController();
 

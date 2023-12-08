@@ -1,4 +1,5 @@
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,8 +18,8 @@ import 'ProfileScreen/provider/edit_profile_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -220,6 +221,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     onEditingComplete: () => FocusScope.of(context).nextFocus(),
                   ),
                   heightBox(10.w),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextWidget(
+                      text: 'Birthday',
+                      color: const Color(0xFF3B3B3B).withOpacity(0.8),
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  heightBox(5.w),
                   CustomDatePicker(
                     getDateTime: edit.getDateTime,
                     showSelected: edit.showSelectedDates,

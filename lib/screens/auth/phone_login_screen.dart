@@ -18,7 +18,7 @@ import '../../widgets/text_editing_widget.dart';
 import '../../widgets/text_widget.dart';
 
 class PhoneLoginScreen extends StatelessWidget {
-  PhoneLoginScreen({Key? key}) : super(key: key);
+  PhoneLoginScreen({super.key});
 
   final maskFormatter = MaskTextInputFormatter(
       mask: '### ### ####',
@@ -138,7 +138,7 @@ class PhoneLoginScreen extends StatelessWidget {
 }
 
 class PhoneCountryCodeList extends StatelessWidget {
-  PhoneCountryCodeList({Key? key}) : super(key: key);
+  PhoneCountryCodeList({super.key});
   final searchController = TextEditingController();
 
   @override

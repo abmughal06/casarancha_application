@@ -17,12 +17,11 @@ class CustomDatePicker extends StatefulWidget {
   final DateTime? getDateTime;
   final String? userDateTime;
   const CustomDatePicker(
-      {Key? key,
+      {super.key,
       required this.dateChangedCallback,
       this.showSelected = const [],
       this.getDateTime,
-      this.userDateTime})
-      : super(key: key);
+      this.userDateTime});
 
   @override
   State<CustomDatePicker> createState() => _CustomDatePickerState();
@@ -266,11 +265,10 @@ class CustomDatePicker2 extends StatefulWidget {
   final Function dateChangedCallback;
   final DateTime? getDateTime;
   const CustomDatePicker2(
-      {Key? key,
+      {super.key,
       required this.dateChangedCallback,
       this.showSelected = const [],
-      this.getDateTime})
-      : super(key: key);
+      this.getDateTime});
 
   @override
   State<CustomDatePicker2> createState() => _CustomDatePicker2State();

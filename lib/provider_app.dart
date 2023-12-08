@@ -22,7 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProviderApp extends StatelessWidget {
-  const ProviderApp({Key? key, required this.app}) : super(key: key);
+  const ProviderApp({super.key, required this.app});
   final Widget app;
 
   @override

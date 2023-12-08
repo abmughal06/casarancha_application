@@ -22,10 +22,10 @@ import '../text_widget.dart';
 
 class PostCreatorProfileTile extends StatelessWidget {
   const PostCreatorProfileTile({
-    Key? key,
+    super.key,
     required this.post,
     this.groupId,
-  }) : super(key: key);
+  });
   final PostModel post;
   final String? groupId;
 

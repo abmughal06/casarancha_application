@@ -31,12 +31,11 @@ import '../text_widget.dart';
 
 class PostCommentTile extends StatefulWidget {
   const PostCommentTile(
-      {Key? key,
+      {super.key,
       required this.cmnt,
       required this.isFeedTile,
       this.postModel,
-      this.groupId})
-      : super(key: key);
+      this.groupId});
   final Comment cmnt;
   final bool isFeedTile;
   final PostModel? postModel;
@@ -464,12 +463,11 @@ TextSpan highlightMentions({
 
 class FeedPostCommentTile extends StatelessWidget {
   const FeedPostCommentTile(
-      {Key? key,
+      {super.key,
       required this.cmnt,
       required this.isFeedTile,
       this.postModel,
-      this.groupId})
-      : super(key: key);
+      this.groupId});
   final Comment cmnt;
   final bool isFeedTile;
   final PostModel? postModel;
@@ -558,11 +556,11 @@ class FeedPostCommentTile extends StatelessWidget {
 
 class PostCommentReplyTile extends StatelessWidget {
   const PostCommentReplyTile({
-    Key? key,
+    super.key,
     required this.comment,
     this.groupId,
     required this.postModel,
-  }) : super(key: key);
+  });
 
   final Comment comment;
   final String? groupId;

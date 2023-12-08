@@ -16,7 +16,6 @@ import '../../models/providers/user_data_provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../screens/profile/AppUser/app_user_screen.dart';
 import '../../utils/app_utils.dart';
 import '../common_widgets.dart';
 import '../shared/skeleton.dart';
@@ -34,7 +33,7 @@ class CustomPostFooter extends StatelessWidget {
   final String? groupId;
 
   const CustomPostFooter({
-    Key? key,
+    super.key,
     this.ontapLike,
     this.ontapSave,
     this.isDesc = false,
@@ -44,7 +43,7 @@ class CustomPostFooter extends StatelessWidget {
     required this.postModel,
     required this.savepostIds,
     this.groupId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -337,7 +336,7 @@ Stream<String?> streamUsername(UserModel user) {
       }
     });
   } catch (e) {
-    print('Error streaming username: $e');
+    printLog('Error streaming username: $e');
     return Stream.value(null);
   }
 }

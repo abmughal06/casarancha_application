@@ -21,12 +21,11 @@ import 'chat_input_field.dart';
 
 class ChatInputFieldGhost extends StatelessWidget {
   const ChatInputFieldGhost(
-      {Key? key,
+      {super.key,
       required this.currentUser,
       required this.appUser,
       required this.onTapSentMessage,
-      required this.firstMessage})
-      : super(key: key);
+      required this.firstMessage});
   final UserModel currentUser;
   final UserModel appUser;
   final VoidCallback onTapSentMessage;
@@ -194,11 +193,10 @@ class ChatInputFieldGhost extends StatelessWidget {
 
 class ShowMediaToSendInChatGhost extends StatelessWidget {
   const ShowMediaToSendInChatGhost(
-      {Key? key,
+      {super.key,
       required this.currentUser,
       required this.appUser,
-      required this.firstMessage})
-      : super(key: key);
+      required this.firstMessage});
   final UserModel currentUser;
   final UserModel appUser;
   final bool firstMessage;
@@ -416,14 +414,13 @@ class ShowMediaToSendInChatGhost extends StatelessWidget {
 
 class VoiceRecordingWidgetGhost extends StatelessWidget {
   const VoiceRecordingWidgetGhost(
-      {Key? key,
+      {super.key,
       required this.isRecording,
       required this.isRecordingSend,
       required this.duration,
       required this.onTapDelete,
       required this.isRecorderLock,
-      required this.sendRecording})
-      : super(key: key);
+      required this.sendRecording});
 
   final bool isRecording;
   final bool isRecordingSend;

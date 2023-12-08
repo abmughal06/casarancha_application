@@ -18,11 +18,11 @@ import '../../../widgets/common_widgets.dart';
 
 class ChatInputField extends StatelessWidget {
   const ChatInputField({
-    Key? key,
+    super.key,
     required this.currentUser,
     required this.appUser,
     required this.onTapSentMessage,
-  }) : super(key: key);
+  });
   final UserModel currentUser;
 
   final UserModel appUser;
@@ -177,8 +177,7 @@ class ChatInputField extends StatelessWidget {
 
 class ShowMediaToSendInChat extends StatelessWidget {
   const ShowMediaToSendInChat(
-      {Key? key, required this.currentUser, required this.appUser})
-      : super(key: key);
+      {super.key, required this.currentUser, required this.appUser});
   final UserModel currentUser;
   final UserModel appUser;
 
@@ -410,14 +409,13 @@ String formatTime(Duration duration) {
 
 class VoiceRecordingWidget extends StatelessWidget {
   const VoiceRecordingWidget(
-      {Key? key,
+      {super.key,
       required this.isRecording,
       required this.isRecordingSend,
       required this.duration,
       required this.onTapDelete,
       required this.isRecorderLock,
-      required this.sendRecording})
-      : super(key: key);
+      required this.sendRecording});
 
   final bool isRecording;
   final bool isRecordingSend;

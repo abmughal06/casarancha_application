@@ -7,17 +7,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../models/media_details.dart';
 import '../../resources/color_resources.dart';
-import '../../screens/dashboard/provider/download_provider.dart';
 import '../custom_dialog.dart';
 import '../music_player_url.dart';
 import '../video_player.dart';
 
 class CheckMediaAndShow extends StatelessWidget {
   const CheckMediaAndShow({
-    Key? key,
+    super.key,
     required this.mediaData,
     this.iniializedFuturePlay,
-  }) : super(key: key);
+  });
 
   final MediaDetails mediaData;
   final Future<void>? iniializedFuturePlay;
@@ -88,9 +87,9 @@ class CheckMediaAndShow extends StatelessWidget {
 
 class ChatMediaWidget extends StatelessWidget {
   const ChatMediaWidget({
-    Key? key,
+    super.key,
     required this.media,
-  }) : super(key: key);
+  });
 
   final List<MediaDetails> media;
 
@@ -145,8 +144,7 @@ class ChatMediaWidget extends StatelessWidget {
 }
 
 class ChatMediaFullScreenView extends StatelessWidget {
-  const ChatMediaFullScreenView({Key? key, required this.media})
-      : super(key: key);
+  const ChatMediaFullScreenView({super.key, required this.media});
   final List<MediaDetails> media;
 
   @override

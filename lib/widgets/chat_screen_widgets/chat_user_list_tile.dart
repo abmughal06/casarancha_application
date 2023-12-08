@@ -14,11 +14,10 @@ import '../text_widget.dart';
 
 class ChatUserListTile extends StatelessWidget {
   const ChatUserListTile(
-      {Key? key,
+      {super.key,
       required this.messageDetails,
       required this.ontapTile,
-      required this.personDetail})
-      : super(key: key);
+      required this.personDetail});
   final MessageDetails messageDetails;
   final UserModel personDetail;
 
@@ -98,8 +97,7 @@ class ChatUserListTile extends StatelessWidget {
 
 class GhostChatListTile extends StatelessWidget {
   const GhostChatListTile(
-      {Key? key, required this.messageDetails, required this.ontapTile})
-      : super(key: key);
+      {super.key, required this.messageDetails, required this.ontapTile});
   final GhostMessageDetails messageDetails;
 
   final VoidCallback ontapTile;
@@ -175,8 +173,7 @@ class GhostChatListTile extends StatelessWidget {
 
 class GhostChatUserListTile extends StatelessWidget {
   const GhostChatUserListTile(
-      {Key? key, required this.messageDetails, required this.ontapTile})
-      : super(key: key);
+      {super.key, required this.messageDetails, required this.ontapTile});
   final GhostMessageDetails messageDetails;
 
   final VoidCallback ontapTile;
@@ -255,8 +252,7 @@ class GhostChatUserListTile extends StatelessWidget {
 
 class ChatUserListTileForNoChat extends StatelessWidget {
   const ChatUserListTileForNoChat(
-      {Key? key, required this.userModel, required this.ontapTile})
-      : super(key: key);
+      {super.key, required this.userModel, required this.ontapTile});
   final UserModel userModel;
 
   final VoidCallback ontapTile;

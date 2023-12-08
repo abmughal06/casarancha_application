@@ -5,14 +5,13 @@ import 'package:provider/provider.dart';
 
 class GhostScaffold extends StatelessWidget {
   const GhostScaffold(
-      {Key? key,
+      {super.key,
       required this.appBar,
       required this.body,
       this.floatingActionButtonAnimator,
       this.floatingActionButton,
       this.floatingActionButtonLocation,
-      this.backgroundColor})
-      : super(key: key);
+      this.backgroundColor});
   final AppBar appBar;
   final Widget body;
   final FloatingActionButtonAnimator? floatingActionButtonAnimator;

@@ -10,11 +10,10 @@ class ProfilePic extends StatelessWidget {
   final bool showBorder;
   final double? heightAndWidth;
   const ProfilePic(
-      {Key? key,
+      {super.key,
       required this.pic,
       this.showBorder = false,
-      this.heightAndWidth})
-      : super(key: key);
+      this.heightAndWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +23,8 @@ class ProfilePic extends StatelessWidget {
               color: showBorder ? colorPrimaryA05 : Colors.transparent,
               width: 1.5),
           shape: BoxShape.circle),
-      height: heightAndWidth ?? 90.h,
-      width: heightAndWidth ?? 90.h,
+      height: heightAndWidth ?? 37.h,
+      width: heightAndWidth ?? 37.h,
       alignment: Alignment.center,
       child: AspectRatio(
         aspectRatio: 1 / 1,

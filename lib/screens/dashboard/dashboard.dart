@@ -13,7 +13,7 @@ import '../forum/forum.dart';
 import '../groups/my_groups_screen.dart';
 
 class DashBoard extends StatefulWidget {
-  const DashBoard({Key? key}) : super(key: key);
+  const DashBoard({super.key});
 
   @override
   State<DashBoard> createState() => _DashBoardState();

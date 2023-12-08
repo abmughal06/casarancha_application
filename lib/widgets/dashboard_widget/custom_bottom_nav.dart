@@ -12,7 +12,7 @@ import '../../screens/dashboard/provider/dashboard_provider.dart';
 import '../profile_pic.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  const CustomBottomNavigationBar({Key? key}) : super(key: key);
+  const CustomBottomNavigationBar({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -43,10 +43,10 @@ void navigateToAppUserScreen(userId, context) {
 
 class AppUserScreen extends StatefulWidget {
   const AppUserScreen({
-    Key? key,
+    super.key,
     required this.appUserId,
     // required this.appUserName,
-  }) : super(key: key);
+  });
 
   final String appUserId;
   // final String appUserName;
@@ -548,10 +548,10 @@ class _AppUserScreenState extends State<AppUserScreen> {
 
 class PostFollowCount extends StatelessWidget {
   const PostFollowCount({
-    Key? key,
+    super.key,
     required this.count,
     required this.countText,
-  }) : super(key: key);
+  });
 
   final int count;
   final String countText;

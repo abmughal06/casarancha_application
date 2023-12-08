@@ -24,11 +24,11 @@ class GhostChatScreen2 extends StatefulWidget {
   final bool? firstMessagebyMe;
 
   const GhostChatScreen2({
-    Key? key,
+    super.key,
     required this.appUserId,
     required this.creatorDetails,
     this.firstMessagebyMe,
-  }) : super(key: key);
+  });
 
   @override
   State<GhostChatScreen2> createState() => _GhostChatScreen2State();

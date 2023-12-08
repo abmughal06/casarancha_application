@@ -12,7 +12,7 @@ import '../../resources/color_resources.dart';
 import '../../widgets/common_widgets.dart';
 
 class MyStoryViewScreen extends StatefulWidget {
-  const MyStoryViewScreen({Key? key, required this.story}) : super(key: key);
+  const MyStoryViewScreen({super.key, required this.story});
 
   final Story story;
 

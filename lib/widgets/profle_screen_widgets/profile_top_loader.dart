@@ -66,7 +66,7 @@ Widget postStoriesBtn(
 }
 
 class ProfileTopLoader extends StatelessWidget {
-  const ProfileTopLoader({Key? key}) : super(key: key);
+  const ProfileTopLoader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +151,7 @@ class ProfileTopLoader extends StatelessWidget {
 }
 
 class ProfileTop extends StatelessWidget {
-  const ProfileTop({Key? key, this.user}) : super(key: key);
+  const ProfileTop({super.key, this.user});
 
   final UserModel? user;
 

@@ -15,9 +15,9 @@ import '../../widgets/text_widget.dart';
 
 class PhoneOTPScreen extends StatelessWidget {
   PhoneOTPScreen({
-    Key? key,
+    super.key,
     required this.verificationId,
-  }) : super(key: key);
+  });
   final String verificationId;
   final TextEditingController otpController = TextEditingController();
 
@@ -97,11 +97,11 @@ class OtpFields extends StatelessWidget {
   final double? height;
   final double? width;
   OtpFields({
-    Key? key,
+    super.key,
     this.height,
     this.width,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

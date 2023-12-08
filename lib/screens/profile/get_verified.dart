@@ -8,7 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class GetVerifiedScreen extends StatelessWidget {
-  const GetVerifiedScreen({Key? key}) : super(key: key);
+  const GetVerifiedScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +65,10 @@ class GetVerifiedScreen extends StatelessWidget {
 
 class CustomExpansionTile extends StatelessWidget {
   const CustomExpansionTile({
-    Key? key,
+    super.key,
     required this.title,
     required this.children,
-  }) : super(key: key);
+  });
   final String title;
   final List<Widget> children;
 
@@ -88,8 +88,7 @@ class CustomExpansionTile extends StatelessWidget {
 
 class ExpansionChildrenListTile extends StatelessWidget {
   const ExpansionChildrenListTile(
-      {Key? key, required this.text, required this.ontap})
-      : super(key: key);
+      {super.key, required this.text, required this.ontap});
   final String text;
   final VoidCallback ontap;
 

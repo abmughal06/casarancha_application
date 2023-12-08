@@ -16,7 +16,7 @@ import '../../widgets/text_editing_widget.dart';
 import '../../widgets/text_widget.dart';
 
 class SignUpScreen extends StatelessWidget {
-  SignUpScreen({Key? key}) : super(key: key);
+  SignUpScreen({super.key});
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();

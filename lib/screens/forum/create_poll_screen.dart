@@ -13,7 +13,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class CreatePollScreen extends StatefulWidget {
-  const CreatePollScreen({Key? key}) : super(key: key);
+  const CreatePollScreen({super.key});
 
   @override
   State<CreatePollScreen> createState() => _CreatePollScreenState();
