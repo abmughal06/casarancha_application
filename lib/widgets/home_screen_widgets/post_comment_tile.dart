@@ -142,17 +142,6 @@ class _PostCommentTileState extends State<PostCommentTile> {
                               ),
                             ),
                           ),
-
-                          // SelectableTextWidget(
-                          //   text: widget.cmnt.message.isEmpty
-                          //       ? "---"
-                          //       : widget.cmnt.message,
-                          //   fontSize: 12.sp,
-                          //   color: color55F,
-                          //   fontWeight: FontWeight.w400,
-                          //   textOverflow: TextOverflow.ellipsis,
-                          // ),
-
                           heightBox(5.h),
                           Row(
                             children: [
@@ -412,7 +401,7 @@ void onUsernameTap(String username, context) async {
 }
 
 String? extractUsername(String tappedText) {
-  final mentionPattern = RegExp(r'@(\w+)');
+  final mentionPattern = RegExp(r'@(\w+(\.\w+)?)');
   final match = mentionPattern.firstMatch(tappedText);
 
   if (match != null) {
@@ -427,7 +416,7 @@ TextSpan highlightMentions({
   BuildContext? context,
   VoidCallback? onTap,
 }) {
-  final mentionPattern = RegExp(r'@(\w+)');
+  final mentionPattern = RegExp(r'@(\w+\.)?\w+');
 
   final segments = mentionPattern.allMatches(text!);
 

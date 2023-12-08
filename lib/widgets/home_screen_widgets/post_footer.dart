@@ -3,6 +3,7 @@ import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_comment_tile.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,6 +16,8 @@ import '../../models/providers/user_data_provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
+import '../../screens/profile/AppUser/app_user_screen.dart';
+import '../../utils/app_utils.dart';
 import '../common_widgets.dart';
 import '../shared/skeleton.dart';
 import '../text_widget.dart';
@@ -226,23 +229,46 @@ class CustomPostFooter extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.w),
               child: Wrap(
-                children: postModel.tagsIds
-                    .map(
-                      (e) => Padding(
-                        padding: EdgeInsets.only(right: 6.w),
-                        child: SelectableTextWidget(
-                          text: e,
-                          fontSize: 13.sp,
-                          color: Colors.blue.shade900,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    )
-                    .toList(),
+                children: postModel.tagsIds.map((userId) {
+                  return Consumer<List<UserModel>?>(
+                    builder: (context, tagusers, child) {
+                      if (tagusers == null) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        var userList = tagusers
+                            .where((element) => element.id == userId)
+                            .toList();
+
+                        if (userList.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+
+                        var username =
+                            userList.map((e) => e.username).join(", ");
+                        return Container(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.69,
+                          ),
+                          child: RichText(
+                            text: highlightMentions(
+                              text: "@$username ",
+                              context: context,
+                              onTap: () {
+                                printLog('============>>>>>>>>>tagged');
+                                onUsernameTap(username, context);
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  );
+                }).toList(),
               ),
             ),
           ),
         ),
+
         Visibility(
           visible: isPostDetail! ? false : postModel.commentIds.isNotEmpty,
           child: StreamProvider.value(
@@ -292,5 +318,26 @@ class CustomPostFooter extends StatelessWidget {
         // heightBox(12.h),
       ],
     );
+  }
+}
+
+Stream<String?> streamUsername(UserModel user) {
+  try {
+    // Assuming you have a 'users' collection in Firestore with documents having 'userId' field
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.exists) {
+        // Assuming the 'username' field in the document contains the username
+        return snapshot.data()?['username'];
+      } else {
+        return null; // User not found
+      }
+    });
+  } catch (e) {
+    print('Error streaming username: $e');
+    return Stream.value(null);
   }
 }

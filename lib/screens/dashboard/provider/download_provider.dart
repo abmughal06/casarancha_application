@@ -98,15 +98,6 @@ class DownloadProvider extends ChangeNotifier {
     }
   }
 
-  // Future<void> openDocument(String filePath) async {
-
-  //   final result = await OpenFile.open(filePath);
-
-  //   if (result.type != ResultType.done) {
-  //     print('========================================> $result');
-  //   }
-  // }
-
   bool isDocOpening = false;
 
   Future<void> openDocument(String fileUrl, String fileName) async {
@@ -114,27 +105,12 @@ class DownloadProvider extends ChangeNotifier {
     notifyListeners();
     try {
       printLog(fileUrl);
-      // if (await canLaunchUrl(Uri.parse(fileUrl))) {
-      // } else {
-      //   throw 'Could not launch $url';
-      // }
+
       final response = await get(Uri.parse(fileUrl));
 
       if (response.statusCode == 200) {
         await launchUrl(Uri.parse(fileUrl),
             mode: LaunchMode.externalApplication);
-
-        // final appDocDir = await getApplicationDocumentsDirectory();
-        // final localFilePath = join(appDocDir.path, fileName);
-
-        // final file = File(localFilePath);
-        // await file.writeAsBytes(response.bodyBytes);
-
-        // final result = await OpenFile.open(localFilePath);
-
-        // if (result.type != ResultType.done) {
-        //   log('File opening Failed +==========<<>>>>>> ${result.message}');
-        // }
       } else {
         printLog('HTTP ERROR +==========<<>>>>>>');
       }
