@@ -142,18 +142,18 @@ class FirebaseMessagingService {
   }
 
   Future<void> sendNotificationToMutipleUsers({
-    List<String>? userIds,
+    required List<UserModel> users,
     dynamic content,
-    String? msg,
+    required String msg,
     String? groupId,
     required bool isMessage,
     required String notificationType,
   }) async {
     // Fetch FCM tokens for the provided user IDs from your map or database
-    Map<String, String> userFCMTokens = await fetchUserFCMTokens(userIds);
+    // Map userFCMTokens = await fetchUserFCMTokens(userIds);
 
     // Iterate through each user and send a notification
-    userFCMTokens.forEach((appUserId, devRegToken) async {
+    for (var user in users) {
       var model = await getCurrentUserDetails();
       var ghostmode = await ghostModeOn();
 
@@ -183,7 +183,7 @@ class FirebaseMessagingService {
           "notification_type": notificationType,
           "content": content,
         },
-        "to": devRegToken,
+        "to": user.fcmToken,
       };
 
       var res = await http.post(
@@ -196,7 +196,7 @@ class FirebaseMessagingService {
 
       if (!isMessage) {
         final NotificationModel notification = NotificationModel(
-          sentToId: appUserId,
+          sentToId: user.id,
           sentById: model.id,
           msg: msg,
           content: content,
@@ -213,32 +213,12 @@ class FirebaseMessagingService {
 
         FirebaseFirestore.instance
             .collection("users")
-            .doc(appUserId)
+            .doc(user.id)
             .collection("notificationList")
             .doc()
             .set(notification.toMap());
       }
-    });
-  }
-
-  Future<Map<String, String>> fetchUserFCMTokens(List<String>? userIds) async {
-    Map<String, String> userFCMTokens = {};
-
-    for (String userId in userIds!) {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(userId)
-          .get();
-
-      if (snapshot.exists) {
-        String? fcmToken = snapshot.get("fcmToken");
-        if (fcmToken != null) {
-          userFCMTokens[userId] = fcmToken;
-        }
-      }
     }
-
-    return userFCMTokens;
   }
 
   Future<String?> getFirebaseToken() async {

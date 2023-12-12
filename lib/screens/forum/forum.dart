@@ -24,74 +24,81 @@ class ForumsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GhostScaffold(
-        appBar: primaryAppbar(
-          title: strForum,
-          elevation: 0.1,
-          leading: const GhostModeBtn(),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Get.bottomSheet(
-                  CupertinoActionSheet(
-                    actions: [
-                      CupertinoActionSheetAction(
-                        onPressed: () {
-                          Get.back();
-                          Get.to(() => const CreatePostScreen(isForum: true));
-                        },
-                        child: const TextWidget(text: 'Upload Post'),
-                      ),
-                      CupertinoActionSheetAction(
-                        onPressed: () {
-                          Get.back();
-                          Get.to(() => const CreatePollScreen());
-                        },
-                        child: const TextWidget(text: 'Upload Poll'),
-                      ),
-                    ],
-                    cancelButton: CupertinoActionSheetAction(
+      appBar: primaryAppbar(
+        title: strForum,
+        elevation: 0.1,
+        leading: const GhostModeBtn(),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Get.bottomSheet(
+                CupertinoActionSheet(
+                  actions: [
+                    CupertinoActionSheetAction(
                       onPressed: () {
                         Get.back();
+                        Get.to(() => const CreatePostScreen(isForum: true));
                       },
-                      child: const Text('Cancel'),
+                      child: const TextWidget(text: 'Upload Post'),
                     ),
+                    CupertinoActionSheetAction(
+                      onPressed: () {
+                        Get.back();
+                        Get.to(() => const CreatePollScreen());
+                      },
+                      child: const TextWidget(text: 'Upload Poll'),
+                    ),
+                  ],
+                  cancelButton: CupertinoActionSheetAction(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: const Text('Cancel'),
                   ),
-                );
-              },
-              icon: const Icon(Icons.more_vert),
-            )
-          ],
-        ),
-        body: StreamProvider.value(
-          value: DataProvider().forums(),
-          initialData: null,
-          child: Consumer<List<PostModel>?>(builder: (context, posts, b) {
-            if (posts == null) {
-              return const PostSkeleton();
-            }
-            return ListView.builder(
-                shrinkWrap: true,
-                itemCount: posts.length,
-                padding: EdgeInsets.only(bottom: 100.h),
-                itemBuilder: (context, index) {
-                  var post = posts[index];
-                  if (posts.isEmpty) {
-                    return const AlertText(
-                        text: 'Forums does not have any posts yet');
-                  }
-
-                  return StreamProvider.value(
-                    value: DataProvider().getSingleUser(post.creatorId),
-                    initialData: null,
-                    child: Consumer<UserModel?>(builder: (context, appUser, b) {
-                      if (appUser == null) {
-                        return const PostSkeleton();
+                ),
+              );
+            },
+            icon: const Icon(Icons.more_vert),
+          )
+        ],
+      ),
+      body: StreamProvider.value(
+        value: DataProvider().forums(),
+        initialData: null,
+        child: Consumer<List<PostModel>?>(builder: (context, posts, b) {
+          if (posts == null) {
+            return const PostSkeleton();
+          }
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                    itemCount: posts.length,
+                    padding: EdgeInsets.only(bottom: 100.h),
+                    itemBuilder: (context, index) {
+                      var post = posts[index];
+                      if (posts.isEmpty) {
+                        return const AlertText(
+                            text: 'Forums does not have any posts yet');
                       }
-                      return PostCard(post: post, postCreator: appUser);
+
+                      return StreamProvider.value(
+                        value: DataProvider().getSingleUser(post.creatorId),
+                        initialData: null,
+                        child: Consumer<UserModel?>(
+                            builder: (context, appUser, b) {
+                          if (appUser == null) {
+                            return const PostSkeleton();
+                          }
+                          return PostCard(post: post, postCreator: appUser);
+                        }),
+                      );
                     }),
-                  );
-                });
-          }),
-        ));
+              ),
+            ],
+          );
+        }),
+      ),
+    );
   }
 }
