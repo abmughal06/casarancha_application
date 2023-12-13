@@ -555,8 +555,7 @@
 					"\"nanopb\"",
 					"-framework",
 					"\"open_file\"",
-					"-framework",
-					"\"package_info_plus\"",
+					
 					"-framework",
 					"\"path_provider_foundation\"",
 					"-framework",
@@ -579,8 +578,7 @@
 					"\"video_player_avfoundation\"",
 					"-framework",
 					"\"video_thumbnail\"",
-					"-framework",
-					"\"wakelock_plus\"",
+					
 					"-weak_framework",
 					"\"AuthenticationServices\"",
 					"-weak_framework",
@@ -885,8 +883,7 @@
 					"\"nanopb\"",
 					"-framework",
 					"\"open_file\"",
-					"-framework",
-					"\"package_info_plus\"",
+					
 					"-framework",
 					"\"path_provider_foundation\"",
 					"-framework",
@@ -909,8 +906,7 @@
 					"\"video_player_avfoundation\"",
 					"-framework",
 					"\"video_thumbnail\"",
-					"-framework",
-					"\"wakelock_plus\"",
+					
 					"-weak_framework",
 					"\"AuthenticationServices\"",
 					"-weak_framework",
@@ -1109,8 +1105,7 @@
 					"\"nanopb\"",
 					"-framework",
 					"\"open_file\"",
-					"-framework",
-					"\"package_info_plus\"",
+					
 					"-framework",
 					"\"path_provider_foundation\"",
 					"-framework",
@@ -1133,8 +1128,7 @@
 					"\"video_player_avfoundation\"",
 					"-framework",
 					"\"video_thumbnail\"",
-					"-framework",
-					"\"wakelock_plus\"",
+					
 					"-weak_framework",
 					"\"AuthenticationServices\"",
 					"-weak_framework",
