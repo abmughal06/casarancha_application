@@ -42,6 +42,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();
+    final allUsers = context.watch<List<UserModel>>();
 
     return Scaffold(
       appBar: primaryAppbar(
@@ -73,7 +74,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                             user: user,
                             isForum: widget.isForum,
                             tagIds: userIds,
-                          );
+                            allUsers: allUsers);
                 widget.createPostController.selectedUsers = [];
               });
         },

@@ -31,22 +31,50 @@ class PostProvider extends ChangeNotifier {
 
   final postCommentController = TextEditingController();
   bool isMentionActive = false;
+  List commentTagsId = [];
 
-  // commentMentionListner() {
-  //   postCommentController.addListener(() {
-  //     // Check if "@" is present at the beginning of a word (without space)
-  //     String text = postCommentController.text;
-  //     isMentionActive =
-  //         text.isNotEmpty && text.lastIndexOf('@') == text.length - 1;
+  commentMentionListener() {
+    postCommentController.addListener(() {
+      String text = postCommentController.text;
 
-  //     printLog('hahahaha');
-  //     notifyListeners();
-  //   });
-  // }
+      // Check if "@" is present at the beginning of a word (without space)
+      if (text.isNotEmpty) {
+        List<String> words = text.split(' ');
+        String lastWord = words.isNotEmpty ? words.last : '';
 
-  // PostProvider() {
-  //   commentMentionListner();
-  // }
+        if (lastWord.startsWith('@')) {
+          isMentionActive = true;
+        } else if (lastWord.contains('@')) {
+          // Mention is still active if "@" is present anywhere in the last word
+          isMentionActive = true;
+        } else {
+          // Mention becomes inactive when a space is typed after "@"
+          isMentionActive = false;
+        }
+      } else {
+        isMentionActive = false;
+      }
+
+      notifyListeners();
+    });
+  }
+
+  PostProvider() {
+    // commentMentionListener();
+  }
+
+  tagUserAndSaveId(user) {
+    commentTagsId.add(user.id);
+    final text = postCommentController.text;
+    final i = text.lastIndexOf('@');
+    final mention = user.username;
+    postCommentController.value = TextEditingValue(
+      text: text.substring(0, i + 1) + mention,
+    );
+    postCommentController.selection = TextSelection.fromPosition(
+        TextPosition(offset: postCommentController.text.length));
+    notifyListeners();
+  }
 
   final FocusNode postCommentFocus = FocusNode();
   String? repCommentId;
@@ -61,24 +89,17 @@ class PostProvider extends ChangeNotifier {
 
     log(postModel!.id.toString());
     try {
-      log('1');
       var uid = fauth.currentUser!.uid;
-      log('2');
 
       if (postModel.likesIds.contains(uid)) {
-        log('3');
-
         await postRef.doc(postModel.id).update({
           'likesIds': FieldValue.arrayRemove([uid])
         });
       } else {
-        log('4');
-
         await postRef.doc(postModel.id).update({
           'likesIds': FieldValue.arrayUnion([uid])
         });
       }
-      log('5');
     } catch (e) {
       log("$e");
     }
@@ -233,7 +254,8 @@ class PostProvider extends ChangeNotifier {
     UserModel? user,
     String? comment,
     String? groupId,
-    List<String>? tagsId,
+    // List<String>? tagsId,
+    List<UserModel>? allUsers,
   }) {
     if (repCommentId == null) {
       try {
@@ -261,7 +283,7 @@ class PostProvider extends ChangeNotifier {
           dislikeIds: [],
           likeIds: [],
           replyIds: [],
-          tagIds: tagsId!,
+          tagIds: commentTagsId,
         );
 
         postRef
@@ -273,6 +295,7 @@ class PostProvider extends ChangeNotifier {
             "commentIds": FieldValue.arrayUnion([cmntId])
           }, SetOptions(merge: true));
 
+          // if (commentTagsId.isEmpty) {
           var recieverRef = await FirebaseFirestore.instance
               .collection("users")
               .doc(postModel.creatorId)
@@ -289,6 +312,22 @@ class PostProvider extends ChangeNotifier {
             msg:
                 "has commented on your ${groupId == null ? "post" : "group post"}.",
           );
+          // } else {
+          if (commentTagsId.isNotEmpty) {
+            FirebaseMessagingService().sendNotificationToMutipleUsers(
+              isMessage: false,
+              notificationType: 'feed_post_cmnt',
+              users: allUsers!
+                  .where((element) => commentTagsId.contains(element.id))
+                  .toList(),
+              msg:
+                  "has mentioned you in ${groupId == null ? "post" : "group post"}.",
+              groupId: groupId,
+              content: postModel.toMap(),
+            );
+          }
+          // }
+          commentTagsId.clear();
         });
       } catch (e) {
         printLog(e.toString());
@@ -303,9 +342,10 @@ class PostProvider extends ChangeNotifier {
     PostModel? postModel,
     String? recieverId,
     UserModel? user,
+    List<UserModel>? allUsers,
     String? groupId,
     String? reply,
-    List<String>? tagsId,
+    // List<String>? tagsId,
   }) {
     if (repCommentId != null) {
       try {
@@ -339,7 +379,7 @@ class PostProvider extends ChangeNotifier {
           dislikeIds: [],
           likeIds: [],
           replyIds: [],
-          tagIds: tagsId!,
+          tagIds: commentTagsId,
         );
 
         cmntRef
@@ -351,6 +391,7 @@ class PostProvider extends ChangeNotifier {
             "replyIds": FieldValue.arrayUnion([repId])
           }, SetOptions(merge: true));
 
+          // if (commentTagsId.isEmpty) {
           var recieverRef = await FirebaseFirestore.instance
               .collection("users")
               .doc(user.id)
@@ -367,6 +408,22 @@ class PostProvider extends ChangeNotifier {
             msg:
                 "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
           );
+          // } else {
+          if (commentTagsId.isNotEmpty) {
+            FirebaseMessagingService().sendNotificationToMutipleUsers(
+              isMessage: false,
+              notificationType: 'feed_post_cmnt',
+              users: allUsers!
+                  .where((element) => commentTagsId.contains(element.id))
+                  .toList(),
+              msg:
+                  'has mentioned you in ${groupId == null ? "post" : "group post"}.',
+              groupId: groupId,
+              content: postModel.toMap(),
+            );
+          }
+          // }
+          commentTagsId.clear();
         });
       } catch (e) {
         printLog(e.toString());

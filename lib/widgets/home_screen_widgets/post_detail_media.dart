@@ -213,7 +213,7 @@ class PostMediaWidget extends StatelessWidget {
                           : post.mediaData.first.pollOptions!.length < 4
                               ? 1.5 / 1
                               : 1 / 1
-                      : 9 / 16,
+                      : double.parse(post.mediaData.first.videoAspectRatio!),
       child: PageView(
         children: post.mediaData
             .map(
@@ -226,12 +226,8 @@ class PostMediaWidget extends StatelessWidget {
                             ? double.parse(e.imageWidth!) /
                                 double.parse(e.imageHeight!)
                             : e.type == 'poll'
-                                ? e.pollOptions!.length < 3
-                                    ? 2 / 1
-                                    : e.pollOptions!.length < 4
-                                        ? 1.5 / 1
-                                        : 1 / 1
-                                : 9 / 16,
+                                ? 1 / 1
+                                : double.parse(e.videoAspectRatio!),
                 child: Stack(
                   children: [
                     CheckMediaAndShowPost(
@@ -283,7 +279,10 @@ class PostMediaWidget extends StatelessWidget {
 
 class PostFullScreenView extends StatelessWidget {
   const PostFullScreenView(
-      {super.key, required this.post, required this.isPostDetail, this.groupId});
+      {super.key,
+      required this.post,
+      required this.isPostDetail,
+      this.groupId});
   final PostModel post;
   final bool isPostDetail;
   final String? groupId;

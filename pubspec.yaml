@@ -28,7 +28,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   # audio_video_progress_bar: ^0.11.0
-  auto_size_text: ^3.0.0
+  # auto_size_text: ^3.0.0
   cached_network_image: ^3.2.2
 
   provider: ^6.0.5
@@ -40,14 +40,14 @@ dependencies:
   share_plus: ^7.2.1
   flutter_linkify: ^6.0.0
 
-  cloud_firestore: ^4.3.1
+  cloud_firestore: ^4.13.4
   cupertino_icons: ^1.0.5
   file_picker: ^6.1.1
   firebase_auth: ^4.2.5
   firebase_storage: ^11.0.10
   http: ^1.1.2
 
-  firebase_core: ^2.4.1
+  firebase_core: ^2.24.2
   firebase_messaging: ^14.5.0
   flutter_local_notifications: ^16.2.0
 
@@ -60,8 +60,8 @@ dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
   visibility_detector: ^0.4.0+2
-  story_viewer: ^0.2.0
-  slide_action: ^0.0.2
+  # story_viewer: ^0.2.0
+  # slide_action: ^0.0.2
   carousel_slider: ^4.2.1
   mask_text_input_formatter: ^2.5.0
   pin_code_fields: ^8.0.1
@@ -71,7 +71,6 @@ dependencies:
   flutterfire_ui: ^0.4.3+10
   record: ^4.4.4
   permission_handler: ^11.1.0
-  flutter_speed_dial: ^7.0.0
   dio: ^5.3.2
   emoji_regex: ^0.0.5
   badges: ^3.0.2
@@ -86,23 +85,24 @@ dependencies:
   audioplayers: ^5.2.1
   voice_message_package: ^2.1.2
   uuid: ^4.2.1
-  just_audio: ^0.9.34
+  # just_audio: ^0.9.34
   timeago: ^3.3.0
   google_sign_in: ^5.4.3
   flutter_facebook_auth: ^4.4.1+1
-  twitter_login: ^4.2.3
+  # twitter_login: ^4.2.3
   image_cropper: ^5.0.1
   readmore: ^2.2.0
   video_thumbnail: ^0.5.3
-  percent_indicator: ^4.2.3
+  # percent_indicator: ^4.2.3
   path_provider: ^2.0.12
-  inview_notifier_list: ^3.0.0
-  grouped_list: ^5.1.2
+  # inview_notifier_list: ^3.0.0
+  # grouped_list: ^5.1.2
   cloud_functions: ^4.0.10
-  chewie: ^1.4.0
+  # chewie: ^1.4.0
+  flutter_polls: ^0.1.5
   crypto: ^3.0.2
   jwt_decoder: ^2.0.1
-  encrypted_shared_preferences: ^3.0.1
+  # encrypted_shared_preferences: ^3.0.1
   shared_preferences: ^2.0.15
   dotted_border: ^2.1.0
   flutter_mentions: ^2.0.1

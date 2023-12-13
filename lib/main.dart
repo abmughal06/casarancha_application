@@ -17,21 +17,12 @@ void main() async {
   runApp(const MyApp());
 }
 
-String? getToken = '';
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return
-        //  MaterialApp(
-        //     debugShowCheckedModeBanner: false,
-        //     theme: ThemeData(
-        //       primarySwatch: Colors.red,
-        //     ),
-        //     home: const Test());
-        ScreenUtilInit(
+    return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,

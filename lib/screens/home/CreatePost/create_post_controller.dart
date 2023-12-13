@@ -80,6 +80,7 @@ class CreatePostMethods extends ChangeNotifier {
       {String? groupId,
       UserModel? user,
       required bool isForum,
+      required List<UserModel> allUsers,
       List<String>? tagIds}) async {
     isSharingPost = true;
     notifyListeners();
@@ -126,11 +127,12 @@ class CreatePostMethods extends ChangeNotifier {
       Get.back();
       if (tagIds.isNotEmpty) {
         FirebaseMessagingService().sendNotificationToMutipleUsers(
-          userIds: tagIds,
           isMessage: false,
           msg: 'has tagged you in a post',
           notificationType: "post",
           content: post,
+          users:
+              allUsers.where((element) => tagIds.contains(element.id)).toList(),
         );
       }
     } catch (e) {

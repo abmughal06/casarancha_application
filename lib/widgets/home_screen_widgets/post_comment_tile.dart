@@ -124,6 +124,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                               ),
                             ),
                           ),
+                          heightBox(5.h),
                           Container(
                             constraints: BoxConstraints(
                                 maxWidth:
@@ -144,6 +145,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                           heightBox(5.h),
                           Row(
                             children: [
+                              widthBox(2.w),
                               InkWell(
                                 onTap: () {
                                   postProvider.toggleLikeComment(
