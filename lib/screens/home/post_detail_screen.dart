@@ -1,12 +1,8 @@
-import 'dart:developer';
-
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/image_resources.dart';
-import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_creator_prf_tile.dart';
-import 'package:casarancha/widgets/shared/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -34,7 +30,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final users = context.watch<List<UserModel>?>();
-    final postProvider = Provider.of<PostProvider>(context);
+    // final postProvider = Provider.of<PostProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -58,11 +54,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     child: Consumer<PostModel?>(
                       builder: (context, post, b) {
                         if (post == null) {
-                          log(widget.postModel.id);
-                          return const Skeleton(
+                          return shimmerImg(
                             height: 9 / 16,
                             width: double.infinity,
-                            radius: 12,
+                            borderRadius: 12,
                           );
                         } else {
                           return Column(
@@ -110,7 +105,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     child: Consumer<List<Comment>?>(
                       builder: (context, comment, b) {
                         if (comment == null || users == null) {
-                          return const CircularProgressIndicator.adaptive();
+                          return shimmerImg(
+                            height: 100,
+                            width: double.infinity,
+                            borderRadius: 12,
+                          );
                         }
 
                         return ListView.builder(
@@ -146,7 +145,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             PostCommentField(
               postModel: widget.postModel,
               groupId: widget.groupId,
-              commentController: postProvider.postCommentController,
             )
           ],
         ),

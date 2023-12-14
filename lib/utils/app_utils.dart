@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:intl/intl.dart';
@@ -13,9 +12,6 @@ import '../resources/color_resources.dart';
 import '../widgets/text_widget.dart';
 import 'app_constants.dart';
 import 'page_transition_utils.dart';
-
-final GlobalKey<FlutterMentionsState> mentionKey =
-    GlobalKey<FlutterMentionsState>();
 
 class AppUtils {
   AppUtils._privateConstructor();

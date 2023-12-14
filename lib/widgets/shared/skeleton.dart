@@ -45,21 +45,22 @@ class PostSkeleton extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  widthBox(7),
-                  Skeleton(
-                      height: 30.h,
-                      width: 30.h,
-                      radius: 1000,
-                      padding: const EdgeInsets.all(8)),
+                  widthBox(12),
+                  shimmerImg(
+                    height: 30.h,
+                    width: 30.h,
+                    borderRadius: 1000,
+                  ),
+                  widthBox(12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Skeleton(
+                      shimmerImg(
                         height: 10.h,
                         width: 130.w,
                       ),
                       heightBox(5.h),
-                      Skeleton(
+                      shimmerImg(
                         height: 10.h,
                         width: 100.w,
                       ),
@@ -67,39 +68,46 @@ class PostSkeleton extends StatelessWidget {
                   ),
                 ],
               ),
-              const Skeleton(
+              heightBox(15),
+              shimmerImg(
                 height: 400,
                 width: double.infinity,
               ),
+              heightBox(15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      Skeleton(
-                          height: 20.h,
-                          width: 30.h,
-                          padding: const EdgeInsets.all(8)),
-                      Skeleton(
-                          height: 20.h,
-                          width: 30.h,
-                          padding: const EdgeInsets.all(8)),
-                      Skeleton(
-                          height: 20.h,
-                          width: 30.h,
-                          padding: const EdgeInsets.all(8)),
+                      widthBox(12),
+                      shimmerImg(
+                        height: 20.h,
+                        width: 30.h,
+                      ),
+                      widthBox(12),
+                      shimmerImg(
+                        height: 20.h,
+                        width: 30.h,
+                      ),
+                      widthBox(12),
+                      shimmerImg(
+                        height: 20.h,
+                        width: 30.h,
+                      ),
                     ],
                   ),
                   Row(
                     children: [
-                      Skeleton(
-                          height: 20.h,
-                          width: 30.h,
-                          padding: const EdgeInsets.all(8)),
-                      Skeleton(
-                          height: 20.h,
-                          width: 30.h,
-                          padding: const EdgeInsets.all(8)),
+                      shimmerImg(
+                        height: 20.h,
+                        width: 30.h,
+                      ),
+                      widthBox(12),
+                      shimmerImg(
+                        height: 20.h,
+                        width: 30.h,
+                      ),
+                      widthBox(12),
                     ],
                   ),
                 ],
@@ -121,10 +129,10 @@ class StorySkeleton extends StatelessWidget {
         padding: const EdgeInsets.only(left: 15),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) => Skeleton(
+        itemBuilder: (context, index) => shimmerImg(
           height: 55.h,
           width: 55.h,
-          radius: 1000,
+          borderRadius: 1000,
         ),
         separatorBuilder: (context, index) => widthBox(10),
         itemCount: 10,

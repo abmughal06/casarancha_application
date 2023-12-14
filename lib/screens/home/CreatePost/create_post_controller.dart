@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
-import '../../../utils/app_utils.dart';
 
 class CreatePostMethods extends ChangeNotifier {
   late TextEditingController quoteTextController;
@@ -129,8 +128,8 @@ class CreatePostMethods extends ChangeNotifier {
         FirebaseMessagingService().sendNotificationToMutipleUsers(
           isMessage: false,
           msg: 'has tagged you in a post',
-          notificationType: "post",
-          content: post,
+          notificationType: "feed_post_cmnt",
+          content: post.toMap(),
           users:
               allUsers.where((element) => tagIds.contains(element.id)).toList(),
         );
@@ -306,7 +305,7 @@ class CreatePostMethods extends ChangeNotifier {
           photosList.add(image);
         }
 
-        printLog(photosList.toString());
+        // printLog(photosList.toString());
         notifyListeners();
       }
     } catch (e) {

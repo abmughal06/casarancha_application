@@ -108,10 +108,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   ? PostModel.fromMap(notification.content)
                                   : null;
 
-                          var contentImage =
-                              notification.notificationType == 'feed_post_cmnt'
-                                  ? postModel!.mediaData.first.link
-                                  : notification.content;
+                          var contentImage = postModel != null
+                              ? postModel.mediaData.first.link
+                              : '';
 
                           return ListTile(
                             onTap: () {
@@ -200,18 +199,38 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     color: const Color(0xff5F5F5F)),
                               ),
                             ),
-                            trailing: Container(
-                              height: isPostShow ? 50.h : 0,
-                              width: isPostShow ? 40.w : 0,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                image: isPostShow
-                                    ? DecorationImage(
-                                        image: CachedNetworkImageProvider(
-                                            contentImage),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : null,
+                            trailing: Visibility(
+                              visible: notification.content != null,
+                              child: Container(
+                                height: isPostShow ? 50.h : 0,
+                                width: isPostShow ? 40.w : 0,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  border: Border.all(
+                                      color: contentImage.contains('http')
+                                          ? Colors.transparent
+                                          : colorPrimaryA05,
+                                      width: 1.w),
+                                  image: isPostShow
+                                      ? contentImage.contains('http')
+                                          ? DecorationImage(
+                                              image: CachedNetworkImageProvider(
+                                                  contentImage),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : null
+                                      : null,
+                                ),
+                                child: Center(
+                                  child: TextWidget(
+                                    text: contentImage.contains('http')
+                                        ? ''
+                                        : 'Quote\nPost',
+                                    textAlign: TextAlign.center,
+                                    fontSize: 10.sp,
+                                    textOverflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                               ),
                             ),
                           );

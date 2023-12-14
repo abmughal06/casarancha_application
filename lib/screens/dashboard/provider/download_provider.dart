@@ -104,7 +104,7 @@ class DownloadProvider extends ChangeNotifier {
     isDocOpening = true;
     notifyListeners();
     try {
-      printLog(fileUrl);
+      // printLog(fileUrl);
 
       final response = await get(Uri.parse(fileUrl));
 

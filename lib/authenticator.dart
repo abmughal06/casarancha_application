@@ -1,8 +1,6 @@
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
-import 'package:casarancha/utils/app_constants.dart';
-import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/dynamic_links.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,11 +38,11 @@ class _AuthenticateState extends State<Authenticate> {
             : null,
         initialData: null,
         builder: (context, snapshot) {
-          printLog(currentUserUID);
+          // printLog(currentUserUID);
 
           if (snapshot.hasData) {
             if (snapshot.data!.exists) {
-              printLog(snapshot.data!['name'].toString());
+              // printLog(snapshot.data!['name'].toString());
               return const DashBoard();
             } else {
               return const SetupProfileScreen();

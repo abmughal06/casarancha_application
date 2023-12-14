@@ -289,7 +289,7 @@ Widget profileAcceptDecline(
 Widget shimmerImg(
     {double? height,
     double? width,
-    borderRadius,
+    double? borderRadius,
     BoxBorder? border,
     BoxShape? boxShape,
     Widget? child}) {
@@ -302,7 +302,7 @@ Widget shimmerImg(
           width: width,
           decoration: BoxDecoration(
             color: Colors.grey,
-            shape: boxShape ?? BoxShape.rectangle,
+            // shape: boxShape ?? BoxShape.rectangle,
             borderRadius: BorderRadius.circular(borderRadius ?? 0),
             border: border,
           ),

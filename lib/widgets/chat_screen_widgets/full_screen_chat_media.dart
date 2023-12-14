@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -149,7 +148,7 @@ class ChatMediaFullScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    printLog(media.toString());
+    // printLog(media.toString());
     var link = media.map((e) => e.link).join(", ");
     var name = media.map((e) => e.name).join(", ");
     return Scaffold(

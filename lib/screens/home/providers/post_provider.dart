@@ -8,6 +8,7 @@ import 'package:casarancha/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -28,53 +29,55 @@ class PostProvider extends ChangeNotifier {
   final currentUserRef = FirebaseFirestore.instance
       .collection("users")
       .doc(FirebaseAuth.instance.currentUser!.uid);
+  final GlobalKey<FlutterMentionsState> mentionKey =
+      GlobalKey<FlutterMentionsState>();
 
-  final postCommentController = TextEditingController();
+  // final postCommentController = TextEditingController();
   bool isMentionActive = false;
   List commentTagsId = [];
 
-  commentMentionListener() {
-    postCommentController.addListener(() {
-      String text = postCommentController.text;
+  // commentMentionListener() {
+  //   postCommentController.addListener(() {
+  //     String text = postCommentController.text;
 
-      // Check if "@" is present at the beginning of a word (without space)
-      if (text.isNotEmpty) {
-        List<String> words = text.split(' ');
-        String lastWord = words.isNotEmpty ? words.last : '';
+  //     // Check if "@" is present at the beginning of a word (without space)
+  //     if (text.isNotEmpty) {
+  //       List<String> words = text.split(' ');
+  //       String lastWord = words.isNotEmpty ? words.last : '';
 
-        if (lastWord.startsWith('@')) {
-          isMentionActive = true;
-        } else if (lastWord.contains('@')) {
-          // Mention is still active if "@" is present anywhere in the last word
-          isMentionActive = true;
-        } else {
-          // Mention becomes inactive when a space is typed after "@"
-          isMentionActive = false;
-        }
-      } else {
-        isMentionActive = false;
-      }
+  //       if (lastWord.startsWith('@')) {
+  //         isMentionActive = true;
+  //       } else if (lastWord.contains('@')) {
+  //         // Mention is still active if "@" is present anywhere in the last word
+  //         isMentionActive = true;
+  //       } else {
+  //         // Mention becomes inactive when a space is typed after "@"
+  //         isMentionActive = false;
+  //       }
+  //     } else {
+  //       isMentionActive = false;
+  //     }
 
-      notifyListeners();
-    });
-  }
+  //     notifyListeners();
+  //   });
+  // }
 
-  PostProvider() {
-    // commentMentionListener();
-  }
+  // PostProvider() {
+  //   // commentMentionListener();
+  // }
 
-  tagUserAndSaveId(user) {
-    commentTagsId.add(user.id);
-    final text = postCommentController.text;
-    final i = text.lastIndexOf('@');
-    final mention = user.username;
-    postCommentController.value = TextEditingValue(
-      text: text.substring(0, i + 1) + mention,
-    );
-    postCommentController.selection = TextSelection.fromPosition(
-        TextPosition(offset: postCommentController.text.length));
-    notifyListeners();
-  }
+  // tagUserAndSaveId(user) {
+  //   commentTagsId.add(user.id);
+  //   final text = postCommentController.text;
+  //   final i = text.lastIndexOf('@');
+  //   final mention = user.username;
+  //   postCommentController.value = TextEditingValue(
+  //     text: text.substring(0, i + 1) + mention,
+  //   );
+  //   postCommentController.selection = TextSelection.fromPosition(
+  //       TextPosition(offset: postCommentController.text.length));
+  //   notifyListeners();
+  // }
 
   final FocusNode postCommentFocus = FocusNode();
   String? repCommentId;
@@ -252,7 +255,7 @@ class PostProvider extends ChangeNotifier {
   void postComment({
     PostModel? postModel,
     UserModel? user,
-    String? comment,
+    // String? comment,
     String? groupId,
     // List<String>? tagsId,
     List<UserModel>? allUsers,
@@ -278,7 +281,7 @@ class PostProvider extends ChangeNotifier {
               imageUrl: user.imageStr,
               isVerified: user.isVerified),
           createdAt: DateTime.now().toIso8601String(),
-          message: comment!,
+          message: mentionKey.currentState!.controller!.text,
           postId: postModel.id,
           dislikeIds: [],
           likeIds: [],
@@ -333,7 +336,7 @@ class PostProvider extends ChangeNotifier {
         printLog(e.toString());
       } finally {
         postCommentFocus.unfocus();
-        postCommentController.clear();
+        mentionKey.currentState!.controller!.clear();
       }
     }
   }
@@ -344,7 +347,7 @@ class PostProvider extends ChangeNotifier {
     UserModel? user,
     List<UserModel>? allUsers,
     String? groupId,
-    String? reply,
+    // String? reply,
     // List<String>? tagsId,
   }) {
     if (repCommentId != null) {
@@ -374,7 +377,7 @@ class PostProvider extends ChangeNotifier {
               imageUrl: user.imageStr,
               isVerified: user.isVerified),
           createdAt: DateTime.now().toIso8601String(),
-          message: reply!,
+          message: mentionKey.currentState!.controller!.text,
           postId: postModel.id,
           dislikeIds: [],
           likeIds: [],
@@ -429,7 +432,7 @@ class PostProvider extends ChangeNotifier {
         printLog(e.toString());
       } finally {
         postCommentFocus.unfocus();
-        postCommentController.clear();
+        mentionKey.currentState!.controller!.clear();
         repCommentId = null;
       }
     }
@@ -936,7 +939,7 @@ class PostProvider extends ChangeNotifier {
       'shareCount': FieldValue.arrayUnion([currentUser.id])
     });
 
-    printLog(recieverIds.toString());
+    // printLog(recieverIds.toString());
     notifyListeners();
 
     var recieverFCMToken = appUser.fcmToken;

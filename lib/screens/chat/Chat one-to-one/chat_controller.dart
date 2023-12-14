@@ -146,7 +146,7 @@ class ChatProvider extends ChangeNotifier {
           .doc(appUser.id)
           .get();
       var recieverFCMToken = recieverRef.data()!['fcmToken'];
-      printLog(recieverRef.data()!['id']);
+      // printLog(recieverRef.data()!['id']);
       FirebaseMessagingService().sendNotificationToUser(
         appUserId: recieverRef.data()!['id'],
         notificationType: "msg",
@@ -768,7 +768,7 @@ class ChatProvider extends ChangeNotifier {
           photosList.add(image);
         }
 
-        printLog(photosList.toString());
+        // printLog(photosList.toString());
         notifyListeners();
       }
     } catch (e) {

@@ -31,7 +31,7 @@ class FirebaseMessagingService {
   updateUserFcmToken() async {
     try {
       if (FirebaseAuth.instance.currentUser != null) {
-        printLog('check1');
+        // printLog('check1');
         final token = await getFirebaseToken();
         final ref = FirebaseFirestore.instance
             .collection('users')
@@ -39,7 +39,7 @@ class FirebaseMessagingService {
         final currentUser = await ref.get();
 
         if (currentUser.data()!['fcmToken'] == token) {
-          printLog('check2');
+          // printLog('check2');
           return;
         } else {
           ref.update({
@@ -109,13 +109,13 @@ class FirebaseMessagingService {
       "to": devRegToken
     };
 
-    var res = http.post(
+    http.post(
       Uri.parse("https://fcm.googleapis.com/fcm/send"),
       headers: header,
       body: jsonEncode(officialBodyFormat),
     );
-    final result = await res;
-    printLog(result.statusCode.toString());
+    // final result = await res;
+    // printLog(result.statusCode.toString());
 
     if (isMessage == false) {
       final NotificationModel notification = NotificationModel(
@@ -186,13 +186,13 @@ class FirebaseMessagingService {
         "to": user.fcmToken,
       };
 
-      var res = await http.post(
+      await http.post(
         Uri.parse("https://fcm.googleapis.com/fcm/send"),
         headers: header,
         body: jsonEncode(officialBodyFormat),
       );
 
-      printLog(res.statusCode.toString());
+      // printLog(res.statusCode.toString());
 
       if (!isMessage) {
         final NotificationModel notification = NotificationModel(

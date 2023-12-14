@@ -248,15 +248,13 @@ class CustomPostFooter extends StatelessWidget {
                           constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * 0.69,
                           ),
-                          child: RichText(
-                            text: highlightMentions(
-                              text: "@$username ",
-                              context: context,
-                              onTap: () {
-                                printLog('============>>>>>>>>>tagged');
-                                onUsernameTap(username, context);
-                              },
-                            ),
+                          child: selectableHighlightMentions(
+                            text: "@$username ",
+                            context: context,
+                            onTap: () {
+                              // printLog('============>>>>>>>>>tagged');
+                              onUsernameTap(username, context);
+                            },
                           ),
                         );
                       }

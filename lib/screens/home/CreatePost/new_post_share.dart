@@ -1,6 +1,5 @@
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
-import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
@@ -62,7 +61,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                     .map((user) => user.id)
                     .toList();
 
-                printLog(userIds.toString());
+                // printLog(userIds.toString());
                 user == null
                     ? GlobalSnackBar.show(message: strAlertSharePost)
                     : widget.isPoll
@@ -309,7 +308,7 @@ class TagUserListDialog extends StatelessWidget {
                             onTap: () {
                               prov.updateTagList(userSnap);
 
-                              printLog(prov.selectedUsers.toString());
+                              // printLog(prov.selectedUsers.toString());
                             },
                             title: Text(userSnap.username),
                             trailing: prov.selectedUsers.contains(userSnap)

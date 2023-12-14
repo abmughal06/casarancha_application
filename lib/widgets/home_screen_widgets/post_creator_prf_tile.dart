@@ -15,7 +15,6 @@ import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../../screens/profile/AppUser/app_user_screen.dart';
-import '../../utils/app_utils.dart';
 import '../../utils/snackbar.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
@@ -202,15 +201,13 @@ class PostCreatorProfileTile extends StatelessWidget {
                                   maxWidth:
                                       MediaQuery.of(context).size.width * 0.69,
                                 ),
-                                child: RichText(
-                                  text: highlightMentions(
-                                    text: "@$username ",
-                                    context: context,
-                                    onTap: () {
-                                      printLog('============>>>>>>>>>tagged');
-                                      onUsernameTap(username, context);
-                                    },
-                                  ),
+                                child: selectableHighlightMentions(
+                                  text: "@$username ",
+                                  context: context,
+                                  onTap: () {
+                                    // printLog('============>>>>>>>>>tagged');
+                                    onUsernameTap(username, context);
+                                  },
                                 ),
                               );
                             }

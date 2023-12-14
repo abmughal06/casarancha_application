@@ -129,17 +129,14 @@ class _PostCommentTileState extends State<PostCommentTile> {
                             constraints: BoxConstraints(
                                 maxWidth:
                                     MediaQuery.of(context).size.width * 0.69),
-                            child: RichText(
-                              text: highlightMentions(
-                                text: widget.cmnt.message,
-                                context: context,
-                                onTap: () {
-                                  printLog('============>>>>>>>>>comment');
-                                  var username =
-                                      extractUsername(widget.cmnt.message);
-                                  onUsernameTap(username!, context);
-                                },
-                              ),
+                            child: selectableHighlightMentions(
+                              text: widget.cmnt.message,
+                              context: context,
+                              onTap: () {
+                                var username =
+                                    extractUsername(widget.cmnt.message);
+                                onUsernameTap(username!, context);
+                              },
                             ),
                           ),
                           heightBox(5.h),
@@ -215,8 +212,11 @@ class _PostCommentTileState extends State<PostCommentTile> {
                               widthBox(15.w),
                               InkWell(
                                 onTap: () {
-                                  postProvider.postCommentController.text =
-                                      '@${appUser.username} ';
+                                  postProvider
+                                      .mentionKey
+                                      .currentState!
+                                      .controller!
+                                      .text = '@${appUser.username} ';
                                   postProvider.postCommentFocus.requestFocus();
                                   postProvider.repCommentId = widget.cmnt.id;
                                 },
@@ -412,7 +412,7 @@ String? extractUsername(String tappedText) {
   }
 }
 
-TextSpan highlightMentions({
+SelectableText selectableHighlightMentions({
   String? text,
   BuildContext? context,
   VoidCallback? onTap,
@@ -460,7 +460,9 @@ TextSpan highlightMentions({
     style: const TextStyle(color: Colors.black),
   ));
 
-  return TextSpan(children: spans);
+  return SelectableText.rich(
+    TextSpan(children: spans),
+  );
 }
 
 class FeedPostCommentTile extends StatelessWidget {
@@ -519,25 +521,27 @@ class FeedPostCommentTile extends StatelessWidget {
               ),
             ),
             subtitle: InkWell(
-                onTap: () {
-                  Get.to(
-                    () => PostDetailScreen(
-                      postModel: postModel!,
-                      groupId: groupId,
-                    ),
-                  );
-                },
-                child: RichText(
-                  text: highlightMentions(
-                    text: cmnt.message.isEmpty ? "---" : cmnt.message,
-                    context: context,
-                    onTap: () {
-                      printLog('============>>>>>>>>>comment');
-                      var username = extractUsername(cmnt.message);
-                      onUsernameTap(username!, context);
-                    },
+              onTap: () {
+                Get.to(
+                  () => PostDetailScreen(
+                    postModel: postModel!,
+                    groupId: groupId,
                   ),
-                )),
+                );
+              },
+              child: Container(
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.69),
+                child: selectableHighlightMentions(
+                  text: cmnt.message,
+                  context: context,
+                  onTap: () {
+                    var username = extractUsername(cmnt.message);
+                    onUsernameTap(username!, context);
+                  },
+                ),
+              ),
+            ),
             // TextWidget(
             //   onTap: () => Get.to(() => PostDetailScreen(
             //         postModel: postModel!,
@@ -663,30 +667,24 @@ class PostCommentReplyTile extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      RichText(
-                                        text: highlightMentions(
+                                      Container(
+                                        constraints: BoxConstraints(
+                                            maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.50),
+                                        child: selectableHighlightMentions(
                                           text: rep.message.isEmpty
                                               ? '---'
                                               : rep.message,
                                           context: context,
                                           onTap: () {
-                                            printLog(
-                                                '============>>>>>>>>>comment');
                                             var username =
                                                 extractUsername(rep.message);
                                             onUsernameTap(username!, context);
                                           },
                                         ),
                                       ),
-                                      // SelectableTextWidget(
-                                      //   text: rep.message.isEmpty
-                                      //       ? "---"
-                                      //       : rep.message,
-                                      //   fontSize: 12.sp,
-                                      //   color: color55F,
-                                      //   fontWeight: FontWeight.w400,
-                                      //   textOverflow: TextOverflow.ellipsis,
-                                      // ),
                                       heightBox(5.h),
                                       Row(
                                         children: [
@@ -769,7 +767,10 @@ class PostCommentReplyTile extends StatelessWidget {
                                           widthBox(10.w),
                                           InkWell(
                                             onTap: () {
-                                              postProvider.postCommentController
+                                              postProvider
+                                                      .mentionKey
+                                                      .currentState!
+                                                      .controller!
                                                       .text =
                                                   '@${repUser.username} ';
                                               postProvider.postCommentFocus
