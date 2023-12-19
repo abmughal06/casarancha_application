@@ -1,3 +1,4 @@
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/screens/home/CreatePost/new_post_share.dart';
@@ -24,14 +25,14 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
   final questionController = TextEditingController();
   TextEditingController optionController = TextEditingController();
 
-  List<String> options = [];
+  List<PollOptions> options = [];
 
   late CreatePostMethods prov;
 
   @override
   void dispose() {
     prov.question = '';
-    prov.options = <Map>[];
+    prov.options = [];
     super.dispose();
   }
 
@@ -76,7 +77,8 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                   if (optionController.text.trim().isNotEmpty) {
                     if (mounted) {
                       setState(() {
-                        options.add(optionController.text.trim());
+                        options.add(PollOptions(
+                            option: optionController.text.trim(), votes: 0));
                         optionController.clear();
                       });
                     }
@@ -101,7 +103,8 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: 10.w),
-                    child: TextWidget(text: '${index + 1}. ${options[index]}'),
+                    child: TextWidget(
+                        text: '${index + 1}. ${options[index].option}'),
                   ),
                   Row(
                     children: [
@@ -109,7 +112,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                         onTap: () {
                           if (mounted) {
                             setState(() {
-                              optionController.text = options[index];
+                              optionController.text = options[index].option;
                               options.removeAt(index);
                             });
                           }
@@ -148,10 +151,9 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
         onTap: () {
           if (options.length >= 2) {
             prov.question = questionController.text.trim();
-            prov.options =
-                options.map((e) => {'option': e, 'votes': []}).toList();
+            prov.options = options;
             Get.to(() => NewPostShareScreen(
-                  createPostController: prov,
+                  // createPostController: prov,
                   isPoll: true,
                   isForum: true,
                 ));

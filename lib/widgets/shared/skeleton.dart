@@ -47,8 +47,8 @@ class PostSkeleton extends StatelessWidget {
                 children: [
                   widthBox(12),
                   shimmerImg(
-                    height: 30.h,
-                    width: 30.h,
+                    height: 40.h,
+                    width: 40.h,
                     borderRadius: 1000,
                   ),
                   widthBox(12),
@@ -124,14 +124,14 @@ class StorySkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 56.h,
+      height: 50.h,
       child: ListView.separated(
-        padding: const EdgeInsets.only(left: 15),
+        // padding: const EdgeInsets.only(left: 15),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) => shimmerImg(
-          height: 55.h,
-          width: 55.h,
+          height: 50.h,
+          width: 50.h,
           borderRadius: 1000,
         ),
         separatorBuilder: (context, index) => widthBox(10),

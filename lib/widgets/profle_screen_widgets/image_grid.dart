@@ -34,8 +34,10 @@ class ImageGridView extends StatelessWidget {
                 margin: EdgeInsets.zero,
                 color: Colors.transparent,
                 child: GestureDetector(
-                  onTap: () => Get.to(
-                      () => PostFullScreenView(post: data, isPostDetail: true)),
+                  onTap: () => Get.to(() => PostFullScreenView(
+                        post: data,
+                        isPostDetail: true,
+                      )),
                   child: CachedNetworkImage(
                     imageUrl: data.mediaData[0].link,
                     fit: BoxFit.cover,

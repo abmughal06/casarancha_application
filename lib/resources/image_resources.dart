@@ -34,6 +34,7 @@ const icLeftArrowCall = "assets/images/ic_left_arrow_call.svg";
 //HomePage
 const icGhostMode = "assets/images/img_home_page/ic_ghost_mode.svg";
 const imgGhostUser = "assets/images/img_home_page/ic_ghost_user.png";
+const imgGhostUserBg = "assets/images/img_home_page/ic_ghost_user_bg.png";
 const imgAddPost = "assets/images/img_home_page/img_add_post.png";
 const icNotifyBell = "assets/images/img_home_page/ic_notify_bell.svg";
 const icCardMenu = "assets/images/img_home_page/ic_menu_bar.svg";

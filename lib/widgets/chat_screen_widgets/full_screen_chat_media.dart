@@ -48,6 +48,7 @@ class CheckMediaAndShow extends StatelessWidget {
             builder: (context, snapshot) {
               return VideoPlayerWidget(
                 videoUrl: mediaData.link,
+                media: mediaData,
               );
             });
       case "Video":
@@ -56,6 +57,7 @@ class CheckMediaAndShow extends StatelessWidget {
             builder: (context, snapshot) {
               return VideoPlayerWidget(
                 videoUrl: mediaData.link,
+                media: mediaData,
               );
             });
       case "InChatMusic":

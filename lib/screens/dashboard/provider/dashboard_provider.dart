@@ -5,6 +5,8 @@ class DashboardProvider extends ChangeNotifier {
   int currentIndex = 0;
   PageController pageController = PageController(initialPage: 0);
   ScrollController scrollController = ScrollController();
+  ScrollController forumScrollController = ScrollController();
+  ScrollController ghostPostScrollController = ScrollController();
 
   changePage(int page) {
     currentIndex = page;

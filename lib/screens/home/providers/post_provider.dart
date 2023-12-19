@@ -32,52 +32,8 @@ class PostProvider extends ChangeNotifier {
   final GlobalKey<FlutterMentionsState> mentionKey =
       GlobalKey<FlutterMentionsState>();
 
-  // final postCommentController = TextEditingController();
   bool isMentionActive = false;
   List commentTagsId = [];
-
-  // commentMentionListener() {
-  //   postCommentController.addListener(() {
-  //     String text = postCommentController.text;
-
-  //     // Check if "@" is present at the beginning of a word (without space)
-  //     if (text.isNotEmpty) {
-  //       List<String> words = text.split(' ');
-  //       String lastWord = words.isNotEmpty ? words.last : '';
-
-  //       if (lastWord.startsWith('@')) {
-  //         isMentionActive = true;
-  //       } else if (lastWord.contains('@')) {
-  //         // Mention is still active if "@" is present anywhere in the last word
-  //         isMentionActive = true;
-  //       } else {
-  //         // Mention becomes inactive when a space is typed after "@"
-  //         isMentionActive = false;
-  //       }
-  //     } else {
-  //       isMentionActive = false;
-  //     }
-
-  //     notifyListeners();
-  //   });
-  // }
-
-  // PostProvider() {
-  //   // commentMentionListener();
-  // }
-
-  // tagUserAndSaveId(user) {
-  //   commentTagsId.add(user.id);
-  //   final text = postCommentController.text;
-  //   final i = text.lastIndexOf('@');
-  //   final mention = user.username;
-  //   postCommentController.value = TextEditingValue(
-  //     text: text.substring(0, i + 1) + mention,
-  //   );
-  //   postCommentController.selection = TextSelection.fromPosition(
-  //       TextPosition(offset: postCommentController.text.length));
-  //   notifyListeners();
-  // }
 
   final FocusNode postCommentFocus = FocusNode();
   String? repCommentId;
@@ -134,8 +90,14 @@ class PostProvider extends ChangeNotifier {
             .doc(groupId)
             .collection('posts')
         : FirebaseFirestore.instance.collection("posts");
+
+    var userRef =
+        FirebaseFirestore.instance.collection('users').doc(currentUserUID);
     try {
       await postRef.doc(postModel!.id).delete().then((value) => Get.back());
+      await userRef.update({
+        'postsIds': FieldValue.arrayRemove([postModel.id])
+      });
     } catch (e) {
       log("$e");
     }
@@ -156,20 +118,6 @@ class PostProvider extends ChangeNotifier {
           }, SetOptions(merge: true));
         }
       }
-    } catch (e) {
-      log('$e');
-    }
-  }
-
-  void deletePostComment({String? postId, String? groupId}) async {
-    final postRef = groupId != null
-        ? FirebaseFirestore.instance
-            .collection("groups")
-            .doc(groupId)
-            .collection('posts')
-        : FirebaseFirestore.instance.collection("posts");
-    try {
-      await postRef.doc(postId).collection("comments").get().then((value) {});
     } catch (e) {
       log('$e');
     }
@@ -807,29 +755,37 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void updatePollData({required String postId, required int index}) async {
+  void updatePollData({
+    required String postId,
+    required String option,
+  }) async {
     try {
       final ref = firestore.collection('posts').doc(postId);
       final data = await ref.get();
       final media = MediaDetails.fromMap(data.data()!['mediaData'][0]);
-      final pollOptions =
-          media.pollOptions!.map((e) => PollOptions.fromMap(e)).toList();
-      List list = [];
-      for (var i in pollOptions) {
-        list += i.votes;
+      final pollOptions = media.pollOptions!;
+
+      for (var i = 0; i < pollOptions.length; i++) {
+        var pollOption = PollOptions.fromMap(pollOptions[i]);
+        if (pollOption.option == option) {
+          var newData = pollOption.copyWith(option, pollOption.votes + 1);
+          pollOptions[i] = newData.toMap();
+        }
       }
-      printLog(list.toString());
-      if (!list.contains(currentUserUID)) {
-        pollOptions[index] = pollOptions[index].copyWith(
-            pollOptions[index].option,
-            pollOptions[index].votes + [currentUserUID]);
-        var newMedia = media
-            .copyWith(pollOptions: pollOptions.map((e) => e.toMap()).toList())
-            .toMap();
-        firestore.collection('posts').doc(postId).update({
-          "mediaData": [newMedia]
-        });
-      }
+      final pollVotedUsers = media.pollVotedUsers!;
+      var newPollVotedUser = pollVotedUsers;
+      var pollVoter = PollVotedUsers(id: currentUserUID!, votedOption: option);
+      newPollVotedUser.add(pollVoter.toMap());
+
+      var newMedia = media
+          .copyWith(
+            pollOptions: pollOptions,
+            pollVotedUsers: newPollVotedUser,
+          )
+          .toMap();
+      firestore.collection('posts').doc(postId).update({
+        "mediaData": [newMedia],
+      });
     } catch (e) {
       GlobalSnackBar.show(message: 'unknown error occured, please try later');
     }

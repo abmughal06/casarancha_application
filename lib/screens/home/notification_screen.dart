@@ -122,7 +122,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     ));
                               }
                               if (notification.notificationType ==
-                                  'user_follow') {
+                                      'user_follow' ||
+                                  notification.notificationType ==
+                                      'dynamicLink') {
                                 navigateToAppUserScreen(
                                     notification.sentById, context);
                               }
@@ -140,8 +142,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                         .createdDetails!.imageUrl.isNotEmpty
                                     ? DecorationImage(
                                         image: CachedNetworkImageProvider(
-                                            notification
-                                                .createdDetails!.imageUrl),
+                                          notification.createdDetails!.imageUrl,
+                                        ),
                                         fit: BoxFit.cover,
                                       )
                                     : notification.createdDetails!.imageUrl !=

@@ -52,7 +52,7 @@ class CreatePostMethods extends ChangeNotifier {
   var mediaData = <MediaDetails>[];
   var isSharingPost = false;
   var question = '';
-  var options = <Map>[];
+  var options = <PollOptions>[];
 
   bool showPostTime = false;
 
@@ -79,6 +79,7 @@ class CreatePostMethods extends ChangeNotifier {
       {String? groupId,
       UserModel? user,
       required bool isForum,
+      required bool isGhostPost,
       required List<UserModel> allUsers,
       List<String>? tagIds}) async {
     isSharingPost = true;
@@ -110,6 +111,7 @@ class CreatePostMethods extends ChangeNotifier {
         shareLink: '',
         videoViews: [],
         isForumPost: isForum,
+        isGhostPost: isGhostPost,
         shareCount: [],
         showPostTime: showPostTime,
         mediaData: mediaData,
@@ -159,7 +161,6 @@ class CreatePostMethods extends ChangeNotifier {
       imageUrl: user.imageStr,
       isVerified: user.isVerified,
     );
-
     try {
       final mediaDetails = MediaDetails(
         id: DateTime.now().toUtc().toString(),
@@ -167,7 +168,7 @@ class CreatePostMethods extends ChangeNotifier {
         type: 'poll',
         link: '',
         pollQuestion: question,
-        pollOptions: options,
+        pollOptions: options.map((e) => e.toMap()).toList(),
       );
 
       final post = PostModel(
@@ -184,6 +185,7 @@ class CreatePostMethods extends ChangeNotifier {
         shareCount: [],
         showPostTime: showPostTime,
         mediaData: [mediaDetails],
+        isGhostPost: false,
       );
 
       DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
@@ -191,7 +193,8 @@ class CreatePostMethods extends ChangeNotifier {
       userModel.postsIds.add(postId);
       await userRef.update({"postsIds": userModel.postsIds});
 
-      await forumRef.set(post.toMap());
+      await forumRef.set(post.toMap()).catchError((e) {});
+
       Get.back();
       Get.back();
     } catch (e) {

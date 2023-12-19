@@ -24,6 +24,7 @@ class PostModel {
   String? postBlockStatus;
   List<dynamic> videoViews;
   bool isForumPost;
+  bool isGhostPost;
 
   PostModel({
     required this.id,
@@ -35,6 +36,7 @@ class PostModel {
     required this.shareLink,
     required this.shareCount,
     required this.isForumPost,
+    required this.isGhostPost,
     this.videoViews = const [],
     this.mediaData = const [],
     this.likesIds = const [],
@@ -63,6 +65,7 @@ class PostModel {
       bool? showPostTime,
       bool? isForumPost,
       int? reportCount,
+      bool? isGhostPost,
       String? postBlockStatus}) {
     return PostModel(
       videoViews: videoViews ?? this.videoViews,
@@ -82,6 +85,7 @@ class PostModel {
       postBlockStatus: postBlockStatus ?? this.postBlockStatus,
       shareCount: shareCount ?? this.shareCount,
       isForumPost: isForumPost ?? this.isForumPost,
+      isGhostPost: isGhostPost ?? this.isGhostPost,
     );
   }
 
@@ -102,6 +106,7 @@ class PostModel {
       'tagsIds': tagsIds,
       'showPostTime': showPostTime,
       'isForumPost': isForumPost,
+      'isGhostPost': isGhostPost,
       'reportCount': reportCount,
       'postBlockStatus': postBlockStatus
     };
@@ -112,6 +117,7 @@ class PostModel {
         id: map['id'] ?? '',
         videoViews: map['videoViews'] ?? [],
         isForumPost: map['isForumPost'] ?? false,
+        isGhostPost: map['isGhostPost'] ?? false,
         creatorId: map['creatorId'] ?? '',
         creatorDetails: CreatorDetails.fromMap(map['creatorDetails']),
         createdAt: map['createdAt'] ?? '',

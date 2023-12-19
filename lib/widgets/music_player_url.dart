@@ -99,117 +99,124 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context, listen: false);
 
-    return GestureDetector(
-      onTap: () {
-        audioPlayer.pause();
-        widget.isPostDetail
-            ? Get.to(() => PostFullScreenView(
-                post: widget.postModel!, isPostDetail: widget.isPostDetail))
-            : Get.to(() => PostDetailScreen(postModel: widget.postModel!));
-      },
-      child: VisibilityDetector(
-          key: Key(widget.musicDetails.link),
-          onVisibilityChanged: (visibilityInfo) {
-            audioPlayer.pause();
-          },
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(widget.border),
-                  image: DecorationImage(
-                    image: AssetImage(
-                      musicImgUrl,
-                    ),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                alignment: Alignment.bottomCenter,
-                child: Container(
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 200,
+      child: GestureDetector(
+        onTap: () {
+          audioPlayer.pause();
+          widget.isPostDetail
+              ? Get.to(() => PostFullScreenView(
+                  post: widget.postModel!, isPostDetail: widget.isPostDetail))
+              : Get.to(() => PostDetailScreen(postModel: widget.postModel!));
+        },
+        child: VisibilityDetector(
+            key: Key(widget.musicDetails.link),
+            onVisibilityChanged: (visibilityInfo) {
+              audioPlayer.pause();
+            },
+            child: Stack(
+              children: [
+                Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(widget.border),
-                    color: color221.withOpacity(0.35),
+                    image: DecorationImage(
+                      image: AssetImage(
+                        musicImgUrl,
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(widget.border),
+                      color: color221.withOpacity(0.35),
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: 15,
-                right: 15,
-                bottom: 15,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        isPlaying ? audioPlayer.pause() : audioPlayer.resume();
-                        postProvider.countVideoViews(
-                          postModel: widget.postModel,
-                          groupId: widget.groupId,
-                        );
+                Positioned(
+                  left: 15,
+                  right: 15,
+                  bottom: 15,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          isPlaying
+                              ? audioPlayer.pause()
+                              : audioPlayer.resume();
+                          postProvider.countVideoViews(
+                            postModel: widget.postModel,
+                            groupId: widget.groupId,
+                          );
 
-                        audioPlayer.setReleaseMode(ReleaseMode.loop);
-                      },
-                      child: SvgPicture.asset(
-                        isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
-                        width: 38.h,
-                        height: 38.h,
+                          audioPlayer.setReleaseMode(ReleaseMode.loop);
+                        },
+                        child: SvgPicture.asset(
+                          isPlaying ? icMusicPauseBtn : icMusicPlayBtn,
+                          width: 38.h,
+                          height: 38.h,
+                        ),
                       ),
-                    ),
-                    widthBox(5.w),
-                    Expanded(
-                      // flex: 1,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          SliderTheme(
-                            data: SliderThemeData(
-                              overlayShape: SliderComponentShape.noThumb,
+                      widthBox(5.w),
+                      Expanded(
+                        // flex: 1,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            SliderTheme(
+                              data: SliderThemeData(
+                                overlayShape: SliderComponentShape.noThumb,
+                              ),
+                              child: Slider(
+                                thumbColor: colorF03,
+                                activeColor: colorF03,
+                                inactiveColor: colorEE5,
+                                min: 0.0,
+                                max: duration.inMicroseconds.toDouble(),
+                                value: position.inMicroseconds.toDouble(),
+                                onChanged: (value) async {
+                                  final position =
+                                      Duration(microseconds: value.toInt());
+                                  await audioPlayer.seek(position);
+                                },
+                              ),
                             ),
-                            child: Slider(
-                              thumbColor: colorF03,
-                              activeColor: colorF03,
-                              inactiveColor: colorEE5,
-                              min: 0.0,
-                              max: duration.inMicroseconds.toDouble(),
-                              value: position.inMicroseconds.toDouble(),
-                              onChanged: (value) async {
-                                final position =
-                                    Duration(microseconds: value.toInt());
-                                await audioPlayer.seek(position);
-                              },
+                            heightBox(5.h),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 7.w),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextWidget(
+                                    text: formatTime(position),
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: colorWhite,
+                                  ),
+                                  TextWidget(
+                                    text: formatTime(duration),
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: colorWhite,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          heightBox(5.h),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 7.w),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TextWidget(
-                                  text: formatTime(position),
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: colorWhite,
-                                ),
-                                TextWidget(
-                                  text: formatTime(duration),
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: colorWhite,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            )),
+      ),
     );
     //   },
     // );

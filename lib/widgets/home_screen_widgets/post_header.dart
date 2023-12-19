@@ -1,5 +1,6 @@
 import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,6 +20,7 @@ class CustomPostHeader extends StatelessWidget {
   final bool? isVideoPost;
   final VoidCallback? onVertItemClick;
   final UserModel postCreator;
+  final bool isGhostPost;
 
   const CustomPostHeader(
       {super.key,
@@ -27,36 +29,50 @@ class CustomPostHeader extends StatelessWidget {
       this.headerOnTap,
       this.onVertItemClick,
       required this.postCreator,
-      required this.postModel});
+      required this.postModel,
+      this.isGhostPost = false});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: ListTile(
-        onTap: headerOnTap,
+        onTap: isGhostPost
+            ? () =>
+                GlobalSnackBar.show(message: "You can't visit a ghost profile")
+            : headerOnTap,
         minVerticalPadding: 0,
         visualDensity: const VisualDensity(vertical: -2),
         horizontalTitleGap: 10,
-        leading: InkWell(
-          onTap: headerOnTap,
-          child: ProfilePic(
-            pic: postCreator.imageStr,
-            heightAndWidth: 40.h,
-          ),
-        ),
+        leading: isGhostPost
+            ? Container(
+                height: 40.h,
+                width: 40.h,
+                decoration: const BoxDecoration(
+                  color: colorF03,
+                  shape: BoxShape.circle,
+                ),
+                child: Image.asset(imgGhostUser),
+              )
+            : InkWell(
+                onTap: headerOnTap,
+                child: ProfilePic(
+                  pic: postCreator.imageStr,
+                  heightAndWidth: 40.h,
+                ),
+              ),
         title: Row(
           children: [
             TextWidget(
               onTap: headerOnTap,
-              text: postCreator.username,
+              text: isGhostPost ? postCreator.ghostName : postCreator.username,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
               color: isVideoPost! ? colorFF7 : color221,
             ),
             widthBox(5.w),
             Visibility(
-              visible: postCreator.isVerified,
+              visible: !isGhostPost && postCreator.isVerified,
               child: SvgPicture.asset(
                 icVerifyBadge,
                 width: 17.w,
@@ -69,7 +85,7 @@ class CustomPostHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Visibility(
-              visible: postCreator.education.isNotEmpty,
+              visible: !isGhostPost && postCreator.education.isNotEmpty,
               child: SelectableText.rich(
                 TextSpan(
                   children: [
@@ -101,7 +117,7 @@ class CustomPostHeader extends StatelessWidget {
               ),
             ),
             Visibility(
-              visible: postCreator.work.isNotEmpty,
+              visible: !isGhostPost && postCreator.work.isNotEmpty,
               child: SelectableText.rich(
                 TextSpan(
                   children: [

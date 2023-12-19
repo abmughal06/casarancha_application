@@ -28,6 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final List<Widget> _myTabs = const [
     Tab(text: strSrcPeople),
     Tab(text: strSrcGroup),
+    Tab(text: 'Mental Health'),
     Tab(text: strSrcLocation),
   ];
 
@@ -194,6 +195,112 @@ class _SearchScreenState extends State<SearchScreen> {
                       );
                     },
                   ),
+                  //Mental Health
+                  Consumer2<List<UserModel>?, List<GroupModel>?>(
+                      builder: (context, users, groups, b) {
+                    if (users == null || groups == null) {
+                      return const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      );
+                    }
+
+                    if (searchController.text.isEmpty ||
+                        searchController.text == '') {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 60),
+                          child: TextWidget(
+                            textAlign: TextAlign.center,
+                            text: strAlertSearch,
+                          ),
+                        ),
+                      );
+                    }
+                    var groupsList = groups
+                        .where((element) =>
+                            element.isVerified &&
+                            (element.name.toLowerCase().contains(
+                                searchController.text.toLowerCase())) &&
+                            element.creatorId !=
+                                FirebaseAuth.instance.currentUser!.uid &&
+                            element.isPublic)
+                        .toList();
+
+                    var usersList = users
+                        .where((element) =>
+                            element.isVerified &&
+                            (element.name.toLowerCase().contains(
+                                    searchController.text.toLowerCase()) ||
+                                element.username.toLowerCase().contains(
+                                    searchController.text.toLowerCase())) &&
+                            element.id !=
+                                FirebaseAuth.instance.currentUser!.uid)
+                        .toList();
+
+                    // var filterList = groupsList + usersList;
+
+                    return ListView(
+                      children: [
+                        ListView.builder(
+                          itemCount: groupsList.length,
+                          padding: const EdgeInsets.only(bottom: 0),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            var groupSnap = groupsList[index];
+
+                            var isCurrentUserGroupMember = groupSnap.memberIds
+                                .contains(
+                                    FirebaseAuth.instance.currentUser!.uid);
+                            return GroupTile(
+                              group: groupSnap,
+                              ontapTrailing: () {
+                                if (!isCurrentUserGroupMember) {
+                                  context
+                                      .read<NewGroupProvider>()
+                                      .addGroupMembers(
+                                          id: FirebaseAuth
+                                              .instance.currentUser!.uid,
+                                          groupId: groupSnap.id);
+                                }
+                              },
+                              isSearchScreen: true,
+                              btnText: isCurrentUserGroupMember
+                                  ? strJoined
+                                  : strSrcJoin,
+                            );
+                          },
+                        ),
+                        const Divider(),
+                        ListView.builder(
+                          itemCount: usersList.length,
+                          padding: const EdgeInsets.only(bottom: 100),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            var userSnap = usersList[index];
+                            var currentUser = users
+                                .where((element) =>
+                                    element.id ==
+                                    FirebaseAuth.instance.currentUser!.uid)
+                                .first;
+                            return FollowFollowingTile(
+                              user: userSnap,
+                              ontapToggleFollow: () =>
+                                  profileProvider.toggleFollowBtn(
+                                userModel: currentUser,
+                                appUserId: userSnap.id,
+                              ),
+                              btnName: currentUser.followingsIds
+                                      .contains(userSnap.id)
+                                  ? strUnFollow
+                                  : strSrcFollow,
+                            );
+                          },
+                        )
+                      ],
+                    );
+                  }),
                   /*location*/
                   Container(),
                 ],

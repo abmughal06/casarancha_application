@@ -26,13 +26,15 @@ class PostCard extends StatelessWidget {
       required this.post,
       this.initializedFuturePlay,
       required this.postCreator,
-      this.groupId});
+      this.groupId,
+      this.isGhostPost = false});
 
   final PostModel post;
   final Future<void>? initializedFuturePlay;
   final UserModel postCreator;
 
   final String? groupId;
+  final bool isGhostPost;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,7 @@ class PostCard extends StatelessWidget {
         CustomPostHeader(
           postCreator: postCreator,
           postModel: post,
+          isGhostPost: isGhostPost,
           onVertItemClick: () {
             if (post.creatorId == curruentUser!.id) {
               Get.bottomSheet(
@@ -106,6 +109,7 @@ class PostCard extends StatelessWidget {
           isPostDetail: false,
           groupId: groupId,
         ),
+        // buildPostCards(post.mediaData),
         heightBox(10.h),
         CustomPostFooter(
           groupId: groupId,

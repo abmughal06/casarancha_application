@@ -2,6 +2,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/forum/create_poll_screen.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
@@ -18,11 +19,21 @@ import '../../models/post_model.dart';
 import '../../models/user_model.dart';
 import '../../widgets/primary_appbar.dart';
 
-class ForumsScreen extends StatelessWidget {
+class ForumsScreen extends StatefulWidget {
   const ForumsScreen({super.key});
 
   @override
+  State<ForumsScreen> createState() => _ForumsScreenState();
+}
+
+class _ForumsScreenState extends State<ForumsScreen>
+    with AutomaticKeepAliveClientMixin<ForumsScreen> {
+  @override
   Widget build(BuildContext context) {
+    final ghostProvider = context.watch<DashboardProvider>();
+
+    super.build(context);
+
     return GhostScaffold(
       appBar: primaryAppbar(
         title: strForum,
@@ -69,36 +80,44 @@ class ForumsScreen extends StatelessWidget {
           if (posts == null) {
             return const PostSkeleton();
           }
-          return Column(
+          return ListView(
+            controller: ghostProvider.forumScrollController,
+            key: const PageStorageKey(1),
             children: [
-              Expanded(
-                child: ListView.builder(
-                    itemCount: posts.length,
-                    padding: EdgeInsets.only(bottom: 100.h),
-                    itemBuilder: (context, index) {
-                      var post = posts[index];
-                      if (posts.isEmpty) {
-                        return const AlertText(
-                            text: 'Forums does not have any posts yet');
-                      }
+              ListView.builder(
+                  itemCount: posts.length,
+                  padding: EdgeInsets.only(
+                    bottom: 100.h,
+                    top: 15,
+                  ),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    var post = posts[index];
+                    if (posts.isEmpty) {
+                      return const AlertText(
+                          text: 'Forums does not have any posts yet');
+                    }
 
-                      return StreamProvider.value(
-                        value: DataProvider().getSingleUser(post.creatorId),
-                        initialData: null,
-                        child: Consumer<UserModel?>(
-                            builder: (context, appUser, b) {
-                          if (appUser == null) {
-                            return const PostSkeleton();
-                          }
-                          return PostCard(post: post, postCreator: appUser);
-                        }),
-                      );
-                    }),
-              ),
+                    return StreamProvider.value(
+                      value: DataProvider().getSingleUser(post.creatorId),
+                      initialData: null,
+                      child:
+                          Consumer<UserModel?>(builder: (context, appUser, b) {
+                        if (appUser == null) {
+                          return const PostSkeleton();
+                        }
+                        return PostCard(post: post, postCreator: appUser);
+                      }),
+                    );
+                  }),
             ],
           );
         }),
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

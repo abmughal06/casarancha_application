@@ -1,5 +1,6 @@
 import 'package:casarancha/models/ghost_message_details.dart';
 import 'package:casarancha/models/message_details.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:casarancha/models/user_model.dart';
@@ -34,7 +35,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
           ),
           // elevation: 2,
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 5.w),
+            padding: EdgeInsets.symmetric(vertical: 10.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -46,64 +47,88 @@ class CustomBottomNavigationBar extends StatelessWidget {
                       curve: Curves.easeIn,
                     );
                   },
-                  child: IconButton(
-                    onPressed: () {
-                      provider.changePage(0);
-                    },
-                    icon: SvgPicture.asset(
-                      provider.currentIndex == 0
-                          ? icBottomSelHome
-                          : icBottomDeSelHome,
-                      color: provider.currentIndex == 0 ? null : Colors.white,
-                    ),
+                  onTap: () {
+                    provider.changePage(0);
+                  },
+                  child: SvgPicture.asset(
+                    provider.currentIndex == 0
+                        ? icBottomSelHome
+                        : icBottomDeSelHome,
+                    color: provider.currentIndex == 0 ? null : Colors.white,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
+                InkWell(
+                  onDoubleTap: () {
+                    provider.ghostPostScrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                  onTap: () {
                     provider.changePage(1);
                   },
-                  icon: SvgPicture.asset(
-                    provider.currentIndex == 1
-                        ? icBottomSelSearch
-                        : icBottomDeSelSearch,
-                    color: provider.currentIndex == 1 ? null : Colors.white,
+                  child: Image.asset(
+                    imgGhostUserBg,
+                    color: provider.currentIndex == 1
+                        ? colorPrimaryA05
+                        : Colors.white,
+                    height: 27,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
+                InkWell(
+                  onTap: () {
                     provider.changePage(2);
                   },
-                  icon: SvgPicture.asset(
+                  child: SvgPicture.asset(
                     provider.currentIndex == 2
-                        ? icBottomSelGrp
-                        : icBottomDeSelGrp,
+                        ? icBottomSelSearch
+                        : icBottomDeSelSearch,
                     color: provider.currentIndex == 2 ? null : Colors.white,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
+                InkWell(
+                  onTap: () {
                     provider.changePage(3);
                   },
-                  icon: SvgPicture.asset(
+                  child: SvgPicture.asset(
                     provider.currentIndex == 3
+                        ? icBottomSelGrp
+                        : icBottomDeSelGrp,
+                    color: provider.currentIndex == 3 ? null : Colors.white,
+                  ),
+                ),
+                InkWell(
+                  onDoubleTap: () {
+                    provider.forumScrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                  onTap: () {
+                    provider.changePage(4);
+                  },
+                  child: SvgPicture.asset(
+                    provider.currentIndex == 4
                         ? icForumSelHome
                         : icForumDeSelHome,
-                    color: provider.currentIndex == 3 ? null : Colors.white,
+                    color: provider.currentIndex == 4 ? null : Colors.white,
                     height: 22.h,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    provider.changePage(4);
+                InkWell(
+                  onTap: () {
+                    provider.changePage(5);
                   },
-                  icon: Consumer<List<MessageDetails>?>(
+                  child: Consumer<List<MessageDetails>?>(
                       builder: (context, msg, b) {
                     if (msg == null || ghostMessage == null) {
                       return SvgPicture.asset(
-                        provider.currentIndex == 4
+                        provider.currentIndex == 5
                             ? icBottomSelChat
                             : icBottomDeSelChat,
-                        color: provider.currentIndex == 4 ? null : Colors.white,
+                        color: provider.currentIndex == 5 ? null : Colors.white,
                       );
                     }
                     var filterList = msg
@@ -124,23 +149,24 @@ class CustomBottomNavigationBar extends StatelessWidget {
                       label: Text(count.toString()),
                       isLabelVisible: count > 0,
                       child: SvgPicture.asset(
-                        provider.currentIndex == 4
+                        provider.currentIndex == 5
                             ? icBottomSelChat
                             : icBottomDeSelChat,
-                        color: provider.currentIndex == 4 ? null : Colors.white,
+                        color: provider.currentIndex == 5 ? null : Colors.white,
                       ),
                     );
                   }),
                 ),
-                IconButton(
-                  onPressed: () {
-                    provider.changePage(5);
+                InkWell(
+                  onTap: () {
+                    provider.changePage(6);
                   },
-                  icon: Consumer<UserModel?>(builder: (context, user, b) {
+                  child: Consumer<UserModel?>(builder: (context, user, b) {
                     if (user == null) {
                       return const CircularProgressIndicator.adaptive();
                     }
                     return ProfilePic(
+                      heightAndWidth: 30.h,
                       pic: user.imageStr,
                     );
                   }),

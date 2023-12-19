@@ -107,6 +107,24 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Stream<List<PostModel>?> ghostPosts() {
+    try {
+      return FirebaseFirestore.instance
+          .collection('posts')
+          .orderBy("createdAt", descending: true)
+          .snapshots()
+          .map((event) => event.docs
+              .where((element) =>
+                  element.data().isNotEmpty &&
+                  element.data()['isGhostPost'] == true &&
+                  element.data()['mediaData'].isNotEmpty)
+              .map((e) => PostModel.fromMap(e.data()))
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<PostModel?> singlePost({String? groupId, required String postId}) {
     try {
       final ref = groupId == null

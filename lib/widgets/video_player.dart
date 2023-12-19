@@ -1,3 +1,4 @@
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_input_field.dart';
@@ -22,10 +23,12 @@ class VideoPlayerWidget extends StatefulWidget {
       required this.videoUrl,
       this.postModel,
       this.isPostDetailScreen = false,
-      this.groupId});
+      this.groupId,
+      required this.media});
   final String? videoUrl;
   final PostModel? postModel;
   final bool? isPostDetailScreen;
+  final MediaDetails media;
 
   final String? groupId;
   @override
@@ -68,7 +71,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       ))
         ..initialize().then((value) {
           if (mounted) {
-            setState(() {});
+            setState(() {
+              // print(true);
+            });
           }
         });
 
@@ -107,21 +112,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           videoPlayerController.pause();
         }
       },
-      child: GestureDetector(
-        onTap: () {
-          if (isVideoPlaying) {
+      child: SizedBox(
+        height: MediaQuery.of(context).size.width /
+            double.parse(widget.media.videoAspectRatio!),
+        width: MediaQuery.of(context).size.width,
+        child: GestureDetector(
+          onTap: () {
+            if (isVideoPlaying) {
+              videoPlayerController.pause();
+            } else {
+              videoPlayerController.play();
+            }
+          },
+          onLongPress: () {
             videoPlayerController.pause();
-          } else {
+          },
+          onLongPressEnd: (c) {
             videoPlayerController.play();
-          }
-        },
-        onLongPress: () {
-          videoPlayerController.pause();
-        },
-        onLongPressEnd: (c) {
-          videoPlayerController.play();
-        },
-        child: Center(
+          },
           child: videoPlayerController.value.isInitialized
               ? Stack(
                   children: [

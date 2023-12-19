@@ -27,7 +27,7 @@ AppBar primaryAppbar({
         fontSize: 16.sp,
       ),
     ),
-    elevation: elevation ?? 5,
+    elevation: elevation ?? 0.1,
     automaticallyImplyLeading: showBackButton,
     bottom: bottom,
     actions: actions,

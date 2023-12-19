@@ -25,11 +25,13 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.zb.casarancha</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>https</string>
-				<string>fb5791300140991335</string>
-				<string>com.googleusercontent.apps.423296603409-6uvc04rt06buro6i4488i6ta85n8nnr7</string>
+				<string>com.zb.casarancha</string>
 			</array>
 		</dict>
 	</array>
@@ -41,6 +43,10 @@
 	<string>fdd96669931dd4fcf601f0d0b61d72d8</string>
 	<key>FacebookDisplayName</key>
 	<string>Casarancha</string>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+	<array>
+		<string>https://casarancha.page.link</string>
+	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
@@ -90,10 +96,5 @@
 	<false/>
 	<key>com.apple.security.network.client</key>
 	<true/>
-	<key>FirebaseDynamicLinksCustomDomains</key>
-	<array>
-    	<string>https://casarancha.page.link</string>
-    	<!-- <string>https://custom.domain.io/path2</string> -->
-	</array>
 </dict>
 </plist>

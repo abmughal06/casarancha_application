@@ -12,11 +12,13 @@ class MediaDetails {
   List? storyViews;
   String? pollQuestion;
   List<dynamic>? pollOptions;
+  List<dynamic>? pollVotedUsers;
   MediaDetails(
       {required this.id,
       required this.name,
       required this.type,
       required this.link,
+      this.pollVotedUsers,
       this.imageHeight,
       this.storyViews,
       this.videoViews,
@@ -33,6 +35,7 @@ class MediaDetails {
     List? storyViews,
     String? pollQuestion,
     List<dynamic>? pollOptions,
+    List<dynamic>? pollVotedUsers,
     String? imageHeight,
     String? imageWidth,
     String? videoAspectRatio,
@@ -48,6 +51,7 @@ class MediaDetails {
       pollQuestion: pollQuestion ?? this.pollQuestion,
       imageHeight: imageHeight ?? this.imageHeight,
       imageWidth: imageWidth ?? this.imageWidth,
+      pollVotedUsers: pollVotedUsers ?? this.pollVotedUsers,
       videoAspectRatio: videoAspectRatio ?? this.videoAspectRatio,
       videoViews: videoViews ?? this.videoViews,
     );
@@ -83,6 +87,7 @@ class MediaDetails {
                     'link': link,
                     'pollQuestion': pollQuestion,
                     'pollOptions': pollOptions,
+                    'pollVotedUsers': pollVotedUsers,
                   }
                 : {
                     'id': id,
@@ -100,6 +105,7 @@ class MediaDetails {
       storyViews: map['storyViews'] ?? [],
       type: map['type'] ?? '',
       link: map['link'] ?? '',
+      pollVotedUsers: map['pollVotedUsers'] ?? [],
       pollOptions: map['pollOptions'] ?? [],
       pollQuestion: map['pollQuestion'] ?? '',
       imageHeight: map['imageHeight'] ?? '',
@@ -186,14 +192,14 @@ class MediaDetails {
 
 class PollOptions {
   final String option;
-  final List<dynamic> votes;
+  final int votes;
 
   PollOptions({required this.option, required this.votes});
 
   factory PollOptions.fromMap(Map<String, dynamic> map) {
     return PollOptions(
       option: map['option'] ?? '',
-      votes: map['vote'] ?? [],
+      votes: map['votes'] ?? 0,
     );
   }
 
@@ -206,11 +212,42 @@ class PollOptions {
 
   PollOptions copyWith(
     String? option,
-    List<dynamic>? votes,
+    int? votes,
   ) {
     return PollOptions(
       option: option ?? this.option,
       votes: votes ?? this.votes,
+    );
+  }
+}
+
+class PollVotedUsers {
+  final String id;
+  final String votedOption;
+
+  PollVotedUsers({required this.id, required this.votedOption});
+
+  factory PollVotedUsers.fromMap(Map<String, dynamic> map) {
+    return PollVotedUsers(
+      id: map['id'] ?? '',
+      votedOption: map['votedOption'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'votedOption': votedOption,
+    };
+  }
+
+  PollVotedUsers copyWith(
+    String? id,
+    String? votedOption,
+  ) {
+    return PollVotedUsers(
+      id: id ?? this.id,
+      votedOption: votedOption ?? this.votedOption,
     );
   }
 }

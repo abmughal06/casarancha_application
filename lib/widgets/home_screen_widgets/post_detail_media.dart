@@ -5,6 +5,7 @@ import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/custom_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -52,33 +53,36 @@ class CheckMediaAndShowPost extends StatelessWidget {
           postModel: postModel,
           groupId: groupId,
         );
-        return InkWell(
-          onDoubleTap: ondoubleTap,
-          onLongPress: () {
-            isPostDetail
-                ? showDialog(
-                    context: context,
-                    builder: (context) {
-                      return CustomDownloadDialog(
-                        url: mediaData.link,
-                        path:
-                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
-                      );
-                    })
-                : null;
-          },
-          onTap: isPostDetail
-              ? () => Get.to(() => PostFullScreenView(
-                  post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(
-                    postModel: postModel,
-                    groupId: groupId,
-                  )),
-          child: CachedNetworkImage(
-              progressIndicatorBuilder: (context, url, progress) => Container(
-                    color: colorBlack.withOpacity(0.04),
-                  ),
-              imageUrl: mediaData.link),
+        return SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: InkWell(
+            onDoubleTap: ondoubleTap,
+            onLongPress: () {
+              isPostDetail
+                  ? showDialog(
+                      context: context,
+                      builder: (context) {
+                        return CustomDownloadDialog(
+                          url: mediaData.link,
+                          path:
+                              '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
+                        );
+                      })
+                  : null;
+            },
+            onTap: isPostDetail
+                ? () => Get.to(() => PostFullScreenView(
+                    post: postModel, isPostDetail: isPostDetail))
+                : () => Get.to(() => PostDetailScreen(
+                      postModel: postModel,
+                      groupId: groupId,
+                    )),
+            child: CachedNetworkImage(
+                progressIndicatorBuilder: (context, url, progress) => Container(
+                      color: colorBlack.withOpacity(0.04),
+                    ),
+                imageUrl: mediaData.link),
+          ),
         );
 
       case "Video":
@@ -106,6 +110,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
                   )),
           child: VideoPlayerWidget(
             key: ValueKey(mediaData.link),
+            media: mediaData,
             videoUrl: mediaData.link,
             postModel: postModel,
             isPostDetailScreen: isFullScreen ? false : isPostDetail,
@@ -127,6 +132,8 @@ class CheckMediaAndShowPost extends StatelessWidget {
 
       case 'poll':
         return Container(
+            // height: 200,
+            width: MediaQuery.of(context).size.width,
             padding: isPostDetail
                 ? EdgeInsets.only(
                     top: 100.h, left: 12.h, right: 12.h, bottom: 12.h)
@@ -148,7 +155,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
             padding: EdgeInsets.only(
               left: isPostDetail ? 20 : 15,
               right: isPostDetail ? 20 : 15,
-              top: isPostDetail ? 110 : 10,
+              top: isPostDetail ? 130 : 15,
               bottom: 20,
             ),
             child: SingleChildScrollView(
@@ -182,13 +189,36 @@ double getQouteAspectRatio(String text, bool isPostDetail) {
   }
 }
 
+Widget buildPostCards(
+    {required PostModel post,
+    required bool isPostDetail,
+    String? groupId,
+    required VoidCallback ondoubleTap,
+    required bool isFullScreen}) {
+  return ExpandablePageView.builder(
+    itemCount: post.mediaData.length,
+    itemBuilder: (context, index) {
+      return CheckMediaAndShowPost(
+        groupId: groupId,
+        isPostDetail: isPostDetail,
+        postModel: post,
+        ondoubleTap: ondoubleTap,
+        mediaData: post.mediaData[index],
+        postId: post.id,
+        isFullScreen: isFullScreen,
+      );
+    },
+  );
+}
+
 class PostMediaWidget extends StatelessWidget {
-  const PostMediaWidget(
-      {super.key,
-      required this.post,
-      required this.isPostDetail,
-      this.isFullScreen = false,
-      required this.groupId});
+  const PostMediaWidget({
+    super.key,
+    required this.post,
+    required this.isPostDetail,
+    this.isFullScreen = false,
+    required this.groupId,
+  });
 
   final PostModel post;
   final bool isPostDetail;
@@ -198,94 +228,65 @@ class PostMediaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    var e = post.mediaData.first;
-    return AspectRatio(
-      aspectRatio: post.mediaData.first.type == 'Qoute'
-          ? getQouteAspectRatio(post.mediaData.first.link, isPostDetail)
-          : post.mediaData.first.type == 'Music'
-              ? 13 / 9
-              : post.mediaData.first.type == 'Photo'
-                  ? double.parse(post.mediaData.first.imageWidth!) /
-                      double.parse(post.mediaData.first.imageHeight!)
-                  : post.mediaData.first.type == 'poll'
-                      ? post.mediaData.first.pollOptions!.length < 3
-                          ? 2 / 1
-                          : post.mediaData.first.pollOptions!.length < 4
-                              ? 1.5 / 1
-                              : 1 / 1
-                      : double.parse(post.mediaData.first.videoAspectRatio!),
-      child: PageView(
-        children: post.mediaData
-            .map(
-              (v) => AspectRatio(
-                aspectRatio: e.type == 'Qoute'
-                    ? getQouteAspectRatio(e.link, isPostDetail)
-                    : e.type == 'Music'
-                        ? 13 / 9
-                        : e.type == 'Photo'
-                            ? double.parse(e.imageWidth!) /
-                                double.parse(e.imageHeight!)
-                            : e.type == 'poll'
-                                ? 1 / 1
-                                : double.parse(e.videoAspectRatio!),
-                child: Stack(
-                  children: [
-                    CheckMediaAndShowPost(
-                      groupId: groupId,
-                      isPostDetail: isPostDetail,
-                      postModel: post,
-                      ondoubleTap: () =>
-                          prov.toggleLikeDislike(postModel: post),
-                      mediaData: e,
-                      postId: post.id,
-                      isFullScreen: isFullScreen,
-                    ),
-                    Visibility(
-                      visible: post.mediaData.length > 1,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: post.mediaData
-                                .map(
-                                  (i) => Container(
-                                    height: 8.h,
-                                    width: 8.h,
-                                    margin: EdgeInsets.all(3.w),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: i.id != e.id
-                                          ? colorDD9.withOpacity(0.3)
-                                          : colorFF7,
-                                    ),
-                                  ),
-                                )
-                                .toList(),
+    return ExpandablePageView.builder(
+      itemCount: post.mediaData.length,
+      itemBuilder: (context, index) {
+        return Stack(
+          children: [
+            CheckMediaAndShowPost(
+              groupId: groupId,
+              isPostDetail: isPostDetail,
+              postModel: post,
+              ondoubleTap: () =>
+                  prov.toggleLikeDislike(postModel: post, groupId: groupId),
+              mediaData: post.mediaData[index],
+              postId: post.id,
+              isFullScreen: isFullScreen,
+            ),
+            Visibility(
+              visible: post.mediaData.length > 1,
+              child: Positioned(
+                width: MediaQuery.of(context).size.width,
+                bottom: 12,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: post.mediaData
+                      .map(
+                        (i) => Container(
+                          height: 8.h,
+                          width: 8.h,
+                          margin: EdgeInsets.all(3.w),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: i.id != post.mediaData[index].id
+                                ? colorDD9.withOpacity(0.3)
+                                : colorFF7,
                           ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                      .toList(),
                 ),
               ),
-            )
-            .toList(),
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
 class PostFullScreenView extends StatelessWidget {
-  const PostFullScreenView(
-      {super.key,
-      required this.post,
-      required this.isPostDetail,
-      this.groupId});
+  const PostFullScreenView({
+    super.key,
+    required this.post,
+    required this.isPostDetail,
+    this.groupId,
+  });
   final PostModel post;
   final bool isPostDetail;
   final String? groupId;
+  // final MediaDetails media;
 
   @override
   Widget build(BuildContext context) {

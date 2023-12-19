@@ -1,6 +1,5 @@
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
-import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/profile_pic.dart';
@@ -21,63 +20,71 @@ import '../../search/search_screen.dart';
 class NewPostShareScreen extends StatefulWidget {
   const NewPostShareScreen({
     super.key,
-    required this.createPostController,
     this.groupId,
     required this.isPoll,
     required this.isForum,
+    this.isGhostPost = false,
   });
 
   final String? groupId;
   final bool isPoll;
   final bool isForum;
-
-  final CreatePostMethods createPostController;
+  final bool isGhostPost;
 
   @override
   State<NewPostShareScreen> createState() => _NewPostShareScreenState();
 }
 
 class _NewPostShareScreenState extends State<NewPostShareScreen> {
+  late CreatePostMethods createPostMethods;
+
+  @override
+  void dispose() {
+    createPostMethods.selectedUsers.clear();
+    createPostMethods.locationController.clear();
+    createPostMethods.showPostTime = false;
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();
     final allUsers = context.watch<List<UserModel>>();
+    createPostMethods = Provider.of<CreatePostMethods>(context);
 
     return Scaffold(
       appBar: primaryAppbar(
         title: strNewPost,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Consumer<CreatePostMethods>(
-        builder: (context, state, b) {
-          return CommonButton(
-              showLoading: state.isSharingPost,
+      floatingActionButton: user == null
+          ? Container()
+          : CommonButton(
+              showLoading: createPostMethods.isSharingPost,
               text: strSharePost,
               height: 58.w,
               verticalOutMargin: 10.w,
               horizontalOutMargin: 10.w,
               onTap: () {
-                List<String> userIds = widget.createPostController.selectedUsers
+                List<String> userIds = createPostMethods.selectedUsers
                     .map((user) => user.id)
                     .toList();
 
-                // printLog(userIds.toString());
-                user == null
-                    ? GlobalSnackBar.show(message: strAlertSharePost)
-                    : widget.isPoll
-                        ? state.sharePollPost(
-                            user: user,
-                          )
-                        : state.sharePost(
-                            groupId: widget.groupId,
-                            user: user,
-                            isForum: widget.isForum,
-                            tagIds: userIds,
-                            allUsers: allUsers);
-                widget.createPostController.selectedUsers = [];
-              });
-        },
-      ),
+                widget.isPoll
+                    ? createPostMethods.sharePollPost(
+                        user: user,
+                      )
+                    : createPostMethods.sharePost(
+                        groupId: widget.groupId,
+                        user: user,
+                        isGhostPost: widget.isGhostPost,
+                        isForum: widget.isForum,
+                        tagIds: userIds,
+                        allUsers: allUsers,
+                      );
+                createPostMethods.selectedUsers.clear();
+              },
+            ),
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 20.w,
@@ -89,7 +96,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 TextEditingWidget(
-                  controller: widget.createPostController.captionController,
+                  controller: createPostMethods.captionController,
                   hintColor: color887,
                   hint: strWriteCaption,
                   color: colorFF4,
@@ -159,8 +166,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                                       widthBox(12.w),
                                       GestureDetector(
                                         onTap: () {
-                                          widget.createPostController
-                                              .updateTagList(e);
+                                          createPostMethods.updateTagList(e);
                                         },
                                         child: const Icon(
                                           Icons.close,
@@ -177,7 +183,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                 ),
                 heightBox(10.w),
                 TextEditingWidget(
-                  controller: widget.createPostController.locationController,
+                  controller: createPostMethods.locationController,
                   hintColor: color887,
                   hint: strLocation,
                   prefixIcon: Padding(

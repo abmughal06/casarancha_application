@@ -133,13 +133,6 @@ class ChatProvider extends ChangeNotifier {
       messageRefForCurrentUser.set(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
 
-      // userRef
-      //     .doc(appUser.id)
-      //     .collection('messageList')
-      //     .doc(currentUser.id)
-      //     .update(
-      //       currentUserMessageDetails.toMap(),
-      //     );
       unreadMessages += 1;
       var recieverRef = await FirebaseFirestore.instance
           .collection("users")
@@ -828,9 +821,13 @@ class ChatProvider extends ChangeNotifier {
     final List<File> mediaFilesHelper = [];
     try {
       final result = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'doc', 'docx'],
+        // allowMultiple: true,
+        type: FileType.any,
+        // allowedExtensions: [
+        //   'pdf',
+        //   'doc',
+        //   'docx',
+        // ],
       );
       for (var element in result!.files) {
         log('========>>>>>');

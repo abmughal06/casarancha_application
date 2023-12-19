@@ -28,9 +28,14 @@ import '../../../widgets/text_widget.dart';
 import 'new_post_share.dart';
 
 class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key, this.groupId, required this.isForum});
+  const CreatePostScreen(
+      {super.key,
+      this.groupId,
+      this.isForum = false,
+      this.isGhostPost = false});
   final String? groupId;
   final bool isForum;
+  final bool isGhostPost;
 
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
@@ -83,7 +88,11 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       child: Scaffold(
         appBar: primaryAppbar(
           elevation: 1,
-          title: 'Create Post',
+          title: widget.isGhostPost
+              ? 'Create Ghost Post'
+              : widget.isForum
+                  ? 'Create Forum Post'
+                  : 'Create Post',
           bottom: primaryTabBar(
             tabs: _createPostTabs,
           ),
@@ -119,40 +128,136 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
                   //Photo Tab
 
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.w,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        PrimaryTextButton(
-                          onPressed: createPost.getPhoto,
-                          title: strAddPhotos,
-                          icon: SvgPicture.asset(
-                            icAddPostRed,
+                  widget.isGhostPost
+                      ? const Center(
+                          child: TextWidget(
+                            text: 'You cannot share pictures in ghost posts',
+                          ),
+                        )
+                      : Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.w,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              PrimaryTextButton(
+                                onPressed: createPost.getPhoto,
+                                title: strAddPhotos,
+                                icon: SvgPicture.asset(
+                                  icAddPostRed,
+                                ),
+                              ),
+                              heightBox(10.w),
+                              Expanded(
+                                child: Consumer<CreatePostMethods>(
+                                  builder: (context, state, b) {
+                                    return ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      padding: EdgeInsets.only(bottom: 100.w),
+                                      itemCount: createPost.photosList.length,
+                                      itemBuilder: (context, index) {
+                                        final photoFile =
+                                            state.photosList[index];
+                                        return Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: 10.w,
+                                            ),
+                                            child: AspectRatio(
+                                              aspectRatio: 2 / 3,
+                                              child: Center(
+                                                child: Card(
+                                                  elevation: 5,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(
+                                                        10.r,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  child: Stack(
+                                                    children: [
+                                                      ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(
+                                                            10.r,
+                                                          ),
+                                                        ),
+                                                        child: Image.file(
+                                                          photoFile,
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      ),
+                                                      Positioned(
+                                                        top: 2,
+                                                        left: 2,
+                                                        child: IconButton(
+                                                          onPressed: () {
+                                                            state
+                                                                .removePhotoFile(
+                                                                    photoFile);
+                                                          },
+                                                          icon:
+                                                              SvgPicture.asset(
+                                                            icRemovePost,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ));
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        heightBox(10.w),
-                        Expanded(
-                          child: Consumer<CreatePostMethods>(
-                            builder: (context, state, b) {
-                              return ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                padding: EdgeInsets.only(bottom: 100.w),
-                                itemCount: createPost.photosList.length,
-                                itemBuilder: (context, index) {
-                                  final photoFile = state.photosList[index];
-                                  return Padding(
-                                      padding: EdgeInsets.only(
-                                        bottom: 10.w,
-                                      ),
-                                      child: AspectRatio(
-                                        aspectRatio: 2 / 3,
-                                        child: Center(
+
+                  //Video Tab
+                  widget.isGhostPost
+                      ? const Center(
+                          child: TextWidget(
+                            text: 'You cannot share Videos in ghost posts',
+                          ),
+                        )
+                      : Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.w,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              PrimaryTextButton(
+                                onPressed: createPost.getVideo,
+                                title: strAddVideos,
+                                icon: SvgPicture.asset(
+                                  icAddPostRed,
+                                ),
+                              ),
+                              heightBox(10.w),
+                              Expanded(
+                                child: Consumer<CreatePostMethods>(
+                                    builder: (context, state, b) {
+                                  return ListView.builder(
+                                    itemCount: state.videosList.length,
+                                    itemBuilder: (context, index) {
+                                      final videoFile = state.videosList[index];
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom: 10.w,
+                                        ),
+                                        child: AspectRatio(
+                                          aspectRatio: 2 / 3,
                                           child: Card(
-                                            elevation: 5,
+                                            elevation: 1,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(
@@ -161,6 +266,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                               ),
                                             ),
                                             child: Stack(
+                                              fit: StackFit.expand,
                                               children: [
                                                 ClipRRect(
                                                   borderRadius:
@@ -169,18 +275,16 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                                       10.r,
                                                     ),
                                                   ),
-                                                  child: Image.file(
-                                                    photoFile,
-                                                    fit: BoxFit.contain,
+                                                  child: VideoPlayerWithFile(
+                                                    videoFile: videoFile,
                                                   ),
                                                 ),
-                                                Positioned(
-                                                  top: 2,
-                                                  left: 2,
+                                                Align(
+                                                  alignment: Alignment.topRight,
                                                   child: IconButton(
                                                     onPressed: () {
-                                                      state.removePhotoFile(
-                                                          photoFile);
+                                                      state.removeVideoFile(
+                                                          videoFile);
                                                     },
                                                     icon: SvgPicture.asset(
                                                       icRemovePost,
@@ -191,137 +295,65 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                                             ),
                                           ),
                                         ),
-                                      ));
-                                },
-                              );
-                            },
+                                      );
+                                    },
+                                  );
+                                }),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-
-                  //Video Tab
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.w,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        PrimaryTextButton(
-                          onPressed: createPost.getVideo,
-                          title: strAddVideos,
-                          icon: SvgPicture.asset(
-                            icAddPostRed,
-                          ),
-                        ),
-                        heightBox(10.w),
-                        Expanded(
-                          child: Consumer<CreatePostMethods>(
-                              builder: (context, state, b) {
-                            return ListView.builder(
-                              itemCount: state.videosList.length,
-                              itemBuilder: (context, index) {
-                                final videoFile = state.videosList[index];
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: 10.w,
-                                  ),
-                                  child: AspectRatio(
-                                    aspectRatio: 2 / 3,
-                                    child: Card(
-                                      elevation: 1,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(
-                                            10.r,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(
-                                                10.r,
-                                              ),
-                                            ),
-                                            child: VideoPlayerWithFile(
-                                              videoFile: videoFile,
-                                            ),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.topRight,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                state
-                                                    .removeVideoFile(videoFile);
-                                              },
-                                              icon: SvgPicture.asset(
-                                                icRemovePost,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
 
                   // Music Tab
 
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.w,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        PrimaryTextButton(
-                          onPressed: createPost.getMusic,
-                          title: strAddMusic,
-                          icon: SvgPicture.asset(
-                            icAddPostRed,
+                  widget.isGhostPost
+                      ? const Center(
+                          child: TextWidget(
+                            text: 'You cannot share Musics in ghost posts',
+                          ),
+                        )
+                      : Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.w,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              PrimaryTextButton(
+                                onPressed: createPost.getMusic,
+                                title: strAddMusic,
+                                icon: SvgPicture.asset(
+                                  icAddPostRed,
+                                ),
+                              ),
+                              heightBox(10.w),
+                              Expanded(
+                                child: Consumer<CreatePostMethods>(
+                                    builder: (context, state, b) {
+                                  return ListView.builder(
+                                    itemCount: state.musicList.length,
+                                    itemBuilder: (context, index) {
+                                      final music = state.musicList[index];
+                                      log(music.path);
+                                      return Card(
+                                        elevation: 5,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10.r,
+                                          ),
+                                        ),
+                                        child: MusicPlayerWithFile(
+                                          musicFile: music,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }),
+                              ),
+                            ],
                           ),
                         ),
-                        heightBox(10.w),
-                        Expanded(
-                          child: Consumer<CreatePostMethods>(
-                              builder: (context, state, b) {
-                            return ListView.builder(
-                              itemCount: state.musicList.length,
-                              itemBuilder: (context, index) {
-                                final music = state.musicList[index];
-                                log(music.path);
-                                return Card(
-                                  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      10.r,
-                                    ),
-                                  ),
-                                  child: MusicPlayerWithFile(
-                                    musicFile: music,
-                                  ),
-                                );
-                              },
-                            );
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -335,7 +367,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   () => NewPostShareScreen(
                     isPoll: false,
                     isForum: widget.isForum,
-                    createPostController: createPost,
+                    isGhostPost: widget.isGhostPost,
+                    // createPostController: createPost,
                     groupId: widget.groupId,
                   ),
                 );

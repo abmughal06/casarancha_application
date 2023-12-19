@@ -101,22 +101,21 @@ class _HomeScreenState extends State<HomeScreen>
         key: const PageStorageKey(0),
         children: [
           //story section
-          SizedBox(
-            height: 77.h,
-            child: Consumer<List<Story>?>(
-              builder: (context, provider, b) {
-                if (provider == null || currentUser == null) {
-                  return const StorySkeleton();
-                } else {
-                  var filterList = provider
-                      .where((element) =>
-                          currentUser.followersIds.contains(element.id) ||
-                          currentUser.followingsIds.contains(element.id))
-                      .toList();
-                  return Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
-                    child: Row(
+          Padding(
+            padding: EdgeInsets.all(10.h),
+            child: SizedBox(
+              height: 50.h,
+              child: Consumer<List<Story>?>(
+                builder: (context, provider, b) {
+                  if (provider == null || currentUser == null) {
+                    return const StorySkeleton();
+                  } else {
+                    var filterList = provider
+                        .where((element) =>
+                            currentUser.followersIds.contains(element.id) ||
+                            currentUser.followingsIds.contains(element.id))
+                        .toList();
+                    return Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         provider
@@ -172,10 +171,10 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ],
-                    ),
-                  );
-                }
-              },
+                    );
+                  }
+                },
+              ),
             ),
           ),
           //post section
@@ -195,11 +194,13 @@ class _HomeScreenState extends State<HomeScreen>
                         currentUser.followingsIds.contains(element.creatorId) ||
                         element.creatorId == currentUser.id &&
                             element.mediaData.isNotEmpty &&
-                            element.isForumPost == false))
+                            element.isForumPost == false &&
+                            element.isGhostPost == false))
                     : posts
                         .where((element) =>
                             element.mediaData.isNotEmpty &&
-                            element.isForumPost == false)
+                            element.isForumPost == false &&
+                            element.isGhostPost == false)
                         .toList();
                 List<PostModel> filterList = [];
                 List<UserModel> postCreator = [];

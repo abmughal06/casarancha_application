@@ -290,6 +290,8 @@ class FirebaseMessagingService {
               isVerified: appUserData.isVerified)));
     } else if (strNot == "user_follow") {
       navigateToAppUserScreen(notificationData['userRequestId'], context);
+    } else if (strNot == 'dynamicLink') {
+      navigateToAppUserScreen(notificationData['userRequestId'], context);
     } else {
       final post = PostModel.fromMap(jsonDecode(notificationData['content']));
 
