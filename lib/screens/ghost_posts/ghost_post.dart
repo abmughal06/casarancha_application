@@ -25,6 +25,8 @@ class _GhostPostsState extends State<GhostPosts>
   @override
   Widget build(BuildContext context) {
     final dashboardProvider = Provider.of<DashboardProvider>(context);
+    final users = context.watch<List<UserModel>?>();
+
     super.build(context);
     return GhostScaffold(
       appBar: primaryAppbar(title: 'Ghost Posts'),
@@ -35,7 +37,7 @@ class _GhostPostsState extends State<GhostPosts>
             initialData: null,
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, child) {
-                if (posts == null) {
+                if (posts == null || users == null) {
                   return const PostSkeleton();
                 }
                 return ListView(
@@ -44,24 +46,16 @@ class _GhostPostsState extends State<GhostPosts>
                     ListView.builder(
                       itemCount: posts.length,
                       shrinkWrap: true,
+                      padding: const EdgeInsets.only(top: 10, bottom: 100),
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (co, index) {
-                        return StreamProvider.value(
-                          value: DataProvider()
-                              .getSingleUser(posts[index].creatorId),
-                          initialData: null,
-                          child: Consumer<UserModel?>(
-                            builder: (context, user, b) {
-                              if (user == null) {
-                                return const PostSkeleton();
-                              }
-                              return PostCard(
-                                isGhostPost: posts[index].isGhostPost,
-                                post: posts[index],
-                                postCreator: user,
-                              );
-                            },
-                          ),
+                        return PostCard(
+                          isGhostPost: posts[index].isGhostPost,
+                          post: posts[index],
+                          postCreator: users
+                              .where((element) =>
+                                  element.id == posts[index].creatorId)
+                              .first,
                         );
                       },
                     ),

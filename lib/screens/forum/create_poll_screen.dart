@@ -152,8 +152,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
           if (options.length >= 2) {
             prov.question = questionController.text.trim();
             prov.options = options;
-            Get.to(() => NewPostShareScreen(
-                  // createPostController: prov,
+            Get.to(() => const NewPostShareScreen(
                   isPoll: true,
                   isForum: true,
                 ));

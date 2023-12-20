@@ -161,15 +161,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   onTap: () {
                     provider.changePage(6);
                   },
-                  child: Consumer<UserModel?>(builder: (context, user, b) {
-                    if (user == null) {
-                      return const CircularProgressIndicator.adaptive();
-                    }
-                    return ProfilePic(
-                      heightAndWidth: 30.h,
-                      pic: user.imageStr,
-                    );
-                  }),
+                  child: Consumer<UserModel?>(
+                    builder: (context, user, b) {
+                      if (user == null) {
+                        return const CircularProgressIndicator.adaptive();
+                      }
+                      return ProfilePic(
+                        heightAndWidth: 30.h,
+                        pic: user.imageStr,
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

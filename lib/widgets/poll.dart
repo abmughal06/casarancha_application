@@ -2,8 +2,10 @@ import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/utils/app_constants.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polls/flutter_polls.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class Poll extends StatefulWidget {
@@ -45,7 +47,10 @@ class _PollState extends State<Poll> {
           pollVotedUsers == null ? "" : pollVotedUsers.votedOption,
       pollTitle: Align(
         alignment: Alignment.centerLeft,
-        child: Text(widget.postModel.mediaData.first.pollQuestion.toString()),
+        child: TextWidget(
+          text: widget.postModel.mediaData.first.pollQuestion.toString(),
+          fontWeight: FontWeight.w600,
+        ),
       ),
       pollOptions: widget.postModel.mediaData.first.pollOptions!
           .map(
@@ -54,8 +59,10 @@ class _PollState extends State<Poll> {
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 15),
-                  child: Text(
-                    e['option'],
+                  child: TextWidget(
+                    text: e['option'],
+                    fontWeight: FontWeight.w400,
+                    fontSize: 13.sp,
                   ),
                 ),
               ),
@@ -161,18 +168,18 @@ class _PollState extends State<Poll> {
   }
 }
 
-int findLargestValue(List<int> numbers) {
-  if (numbers.isEmpty) {
-    throw ArgumentError("The list cannot be empty");
-  }
+// int findLargestValue(List<int> numbers) {
+//   if (numbers.isEmpty) {
+//     throw ArgumentError("The list cannot be empty");
+//   }
 
-  int largestValue = numbers[0];
+//   int largestValue = numbers[0];
 
-  for (int i = 1; i < numbers.length; i++) {
-    if (numbers[i] > largestValue) {
-      largestValue = numbers[i];
-    }
-  }
+//   for (int i = 1; i < numbers.length; i++) {
+//     if (numbers[i] > largestValue) {
+//       largestValue = numbers[i];
+//     }
+//   }
 
-  return largestValue;
-}
+//   return largestValue;
+// }

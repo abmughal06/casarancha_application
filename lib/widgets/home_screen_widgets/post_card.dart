@@ -49,54 +49,56 @@ class PostCard extends StatelessWidget {
           postModel: post,
           isGhostPost: isGhostPost,
           onVertItemClick: () {
-            if (post.creatorId == curruentUser!.id) {
-              Get.bottomSheet(
-                Container(
-                  decoration: const BoxDecoration(color: Colors.red),
-                  height: 80,
-                  child: InkWell(
-                    onTap: () => postPorvider.deletePost(
-                        postModel: post, groupId: groupId),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        TextWidget(
-                          text: "Delete Post",
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        )
-                      ],
+            if (curruentUser != null) {
+              if (post.creatorId == curruentUser.id) {
+                Get.bottomSheet(
+                  Container(
+                    decoration: const BoxDecoration(color: Colors.red),
+                    height: 80,
+                    child: InkWell(
+                      onTap: () => postPorvider.deletePost(
+                          postModel: post, groupId: groupId),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          TextWidget(
+                            text: "Delete Post",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                isScrollControlled: true,
-              );
-            } else {
-              Get.bottomSheet(
-                BottomSheetWidget(
-                  blockText: curruentUser.blockIds.contains(post.creatorId)
-                      ? 'Unblock User'
-                      : 'Block User',
-                  ontapBlock: () {
-                    Get.back();
-                    postPorvider.blockUnblockUser(
-                        currentUser: curruentUser, appUser: post.creatorId);
-                  },
-                  onTapDownload: () async {
-                    Get.back();
-                    showDialog(
-                        context: context,
-                        builder: (c) => CustomDownloadDialog(
-                              path:
-                                  '${post.mediaData.first.type}${Random().nextInt(2)}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}',
-                              url: post.mediaData.first.link,
-                            ));
-                  },
-                ),
-                isScrollControlled: true,
-              );
+                  isScrollControlled: true,
+                );
+              } else {
+                Get.bottomSheet(
+                  BottomSheetWidget(
+                    blockText: curruentUser.blockIds.contains(post.creatorId)
+                        ? 'Unblock User'
+                        : 'Block User',
+                    ontapBlock: () {
+                      Get.back();
+                      postPorvider.blockUnblockUser(
+                          currentUser: curruentUser, appUser: post.creatorId);
+                    },
+                    onTapDownload: () async {
+                      Get.back();
+                      showDialog(
+                          context: context,
+                          builder: (c) => CustomDownloadDialog(
+                                path:
+                                    '${post.mediaData.first.type}${Random().nextInt(2)}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}',
+                                url: post.mediaData.first.link,
+                              ));
+                    },
+                  ),
+                  isScrollControlled: true,
+                );
+              }
             }
           },
           ontap: () {},

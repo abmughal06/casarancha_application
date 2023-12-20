@@ -11,7 +11,6 @@ import 'package:casarancha/widgets/shared/skeleton.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +30,7 @@ class _ForumsScreenState extends State<ForumsScreen>
   @override
   Widget build(BuildContext context) {
     final ghostProvider = context.watch<DashboardProvider>();
+    final users = context.watch<List<UserModel>?>();
 
     super.build(context);
 
@@ -77,7 +77,7 @@ class _ForumsScreenState extends State<ForumsScreen>
         value: DataProvider().forums(),
         initialData: null,
         child: Consumer<List<PostModel>?>(builder: (context, posts, b) {
-          if (posts == null) {
+          if (posts == null || users == null) {
             return const PostSkeleton();
           }
           return ListView(
@@ -85,32 +85,25 @@ class _ForumsScreenState extends State<ForumsScreen>
             key: const PageStorageKey(1),
             children: [
               ListView.builder(
-                  itemCount: posts.length,
-                  padding: EdgeInsets.only(
-                    bottom: 100.h,
-                    top: 15,
-                  ),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    var post = posts[index];
-                    if (posts.isEmpty) {
-                      return const AlertText(
-                          text: 'Forums does not have any posts yet');
-                    }
+                itemCount: posts.length,
+                padding: const EdgeInsets.only(top: 10, bottom: 100),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  if (posts.isEmpty) {
+                    return const AlertText(
+                        text: 'Forums does not have any posts yet');
+                  }
+                  var post = posts[index];
+                  var appUser = users
+                      .where(
+                        (element) => element.id == post.creatorId,
+                      )
+                      .first;
 
-                    return StreamProvider.value(
-                      value: DataProvider().getSingleUser(post.creatorId),
-                      initialData: null,
-                      child:
-                          Consumer<UserModel?>(builder: (context, appUser, b) {
-                        if (appUser == null) {
-                          return const PostSkeleton();
-                        }
-                        return PostCard(post: post, postCreator: appUser);
-                      }),
-                    );
-                  }),
+                  return PostCard(post: post, postCreator: appUser);
+                },
+              ),
             ],
           );
         }),

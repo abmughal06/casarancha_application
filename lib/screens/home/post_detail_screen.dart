@@ -33,122 +33,120 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     // final postProvider = Provider.of<PostProvider>(context);
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(15),
-            bottomRight: Radius.circular(15),
-          ),
-        ),
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  StreamProvider.value(
-                    value: DataProvider().singlePost(
-                        postId: widget.postModel.id, groupId: widget.groupId),
-                    initialData: null,
-                    catchError: (context, error) => null,
-                    child: Consumer<PostModel?>(
-                      builder: (context, post, b) {
-                        if (post == null) {
-                          return shimmerImg(
-                            height: 9 / 16,
-                            width: double.infinity,
-                            borderRadius: 12,
-                          );
-                        } else {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Stack(
+      body: widget.postModel.mediaData.isEmpty &&
+              widget.postModel.commentIds.isEmpty
+          ? const Center(
+              child: Text('Post deleted'),
+            )
+          : Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      StreamProvider.value(
+                        value: DataProvider().singlePost(
+                            postId: widget.postModel.id,
+                            groupId: widget.groupId),
+                        initialData: null,
+                        catchError: (context, error) => null,
+                        child: Consumer<PostModel?>(
+                          builder: (context, post, b) {
+                            if (post == null) {
+                              return shimmerImg(
+                                height: 9 / 16,
+                                width: double.infinity,
+                                borderRadius: 12,
+                              );
+                            } else {
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  PostMediaWidget(
-                                    groupId: widget.groupId,
-                                    post: post,
-                                    isPostDetail: true,
-                                  ),
-                                  Positioned(
-                                    top: 60,
-                                    left: 20,
-                                    child: CircleAvatar(
-                                      backgroundColor: Colors.grey.shade50,
-                                      child: InkWell(
-                                        child: SvgPicture.asset(
-                                          icIosBackArrow,
-                                          color: Colors.black,
-                                        ),
-                                        onTap: () => Get.back(),
+                                  Stack(
+                                    children: [
+                                      PostMediaWidget(
+                                        groupId: widget.groupId,
+                                        post: post,
+                                        isPostDetail: true,
                                       ),
-                                    ),
+                                      Positioned(
+                                        top: 60,
+                                        left: 20,
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.grey.shade50,
+                                          child: InkWell(
+                                            child: SvgPicture.asset(
+                                              icIosBackArrow,
+                                              color: Colors.black,
+                                            ),
+                                            onTap: () => Get.back(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  PostCreatorProfileTile(
+                                    post: post,
+                                    groupId: widget.groupId,
                                   ),
                                 ],
-                              ),
-                              const SizedBox(height: 12),
-                              PostCreatorProfileTile(
-                                post: post,
-                                groupId: widget.groupId,
-                              ),
-                            ],
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  StreamProvider.value(
-                    value: DataProvider().comment(
-                        cmntId: widget.postModel.id, groupId: widget.groupId),
-                    initialData: null,
-                    catchError: (context, error) => null,
-                    child: Consumer<List<Comment>?>(
-                      builder: (context, comment, b) {
-                        if (comment == null || users == null) {
-                          return shimmerImg(
-                            height: 100,
-                            width: double.infinity,
-                            borderRadius: 12,
-                          );
-                        }
-
-                        return ListView.builder(
-                          itemCount: comment.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 24),
-                          itemBuilder: (context, index) {
-                            var data = comment[index];
-                            var cmnt = data;
-                            if (cmnt.creatorDetails.name.isNotEmpty) {
-                              return cmnt.message.isEmpty
-                                  ? Container()
-                                  : PostCommentTile(
-                                      cmnt: cmnt,
-                                      postModel: widget.postModel,
-                                      isFeedTile: false,
-                                      groupId: widget.groupId,
-                                    );
-                            } else {
-                              return Container();
+                              );
                             }
                           },
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                      StreamProvider.value(
+                        value: DataProvider().comment(
+                            cmntId: widget.postModel.id,
+                            groupId: widget.groupId),
+                        initialData: null,
+                        catchError: (context, error) => null,
+                        child: Consumer<List<Comment>?>(
+                          builder: (context, comment, b) {
+                            if (comment == null || users == null) {
+                              return shimmerImg(
+                                height: 100,
+                                width: double.infinity,
+                                borderRadius: 12,
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: comment.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 24),
+                              itemBuilder: (context, index) {
+                                var data = comment[index];
+                                var cmnt = data;
+                                if (cmnt.creatorDetails.name.isNotEmpty) {
+                                  return cmnt.message.isEmpty
+                                      ? Container()
+                                      : PostCommentTile(
+                                          cmnt: cmnt,
+                                          postModel: widget.postModel,
+                                          isFeedTile: false,
+                                          groupId: widget.groupId,
+                                        );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      heightBox(70.h),
+                    ],
                   ),
-                  heightBox(70.h),
-                ],
-              ),
+                ),
+                PostCommentField(
+                  postModel: widget.postModel,
+                  groupId: widget.groupId,
+                )
+              ],
             ),
-            PostCommentField(
-              postModel: widget.postModel,
-              groupId: widget.groupId,
-            )
-          ],
-        ),
-      ),
     );
   }
 }

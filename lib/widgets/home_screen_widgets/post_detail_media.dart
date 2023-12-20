@@ -228,6 +228,15 @@ class PostMediaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
+    if (post.mediaData.isEmpty) {
+      return const SizedBox(
+        width: double.infinity,
+        height: 500,
+        child: Center(
+          child: Text('Post is deleted'),
+        ),
+      );
+    }
     return ExpandablePageView.builder(
       itemCount: post.mediaData.length,
       itemBuilder: (context, index) {

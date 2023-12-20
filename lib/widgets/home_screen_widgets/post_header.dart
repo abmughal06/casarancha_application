@@ -64,7 +64,10 @@ class CustomPostHeader extends StatelessWidget {
         title: Row(
           children: [
             TextWidget(
-              onTap: headerOnTap,
+              onTap: isGhostPost
+                  ? () => GlobalSnackBar.show(
+                      message: "You can't visit a ghost profile")
+                  : headerOnTap,
               text: isGhostPost ? postCreator.ghostName : postCreator.username,
               fontSize: 14.sp,
               fontWeight: FontWeight.w500,
