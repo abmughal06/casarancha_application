@@ -114,7 +114,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       },
       child: SizedBox(
         height: MediaQuery.of(context).size.width /
-            double.parse(widget.media.videoAspectRatio!),
+            videoPlayerController.value.aspectRatio,
         width: MediaQuery.of(context).size.width,
         child: GestureDetector(
           onTap: () {

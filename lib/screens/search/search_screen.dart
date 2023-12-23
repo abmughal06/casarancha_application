@@ -6,7 +6,6 @@ import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/widgets/group_widgets/group_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
-import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -89,14 +88,46 @@ class _SearchScreenState extends State<SearchScreen> {
 
                       if (searchController.text.isEmpty ||
                           searchController.text == '') {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 60),
-                            child: TextWidget(
-                              textAlign: TextAlign.center,
-                              text: strAlertSearch,
-                            ),
-                          ),
+                        // return const Center(
+                        //   child: Padding(
+                        //     padding: EdgeInsets.symmetric(horizontal: 60),
+                        //     child: TextWidget(
+                        //       textAlign: TextAlign.center,
+                        //       text: strAlertSearch,
+                        //     ),
+                        //   ),
+                        // );
+                        var filterList = users
+                            .where(
+                              (element) =>
+                                  element.id !=
+                                      FirebaseAuth.instance.currentUser!.uid &&
+                                  element.isVerified,
+                            )
+                            .toList();
+                        return ListView.builder(
+                          itemCount: filterList.length,
+                          padding: const EdgeInsets.only(bottom: 100),
+                          itemBuilder: (context, index) {
+                            var userSnap = filterList[index];
+                            var currentUser = users
+                                .where((element) =>
+                                    element.id ==
+                                    FirebaseAuth.instance.currentUser!.uid)
+                                .first;
+                            return FollowFollowingTile(
+                              user: userSnap,
+                              ontapToggleFollow: () =>
+                                  profileProvider.toggleFollowBtn(
+                                userModel: currentUser,
+                                appUserId: userSnap.id,
+                              ),
+                              btnName: currentUser.followingsIds
+                                      .contains(userSnap.id)
+                                  ? strUnFollow
+                                  : strSrcFollow,
+                            );
+                          },
                         );
                       }
                       var filterList = users
@@ -147,14 +178,51 @@ class _SearchScreenState extends State<SearchScreen> {
 
                       if (searchController.text.isEmpty ||
                           searchController.text == '') {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 60),
-                            child: TextWidget(
-                              textAlign: TextAlign.center,
-                              text: strAlertSearch,
-                            ),
-                          ),
+                        // return const Center(
+                        //   child: Padding(
+                        //     padding: EdgeInsets.symmetric(horizontal: 60),
+                        //     child: TextWidget(
+                        //       textAlign: TextAlign.center,
+                        //       text: strAlertSearch,
+                        //     ),
+                        //   ),
+                        // );
+                        var filterList = groups
+                            .where(
+                              (element) =>
+                                  element.creatorId !=
+                                      FirebaseAuth.instance.currentUser!.uid &&
+                                  element.isPublic &&
+                                  element.isVerified,
+                            )
+                            .toList();
+                        return ListView.builder(
+                          itemCount: filterList.length,
+                          padding: const EdgeInsets.only(bottom: 100),
+                          itemBuilder: (context, index) {
+                            var groupSnap = filterList[index];
+
+                            var isCurrentUserGroupMember = groupSnap.memberIds
+                                .contains(
+                                    FirebaseAuth.instance.currentUser!.uid);
+                            return GroupTile(
+                              group: groupSnap,
+                              ontapTrailing: () {
+                                if (!isCurrentUserGroupMember) {
+                                  context
+                                      .read<NewGroupProvider>()
+                                      .addGroupMembers(
+                                          id: FirebaseAuth
+                                              .instance.currentUser!.uid,
+                                          groupId: groupSnap.id);
+                                }
+                              },
+                              isSearchScreen: true,
+                              btnText: isCurrentUserGroupMember
+                                  ? strJoined
+                                  : strSrcJoin,
+                            );
+                          },
                         );
                       }
                       var filterList = groups
@@ -206,14 +274,89 @@ class _SearchScreenState extends State<SearchScreen> {
 
                     if (searchController.text.isEmpty ||
                         searchController.text == '') {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 60),
-                          child: TextWidget(
-                            textAlign: TextAlign.center,
-                            text: strAlertSearch,
+                      // return const Center(
+                      //   child: Padding(
+                      //     padding: EdgeInsets.symmetric(horizontal: 60),
+                      //     child: TextWidget(
+                      //       textAlign: TextAlign.center,
+                      //       text: strAlertSearch,
+                      //     ),
+                      //   ),
+                      // );
+                      var groupsList = groups
+                          .where((element) =>
+                              element.isVerified &&
+                              element.creatorId !=
+                                  FirebaseAuth.instance.currentUser!.uid &&
+                              element.isPublic)
+                          .toList();
+
+                      var usersList = users
+                          .where((element) =>
+                              element.isVerified &&
+                              element.id !=
+                                  FirebaseAuth.instance.currentUser!.uid)
+                          .toList();
+                      return ListView(
+                        children: [
+                          ListView.builder(
+                            itemCount: groupsList.length,
+                            padding: const EdgeInsets.only(bottom: 0),
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              var groupSnap = groupsList[index];
+
+                              var isCurrentUserGroupMember = groupSnap.memberIds
+                                  .contains(
+                                      FirebaseAuth.instance.currentUser!.uid);
+                              return GroupTile(
+                                group: groupSnap,
+                                ontapTrailing: () {
+                                  if (!isCurrentUserGroupMember) {
+                                    context
+                                        .read<NewGroupProvider>()
+                                        .addGroupMembers(
+                                            id: FirebaseAuth
+                                                .instance.currentUser!.uid,
+                                            groupId: groupSnap.id);
+                                  }
+                                },
+                                isSearchScreen: true,
+                                btnText: isCurrentUserGroupMember
+                                    ? strJoined
+                                    : strSrcJoin,
+                              );
+                            },
                           ),
-                        ),
+                          const Divider(),
+                          ListView.builder(
+                            itemCount: usersList.length,
+                            padding: const EdgeInsets.only(bottom: 100),
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              var userSnap = usersList[index];
+                              var currentUser = users
+                                  .where((element) =>
+                                      element.id ==
+                                      FirebaseAuth.instance.currentUser!.uid)
+                                  .first;
+                              return FollowFollowingTile(
+                                user: userSnap,
+                                ontapToggleFollow: () =>
+                                    profileProvider.toggleFollowBtn(
+                                  userModel: currentUser,
+                                  appUserId: userSnap.id,
+                                ),
+                                btnName: currentUser.followingsIds
+                                        .contains(userSnap.id)
+                                    ? strUnFollow
+                                    : strSrcFollow,
+                              );
+                            },
+                          )
+                        ],
                       );
                     }
                     var groupsList = groups

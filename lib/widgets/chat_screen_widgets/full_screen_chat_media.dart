@@ -43,23 +43,15 @@ class CheckMediaAndShow extends StatelessWidget {
             imageUrl: mediaData.link);
 
       case "InChatVideo":
-        return FutureBuilder(
-            future: iniializedFuturePlay,
-            builder: (context, snapshot) {
-              return VideoPlayerWidget(
-                videoUrl: mediaData.link,
-                media: mediaData,
-              );
-            });
+        return VideoPlayerWidget(
+          videoUrl: mediaData.link,
+          media: mediaData,
+        );
       case "Video":
-        return FutureBuilder(
-            future: iniializedFuturePlay,
-            builder: (context, snapshot) {
-              return VideoPlayerWidget(
-                videoUrl: mediaData.link,
-                media: mediaData,
-              );
-            });
+        return VideoPlayerWidget(
+          videoUrl: mediaData.link,
+          media: mediaData,
+        );
       case "InChatMusic":
         return MusicPlayerUrl(
           isPostDetail: false,

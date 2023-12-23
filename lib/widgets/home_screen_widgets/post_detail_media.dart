@@ -53,36 +53,35 @@ class CheckMediaAndShowPost extends StatelessWidget {
           postModel: postModel,
           groupId: groupId,
         );
-        return SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: InkWell(
-            onDoubleTap: ondoubleTap,
-            onLongPress: () {
-              isPostDetail
-                  ? showDialog(
-                      context: context,
-                      builder: (context) {
-                        return CustomDownloadDialog(
-                          url: mediaData.link,
-                          path:
-                              '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
-                        );
-                      })
-                  : null;
-            },
-            onTap: isPostDetail
-                ? () => Get.to(() => PostFullScreenView(
-                    post: postModel, isPostDetail: isPostDetail))
-                : () => Get.to(() => PostDetailScreen(
-                      postModel: postModel,
-                      groupId: groupId,
-                    )),
-            child: CachedNetworkImage(
-                progressIndicatorBuilder: (context, url, progress) => Container(
-                      color: colorBlack.withOpacity(0.04),
-                    ),
-                imageUrl: mediaData.link),
-          ),
+        return InkWell(
+          onDoubleTap: ondoubleTap,
+          onLongPress: () {
+            isPostDetail
+                ? showDialog(
+                    context: context,
+                    builder: (context) {
+                      return CustomDownloadDialog(
+                        url: mediaData.link,
+                        path:
+                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
+                      );
+                    })
+                : null;
+          },
+          onTap: isPostDetail
+              ? () => Get.to(() => PostFullScreenView(
+                  post: postModel, isPostDetail: isPostDetail))
+              : () => Get.to(() => PostDetailScreen(
+                    postModel: postModel,
+                    groupId: groupId,
+                  )),
+          child: CachedNetworkImage(
+              progressIndicatorBuilder: (context, url, progress) => Container(
+                    color: colorBlack.withOpacity(0.04),
+                    width: MediaQuery.of(context).size.width,
+                    height: double.parse(mediaData.imageHeight!),
+                  ),
+              imageUrl: mediaData.link),
         );
 
       case "Video":
@@ -189,29 +188,29 @@ double getQouteAspectRatio(String text, bool isPostDetail) {
   }
 }
 
-Widget buildPostCards(
-    {required PostModel post,
-    required bool isPostDetail,
-    String? groupId,
-    required VoidCallback ondoubleTap,
-    required bool isFullScreen}) {
-  return ExpandablePageView.builder(
-    itemCount: post.mediaData.length,
-    itemBuilder: (context, index) {
-      return CheckMediaAndShowPost(
-        groupId: groupId,
-        isPostDetail: isPostDetail,
-        postModel: post,
-        ondoubleTap: ondoubleTap,
-        mediaData: post.mediaData[index],
-        postId: post.id,
-        isFullScreen: isFullScreen,
-      );
-    },
-  );
-}
+// Widget buildPostCards(
+//     {required PostModel post,
+//     required bool isPostDetail,
+//     String? groupId,
+//     required VoidCallback ondoubleTap,
+//     required bool isFullScreen}) {
+//   return ExpandablePageView.builder(
+//     itemCount: post.mediaData.length,
+//     itemBuilder: (context, index) {
+//       return CheckMediaAndShowPost(
+//         groupId: groupId,
+//         isPostDetail: isPostDetail,
+//         postModel: post,
+//         ondoubleTap: ondoubleTap,
+//         mediaData: post.mediaData[index],
+//         postId: post.id,
+//         isFullScreen: isFullScreen,
+//       );
+//     },
+//   );
+// }
 
-class PostMediaWidget extends StatelessWidget {
+class PostMediaWidget extends StatefulWidget {
   const PostMediaWidget({
     super.key,
     required this.post,
@@ -226,9 +225,32 @@ class PostMediaWidget extends StatelessWidget {
   final String? groupId;
 
   @override
+  State<PostMediaWidget> createState() => _PostMediaWidgetState();
+}
+
+class _PostMediaWidgetState extends State<PostMediaWidget> {
+  final PageController postPageController = PageController();
+  int postCurrentPageIndex = 0;
+
+  changeIndex(v) {
+    if (mounted) {
+      setState(() {
+        postCurrentPageIndex = v;
+        postPageController.jumpToPage(postCurrentPageIndex);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    postCurrentPageIndex = 0;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    if (post.mediaData.isEmpty) {
+    if (widget.post.mediaData.isEmpty) {
       return const SizedBox(
         width: double.infinity,
         height: 500,
@@ -238,45 +260,56 @@ class PostMediaWidget extends StatelessWidget {
       );
     }
     return ExpandablePageView.builder(
-      itemCount: post.mediaData.length,
+      itemCount: widget.post.mediaData.length,
+      controller: postPageController,
+      estimatedPageSize: 9 / 16,
+      onPageChanged: (value) {
+        if (mounted) {
+          setState(() {
+            postCurrentPageIndex = value;
+          });
+        }
+      },
       itemBuilder: (context, index) {
         return Stack(
           children: [
             CheckMediaAndShowPost(
-              groupId: groupId,
-              isPostDetail: isPostDetail,
-              postModel: post,
-              ondoubleTap: () =>
-                  prov.toggleLikeDislike(postModel: post, groupId: groupId),
-              mediaData: post.mediaData[index],
-              postId: post.id,
-              isFullScreen: isFullScreen,
+              groupId: widget.groupId,
+              isPostDetail: widget.isPostDetail,
+              postModel: widget.post,
+              ondoubleTap: () => prov.toggleLikeDislike(
+                  postModel: widget.post, groupId: widget.groupId),
+              mediaData: widget.post.mediaData[index],
+              postId: widget.post.id,
+              isFullScreen: widget.isFullScreen,
             ),
             Visibility(
-              visible: post.mediaData.length > 1,
+              visible: widget.post.mediaData.length > 1,
               child: Positioned(
-                width: MediaQuery.of(context).size.width,
-                bottom: 12,
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: post.mediaData
-                      .map(
-                        (i) => Container(
+                  width: MediaQuery.of(context).size.width,
+                  bottom: 12,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        List.generate(widget.post.mediaData.length, (index) {
+                      return InkWell(
+                        onTap: () {
+                          changeIndex(index);
+                        },
+                        child: Container(
                           height: 8.h,
                           width: 8.h,
                           margin: EdgeInsets.all(3.w),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: i.id != post.mediaData[index].id
-                                ? colorDD9.withOpacity(0.3)
-                                : colorFF7,
+                            color: postCurrentPageIndex == index
+                                ? colorFF7
+                                : colorDD9.withOpacity(0.3),
                           ),
                         ),
-                      )
-                      .toList(),
-                ),
-              ),
+                      );
+                    }),
+                  )),
             ),
           ],
         );
