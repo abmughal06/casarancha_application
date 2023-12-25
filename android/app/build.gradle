@@ -35,7 +35,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk localProperties.getProperty('flutter.compileSdkVersion').toInteger()
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -53,10 +53,10 @@ android {
     defaultConfig {
         multiDexEnabled = true   // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.zb.casarancha"
-        minSdkVersion 24
-        targetSdkVersion 33
-        versionCode 15
-        versionName "2.0.0+0"
+        minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
+        targetSdk localProperties.getProperty('flutter.targetSdkVersion').toInteger()
+        versionCode localProperties.getProperty('flutter.versionCode').toInteger()
+        versionName localProperties.getProperty('flutter.versionCode').toString()
     }
     signingConfigs {
         release {
@@ -75,6 +75,7 @@ android {
             minifyEnabled false
         }
     }
+    namespace 'com.zb.casarancha'
 }
 
 flutter {

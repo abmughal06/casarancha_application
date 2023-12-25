@@ -100,8 +100,8 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
     final postProvider = Provider.of<PostProvider>(context, listen: false);
 
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: 200,
+      // width: MediaQuery.of(context).size.width,
+      // height: 200,
       child: GestureDetector(
         onTap: () {
           audioPlayer.pause();

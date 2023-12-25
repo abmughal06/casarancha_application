@@ -520,8 +520,7 @@
 					"-framework",
 					"\"firebase_core\"",
 					"-framework",
-					"\"firebase_database\"",
-					"-framework",
+					
 					"\"firebase_dynamic_links\"",
 					"-framework",
 					"\"firebase_messaging\"",
@@ -846,8 +845,7 @@
 					"-framework",
 					"\"firebase_core\"",
 					"-framework",
-					"\"firebase_database\"",
-					"-framework",
+					
 					"\"firebase_dynamic_links\"",
 					"-framework",
 					"\"firebase_messaging\"",
@@ -1066,8 +1064,7 @@
 					"-framework",
 					"\"firebase_core\"",
 					"-framework",
-					"\"firebase_database\"",
-					"-framework",
+					
 					"\"firebase_dynamic_links\"",
 					"-framework",
 					"\"firebase_messaging\"",
