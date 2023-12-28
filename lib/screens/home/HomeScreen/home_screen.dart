@@ -179,62 +179,79 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           //post section
 
-          StreamProvider.value(
-            value: DataProvider().posts(null),
-            initialData: null,
-            catchError: (context, error) => null,
-            child: Consumer<List<PostModel>?>(
-              builder: (context, posts, b) {
-                if (posts == null || users == null) {
-                  return const PostSkeleton();
-                }
-                var post = ghostProvider.checkGhostMode
-                    ? posts.where((element) => (currentUser!.followersIds
-                            .contains(element.creatorId) ||
-                        currentUser.followingsIds.contains(element.creatorId) ||
-                        element.creatorId == currentUser.id &&
-                            element.mediaData.isNotEmpty &&
-                            element.isForumPost == false &&
-                            element.isGhostPost == false))
-                    : posts
-                        .where((element) =>
-                            element.mediaData.isNotEmpty &&
-                            element.isForumPost == false &&
-                            element.isGhostPost == false)
-                        .toList();
-                List<PostModel> filterList = [];
-                List<UserModel> postCreator = [];
-                for (var p in post) {
-                  for (var u in users) {
-                    if (p.creatorId == u.id) {
-                      filterList.add(p);
-                      postCreator.add(u);
-                    }
-                  }
-                }
+          currentUser == null
+              ? const CircularProgressIndicator(strokeWidth: 2)
+              : StreamProvider.value(
+                  value: ghostProvider.checkGhostMode
+                      ? DataProvider().ghostModePosts(
+                          currentUser.followingsIds,
+                          currentUser.followersIds,
+                          currentUser.id,
+                        )
+                      : DataProvider().posts(),
+                  initialData: null,
+                  catchError: (context, error) => null,
+                  child: Consumer<List<PostModel>?>(
+                    builder: (context, posts, b) {
+                      if (posts == null || users == null) {
+                        return const PostSkeleton();
+                      }
+                      var filterPosts = posts
+                          .where((element) =>
+                              !element.isForumPost &&
+                              element.isGhostPost == false)
+                          .toList();
+                      // var post = ghostProvider.checkGhostMode
+                      //     ? posts.where((element) => (currentUser.followersIds
+                      //             .contains(element.creatorId) ||
+                      //         currentUser.followingsIds
+                      //             .contains(element.creatorId) ||
+                      //         element.creatorId == currentUser.id &&
+                      //             element.mediaData.isNotEmpty &&
+                      //             element.isForumPost == false &&
+                      //             element.isGhostPost == false))
+                      //     : posts
+                      //         .where((element) =>
+                      //             element.mediaData.isNotEmpty &&
+                      //             element.isForumPost == false &&
+                      //             element.isGhostPost == false)
+                      //         .toList();
+                      // List<PostModel> filterList = [];
+                      // List<UserModel> postCreator = [];
+                      // for (var p in post) {
+                      //   for (var u in users) {
+                      //     if (p.creatorId == u.id) {
+                      //       filterList.add(p);
+                      //       postCreator.add(u);
+                      //     }
+                      //   }
+                      // }
 
-                if (filterList.isEmpty) {
-                  return const AlertText(
-                    text: strAlertPost,
-                  );
-                }
+                      if (filterPosts.isEmpty) {
+                        return const AlertText(
+                          text: strAlertPost,
+                        );
+                      }
 
-                return ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.only(bottom: 80.h),
-                  physics: const NeverScrollableScrollPhysics(),
-                  addAutomaticKeepAlives: true,
-                  itemCount: filterList.length,
-                  itemBuilder: (context, index) {
-                    return PostCard(
-                      post: filterList[index],
-                      postCreator: postCreator[index],
-                    );
-                  },
-                );
-              },
-            ),
-          )
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.only(bottom: 80.h),
+                        physics: const NeverScrollableScrollPhysics(),
+                        addAutomaticKeepAlives: true,
+                        itemCount: filterPosts.length,
+                        itemBuilder: (context, index) {
+                          return PostCard(
+                            post: filterPosts[index],
+                            postCreator: users
+                                .where((element) =>
+                                    element.id == filterPosts[index].creatorId)
+                                .first,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                )
         ],
       ),
     );

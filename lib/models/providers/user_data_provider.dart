@@ -69,14 +69,52 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Stream<List<PostModel>?> posts(String? groupId) {
+  Stream<List<PostModel>?> posts() {
     try {
-      final ref = groupId == null
-          ? FirebaseFirestore.instance.collection('posts')
-          : FirebaseFirestore.instance
-              .collection('groups')
-              .doc(groupId)
-              .collection('posts');
+      final ref = FirebaseFirestore.instance.collection('posts');
+      return ref.orderBy("createdAt", descending: true).snapshots().map(
+          (event) => event.docs
+              .where((element) =>
+                  element.data().isNotEmpty &&
+                  element.data()['mediaData'].isNotEmpty)
+              .map((e) => PostModel.fromMap(e.data()))
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<List<PostModel>?> ghostModePosts(
+      List followingsIds, List followersIds, String currentUserId) {
+    try {
+      final ref = FirebaseFirestore.instance.collection('posts');
+      return ref
+          .orderBy("createdAt", descending: true)
+          .snapshots()
+          .map((event) => event.docs
+              .where(
+                (element) =>
+                    (followersIds.contains(element.data()['creatorId']) ||
+                        followingsIds.contains(element.data()['creatorId']) ||
+                        element.data()['creatorId'] == currentUserId) &&
+                    element.data().isNotEmpty &&
+                    element.data()['mediaData'].isNotEmpty &&
+                    element.data()['isForumPost'] == false &&
+                    element.data()['isGhostPost'] == false,
+              )
+              .map((e) => PostModel.fromMap(e.data()))
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<List<PostModel>?> groupPosts(String? groupId) {
+    try {
+      final ref = FirebaseFirestore.instance
+          .collection('groups')
+          .doc(groupId)
+          .collection('posts');
       return ref.orderBy("createdAt", descending: true).snapshots().map(
           (event) => event.docs
               .where((element) =>

@@ -163,7 +163,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                         children: [
                                           StreamProvider.value(
                                               initialData: null,
-                                              value: DataProvider().posts(null),
+                                              value: DataProvider().posts(),
                                               catchError: (context, error) =>
                                                   null,
                                               child: Consumer<List<PostModel>?>(
@@ -479,7 +479,7 @@ class _AppUserScreenState extends State<AppUserScreen> {
                           heightBox(10.w),
                           StreamProvider.value(
                             initialData: null,
-                            value: DataProvider().posts(null),
+                            value: DataProvider().posts(),
                             catchError: (context, error) => null,
                             child: Consumer<List<PostModel>?>(
                                 builder: (context, post, b) {
