@@ -21,6 +21,7 @@
         <activity android:name="com.facebook.FacebookActivity"
                 android:configChanges=
                     "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+                android:exported="true"
                 android:label="@string/app_name" />
             
         <!-- facebook auth activity-->
@@ -72,6 +73,7 @@
         <activity
         android:name="com.yalantis.ucrop.UCropActivity"
         android:screenOrientation="portrait"
+        android:exported="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

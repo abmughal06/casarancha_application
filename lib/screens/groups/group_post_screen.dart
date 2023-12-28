@@ -108,7 +108,7 @@ class GroupPostScreen extends StatelessWidget {
           ),
           heightBox(15.h),
           StreamProvider.value(
-            value: DataProvider().posts(group.id),
+            value: DataProvider().groupPosts(group.id),
             initialData: null,
             catchError: (context, error) => null,
             child: Consumer<List<PostModel>?>(

@@ -18,7 +18,7 @@ class SavedPostScreen extends StatelessWidget {
     return Scaffold(
       appBar: primaryAppbar(title: 'Saved Posts', elevation: 0.1),
       body: StreamProvider.value(
-        value: DataProvider().posts(null),
+        value: DataProvider().posts(),
         initialData: null,
         catchError: (context, error) => null,
         child: Consumer<List<PostModel>?>(

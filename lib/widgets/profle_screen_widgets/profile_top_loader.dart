@@ -209,7 +209,7 @@ class ProfileTop extends StatelessWidget {
             StreamProvider.value(
                 initialData: null,
                 catchError: (context, error) => null,
-                value: DataProvider().posts(null),
+                value: DataProvider().posts(),
                 child: Consumer<List<PostModel>?>(builder: (context, post, b) {
                   if (post == null || user == null) {
                     return profileCounter(

@@ -96,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 heightBox(10.w),
                 StreamProvider.value(
                   initialData: null,
-                  value: DataProvider().posts(null),
+                  value: DataProvider().posts(),
                   catchError: (context, error) => null,
                   child:
                       Consumer<List<PostModel>?>(builder: (context, post, b) {
