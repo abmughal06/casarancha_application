@@ -198,8 +198,7 @@ class _HomeScreenState extends State<HomeScreen>
                       }
                       var filterPosts = posts
                           .where((element) =>
-                              !element.isForumPost &&
-                              element.isGhostPost == false)
+                              !element.isForumPost && !element.isGhostPost)
                           .toList();
                       // var post = ghostProvider.checkGhostMode
                       //     ? posts.where((element) => (currentUser.followersIds
