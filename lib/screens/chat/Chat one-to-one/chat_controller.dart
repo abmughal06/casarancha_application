@@ -56,8 +56,7 @@ class ChatProvider extends ChangeNotifier {
     }
     try {
       var textMessage = messageController.text;
-      messageController.clear();
-      notifyListeners();
+
       final messageRefForCurrentUser = userRef
           .doc(currentUser!.id)
           .collection('messageList')
@@ -149,6 +148,9 @@ class ChatProvider extends ChangeNotifier {
       );
     } catch (e) {
       GlobalSnackBar(message: e.toString());
+    } finally {
+      messageController.clear();
+      notifyListeners();
     }
   }
 
