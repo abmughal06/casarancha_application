@@ -1,5 +1,6 @@
 import 'package:casarancha/models/ghost_message_details.dart';
 import 'package:casarancha/models/message_details.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -17,8 +18,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ghostMessage = context.watch<List<GhostMessageDetails>?>();
-
     return Consumer<DashboardProvider>(
       builder: (context, provider, b) {
         return Card(
@@ -121,41 +120,56 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   onTap: () {
                     provider.changePage(5);
                   },
-                  child: Consumer<List<MessageDetails>?>(
-                      builder: (context, msg, b) {
-                    if (msg == null || ghostMessage == null) {
-                      return SvgPicture.asset(
-                        provider.currentIndex == 5
-                            ? icBottomSelChat
-                            : icBottomDeSelChat,
-                        color: provider.currentIndex == 5 ? null : Colors.white,
-                      );
-                    }
-                    var filterList = msg
-                        .where((element) => element.unreadMessageCount > 0)
-                        .toList();
-                    var ghostFilter = ghostMessage
-                        .where((element) => element.unreadMessageCount > 0)
-                        .toList();
+                  child: StreamProvider.value(
+                    value: DataProvider().chatListUsers(),
+                    initialData: null,
+                    catchError: (context, error) => null,
+                    child: StreamProvider.value(
+                      value: DataProvider().ghostChatListUsers(),
+                      initialData: null,
+                      catchError: (context, error) => null,
+                      child: Consumer2<List<MessageDetails>?,
+                              List<GhostMessageDetails>?>(
+                          builder: (context, msg, ghostMessage, b) {
+                        if (msg == null || ghostMessage == null) {
+                          return SvgPicture.asset(
+                            provider.currentIndex == 5
+                                ? icBottomSelChat
+                                : icBottomDeSelChat,
+                            color: provider.currentIndex == 5
+                                ? null
+                                : Colors.white,
+                          );
+                        }
+                        var filterList = msg
+                            .where((element) => element.unreadMessageCount > 0)
+                            .toList();
+                        var ghostFilter = ghostMessage
+                            .where((element) => element.unreadMessageCount > 0)
+                            .toList();
 
-                    int count = 0;
-                    for (var i in filterList) {
-                      count += i.unreadMessageCount;
-                    }
-                    for (var i in ghostFilter) {
-                      count += i.unreadMessageCount;
-                    }
-                    return Badge(
-                      label: Text(count.toString()),
-                      isLabelVisible: count > 0,
-                      child: SvgPicture.asset(
-                        provider.currentIndex == 5
-                            ? icBottomSelChat
-                            : icBottomDeSelChat,
-                        color: provider.currentIndex == 5 ? null : Colors.white,
-                      ),
-                    );
-                  }),
+                        int count = 0;
+                        for (var i in filterList) {
+                          count += i.unreadMessageCount;
+                        }
+                        for (var i in ghostFilter) {
+                          count += i.unreadMessageCount;
+                        }
+                        return Badge(
+                          label: Text(count.toString()),
+                          isLabelVisible: count > 0,
+                          child: SvgPicture.asset(
+                            provider.currentIndex == 5
+                                ? icBottomSelChat
+                                : icBottomDeSelChat,
+                            color: provider.currentIndex == 5
+                                ? null
+                                : Colors.white,
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
                 ),
                 InkWell(
                   onTap: () {

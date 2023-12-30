@@ -32,7 +32,7 @@ class ProviderApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<AuthenticationProvider>(
             create: (_) => AuthenticationProvider(FirebaseAuth.instance)),
-        ChangeNotifierProvider<DataProvider>(create: (_) => DataProvider()),
+        // ChangeNotifierProvider<DataProvider>(create: (_) => DataProvider()),
         StreamProvider(
           create: (context) => context.read<AuthenticationProvider>().authState,
           initialData: null,
@@ -47,36 +47,36 @@ class ProviderApp extends StatelessWidget {
         //   value: userDataProvider.posts,
         //   initialData: null,
         // ),
-        StreamProvider.value(
-          value: userDataProvider.stories,
-          initialData: null,
-          catchError: (context, error) => null,
-        ),
-        StreamProvider.value(
-          value: userDataProvider.users,
-          initialData: null,
-          catchError: (context, error) => null,
-        ),
-        StreamProvider.value(
-          value: userDataProvider.notifications,
-          initialData: null,
-          catchError: (context, error) => null,
-        ),
-        StreamProvider.value(
-          value: userDataProvider.chatListUsers,
-          initialData: null,
-          catchError: (context, error) => null,
-        ),
-        StreamProvider.value(
-          value: userDataProvider.ghostChatListUsers,
-          initialData: null,
-          catchError: (context, error) => null,
-        ),
-        StreamProvider.value(
-          value: userDataProvider.groups,
-          initialData: null,
-          catchError: (context, error) => null,
-        ),
+        // StreamProvider.value(
+        //   value: userDataProvider.stories,
+        //   initialData: null,
+        //   catchError: (context, error) => null,
+        // ),
+        // StreamProvider.value(
+        //   value: userDataProvider.users,
+        //   initialData: null,
+        //   catchError: (context, error) => null,
+        // ),
+        // StreamProvider.value(
+        //   value: userDataProvider.notifications,
+        //   initialData: null,
+        //   catchError: (context, error) => null,
+        // ),
+        // StreamProvider.value(
+        //   value: userDataProvider.chatListUsers,
+        //   initialData: null,
+        //   catchError: (context, error) => null,
+        // ),
+        // StreamProvider.value(
+        //   value: userDataProvider.ghostChatListUsers,
+        //   initialData: null,
+        //   catchError: (context, error) => null,
+        // ),
+        // StreamProvider.value(
+        //   value: userDataProvider.groups,
+        //   initialData: null,
+        //   catchError: (context, error) => null,
+        // ),
         ChangeNotifierProvider<LoginProvider>(create: (_) => LoginProvider()),
         ChangeNotifierProvider<RegisterProvider>(
             create: (_) => RegisterProvider()),

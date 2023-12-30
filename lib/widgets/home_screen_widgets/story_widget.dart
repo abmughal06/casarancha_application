@@ -86,7 +86,7 @@ class AppUserStoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(right: 10.w, top: 5.w),
+      padding: EdgeInsets.only(right: 10.w),
       child: InkWell(
         onTap: () {
           Get.to(

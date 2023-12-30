@@ -1,3 +1,5 @@
+import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
-import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../resources/localization_text_strings.dart';
@@ -28,134 +29,144 @@ class PostCommentField extends StatelessWidget {
     final postProvider = Provider.of<PostProvider>(context, listen: false);
 
     final user = context.watch<UserModel>();
-    final users = context.watch<List<UserModel>>();
+    // final users = context.watch<List<UserModel>>();
 
     return Align(
       alignment: Alignment.bottomCenter,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        decoration: BoxDecoration(color: colorWhite, boxShadow: [
-          BoxShadow(
-            color: colorPrimaryA05.withOpacity(.36),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(4, 0),
-          ),
-        ]),
-        child: TapRegion(
-          onTapOutside: (v) {
-            FocusScope.of(context).unfocus();
-            postProvider.repCommentId = null;
-          },
-          child: FlutterMentions(
-            key: postProvider.mentionKey,
-            focusNode: postProvider.postCommentFocus,
-            suggestionPosition: SuggestionPosition.Top,
-            maxLines: 3,
-            minLines: 1,
-            decoration: InputDecoration(
-              isDense: true,
-              hintText: strWriteComment,
-              hintStyle: TextStyle(
-                color: color55F,
-                fontSize: 14.sp,
-                fontFamily: strFontName,
-                fontWeight: FontWeight.w400,
+      child: StreamProvider.value(
+        value: DataProvider().users(),
+        initialData: null,
+        catchError: (context, error) => null,
+        child: Consumer<List<UserModel>?>(builder: (context, users, b) {
+          if (users == null) {
+            return Container();
+          }
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            decoration: BoxDecoration(color: colorWhite, boxShadow: [
+              BoxShadow(
+                color: colorPrimaryA05.withOpacity(.36),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(4, 0),
               ),
-              suffixIcon: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: GestureDetector(
-                  onTap: () {
-                    List ids = extractIds(postProvider
-                        .mentionKey.currentState!.controller!.markupText);
-                    postProvider.commentTagsId = ids;
+            ]),
+            child: TapRegion(
+              onTapOutside: (v) {
+                FocusScope.of(context).unfocus();
+                postProvider.repCommentId = null;
+              },
+              child: FlutterMentions(
+                key: postProvider.mentionKey,
+                focusNode: postProvider.postCommentFocus,
+                suggestionPosition: SuggestionPosition.Top,
+                maxLines: 3,
+                minLines: 1,
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: strWriteComment,
+                  hintStyle: TextStyle(
+                    color: color55F,
+                    fontSize: 14.sp,
+                    fontFamily: strFontName,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  suffixIcon: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        List ids = extractIds(postProvider
+                            .mentionKey.currentState!.controller!.markupText);
+                        postProvider.commentTagsId = ids;
 
-                    if (postProvider.repCommentId == null) {
-                      postProvider.postComment(
-                        postModel: postModel,
-                        groupId: groupId,
-                        user: user,
-                        allUsers: users,
-                      );
-                    } else {
-                      postProvider.postCommentReply(
-                        postModel: postModel,
-                        groupId: groupId,
-                        user: user,
-                        recieverId: user.id,
-                        allUsers: users,
-                      );
+                        if (postProvider.repCommentId == null) {
+                          postProvider.postComment(
+                            postModel: postModel,
+                            groupId: groupId,
+                            user: user,
+                            allUsers: users,
+                          );
+                        } else {
+                          postProvider.postCommentReply(
+                            postModel: postModel,
+                            groupId: groupId,
+                            user: user,
+                            recieverId: user.id,
+                            allUsers: users,
+                          );
 
-                      postProvider.repCommentId = null;
-                    }
-                  },
-                  child: Image.asset(
-                    imgSendComment,
-                    height: 38.h,
-                    width: 38.w,
+                          postProvider.repCommentId = null;
+                        }
+                      },
+                      child: Image.asset(
+                        imgSendComment,
+                        height: 38.h,
+                        width: 38.w,
+                      ),
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 20.h),
+                  focusColor: Colors.transparent,
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 0,
+                      color: Colors.transparent,
+                    ),
                   ),
                 ),
-              ),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.w, vertical: 20.h),
-              focusColor: Colors.transparent,
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 0,
-                  color: Colors.transparent,
+                style: TextStyle(
+                  color: color239,
+                  fontSize: 14.sp,
+                  fontFamily: strFontName,
+                  fontWeight: FontWeight.w400,
                 ),
-              ),
-            ),
-            style: TextStyle(
-              color: color239,
-              fontSize: 14.sp,
-              fontFamily: strFontName,
-              fontWeight: FontWeight.w400,
-            ),
-            mentions: [
-              Mention(
-                trigger: '@',
-                style: const TextStyle(color: Colors.blue),
-                data: users
-                    .map((e) => {
-                          "id": e.id,
-                          "display": e.username,
-                          'full_name': e.name,
-                          'photo': e.imageStr
-                        })
-                    .toList(),
-                suggestionBuilder: (data) {
-                  return Container(
-                    padding: EdgeInsets.all(10.w),
-                    child: Row(
-                      children: [
-                        ProfilePic(
-                          pic: data['photo'],
-                          heightAndWidth: 35.w,
-                        ),
-                        widthBox(
-                          20.w,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                mentions: [
+                  Mention(
+                    trigger: '@',
+                    style: const TextStyle(color: Colors.blue),
+                    data: users
+                        .map((e) => {
+                              "id": e.id,
+                              "display": e.username,
+                              'full_name': e.name,
+                              'photo': e.imageStr
+                            })
+                        .toList(),
+                    suggestionBuilder: (data) {
+                      return Container(
+                        padding: EdgeInsets.all(10.w),
+                        child: Row(
                           children: [
-                            Text(data['full_name']),
-                            heightBox(5.h),
-                            Text(
-                              '@${data['display']}',
+                            ProfilePic(
+                              pic: data['photo'],
+                              heightAndWidth: 35.w,
                             ),
+                            widthBox(
+                              20.w,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(data['full_name']),
+                                heightBox(5.h),
+                                Text(
+                                  '@${data['display']}',
+                                ),
+                              ],
+                            )
                           ],
-                        )
-                      ],
-                    ),
-                  );
-                },
+                        ),
+                      );
+                    },
+                  ),
+                ],
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
               ),
-            ],
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-          ),
-        ),
+            ),
+          );
+        }),
       ),
     );
   }

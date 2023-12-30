@@ -421,7 +421,7 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
         ),
         if (!isLoadingVideo)
           Align(
-            alignment: Alignment.bottomLeft,
+            alignment: Alignment.center,
             child: IconButton(
               onPressed: () async {
                 if (isPlayingVideo) {

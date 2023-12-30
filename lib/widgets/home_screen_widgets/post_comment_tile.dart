@@ -542,17 +542,6 @@ class FeedPostCommentTile extends StatelessWidget {
                 ),
               ),
             ),
-            // TextWidget(
-            //   onTap: () => Get.to(() => PostDetailScreen(
-            //         postModel: postModel!,
-            //         groupId: groupId,
-            //       )),
-            //   text: cmnt.message.isEmpty ? "---" : cmnt.message,
-            //   fontSize: 12.sp,
-            //   color: color55F,
-            //   fontWeight: FontWeight.w400,
-            //   textOverflow: TextOverflow.ellipsis,
-            // )
           );
         },
       ),

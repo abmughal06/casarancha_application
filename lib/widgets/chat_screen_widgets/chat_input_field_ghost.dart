@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:flutter/material.dart';
@@ -22,171 +24,195 @@ import 'chat_input_field.dart';
 class ChatInputFieldGhost extends StatelessWidget {
   const ChatInputFieldGhost(
       {super.key,
-      required this.currentUser,
-      required this.appUser,
-      required this.onTapSentMessage,
+      // required this.currentUser,
+      // required this.appUser,
+      // required this.onTapSentMessage,
+      required this.appUserId,
       required this.firstMessage});
-  final UserModel currentUser;
-  final UserModel appUser;
-  final VoidCallback onTapSentMessage;
+  // final UserModel currentUser;
+  final String appUserId;
+  // final VoidCallback onTapSentMessage;
   final bool firstMessage;
 
   @override
   Widget build(BuildContext context) {
     bool isRecordingDelete = false;
-    final ghost = Provider.of<DashboardProvider>(context);
+    final ghostProvider = context.watch<DashboardProvider>();
 
-    return Consumer<ChatProvider>(
-      builder: (context, chatProvider, b) {
-        return chatProvider.photosList.isNotEmpty ||
-                chatProvider.videosList.isNotEmpty ||
-                chatProvider.mediaList.isNotEmpty ||
-                chatProvider.musicList.isNotEmpty
-            ? ShowMediaToSendInChatGhost(
-                firstMessage: firstMessage,
-                currentUser: currentUser,
-                appUser: appUser,
-              )
-            : Container(
-                decoration: BoxDecoration(
-                    color: colorWhite,
-                    border: Border(
-                        top: BorderSide(color: color221.withOpacity(0.3)))),
-                padding: const EdgeInsets.only(
-                    left: 20, right: 20, bottom: 35, top: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Visibility(
-                      visible: !chatProvider.isRecording,
-                      child: Expanded(
-                        child: ChatTextFieldGhost(
-                          chatController: chatProvider.messageController,
-                          ontapSend: () {},
+    return StreamProvider.value(
+      value: DataProvider().allUsers(),
+      initialData: null,
+      catchError: (context, error) => null,
+      child: Consumer2<ChatProvider, List<UserModel>?>(
+        builder: (context, chatProvider, allUsers, b) {
+          if (allUsers == null) {
+            return Container();
+          }
+          var currentUser =
+              allUsers.where((element) => element.id == currentUserUID).first;
+
+          var appUser =
+              allUsers.where((element) => element.id == appUserId).first;
+          return chatProvider.photosList.isNotEmpty ||
+                  chatProvider.videosList.isNotEmpty ||
+                  chatProvider.mediaList.isNotEmpty ||
+                  chatProvider.musicList.isNotEmpty
+              ? ShowMediaToSendInChatGhost(
+                  firstMessage: firstMessage,
+                  currentUser: currentUser,
+                  appUser: appUser,
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                      color: colorWhite,
+                      border: Border(
+                          top: BorderSide(color: color221.withOpacity(0.3)))),
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, bottom: 35, top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Visibility(
+                        visible: !chatProvider.isRecording,
+                        child: Expanded(
+                          child: ChatTextFieldGhost(
+                            chatController: chatProvider.messageController,
+                            ontapSend: () {},
+                          ),
                         ),
                       ),
-                    ),
-                    Visibility(
-                      visible: chatProvider.isRecording,
-                      child: VoiceRecordingWidgetGhost(
-                          sendRecording: () => chatProvider.stopRecording(
-                                currentUser: currentUser,
-                                appUser: appUser,
-                                firstMessageByWho: firstMessage,
-                                isGhostMessage: true,
-                              ),
-                          isRecorderLock: chatProvider.isRecorderLock,
-                          onTapDelete: () => chatProvider.deleteRecording(),
-                          isRecording: chatProvider.isRecording,
-                          isRecordingSend: chatProvider.isRecordingSend,
-                          duration: formatTime(chatProvider.durationInSeconds)),
-                    ),
-                    Visibility(
-                      visible: chatProvider.messageController.text.isEmpty,
-                      child: Row(
-                        children: [
-                          widthBox(12.w),
-                          chatProvider.isRecorderLock
-                              ? GestureDetector(
-                                  onTap: () {
-                                    chatProvider.stopRecording(
-                                        currentUser: currentUser,
-                                        appUser: appUser,
-                                        firstMessageByWho: firstMessage,
-                                        isGhostMessage: true);
-                                  },
-                                  child: Image.asset(
-                                    imgSendComment,
-                                    height: 38.h,
-                                    width: 38.w,
-                                  ),
-                                )
-                              : GestureDetector(
-                                  onLongPressStart: (c) async {
-                                    if (ghost.checkGhostMode) {
-                                      if (await chatProvider.audioRecorder
-                                          .hasPermission()) {
-                                        chatProvider.startRecording();
-                                      }
-                                      isRecordingDelete = false;
-                                    } else {
-                                      GlobalSnackBar.show(
-                                          message:
-                                              'Please enable ghost mode first to send audio');
-                                    }
-                                  },
-                                  onLongPressMoveUpdate: (details) {
-                                    if (ghost.checkGhostMode) {
-                                      final dragDistanceHor =
-                                          details.localPosition.dx;
-                                      final dragDistanceVer =
-                                          details.localPosition.dy;
-
-                                      if (dragDistanceHor < -50) {
-                                        chatProvider.deleteRecording();
-                                        log('deleted');
-                                        isRecordingDelete = true;
-                                      }
-                                      if (dragDistanceVer < -20) {
-                                        chatProvider.toggleRecorderLock();
-                                      }
-                                    } else {
-                                      GlobalSnackBar.show(
-                                          message:
-                                              'Please enable ghost mode first to send audio');
-                                    }
-                                  },
-                                  onLongPressEnd: (details) {
-                                    if (ghost.checkGhostMode) {
-                                      if (!isRecordingDelete) {
-                                        chatProvider.stopRecording(
+                      Visibility(
+                        visible: chatProvider.isRecording,
+                        child: VoiceRecordingWidgetGhost(
+                            sendRecording: () => chatProvider.stopRecording(
+                                  currentUser: currentUser,
+                                  appUser: appUser,
+                                  firstMessageByWho: firstMessage,
+                                  isGhostMessage: true,
+                                ),
+                            isRecorderLock: chatProvider.isRecorderLock,
+                            onTapDelete: () => chatProvider.deleteRecording(),
+                            isRecording: chatProvider.isRecording,
+                            isRecordingSend: chatProvider.isRecordingSend,
+                            duration:
+                                formatTime(chatProvider.durationInSeconds)),
+                      ),
+                      Visibility(
+                        visible: chatProvider.messageController.text.isEmpty,
+                        child: Row(
+                          children: [
+                            widthBox(12.w),
+                            chatProvider.isRecorderLock
+                                ? GestureDetector(
+                                    onTap: () {
+                                      chatProvider.stopRecording(
                                           currentUser: currentUser,
                                           appUser: appUser,
                                           firstMessageByWho: firstMessage,
-                                          isGhostMessage: true,
-                                        );
-                                        log('stopped');
-                                      }
-                                    } else {
-                                      GlobalSnackBar.show(
-                                          message:
-                                              'Please enable ghost mode first to send audio');
-                                    }
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(8.w),
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: colorF03.withOpacity(0.6)),
-                                    child: const Icon(
-                                      Icons.mic_none_sharp,
-                                      color: color221,
+                                          isGhostMessage: true);
+                                    },
+                                    child: Image.asset(
+                                      imgSendComment,
+                                      height: 38.h,
+                                      width: 38.w,
                                     ),
-                                  ),
-                                )
-                        ],
+                                  )
+                                : GestureDetector(
+                                    onLongPressStart: (c) async {
+                                      if (ghostProvider.checkGhostMode) {
+                                        if (await chatProvider.audioRecorder
+                                            .hasPermission()) {
+                                          chatProvider.startRecording();
+                                        }
+                                        isRecordingDelete = false;
+                                      } else {
+                                        GlobalSnackBar.show(
+                                            message:
+                                                'Please enable ghost mode first to send audio');
+                                      }
+                                    },
+                                    onLongPressMoveUpdate: (details) {
+                                      if (ghostProvider.checkGhostMode) {
+                                        final dragDistanceHor =
+                                            details.localPosition.dx;
+                                        final dragDistanceVer =
+                                            details.localPosition.dy;
+
+                                        if (dragDistanceHor < -50) {
+                                          chatProvider.deleteRecording();
+                                          log('deleted');
+                                          isRecordingDelete = true;
+                                        }
+                                        if (dragDistanceVer < -20) {
+                                          chatProvider.toggleRecorderLock();
+                                        }
+                                      } else {
+                                        GlobalSnackBar.show(
+                                            message:
+                                                'Please enable ghost mode first to send audio');
+                                      }
+                                    },
+                                    onLongPressEnd: (details) {
+                                      if (ghostProvider.checkGhostMode) {
+                                        if (!isRecordingDelete) {
+                                          chatProvider.stopRecording(
+                                            currentUser: currentUser,
+                                            appUser: appUser,
+                                            firstMessageByWho: firstMessage,
+                                            isGhostMessage: true,
+                                          );
+                                          log('stopped');
+                                        }
+                                      } else {
+                                        GlobalSnackBar.show(
+                                            message:
+                                                'Please enable ghost mode first to send audio');
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(8.w),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: colorF03.withOpacity(0.6)),
+                                      child: const Icon(
+                                        Icons.mic_none_sharp,
+                                        color: color221,
+                                      ),
+                                    ),
+                                  )
+                          ],
+                        ),
                       ),
-                    ),
-                    Visibility(
-                      visible: chatProvider.messageController.text.isNotEmpty,
-                      child: Row(
-                        children: [
-                          widthBox(12.w),
-                          GestureDetector(
-                            onTap: onTapSentMessage,
-                            child: Image.asset(
-                              imgSendComment,
-                              height: 38.h,
-                              width: 38.w,
+                      Visibility(
+                        visible: chatProvider.messageController.text.isNotEmpty,
+                        child: Row(
+                          children: [
+                            widthBox(12.w),
+                            GestureDetector(
+                              onTap: () {
+                                ghostProvider.checkGhostMode
+                                    ? chatProvider.sentMessageGhost(
+                                        currentUser: currentUser,
+                                        appUser: appUser,
+                                        firstMessageByMe: firstMessage)
+                                    : GlobalSnackBar.show(
+                                        message:
+                                            'Please enable ghost message first to send the message');
+                              },
+                              child: Image.asset(
+                                imgSendComment,
+                                height: 38.h,
+                                width: 38.w,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-      },
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
+        },
+      ),
     );
   }
 }

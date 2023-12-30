@@ -1,4 +1,3 @@
-import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -32,10 +31,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with AutomaticKeepAliveClientMixin<HomeScreen> {
+  DataProvider dataProvider = DataProvider();
+  @override
+  void dispose() {
+    // dataProvider.chatListUsers.drain()
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
-    final users = context.watch<List<UserModel>?>();
+    // final users = context.watch<List<UserModel>?>();
     final ghostProvider = context.watch<DashboardProvider>();
     super.build(context);
     return GhostScaffold(
@@ -62,126 +68,135 @@ class _HomeScreenState extends State<HomeScreen>
               imgAddPost,
             ),
           ),
-          Consumer<List<NotificationModel>?>(
-            builder: (context, notification, b) {
-              if (notification == null) {
+          StreamProvider.value(
+            value: dataProvider.notficationLength(),
+            initialData: null,
+            catchError: (context, error) => null,
+            child: Consumer<List<Notification>?>(
+              builder: (context, notification, b) {
+                if (notification == null) {
+                  return IconButton(
+                    onPressed: () {
+                      Get.to(() => const NotificationScreen());
+                    },
+                    icon: SvgPicture.asset(
+                      icNotifyBell,
+                    ),
+                  );
+                }
+                var count = notification.length.toString();
                 return IconButton(
-                  onPressed: () {},
-                  icon: SvgPicture.asset(
-                    icNotifyBell,
+                  onPressed: () {
+                    Get.to(() => const NotificationScreen());
+                  },
+                  icon: Badge(
+                    label: Text(count),
+                    isLabelVisible: notification.isNotEmpty,
+                    child: SvgPicture.asset(
+                      icNotifyBell,
+                    ),
                   ),
                 );
-              }
-              return IconButton(
-                onPressed: () {
-                  Get.to(() => const NotificationScreen());
-                },
-                icon: Badge(
-                  label: Text(notification
-                      .where((element) => element.isRead == false)
-                      .toList()
-                      .length
-                      .toString()),
-                  isLabelVisible: notification
-                      .where((element) => element.isRead == false)
-                      .toList()
-                      .isNotEmpty,
-                  child: SvgPicture.asset(
-                    icNotifyBell,
-                  ),
-                ),
-              );
-            },
+              },
+            ),
           ),
         ],
       ),
-      body: ListView(
-        // shrinkWrap: true,
-        controller: ghostProvider.scrollController,
-        key: const PageStorageKey(0),
-        children: [
-          //story section
-          Padding(
-            padding: EdgeInsets.all(10.h),
-            child: SizedBox(
-              height: 50.h,
-              child: Consumer<List<Story>?>(
-                builder: (context, provider, b) {
-                  if (provider == null || currentUser == null) {
-                    return const StorySkeleton();
-                  } else {
-                    var filterList = provider
-                        .where((element) =>
-                            currentUser.followersIds.contains(element.id) ||
-                            currentUser.followingsIds.contains(element.id))
-                        .toList();
-                    return Row(
+      body: currentUser == null
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2.w,
+              ),
+            )
+          : ListView(
+              // shrinkWrap: true,
+              controller: ghostProvider.scrollController,
+              key: const PageStorageKey(0),
+              children: [
+                // story section
+                Padding(
+                  padding: EdgeInsets.all(10.h),
+                  child: SizedBox(
+                    height: 50.h,
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        provider
-                                .where((element) =>
-                                    element.creatorId == currentUser.id)
-                                .toList()
-                                .isNotEmpty
-                            ? MyStoryWidget(
-                                stories: provider
-                                    .where((element) =>
-                                        element.creatorId == currentUser.id)
-                                    .first,
-                              )
-                            : GestureDetector(
-                                onTap: () {
-                                  Get.to(() => const AddStoryScreen());
-                                },
-                                child: SvgPicture.asset(
-                                  icProfileAdd,
-                                  height: 50.h,
-                                  width: 50.h,
-                                ),
-                              ),
-                        Expanded(
-                          child: ListView.builder(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w),
-                            itemCount: filterList.length,
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) {
-                              var storyList = [];
-                              final twentyFourHoursAgo = DateTime.now()
-                                  .subtract(const Duration(hours: 24));
-                              DateTime givenDate = DateTime.now();
-
-                              for (int i = 0;
-                                  i < filterList[index].mediaDetailsList.length;
-                                  i++) {
-                                givenDate = DateTime.parse(
-                                    filterList[index].mediaDetailsList[i].id);
-                                if (givenDate.isAfter(twentyFourHoursAgo)) {
-                                  storyList.add(filterList[index]);
-                                }
-                              }
-
-                              if (storyList.contains(filterList[index])) {
-                                return AppUserStoryWidget(
-                                  story: filterList[index],
+                        StreamProvider.value(
+                          value: DataProvider().myStory(),
+                          initialData: null,
+                          catchError: (context, error) => null,
+                          child: Consumer<Story?>(
+                            builder: (context, value, child) {
+                              if (value == null) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Get.to(() => const AddStoryScreen());
+                                  },
+                                  child: SvgPicture.asset(
+                                    icProfileAdd,
+                                    height: 50.h,
+                                    width: 50.h,
+                                  ),
                                 );
-                              } else {
-                                return Container();
                               }
+                              return MyStoryWidget(
+                                stories: value,
+                              );
                             },
                           ),
                         ),
-                      ],
-                    );
-                  }
-                },
-              ),
-            ),
-          ),
-          //post section
+                        StreamProvider.value(
+                          initialData: null,
+                          value: DataProvider().allStories(
+                              currentUser.followersIds +
+                                  currentUser.followingsIds),
+                          catchError: (context, error) => null,
+                          child: Consumer<List<Story>?>(
+                              builder: (context, stories, b) {
+                            if (stories == null) {
+                              return const Expanded(child: StorySkeleton());
+                            }
+                            return Expanded(
+                              child: ListView.builder(
+                                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                itemCount: stories.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  var storyList = [];
+                                  final twentyFourHoursAgo = DateTime.now()
+                                      .subtract(const Duration(hours: 24));
+                                  DateTime givenDate = DateTime.now();
 
-          currentUser == null
-              ? const CircularProgressIndicator(strokeWidth: 2)
-              : StreamProvider.value(
+                                  for (int i = 0;
+                                      i <
+                                          stories[index]
+                                              .mediaDetailsList
+                                              .length;
+                                      i++) {
+                                    givenDate = DateTime.parse(
+                                        stories[index].mediaDetailsList[i].id);
+                                    if (givenDate.isAfter(twentyFourHoursAgo)) {
+                                      storyList.add(stories[index]);
+                                    }
+                                  }
+                                  if (storyList.contains(stories[index])) {
+                                    return AppUserStoryWidget(
+                                      story: stories[index],
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                StreamProvider.value(
                   value: ghostProvider.checkGhostMode
                       ? DataProvider().ghostModePosts(
                           currentUser.followingsIds,
@@ -193,38 +208,13 @@ class _HomeScreenState extends State<HomeScreen>
                   catchError: (context, error) => null,
                   child: Consumer<List<PostModel>?>(
                     builder: (context, posts, b) {
-                      if (posts == null || users == null) {
+                      if (posts == null) {
                         return const PostSkeleton();
                       }
                       var filterPosts = posts
                           .where((element) =>
                               !element.isForumPost && !element.isGhostPost)
                           .toList();
-                      // var post = ghostProvider.checkGhostMode
-                      //     ? posts.where((element) => (currentUser.followersIds
-                      //             .contains(element.creatorId) ||
-                      //         currentUser.followingsIds
-                      //             .contains(element.creatorId) ||
-                      //         element.creatorId == currentUser.id &&
-                      //             element.mediaData.isNotEmpty &&
-                      //             element.isForumPost == false &&
-                      //             element.isGhostPost == false))
-                      //     : posts
-                      //         .where((element) =>
-                      //             element.mediaData.isNotEmpty &&
-                      //             element.isForumPost == false &&
-                      //             element.isGhostPost == false)
-                      //         .toList();
-                      // List<PostModel> filterList = [];
-                      // List<UserModel> postCreator = [];
-                      // for (var p in post) {
-                      //   for (var u in users) {
-                      //     if (p.creatorId == u.id) {
-                      //       filterList.add(p);
-                      //       postCreator.add(u);
-                      //     }
-                      //   }
-                      // }
 
                       if (filterPosts.isEmpty) {
                         return const AlertText(
@@ -241,18 +231,15 @@ class _HomeScreenState extends State<HomeScreen>
                         itemBuilder: (context, index) {
                           return PostCard(
                             post: filterPosts[index],
-                            postCreator: users
-                                .where((element) =>
-                                    element.id == filterPosts[index].creatorId)
-                                .first,
+                            postCreatorId: filterPosts[index].creatorId,
                           );
                         },
                       );
                     },
                   ),
                 )
-        ],
-      ),
+              ],
+            ),
     );
   }
 

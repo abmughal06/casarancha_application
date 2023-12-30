@@ -1,7 +1,7 @@
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
@@ -25,11 +25,12 @@ class _GhostPostsState extends State<GhostPosts>
   @override
   Widget build(BuildContext context) {
     final dashboardProvider = Provider.of<DashboardProvider>(context);
-    final users = context.watch<List<UserModel>?>();
+    // final users = context.watch<List<UserModel>?>();
 
     super.build(context);
     return GhostScaffold(
-      appBar: primaryAppbar(title: 'Ghost Posts'),
+      appBar:
+          primaryAppbar(title: 'Ghost Posts', leading: const GhostModeBtn()),
       body: Stack(
         children: [
           StreamProvider.value(
@@ -37,7 +38,7 @@ class _GhostPostsState extends State<GhostPosts>
             initialData: null,
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, child) {
-                if (posts == null || users == null) {
+                if (posts == null) {
                   return const PostSkeleton();
                 }
                 return ListView(
@@ -52,10 +53,7 @@ class _GhostPostsState extends State<GhostPosts>
                         return PostCard(
                           isGhostPost: posts[index].isGhostPost,
                           post: posts[index],
-                          postCreator: users
-                              .where((element) =>
-                                  element.id == posts[index].creatorId)
-                              .first,
+                          postCreatorId: posts[index].creatorId,
                         );
                       },
                     ),

@@ -91,6 +91,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   @override
+  void dispose() {
+    videoPlayerController.removeListener(() {});
+    duration = Duration.zero;
+    position = Duration.zero;
+    isVideoPlaying = false;
+    videoPlayerController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context);
     return VisibilityDetector(

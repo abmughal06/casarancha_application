@@ -47,7 +47,6 @@ class CustomPostFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final users = context.watch<List<UserModel>?>();
     return Column(
       children: [
         Row(
@@ -113,27 +112,29 @@ class CustomPostFooter extends StatelessWidget {
                   color: color221,
                   onTap: () {
                     Get.bottomSheet(
-                      Consumer<List<UserModel>?>(
-                        builder: (context, value, child) {
-                          if (value == null) {
-                            return const CircularProgressIndicator.adaptive();
-                          }
-                          var filterList = value
-                              .where((element) =>
-                                  postModel.shareCount.contains(element.id))
-                              .toList();
-                          return ListView.builder(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            itemCount: filterList.length,
-                            itemBuilder: (context, index) {
-                              return FollowFollowingTile(
-                                user: filterList[index],
-                                ontapToggleFollow: () {},
-                                btnName: "",
-                              );
-                            },
-                          );
-                        },
+                      StreamProvider.value(
+                        value:
+                            DataProvider().filterUserList(postModel.shareCount),
+                        initialData: null,
+                        catchError: (context, error) => null,
+                        child: Consumer<List<UserModel>?>(
+                          builder: (context, value, child) {
+                            if (value == null) {
+                              return const CircularProgressIndicator.adaptive();
+                            }
+                            return ListView.builder(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              itemCount: value.length,
+                              itemBuilder: (context, index) {
+                                return FollowFollowingTile(
+                                  user: value[index],
+                                  ontapToggleFollow: () {},
+                                  btnName: "",
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                       backgroundColor: Colors.white,
                     );
@@ -147,27 +148,30 @@ class CustomPostFooter extends StatelessWidget {
                 InkWell(
                   onTap: () {
                     Get.bottomSheet(
-                      Consumer<List<UserModel>?>(
-                        builder: (context, value, child) {
-                          if (value == null) {
-                            return const CircularProgressIndicator.adaptive();
-                          }
-                          var filterList = value
-                              .where((element) =>
-                                  postModel.videoViews.contains(element.id))
-                              .toList();
-                          return ListView.builder(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            itemCount: filterList.length,
-                            itemBuilder: (context, index) {
-                              return FollowFollowingTile(
-                                user: filterList[index],
-                                ontapToggleFollow: () {},
-                                btnName: "",
-                              );
-                            },
-                          );
-                        },
+                      StreamProvider.value(
+                        value:
+                            DataProvider().filterUserList(postModel.videoViews),
+                        initialData: null,
+                        catchError: (context, error) => null,
+                        child: Consumer<List<UserModel>?>(
+                          builder: (context, value, child) {
+                            if (value == null) {
+                              return const CircularProgressIndicator.adaptive();
+                            }
+
+                            return ListView.builder(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              itemCount: value.length,
+                              itemBuilder: (context, index) {
+                                return FollowFollowingTile(
+                                  user: value[index],
+                                  ontapToggleFollow: () {},
+                                  btnName: "",
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                       backgroundColor: Colors.white,
                     );
@@ -229,36 +233,42 @@ class CustomPostFooter extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 15.w),
               child: Wrap(
                 children: postModel.tagsIds.map((userId) {
-                  return Consumer<List<UserModel>?>(
-                    builder: (context, tagusers, child) {
-                      if (tagusers == null) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else {
-                        var userList = tagusers
-                            .where((element) => element.id == userId)
-                            .toList();
+                  return StreamProvider.value(
+                    value: DataProvider().filterUserList(postModel.tagsIds),
+                    initialData: null,
+                    catchError: (context, error) => null,
+                    child: Consumer<List<UserModel>?>(
+                      builder: (context, tagusers, child) {
+                        if (tagusers == null) {
+                          return Container();
+                        } else {
+                          var userList = tagusers
+                              .where((element) => element.id == userId)
+                              .toList();
 
-                        if (userList.isEmpty) {
-                          return const SizedBox.shrink();
+                          if (userList.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+
+                          var username =
+                              userList.map((e) => e.username).join(", ");
+                          return Container(
+                            constraints: BoxConstraints(
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.69,
+                            ),
+                            child: selectableHighlightMentions(
+                              text: "@$username ",
+                              context: context,
+                              onTap: () {
+                                // printLog('============>>>>>>>>>tagged');
+                                onUsernameTap(username, context);
+                              },
+                            ),
+                          );
                         }
-
-                        var username =
-                            userList.map((e) => e.username).join(", ");
-                        return Container(
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * 0.69,
-                          ),
-                          child: selectableHighlightMentions(
-                            text: "@$username ",
-                            context: context,
-                            onTap: () {
-                              // printLog('============>>>>>>>>>tagged');
-                              onUsernameTap(username, context);
-                            },
-                          ),
-                        );
-                      }
-                    },
+                      },
+                    ),
                   );
                 }).toList(),
               ),
@@ -274,8 +284,8 @@ class CustomPostFooter extends StatelessWidget {
             initialData: null,
             catchError: (context, error) => null,
             child: Consumer<List<Comment>?>(
-              builder: (context, comment, b) {
-                if (comment == null || users == null) {
+              builder: (context, comments, b) {
+                if (comments == null) {
                   return Row(
                     children: [
                       Skeleton(
@@ -295,11 +305,10 @@ class CustomPostFooter extends StatelessWidget {
                   );
                 }
 
-                if (comment.isEmpty) {
+                if (comments.isEmpty) {
                   return Container();
                 }
-                var data = comment.first;
-                var cmnt = data;
+                var cmnt = comments.first;
                 return cmnt.message.isEmpty
                     ? Container()
                     : FeedPostCommentTile(

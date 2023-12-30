@@ -1,4 +1,5 @@
 import 'package:casarancha/models/group_model.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/create_group_screen.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
@@ -60,80 +61,80 @@ class GroupScreen extends StatelessWidget {
               child: TabBarView(
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  Consumer<List<GroupModel>?>(
-                    builder: (context, groups, b) {
-                      if (groups == null) {
-                        return centerLoader();
-                      }
-                      final filterList = groups
-                          .where((element) =>
-                              element.creatorId !=
-                                  FirebaseAuth.instance.currentUser!.uid &&
-                              element.memberIds.contains(
-                                  FirebaseAuth.instance.currentUser!.uid))
-                          .toList();
+                  StreamProvider.value(
+                    value: DataProvider().joinedGroups(),
+                    initialData: null,
+                    catchError: (context, error) => null,
+                    child: Consumer<List<GroupModel>?>(
+                      builder: (context, groups, b) {
+                        if (groups == null) {
+                          return centerLoader();
+                        }
 
-                      if (filterList.isEmpty) {
-                        return const Center(
-                          child: TextWidget(
-                            text: strAlertGroup,
-                          ),
-                        );
-                      }
-
-                      return ListView.builder(
-                        itemCount: filterList.length,
-                        itemBuilder: (context, index) {
-                          return GroupTile(
-                            ontapTrailing: () {
-                              deleteBottomSheet(
-                                  ontap: () => groupPovider.removeGroupMembers(
-                                      id: FirebaseAuth
-                                          .instance.currentUser!.uid,
-                                      groupId: filterList[index].id),
-                                  text: strLeaveGrp);
-                            },
-                            group: filterList[index],
+                        if (groups.isEmpty) {
+                          return const Center(
+                            child: TextWidget(
+                              text: strAlertGroup,
+                            ),
                           );
-                        },
-                      );
-                    },
+                        }
+
+                        return ListView.builder(
+                          itemCount: groups.length,
+                          itemBuilder: (context, index) {
+                            return GroupTile(
+                              ontapTrailing: () {
+                                deleteBottomSheet(
+                                    ontap: () =>
+                                        groupPovider.removeGroupMembers(
+                                            id: FirebaseAuth
+                                                .instance.currentUser!.uid,
+                                            groupId: groups[index].id),
+                                    text: strLeaveGrp);
+                              },
+                              group: groups[index],
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                   //My Created Groups
                   Stack(
                     children: [
-                      Consumer<List<GroupModel>?>(
-                        builder: (context, groups, b) {
-                          if (groups == null) {
-                            return centerLoader();
-                          }
-                          final filterList = groups
-                              .where((element) =>
-                                  element.creatorId ==
-                                  FirebaseAuth.instance.currentUser!.uid)
-                              .toList();
-                          if (filterList.isEmpty) {
-                            return const Center(
-                              child: TextWidget(
-                                text: strAlertGroupCreated,
-                              ),
-                            );
-                          }
-                          return ListView.builder(
-                            itemCount: filterList.length,
-                            itemBuilder: (context, index) {
-                              return GroupTile(
-                                group: filterList[index],
-                                ontapTrailing: () {
-                                  deleteBottomSheet(
-                                      text: strDeleteGrp,
-                                      ontap: () => groupPovider
-                                          .deleteGroup(filterList[index].id));
-                                },
+                      StreamProvider.value(
+                        value: DataProvider().createdGroups(),
+                        initialData: null,
+                        catchError: (context, error) => null,
+                        child: Consumer<List<GroupModel>?>(
+                          builder: (context, groups, b) {
+                            if (groups == null) {
+                              return centerLoader();
+                            }
+
+                            if (groups.isEmpty) {
+                              return const Center(
+                                child: TextWidget(
+                                  text: strAlertGroupCreated,
+                                ),
                               );
-                            },
-                          );
-                        },
+                            }
+                            return ListView.builder(
+                              itemCount: groups.length,
+                              itemBuilder: (context, index) {
+                                return GroupTile(
+                                  group: groups[index],
+                                  ontapTrailing: () {
+                                    deleteBottomSheet(
+                                        text: strDeleteGrp,
+                                        ontap: () => groupPovider
+                                            .deleteGroup(groups[index].id));
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                       Positioned(
                         right: 20.w,

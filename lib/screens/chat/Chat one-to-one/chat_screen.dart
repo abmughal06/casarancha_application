@@ -1,17 +1,16 @@
 import 'dart:io';
 
 import 'package:casarancha/models/message.dart';
-import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/user_model.dart';
 import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
 import '../../../widgets/chat_screen_widgets/chat_input_field.dart';
@@ -21,22 +20,17 @@ import '../../../widgets/common_widgets.dart';
 
 class ChatScreen extends StatefulWidget {
   final String appUserId;
-  final CreatorDetails creatorDetails;
-  final String? val;
 
   const ChatScreen({
     super.key,
     required this.appUserId,
-    required this.creatorDetails,
-    this.val,
   });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen>
-    with AutomaticKeepAliveClientMixin<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> {
   late ChatProvider chatProvider;
 
   @override
@@ -50,11 +44,7 @@ class _ChatScreenState extends State<ChatScreen>
   @override
   Widget build(BuildContext context) {
     chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    final currentUser = context.watch<UserModel>();
-    final users = context.watch<List<UserModel>>();
-    final appUser =
-        users.where((element) => element.id == widget.appUserId).first;
-    super.build(context);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -67,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen>
         automaticallyImplyLeading: false,
         backgroundColor: colorWhite,
         title: ChatScreenUserAppBar(
-          creatorDetails: widget.creatorDetails,
+          // creatorDetails: widget.creatorDetails,
           appUserId: widget.appUserId,
         ),
         actions: [
@@ -112,8 +102,8 @@ class _ChatScreenState extends State<ChatScreen>
                       final isMe = message.sentToId == widget.appUserId;
                       if (messages.isNotEmpty) {
                         chatProvider.resetMessageCount(
-                          currentUserId: currentUser.id,
-                          appUserId: appUser.id,
+                          currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                          appUserId: widget.appUserId,
                           messageid: message.id,
                         );
                       }
@@ -125,17 +115,7 @@ class _ChatScreenState extends State<ChatScreen>
                   ),
                 ),
                 ChatInputField(
-                  currentUser: currentUser,
-                  appUser: appUser,
-                  onTapSentMessage: () {
-                    chatProvider.sentMessage(
-                      currentUser: currentUser,
-                      appUser: appUser,
-                    );
-                    if (mounted) {
-                      setState(() {});
-                    }
-                  },
+                  appUserId: widget.appUserId,
                 ),
               ],
             );
@@ -158,7 +138,4 @@ class _ChatScreenState extends State<ChatScreen>
       }),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

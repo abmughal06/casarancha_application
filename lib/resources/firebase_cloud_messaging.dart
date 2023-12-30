@@ -283,11 +283,8 @@ class FirebaseMessagingService {
 
       final appUserData = UserModel.fromMap(ref.data()!);
       Get.to(() => ChatScreen(
-          appUserId: appUserData.id,
-          creatorDetails: CreatorDetails(
-              name: appUserData.name,
-              imageUrl: appUserData.imageStr,
-              isVerified: appUserData.isVerified)));
+            appUserId: appUserData.id,
+          ));
     } else if (strNot == "user_follow") {
       navigateToAppUserScreen(notificationData['userRequestId'], context);
     } else if (strNot == 'dynamicLink') {

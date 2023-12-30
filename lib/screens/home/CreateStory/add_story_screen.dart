@@ -36,61 +36,65 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     story = Provider.of<AddStoryProvider>(context, listen: false);
     final user = context.watch<UserModel?>();
     return Scaffold(
-      appBar: primaryAppbar(title: 'Add Story', actions: [
-        IconButton(
-          onPressed: () {
-            Get.bottomSheet(
-              CupertinoActionSheet(
-                actions: [
-                  CupertinoActionSheetAction(
+      appBar: primaryAppbar(
+        title: 'Add Story',
+        actions: [
+          IconButton(
+            onPressed: () {
+              Get.bottomSheet(
+                CupertinoActionSheet(
+                  actions: [
+                    CupertinoActionSheetAction(
+                      onPressed: () {
+                        Get.back();
+
+                        story.getMedia(type: 'Photo');
+                      },
+                      child: const Text(
+                        'Photo',
+                      ),
+                    ),
+                    CupertinoActionSheetAction(
+                      onPressed: () {
+                        Get.back();
+
+                        story.getMedia(type: 'Video');
+                      },
+                      child: const Text(
+                        'Video',
+                      ),
+                    ),
+                  ],
+                  cancelButton: CupertinoActionSheetAction(
                     onPressed: () {
                       Get.back();
-
-                      story.getMedia(type: 'Photo');
                     },
                     child: const Text(
-                      'Photo',
+                      'Cancel',
                     ),
-                  ),
-                  CupertinoActionSheetAction(
-                    onPressed: () {
-                      Get.back();
-
-                      story.getMedia(type: 'Video');
-                    },
-                    child: const Text(
-                      'Video',
-                    ),
-                  ),
-                ],
-                cancelButton: CupertinoActionSheetAction(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  child: const Text(
-                    'Cancel',
                   ),
                 ),
-              ),
-            );
-          },
-          icon: Image.asset(
-            imgAddPost,
+              );
+            },
+            icon: Image.asset(
+              imgAddPost,
+            ),
           ),
-        ),
-      ]),
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton:
-          Consumer<AddStoryProvider>(builder: (context, prov, b) {
-        return CommonButton(
-          showLoading: prov.isSharingStory,
-          text: prov.isSharingStory ? 'Wait' : 'Share Story',
-          height: 58.w,
-          verticalOutMargin: 10.w,
-          horizontalOutMargin: 10.w,
-          onTap: () => prov.shareStory(user: user),
-        );
-      }),
+      floatingActionButton: Consumer<AddStoryProvider>(
+        builder: (context, prov, b) {
+          return CommonButton(
+            showLoading: prov.isSharingStory,
+            text: prov.isSharingStory ? 'Wait' : 'Share Story',
+            height: 58.w,
+            verticalOutMargin: 10.w,
+            horizontalOutMargin: 10.w,
+            onTap: () => prov.shareStory(user: user),
+          );
+        },
+      ),
       body: Consumer<AddStoryProvider>(builder: (context, provider, b) {
         return provider.mediaFile != null
             ? Padding(

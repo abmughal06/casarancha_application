@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_comment_tile.dart';
@@ -33,195 +34,231 @@ class PostCreatorProfileTile extends StatelessWidget {
     final postProvider = Provider.of<PostProvider>(context, listen: false);
     final curruentUser = context.watch<UserModel?>();
     final ghostProvider = Provider.of<DashboardProvider>(context);
-    final appUser = context
-        .watch<List<UserModel>?>()!
-        .where((element) => element.id == post.creatorId)
-        .first;
+    // final appUser = context
+    //     .watch<List<UserModel>?>()!
+    //     .where((element) => element.id == post.creatorId)
+    //     .first;
 
-    return Container(
-      padding: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-          color: colorWhite,
-          borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(25.r),
-              bottomLeft: Radius.circular(25.r)),
-          boxShadow: [
-            BoxShadow(
-              color: colorPrimaryA05.withOpacity(.10),
-              blurRadius: 2,
-              offset: const Offset(0, 3),
-            ),
-            BoxShadow(
-              color: Colors.grey.shade300,
-            ),
-            BoxShadow(
-              color: Colors.grey.shade300,
-            )
-          ]),
-      child: Column(
-        children: [
-          CustomPostFooter(
-            isLike:
-                post.likesIds.contains(FirebaseAuth.instance.currentUser!.uid),
-            isPostDetail: true,
-            ontapLike: () => postProvider.toggleLikeDislike(
-              postModel: post,
-              groupId: groupId,
-            ),
-            ontapSave: () {
-              ghostProvider.checkGhostMode
-                  ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
-                  : postProvider.onTapSave(
-                      userModel: curruentUser, postId: post.id);
-            },
-            postModel: post,
-            savepostIds: curruentUser!.savedPostsIds,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                Row(
+    return StreamProvider.value(
+      value: DataProvider().getSingleUser(post.creatorId),
+      initialData: null,
+      catchError: (context, error) => null,
+      child: Consumer<UserModel?>(builder: (context, appUser, b) {
+        if (appUser == null) {
+          return Container();
+        }
+        return Container(
+          padding: const EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+              color: colorWhite,
+              borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(25.r),
+                  bottomLeft: Radius.circular(25.r)),
+              boxShadow: [
+                BoxShadow(
+                  color: colorPrimaryA05.withOpacity(.10),
+                  blurRadius: 2,
+                  offset: const Offset(0, 3),
+                ),
+                BoxShadow(
+                  color: Colors.grey.shade300,
+                ),
+                BoxShadow(
+                  color: Colors.grey.shade300,
+                )
+              ]),
+          child: Column(
+            children: [
+              CustomPostFooter(
+                isLike: post.likesIds
+                    .contains(FirebaseAuth.instance.currentUser!.uid),
+                isPostDetail: true,
+                ontapLike: () => postProvider.toggleLikeDislike(
+                  postModel: post,
+                  groupId: groupId,
+                ),
+                ontapSave: () {
+                  ghostProvider.checkGhostMode
+                      ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                      : postProvider.onTapSave(
+                          userModel: curruentUser, postId: post.id);
+                },
+                postModel: post,
+                savepostIds: curruentUser!.savedPostsIds,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
                   children: [
-                    SizedBox(
-                      height: 34.h,
-                      width: 34.h,
-                      child: Stack(
+                    Row(
+                      children: [
+                        post.isGhostPost
+                            ? CircleAvatar(
+                                radius: 20,
+                                backgroundColor: colorF03,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: Image.asset(imgGhostUserBg),
+                                ),
+                              )
+                            : SizedBox(
+                                height: 34.h,
+                                width: 34.h,
+                                child: Stack(
+                                  children: [
+                                    InkWell(
+                                      onTap: () => navigateToAppUserScreen(
+                                          post.creatorId, context),
+                                      child: appUser.imageStr != ''
+                                          ? Container(
+                                              height: 30.h,
+                                              width: 30.h,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image:
+                                                      CachedNetworkImageProvider(
+                                                    appUser.imageStr,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : Container(
+                                              height: 30.h,
+                                              width: 30.h,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: AssetImage(
+                                                    imgUserPlaceHolder,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                    Visibility(
+                                      visible: appUser.isVerified,
+                                      child: Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: SvgPicture.asset(icVerifyBadge),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                        widthBox(7.w),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextWidget(
+                              onTap: post.isGhostPost
+                                  ? () {}
+                                  : () => navigateToAppUserScreen(
+                                      post.creatorId, context),
+                              text: post.isGhostPost
+                                  ? appUser.ghostName
+                                  : appUser.username,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                            Visibility(
+                              visible: post.showPostTime ||
+                                  post.locationName.isNotEmpty,
+                              child: TextWidget(
+                                text:
+                                    "${post.showPostTime ? "${convertDateIntoTime(post.createdAt)} " : ""}${post.locationName.isEmpty ? "" : "at ${post.locationName}"}",
+                                fontWeight: FontWeight.w400,
+                                fontSize: 9.sp,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Visibility(
+                      visible: post.description.isNotEmpty,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          InkWell(
-                            onTap: () => navigateToAppUserScreen(
-                                post.creatorId, context),
-                            child: appUser.imageStr != ''
-                                ? Container(
-                                    height: 30.h,
-                                    width: 30.h,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: CachedNetworkImageProvider(
-                                          appUser.imageStr,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 30.h,
-                                    width: 30.h,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: AssetImage(
-                                          imgUserPlaceHolder,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                          ),
-                          Visibility(
-                            visible: appUser.isVerified,
-                            child: Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: SvgPicture.asset(icVerifyBadge),
+                          heightBox(11.h),
+                          Padding(
+                            padding: EdgeInsets.only(left: 2.h),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextWidget(
+                                text: post.description,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xff5f5f5f),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    widthBox(7.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextWidget(
-                          onTap: () =>
-                              navigateToAppUserScreen(post.creatorId, context),
-                          text: appUser.username,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                    Visibility(
+                      visible: post.tagsIds.isNotEmpty,
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Wrap(
+                          children: post.tagsIds.map((userId) {
+                            return StreamProvider.value(
+                              value:
+                                  DataProvider().filterUserList(post.tagsIds),
+                              initialData: null,
+                              catchError: (context, error) => null,
+                              child: Consumer<List<UserModel>?>(
+                                builder: (context, tagusers, child) {
+                                  if (tagusers == null) {
+                                    return Container();
+                                  } else {
+                                    var userList = tagusers
+                                        .where(
+                                            (element) => element.id == userId)
+                                        .toList();
+
+                                    if (userList.isEmpty) {
+                                      return const SizedBox.shrink();
+                                    }
+
+                                    var username = userList
+                                        .map((e) => e.username)
+                                        .join(", ");
+                                    return Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.69,
+                                      ),
+                                      child: selectableHighlightMentions(
+                                        text: "@$username ",
+                                        context: context,
+                                        onTap: () {
+                                          // printLog('============>>>>>>>>>tagged');
+                                          onUsernameTap(username, context);
+                                        },
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            );
+                          }).toList(),
                         ),
-                        TextWidget(
-                          text:
-                              "${post.showPostTime ? "${convertDateIntoTime(post.createdAt)} " : ""}${post.locationName.isEmpty ? "" : "at ${post.locationName}"}",
-                          fontWeight: FontWeight.w400,
-                          fontSize: 9.sp,
-                          color: Colors.black,
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-                Visibility(
-                  visible: post.description.isNotEmpty,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      heightBox(11.h),
-                      Padding(
-                        padding: EdgeInsets.only(left: 2.h),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextWidget(
-                            text: post.description,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xff5f5f5f),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Visibility(
-                  visible: post.tagsIds.isNotEmpty,
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Wrap(
-                      children: post.tagsIds.map((userId) {
-                        return Consumer<List<UserModel>?>(
-                          builder: (context, tagusers, child) {
-                            if (tagusers == null) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else {
-                              var userList = tagusers
-                                  .where((element) => element.id == userId)
-                                  .toList();
-
-                              if (userList.isEmpty) {
-                                return const SizedBox.shrink();
-                              }
-
-                              var username =
-                                  userList.map((e) => e.username).join(", ");
-                              return Container(
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.69,
-                                ),
-                                child: selectableHighlightMentions(
-                                  text: "@$username ",
-                                  context: context,
-                                  onTap: () {
-                                    // printLog('============>>>>>>>>>tagged');
-                                    onUsernameTap(username, context);
-                                  },
-                                ),
-                              );
-                            }
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }

@@ -151,13 +151,13 @@ class ProfileTopLoader extends StatelessWidget {
 }
 
 class ProfileTop extends StatelessWidget {
-  const ProfileTop({super.key, this.user});
+  const ProfileTop({super.key, required this.user});
 
-  final UserModel? user;
+  final UserModel user;
 
   @override
   Widget build(BuildContext context) {
-    final appUsers = context.watch<List<UserModel>?>();
+    // final appUsers = context.watch<List<UserModel>?>();
 
     return Column(
       children: [
@@ -167,7 +167,7 @@ class ProfileTop extends StatelessWidget {
               const CircleBorder(side: BorderSide(color: colorWhite, width: 3)),
           elevation: 3,
           child: ProfilePic(
-            pic: user!.imageStr,
+            pic: user.imageStr,
             showBorder: false,
             heightAndWidth: 105.h,
           ),
@@ -177,7 +177,7 @@ class ProfileTop extends StatelessWidget {
           TextSpan(
             children: [
               TextSpan(
-                text: "${user!.name} ",
+                text: "${user.name} ",
                 style: TextStyle(
                   color: color13F,
                   fontWeight: FontWeight.w600,
@@ -186,7 +186,7 @@ class ProfileTop extends StatelessWidget {
               ),
               WidgetSpan(
                 child: Visibility(
-                  visible: user!.isVerified,
+                  visible: user.isVerified,
                   child: SvgPicture.asset(
                     icVerifyBadge,
                     height: 17,
@@ -197,7 +197,7 @@ class ProfileTop extends StatelessWidget {
           ),
         ),
         SelectableTextWidget(
-          text: user!.username,
+          text: user.username,
           color: colorAA3,
           fontWeight: FontWeight.w400,
           fontSize: 13.sp,
@@ -211,14 +211,14 @@ class ProfileTop extends StatelessWidget {
                 catchError: (context, error) => null,
                 value: DataProvider().posts(),
                 child: Consumer<List<PostModel>?>(builder: (context, post, b) {
-                  if (post == null || user == null) {
+                  if (post == null) {
                     return profileCounter(
                         ontap: null, count: '0', strText: strProfilePost);
                   }
                   return profileCounter(
                       ontap: null,
                       count: post
-                          .where((element) => element.creatorId == user!.id)
+                          .where((element) => element.creatorId == user.id)
                           .toList()
                           .length
                           .toString(),
@@ -230,25 +230,13 @@ class ProfileTop extends StatelessWidget {
                     Get.to(() => const CurruentUserFollowerFollowingScreen(
                           follow: true,
                         )),
-                count: appUsers == null
-                    ? "0"
-                    : appUsers
-                        .where((element) =>
-                            user!.followersIds.contains(element.id))
-                        .length
-                        .toString(),
+                count: user.followersIds.length.toString(),
                 strText: strProfileFollowers),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
                 ontap: () =>
                     Get.to(() => const CurruentUserFollowerFollowingScreen()),
-                count: appUsers == null
-                    ? "0"
-                    : appUsers
-                        .where((element) =>
-                            user!.followingsIds.contains(element.id))
-                        .length
-                        .toString(),
+                count: user.followingsIds.length.toString(),
                 strText: strProfileFollowing),
           ],
         ),
@@ -259,7 +247,7 @@ class ProfileTop extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Visibility(
-                visible: user!.education.isNotEmpty,
+                visible: user.education.isNotEmpty,
                 child: SelectableText.rich(
                   TextSpan(
                     children: [
@@ -271,7 +259,7 @@ class ProfileTop extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' ${user!.education} ',
+                        text: ' ${user.education} ',
                         style: TextStyle(
                           color: color55F,
                           fontSize: 12.sp,
@@ -280,7 +268,7 @@ class ProfileTop extends StatelessWidget {
                       ),
                       WidgetSpan(
                           child: Visibility(
-                              visible: user!.isEducationVerified,
+                              visible: user.isEducationVerified,
                               child: SvgPicture.asset(
                                 icVerifyBadge,
                                 height: 15,
@@ -291,7 +279,7 @@ class ProfileTop extends StatelessWidget {
                 ),
               ),
               Visibility(
-                visible: user!.work.isNotEmpty,
+                visible: user.work.isNotEmpty,
                 child: SelectableText.rich(
                   TextSpan(
                     children: [
@@ -303,7 +291,7 @@ class ProfileTop extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' ${user!.work} ',
+                        text: ' ${user.work} ',
                         style: TextStyle(
                           color: color55F,
                           fontFamily: strFontName,
@@ -312,7 +300,7 @@ class ProfileTop extends StatelessWidget {
                       ),
                       WidgetSpan(
                           child: Visibility(
-                              visible: user!.isWorkVerified,
+                              visible: user.isWorkVerified,
                               child: SvgPicture.asset(
                                 icVerifyBadge,
                                 height: 15,
@@ -323,9 +311,9 @@ class ProfileTop extends StatelessWidget {
                 ),
               ),
               Visibility(
-                visible: user!.bio.isNotEmpty,
+                visible: user.bio.isNotEmpty,
                 child: SelectableTextWidget(
-                  text: user!.bio,
+                  text: user.bio,
                   textAlign: TextAlign.center,
                   color: color55F,
                   fontSize: 12.sp,

@@ -25,13 +25,13 @@ class PostCard extends StatelessWidget {
       {super.key,
       required this.post,
       this.initializedFuturePlay,
-      required this.postCreator,
+      required this.postCreatorId,
       this.groupId,
       this.isGhostPost = false});
 
   final PostModel post;
   final Future<void>? initializedFuturePlay;
-  final UserModel postCreator;
+  final String postCreatorId;
 
   final String? groupId;
   final bool isGhostPost;
@@ -45,7 +45,7 @@ class PostCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       children: [
         CustomPostHeader(
-          postCreator: postCreator,
+          postCreatorId: postCreatorId,
           postModel: post,
           isGhostPost: isGhostPost,
           onVertItemClick: () {

@@ -1,7 +1,9 @@
 import 'dart:developer';
 
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -19,158 +21,171 @@ import '../../../widgets/common_widgets.dart';
 class ChatInputField extends StatelessWidget {
   const ChatInputField({
     super.key,
-    required this.currentUser,
-    required this.appUser,
-    required this.onTapSentMessage,
+    required this.appUserId,
   });
-  final UserModel currentUser;
-
-  final UserModel appUser;
-  final VoidCallback onTapSentMessage;
+  final String appUserId;
 
   @override
   Widget build(BuildContext context) {
     bool isRecordingDelete = false;
 
-    return Consumer<ChatProvider>(
-      builder: (context, chatProvider, b) {
-        return chatProvider.photosList.isNotEmpty ||
-                chatProvider.videosList.isNotEmpty ||
-                chatProvider.mediaList.isNotEmpty ||
-                chatProvider.musicList.isNotEmpty
-            ? ShowMediaToSendInChat(
-                currentUser: currentUser,
-                appUser: appUser,
-              )
-            : Container(
-                decoration: BoxDecoration(
-                    color: colorWhite,
-                    border: Border(
-                        top: BorderSide(color: color221.withOpacity(0.3)))),
-                padding: const EdgeInsets.only(
-                    left: 20, right: 20, bottom: 35, top: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Visibility(
-                      visible: !chatProvider.isRecording,
-                      child: Expanded(
-                        child: ChatTextField(
-                          chatController: chatProvider.messageController,
-                          ontapSend: () {},
+    return StreamProvider.value(
+      value: DataProvider().allUsers(),
+      initialData: null,
+      catchError: (context, error) => null,
+      child: Consumer2<ChatProvider, List<UserModel>?>(
+        builder: (context, chatProvider, allUsers, b) {
+          if (allUsers == null) {
+            return Container();
+          }
+          var currentUser =
+              allUsers.where((element) => element.id == currentUserUID).first;
+          var appUser =
+              allUsers.where((element) => element.id == appUserId).first;
+          return chatProvider.photosList.isNotEmpty ||
+                  chatProvider.videosList.isNotEmpty ||
+                  chatProvider.mediaList.isNotEmpty ||
+                  chatProvider.musicList.isNotEmpty
+              ? ShowMediaToSendInChat(
+                  currentUser: currentUser,
+                  appUser: appUser,
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                      color: colorWhite,
+                      border: Border(
+                          top: BorderSide(color: color221.withOpacity(0.3)))),
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, bottom: 35, top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Visibility(
+                        visible: !chatProvider.isRecording,
+                        child: Expanded(
+                          child: ChatTextField(
+                            chatController: chatProvider.messageController,
+                            ontapSend: () {},
+                          ),
                         ),
                       ),
-                    ),
-                    Visibility(
-                      visible: chatProvider.isRecording,
-                      child: VoiceRecordingWidget(
-                          sendRecording: () => chatProvider.stopRecording(
-                                currentUser: currentUser,
-                                appUser: appUser,
-                                firstMessageByWho: false,
-                                isGhostMessage: false,
-                              ),
-                          isRecorderLock: chatProvider.isRecorderLock,
-                          onTapDelete: () => chatProvider.deleteRecording(),
-                          isRecording: chatProvider.isRecording,
-                          isRecordingSend: chatProvider.isRecordingSend,
-                          duration: formatTime(chatProvider.durationInSeconds)),
-                    ),
-                    Visibility(
-                      visible: chatProvider.messageController.text.isEmpty,
-                      child: Row(
-                        children: [
-                          widthBox(12.w),
-                          chatProvider.isRecorderLock
-                              ? GestureDetector(
-                                  onTap: () {
-                                    chatProvider.stopRecording(
-                                      currentUser: currentUser,
-                                      appUser: appUser,
-                                      firstMessageByWho: false,
-                                      isGhostMessage: false,
-                                    );
-                                  },
-                                  child: Image.asset(
-                                    imgSendComment,
-                                    height: 38.h,
-                                    width: 38.w,
-                                  ),
-                                )
-                              : GestureDetector(
-                                  onLongPress: () async {
-                                    if (await chatProvider.audioRecorder
-                                        .hasPermission()) {
-                                      chatProvider.startRecording();
-                                      isRecordingDelete = false;
-                                    } else {
-                                      return;
-                                    }
-                                  },
-                                  onLongPressMoveUpdate: (details) {
-                                    final dragDistanceHor =
-                                        details.localPosition.dx;
-                                    final dragDistanceVer =
-                                        details.localPosition.dy;
-
-                                    if (dragDistanceHor < -50) {
-                                      chatProvider.deleteRecording();
-
-                                      log('deleted');
-                                      isRecordingDelete = true;
-                                    }
-                                    if (dragDistanceVer < -20) {
-                                      chatProvider.toggleRecorderLock();
-                                    }
-                                  },
-                                  onLongPressEnd: (details) {
-                                    if (!isRecordingDelete) {
+                      Visibility(
+                        visible: chatProvider.isRecording,
+                        child: VoiceRecordingWidget(
+                            sendRecording: () => chatProvider.stopRecording(
+                                  currentUser: currentUser,
+                                  appUser: appUser,
+                                  firstMessageByWho: false,
+                                  isGhostMessage: false,
+                                ),
+                            isRecorderLock: chatProvider.isRecorderLock,
+                            onTapDelete: () => chatProvider.deleteRecording(),
+                            isRecording: chatProvider.isRecording,
+                            isRecordingSend: chatProvider.isRecordingSend,
+                            duration:
+                                formatTime(chatProvider.durationInSeconds)),
+                      ),
+                      Visibility(
+                        visible: chatProvider.messageController.text.isEmpty,
+                        child: Row(
+                          children: [
+                            widthBox(12.w),
+                            chatProvider.isRecorderLock
+                                ? GestureDetector(
+                                    onTap: () {
                                       chatProvider.stopRecording(
                                         currentUser: currentUser,
                                         appUser: appUser,
                                         firstMessageByWho: false,
                                         isGhostMessage: false,
                                       );
-                                    }
-                                    if (chatProvider.isRecorderLock) {}
-                                    chatProvider.cancelTimer();
-                                    chatProvider.deleteRecording();
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(10.w),
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: colorF03.withOpacity(0.6)),
-                                    child: Icon(
-                                      Icons.mic_none_sharp,
-                                      color: color221,
-                                      size: 24.sp,
+                                    },
+                                    child: Image.asset(
+                                      imgSendComment,
+                                      height: 38.h,
+                                      width: 38.w,
                                     ),
-                                  ),
-                                )
-                        ],
+                                  )
+                                : GestureDetector(
+                                    onLongPress: () async {
+                                      if (await chatProvider.audioRecorder
+                                          .hasPermission()) {
+                                        chatProvider.startRecording();
+                                        isRecordingDelete = false;
+                                      } else {
+                                        return;
+                                      }
+                                    },
+                                    onLongPressMoveUpdate: (details) {
+                                      final dragDistanceHor =
+                                          details.localPosition.dx;
+                                      final dragDistanceVer =
+                                          details.localPosition.dy;
+
+                                      if (dragDistanceHor < -50) {
+                                        chatProvider.deleteRecording();
+
+                                        log('deleted');
+                                        isRecordingDelete = true;
+                                      }
+                                      if (dragDistanceVer < -20) {
+                                        chatProvider.toggleRecorderLock();
+                                      }
+                                    },
+                                    onLongPressEnd: (details) {
+                                      if (!isRecordingDelete) {
+                                        chatProvider.stopRecording(
+                                          currentUser: currentUser,
+                                          appUser: appUser,
+                                          firstMessageByWho: false,
+                                          isGhostMessage: false,
+                                        );
+                                      }
+                                      if (chatProvider.isRecorderLock) {}
+                                      chatProvider.cancelTimer();
+                                      chatProvider.deleteRecording();
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(10.w),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: colorF03.withOpacity(0.6)),
+                                      child: Icon(
+                                        Icons.mic_none_sharp,
+                                        color: color221,
+                                        size: 24.sp,
+                                      ),
+                                    ),
+                                  )
+                          ],
+                        ),
                       ),
-                    ),
-                    Visibility(
-                      visible: chatProvider.messageController.text.isNotEmpty,
-                      child: Row(
-                        children: [
-                          widthBox(12.w),
-                          GestureDetector(
-                            onTap: onTapSentMessage,
-                            child: Image.asset(
-                              imgSendComment,
-                              height: 38.h,
-                              width: 38.w,
+                      Visibility(
+                        visible: chatProvider.messageController.text.isNotEmpty,
+                        child: Row(
+                          children: [
+                            widthBox(12.w),
+                            GestureDetector(
+                              onTap: () {
+                                chatProvider.sentMessage(
+                                  currentUser: currentUser,
+                                  appUser: appUser,
+                                );
+                              },
+                              child: Image.asset(
+                                imgSendComment,
+                                height: 38.h,
+                                width: 38.w,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-      },
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
+        },
+      ),
     );
   }
 }

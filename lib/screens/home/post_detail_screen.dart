@@ -10,7 +10,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/comment_model.dart';
-import '../../models/user_model.dart';
 import '../../widgets/home_screen_widgets/post_comment_field.dart';
 import '../../widgets/home_screen_widgets/post_comment_tile.dart';
 import '../../widgets/home_screen_widgets/post_detail_media.dart';
@@ -29,7 +28,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final users = context.watch<List<UserModel>?>();
+    // final users = context.watch<List<UserModel>?>();
     // final postProvider = Provider.of<PostProvider>(context);
 
     return Scaffold(
@@ -103,7 +102,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         catchError: (context, error) => null,
                         child: Consumer<List<Comment>?>(
                           builder: (context, comment, b) {
-                            if (comment == null || users == null) {
+                            if (comment == null) {
                               return shimmerImg(
                                 height: 100,
                                 width: double.infinity,

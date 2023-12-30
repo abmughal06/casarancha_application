@@ -385,8 +385,9 @@ Future<Size> getImageSize(File image) async {
 Future<double> getVideoAspectRatio(File video) async {
   VideoPlayerController videoPlayerController =
       VideoPlayerController.file(video);
-  await videoPlayerController.initialize();
-  return videoPlayerController.value.aspectRatio;
+  return await videoPlayerController
+      .initialize()
+      .then((value) => videoPlayerController.value.aspectRatio);
 }
 
 Future<File?> profileCropImage(String path) async {

@@ -41,6 +41,11 @@ class AddStoryProvider extends ChangeNotifier {
     final creatorId = user!.id;
 
     final storyRef = fbinstance.collection('stories').doc(creatorId);
+    final mediaRef = fbinstance
+        .collection('stories')
+        .doc(creatorId)
+        .collection('media')
+        .doc();
     final userRef = fbinstance.collection('users').doc(creatorId);
     final storyId = storyRef.id;
 
@@ -67,7 +72,7 @@ class AddStoryProvider extends ChangeNotifier {
           creatorId: creatorId,
           creatorDetails: creatorDetails,
           createdAt: DateTime.now().toIso8601String(),
-          mediaDetailsList: [mediaData],
+          mediaDetailsList: [],
         );
 
         await userRef.update({
@@ -75,6 +80,7 @@ class AddStoryProvider extends ChangeNotifier {
         });
 
         await storyRef.set(story.toMap());
+        await mediaRef.set(mediaData.toMap());
       }
 
       Get.back();

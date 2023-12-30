@@ -689,7 +689,10 @@ class ChatQouteTile extends StatelessWidget {
 
 class DateAndSeenTile extends StatelessWidget {
   const DateAndSeenTile(
-      {super.key, required this.isMe, required this.isSeen, required this.date});
+      {super.key,
+      required this.isMe,
+      required this.isSeen,
+      required this.date});
   final bool isMe;
   final bool isSeen;
   final String date;

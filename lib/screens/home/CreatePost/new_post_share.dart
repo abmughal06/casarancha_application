@@ -1,3 +1,4 @@
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -49,7 +50,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();
-    final allUsers = context.watch<List<UserModel>>();
+    // final allUsers = context.watch<List<UserModel>>();
     createPostMethods = Provider.of<CreatePostMethods>(context);
 
     return Scaffold(
@@ -59,31 +60,38 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: user == null
           ? Container()
-          : CommonButton(
-              showLoading: createPostMethods.isSharingPost,
-              text: strSharePost,
-              height: 58.w,
-              verticalOutMargin: 10.w,
-              horizontalOutMargin: 10.w,
-              onTap: () {
-                List<String> userIds = createPostMethods.selectedUsers
-                    .map((user) => user.id)
-                    .toList();
-
-                widget.isPoll
-                    ? createPostMethods.sharePollPost(
-                        user: user,
-                      )
-                    : createPostMethods.sharePost(
-                        groupId: widget.groupId,
-                        user: user,
-                        isGhostPost: widget.isGhostPost,
-                        isForum: widget.isForum,
-                        tagIds: userIds,
-                        allUsers: allUsers,
-                      );
-                createPostMethods.selectedUsers.clear();
-              },
+          : StreamProvider.value(
+              value: DataProvider().filterUserList(
+                  createPostMethods.selectedUsers.map((e) => e.id).toList()),
+              catchError: (context, error) => null,
+              initialData: null,
+              child: Consumer<List<UserModel>?>(builder: (context, users, b) {
+                if (users == null) {
+                  return Container();
+                }
+                return CommonButton(
+                  showLoading: createPostMethods.isSharingPost,
+                  text: strSharePost,
+                  height: 58.w,
+                  verticalOutMargin: 10.w,
+                  horizontalOutMargin: 10.w,
+                  onTap: () {
+                    widget.isPoll
+                        ? createPostMethods.sharePollPost(
+                            user: user,
+                          )
+                        : createPostMethods.sharePost(
+                            groupId: widget.groupId,
+                            user: user,
+                            isGhostPost: widget.isGhostPost,
+                            isForum: widget.isForum,
+                            tagIds: users.map((element) => element.id).toList(),
+                            allUsers: users,
+                          );
+                    createPostMethods.selectedUsers.clear();
+                  },
+                );
+              }),
             ),
       body: Padding(
         padding: EdgeInsets.symmetric(
@@ -280,62 +288,69 @@ class TagUserListDialog extends StatelessWidget {
                 },
               ),
               heightBox(10.h),
-              Consumer<List<UserModel>?>(
-                builder: (context, users, b) {
-                  if (prov.tagsController.text.isEmpty ||
-                      prov.tagsController.text == '') {
-                    return Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: const Center(
-                          child: TextWidget(
-                            textAlign: TextAlign.center,
-                            text: 'Search the users to tag them.',
+              StreamProvider.value(
+                value: DataProvider().users(),
+                initialData: null,
+                catchError: (context, error) => null,
+                child: Consumer<List<UserModel>?>(
+                  builder: (context, users, b) {
+                    if (prov.tagsController.text.isEmpty ||
+                        prov.tagsController.text == '') {
+                      return Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: const Center(
+                            child: TextWidget(
+                              textAlign: TextAlign.center,
+                              text: 'Search the users to tag them.',
+                            ),
                           ),
                         ),
+                      );
+                    }
+                    var filterList = users!
+                        .where((element) => (element.name
+                                .toLowerCase()
+                                .contains(
+                                    prov.tagsController.text.toLowerCase()) ||
+                            element.username.toLowerCase().contains(
+                                prov.tagsController.text.toLowerCase())))
+                        .toList();
+
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: filterList.length,
+                        padding: EdgeInsets.zero,
+                        itemBuilder: (context, index) {
+                          var userSnap = filterList[index];
+
+                          return ListTile(
+                              onTap: () {
+                                prov.updateTagList(userSnap);
+
+                                // printLog(prov.selectedUsers.toString());
+                              },
+                              title: Text(userSnap.username),
+                              trailing: prov.selectedUsers.contains(userSnap)
+                                  ? const Icon(
+                                      Icons.check_circle,
+                                      color: colorPrimaryA05,
+                                    )
+                                  : null,
+                              leading: ProfilePic(
+                                pic: userSnap.imageStr,
+                                heightAndWidth: 40.w,
+                              ));
+                        },
+                        // FollowFollowingTile(
+                        //   btnName: 'Nc',
+                        //   user: userSnap,
+                        //   ontapToggleFollow: () {},
+                        // );
                       ),
                     );
-                  }
-                  var filterList = users!
-                      .where((element) => (element.name.toLowerCase().contains(
-                              prov.tagsController.text.toLowerCase()) ||
-                          element.username.toLowerCase().contains(
-                              prov.tagsController.text.toLowerCase())))
-                      .toList();
-
-                  return Expanded(
-                    child: ListView.builder(
-                      itemCount: filterList.length,
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (context, index) {
-                        var userSnap = filterList[index];
-
-                        return ListTile(
-                            onTap: () {
-                              prov.updateTagList(userSnap);
-
-                              // printLog(prov.selectedUsers.toString());
-                            },
-                            title: Text(userSnap.username),
-                            trailing: prov.selectedUsers.contains(userSnap)
-                                ? const Icon(
-                                    Icons.check_circle,
-                                    color: colorPrimaryA05,
-                                  )
-                                : null,
-                            leading: ProfilePic(
-                              pic: userSnap.imageStr,
-                              heightAndWidth: 40.w,
-                            ));
-                      },
-                      // FollowFollowingTile(
-                      //   btnName: 'Nc',
-                      //   user: userSnap,
-                      //   ontapToggleFollow: () {},
-                      // );
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
               // heightBox(20.h),
 

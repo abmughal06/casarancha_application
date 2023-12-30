@@ -23,16 +23,7 @@ class CheckMediaAndShow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (mediaData.type) {
-      case "InChatPic":
-        return CachedNetworkImage(
-            progressIndicatorBuilder: (context, url, progress) => Center(
-                  child: SizedBox(
-                    height: 30.h,
-                    child: const CircularProgressIndicator.adaptive(),
-                  ),
-                ),
-            imageUrl: mediaData.link);
-      case "Photo":
+      case "InChatPic" || "Photo":
         return CachedNetworkImage(
             progressIndicatorBuilder: (context, url, progress) => Center(
                   child: SizedBox(
@@ -42,24 +33,23 @@ class CheckMediaAndShow extends StatelessWidget {
                 ),
             imageUrl: mediaData.link);
 
-      case "InChatVideo":
-        return VideoPlayerWidget(
-          videoUrl: mediaData.link,
-          media: mediaData,
+      case "InChatVideo" || "Video":
+        return FutureBuilder(
+          future: iniializedFuturePlay,
+          builder: (context, snap) {
+            if (snap.connectionState == ConnectionState.done) {
+              return VideoPlayerWidget(
+                videoUrl: mediaData.link,
+                media: mediaData,
+              );
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         );
-      case "Video":
-        return VideoPlayerWidget(
-          videoUrl: mediaData.link,
-          media: mediaData,
-        );
-      case "InChatMusic":
-        return MusicPlayerUrl(
-          isPostDetail: false,
-          border: 0,
-          musicDetails: mediaData,
-          ontap: () {},
-        );
-      case "Music":
+
+      case "InChatMusic" || "Music":
         return MusicPlayerUrl(
           isPostDetail: false,
           border: 0,

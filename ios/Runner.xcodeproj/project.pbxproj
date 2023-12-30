@@ -390,7 +390,6 @@
 					"-framework",
 					"\"AppAuth\"",
 					"-framework",
-					
 					"\"CFNetwork\"",
 					"-framework",
 					"\"CoreGraphics\"",
@@ -481,7 +480,6 @@
 					"-framework",
 					"\"UIKit\"",
 					"-framework",
-					
 					"\"audio_session\"",
 					"-framework",
 					"\"audioplayers_darwin\"",
@@ -510,7 +508,6 @@
 					"-framework",
 					"\"flutter_share\"",
 					"-framework",
-					
 					"\"google_sign_in_ios\"",
 					"-framework",
 					"\"image_cropper\"",
@@ -701,7 +698,6 @@
 					"-framework",
 					"\"AppAuth\"",
 					"-framework",
-					
 					"\"CFNetwork\"",
 					"-framework",
 					"\"CoreGraphics\"",
@@ -792,7 +788,6 @@
 					"-framework",
 					"\"UIKit\"",
 					"-framework",
-					
 					"\"audio_session\"",
 					"-framework",
 					"\"audioplayers_darwin\"",
@@ -821,7 +816,6 @@
 					"-framework",
 					"\"flutter_share\"",
 					"-framework",
-					
 					"\"google_sign_in_ios\"",
 					"-framework",
 					"\"image_cropper\"",
@@ -906,7 +900,6 @@
 					"-framework",
 					"\"AppAuth\"",
 					"-framework",
-					
 					"\"CFNetwork\"",
 					"-framework",
 					"\"CoreGraphics\"",
@@ -997,7 +990,6 @@
 					"-framework",
 					"\"UIKit\"",
 					"-framework",
-					
 					"\"audio_session\"",
 					"-framework",
 					"\"audioplayers_darwin\"",
@@ -1026,7 +1018,6 @@
 					"-framework",
 					"\"flutter_share\"",
 					"-framework",
-					
 					"\"google_sign_in_ios\"",
 					"-framework",
 					"\"image_cropper\"",

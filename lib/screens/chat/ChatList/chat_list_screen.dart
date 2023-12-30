@@ -45,51 +45,53 @@ class ChatListScreen extends StatelessWidget {
         leading: const GhostModeBtn(),
         actions: [
           IconButton(
-              onPressed: () => context.read<DashboardProvider>().changePage(1),
+              onPressed: () => context.read<DashboardProvider>().changePage(2),
               icon: Image.asset(imgAddPost))
         ],
       ),
-      body: Consumer<DashboardProvider>(builder: (context, ghost, b) {
-        return DefaultTabController(
-          length: 2,
-          initialIndex: ghost.checkGhostMode ? 1 : 0,
-          child: Column(
-            children: [
-              TabBar(
-                onTap: (v) {},
-                labelColor: colorPrimaryA05,
-                unselectedLabelColor: colorAA3,
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14.sp,
-                ),
-                indicatorColor: colorF03,
-                dividerColor: Colors.transparent,
-                indicatorPadding:
-                    EdgeInsets.symmetric(vertical: 5.h, horizontal: 65.w),
-                tabs: const [
-                  Tab(
-                    text: "Friends",
+      body: Consumer<DashboardProvider>(
+        builder: (context, ghost, b) {
+          return DefaultTabController(
+            length: 2,
+            initialIndex: ghost.checkGhostMode ? 1 : 0,
+            child: Column(
+              children: [
+                TabBar(
+                  onTap: (v) {},
+                  labelColor: colorPrimaryA05,
+                  unselectedLabelColor: colorAA3,
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
                   ),
-                  Tab(
-                    text: "Ghosts",
-                  ),
-                ],
-              ),
-              heightBox(15.h),
-              const Expanded(
-                child: TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
-                  children: [
-                    MessageList(),
-                    MessageListGhost(),
+                  indicatorColor: colorF03,
+                  dividerColor: Colors.transparent,
+                  indicatorPadding:
+                      EdgeInsets.symmetric(vertical: 5.h, horizontal: 65.w),
+                  tabs: const [
+                    Tab(
+                      text: "Friends",
+                    ),
+                    Tab(
+                      text: "Ghosts",
+                    ),
                   ],
                 ),
-              )
-            ],
-          ),
-        );
-      }),
+                heightBox(15.h),
+                const Expanded(
+                  child: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
+                    children: [
+                      MessageList(),
+                      MessageListGhost(),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

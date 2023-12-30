@@ -14,7 +14,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/group_model.dart';
 import '../../models/post_model.dart';
-import '../../models/user_model.dart';
 import '../../resources/strings.dart';
 import '../../widgets/home_screen_widgets/post_card.dart';
 
@@ -24,7 +23,7 @@ class GroupPostScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final users = context.watch<List<UserModel>?>();
+    // final users = context.watch<List<UserModel>?>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade50,
@@ -113,24 +112,22 @@ class GroupPostScreen extends StatelessWidget {
             catchError: (context, error) => null,
             child: Consumer<List<PostModel>?>(
               builder: (context, posts, b) {
-                if (posts == null || users == null) {
+                if (posts == null) {
                   return Container();
                 }
-                var post = posts
-                    .where((element) => element.mediaData.isNotEmpty)
-                    .toList();
-                List<PostModel> filterList = [];
-                List<UserModel> postCreator = [];
-                for (var p in post) {
-                  for (var u in users) {
-                    if (p.creatorId == u.id) {
-                      filterList.add(p);
-                      postCreator.add(u);
-                    }
-                  }
-                }
 
-                if (filterList.isEmpty) {
+                // List<PostModel> filterList = [];
+                // List<UserModel> postCreator = [];
+                // for (var p in post) {
+                //   for (var u in users) {
+                //     if (p.creatorId == u.id) {
+                //       filterList.add(p);
+                //       postCreator.add(u);
+                //     }
+                //   }
+                // }
+
+                if (posts.isEmpty) {
                   return const Center(
                     child: TextWidget(
                       text: strAlertGroupPost,
@@ -143,12 +140,12 @@ class GroupPostScreen extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: 80.h),
                   physics: const NeverScrollableScrollPhysics(),
                   addAutomaticKeepAlives: true,
-                  itemCount: filterList.length,
+                  itemCount: posts.length,
                   itemBuilder: (context, index) {
                     return PostCard(
                       groupId: group.id,
-                      post: filterList[index],
-                      postCreator: postCreator[index],
+                      post: posts[index],
+                      postCreatorId: posts[index].creatorId,
                     );
                   },
                 );

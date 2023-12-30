@@ -15,7 +15,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
-import '../../models/user_model.dart';
 import '../../widgets/primary_appbar.dart';
 
 class ForumsScreen extends StatefulWidget {
@@ -30,7 +29,7 @@ class _ForumsScreenState extends State<ForumsScreen>
   @override
   Widget build(BuildContext context) {
     final ghostProvider = context.watch<DashboardProvider>();
-    final users = context.watch<List<UserModel>?>();
+    // final users = context.watch<List<UserModel>?>();
 
     super.build(context);
 
@@ -77,7 +76,7 @@ class _ForumsScreenState extends State<ForumsScreen>
         value: DataProvider().forums(),
         initialData: null,
         child: Consumer<List<PostModel>?>(builder: (context, posts, b) {
-          if (posts == null || users == null) {
+          if (posts == null) {
             return const PostSkeleton();
           }
           return ListView(
@@ -95,13 +94,13 @@ class _ForumsScreenState extends State<ForumsScreen>
                         text: 'Forums does not have any posts yet');
                   }
                   var post = posts[index];
-                  var appUser = users
-                      .where(
-                        (element) => element.id == post.creatorId,
-                      )
-                      .first;
+                  // var appUser = users
+                  //     .where(
+                  //       (element) => element.id == post.creatorId,
+                  //     )
+                  //     .first;
 
-                  return PostCard(post: post, postCreator: appUser);
+                  return PostCard(post: post, postCreatorId: post.creatorId);
                 },
               ),
             ],
