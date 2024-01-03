@@ -63,8 +63,9 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
 
   @override
   void initState() {
-    initImage();
     super.initState();
+
+    initImage();
   }
 
   @override

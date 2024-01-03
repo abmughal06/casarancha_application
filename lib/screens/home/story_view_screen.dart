@@ -59,9 +59,10 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
 
   @override
   void dispose() {
+    super.dispose();
+
     controller!.dispose();
     commentController.dispose();
-    super.dispose();
     currentIndex.value = 0;
   }
 

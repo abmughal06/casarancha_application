@@ -39,6 +39,8 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
 
   @override
   void initState() {
+    super.initState();
+
     User? user = FirebaseAuth.instance.currentUser;
     if (user?.displayName != null) {
       List<String> name = user!.displayName!.split(" ");
@@ -59,7 +61,6 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
     if (user.photoURL != null) {
       provider.profileImage = user.photoURL;
     }
-    super.initState();
   }
 
   @override

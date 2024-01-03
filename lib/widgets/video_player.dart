@@ -66,10 +66,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.initState();
 
     if (widget.videoUrl != null) {
-      videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
-        widget.videoUrl!,
-      ))
-        ..initialize().then((value) {
+      videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(widget.videoUrl!),
+      )..initialize().then((value) {
           if (mounted) {
             setState(() {
               // print(true);
@@ -92,12 +91,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   void dispose() {
+    super.dispose();
+
     videoPlayerController.removeListener(() {});
     duration = Duration.zero;
     position = Duration.zero;
     isVideoPlaying = false;
     videoPlayerController.dispose();
-    super.dispose();
   }
 
   @override

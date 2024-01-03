@@ -6,6 +6,7 @@ import 'package:casarancha/resources/image_resources.dart';
 
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/utils/app_constants.dart';
+import 'package:casarancha/utils/snackbar.dart';
 
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
@@ -73,11 +74,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   late CreatePostMethods createPost;
+  Future<void>? futurePlay;
 
   @override
   void dispose() {
-    createPost.clearLists();
     super.dispose();
+
+    createPost.clearLists();
   }
 
   @override
@@ -245,60 +248,63 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               heightBox(10.w),
                               Expanded(
                                 child: Consumer<CreatePostMethods>(
-                                    builder: (context, state, b) {
-                                  return ListView.builder(
-                                    itemCount: state.videosList.length,
-                                    itemBuilder: (context, index) {
-                                      final videoFile = state.videosList[index];
-                                      return Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: 10.w,
-                                        ),
-                                        child: AspectRatio(
-                                          aspectRatio: 2 / 3,
-                                          child: Card(
-                                            elevation: 1,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(
-                                                  10.r,
+                                  builder: (context, state, b) {
+                                    return ListView.builder(
+                                      itemCount: state.videosList.length,
+                                      itemBuilder: (context, index) {
+                                        final videoFile =
+                                            state.videosList[index];
+                                        return Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: 10.w,
+                                          ),
+                                          child: AspectRatio(
+                                            aspectRatio: 2 / 3,
+                                            child: Card(
+                                              elevation: 1,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(
+                                                    10.r,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            child: Stack(
-                                              fit: StackFit.expand,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                    Radius.circular(
-                                                      10.r,
+                                              child: Stack(
+                                                fit: StackFit.expand,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(
+                                                        10.r,
+                                                      ),
+                                                    ),
+                                                    child: VideoPlayerWithFile(
+                                                      videoFile: videoFile,
                                                     ),
                                                   ),
-                                                  child: VideoPlayerWithFile(
-                                                    videoFile: videoFile,
-                                                  ),
-                                                ),
-                                                Align(
-                                                  alignment: Alignment.topRight,
-                                                  child: IconButton(
-                                                    onPressed: () {
-                                                      state.removeVideoFile(
-                                                          videoFile);
-                                                    },
-                                                    icon: SvgPicture.asset(
-                                                      icRemovePost,
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    child: IconButton(
+                                                      onPressed: () {
+                                                        state.removeVideoFile(
+                                                            videoFile);
+                                                      },
+                                                      icon: SvgPicture.asset(
+                                                        icRemovePost,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                }),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             ],
                           ),
@@ -394,8 +400,14 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
   late VideoPlayerController videoPlayerController;
   bool isLoadingVideo = true;
   bool isPlayingVideo = false;
+  bool isError = false;
   @override
   void initState() {
+    super.initState();
+    initVideo();
+  }
+
+  initVideo() {
     videoPlayerController = VideoPlayerController.file(
       widget.videoFile,
     );
@@ -403,45 +415,65 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
       setState(() {
         isLoadingVideo = false;
       });
+    }).catchError((e) {
+      GlobalSnackBar.show(
+          message: "video format not supported, please try another one.");
+      isLoadingVideo = false;
+      isPlayingVideo = false;
+      isError = true;
+      if (mounted) {
+        setState(() {});
+      }
     });
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    videoPlayerController.dispose();
+    isLoadingVideo = true;
+    isPlayingVideo = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        VideoPlayer(
-          videoPlayerController,
-        ),
-        Center(
-          child: isLoadingVideo
-              ? const CircularProgressIndicator.adaptive()
-              : Container(),
-        ),
-        if (!isLoadingVideo)
-          Align(
-            alignment: Alignment.center,
-            child: IconButton(
-              onPressed: () async {
-                if (isPlayingVideo) {
-                  await videoPlayerController.pause();
-                  isPlayingVideo = false;
-                } else {
-                  await videoPlayerController.play();
-                  isPlayingVideo = true;
-                }
-                setState(() {});
-              },
-              icon: Icon(
-                isPlayingVideo
-                    ? Icons.pause_circle_filled_rounded
-                    : Icons.play_circle_fill_rounded,
-              ),
-            ),
+    return isError
+        ? const Center(
+            child: TextWidget(text: 'File not supported'),
           )
-      ],
-    );
+        : Stack(
+            children: [
+              VideoPlayer(
+                videoPlayerController,
+              ),
+              Center(
+                child: isLoadingVideo
+                    ? const CircularProgressIndicator.adaptive()
+                    : Container(),
+              ),
+              if (!isLoadingVideo)
+                Align(
+                  alignment: Alignment.center,
+                  child: IconButton(
+                    onPressed: () async {
+                      if (isPlayingVideo) {
+                        await videoPlayerController.pause();
+                        isPlayingVideo = false;
+                      } else {
+                        await videoPlayerController.play();
+                        isPlayingVideo = true;
+                      }
+                      setState(() {});
+                    },
+                    icon: Icon(
+                      isPlayingVideo
+                          ? Icons.pause_circle_filled_rounded
+                          : Icons.play_circle_fill_rounded,
+                    ),
+                  ),
+                )
+            ],
+          );
   }
 }
 
@@ -489,8 +521,8 @@ class _MusicPlayerWithFileState extends State<MusicPlayerWithFile> {
 
   @override
   void dispose() {
-    audioPlayer.dispose();
     super.dispose();
+    audioPlayer.dispose();
   }
 
   String formatTime(Duration duration) {

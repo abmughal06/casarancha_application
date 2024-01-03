@@ -365,6 +365,8 @@ class CreatePostMethods extends ChangeNotifier {
 
   @override
   void dispose() {
+    super.dispose();
+
     quoteTextController.dispose();
     captionController.dispose();
     tagsController.dispose();
@@ -373,7 +375,6 @@ class CreatePostMethods extends ChangeNotifier {
     mediaData.clear();
     videosList.clear();
     musicList.clear();
-    super.dispose();
   }
 }
 

@@ -35,10 +35,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    super.dispose();
+
     chatProvider.clearMessageController();
     chatProvider.clearListsondispose();
     chatProvider.recordedFilePath = null;
-    super.dispose();
   }
 
   @override

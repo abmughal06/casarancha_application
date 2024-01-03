@@ -38,9 +38,10 @@ class _MyStoryViewScreenState extends State<MyStoryViewScreen> {
 
   @override
   void dispose() {
+    super.dispose();
+
     controller!.dispose();
     commentController.dispose();
-    super.dispose();
     currentIndex.value = 0;
   }
 

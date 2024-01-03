@@ -20,10 +20,11 @@ class DashboardController extends GetxController {
 
   @override
   void dispose() {
+    super.dispose();
+
     pageController.removeListener(() {
       currentIndex.value = 0;
     });
     pageController.dispose();
-    super.dispose();
   }
 }

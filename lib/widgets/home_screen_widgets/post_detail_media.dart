@@ -52,8 +52,9 @@ class _CheckMediaAndShowPostState extends State<CheckMediaAndShowPost> {
 
   @override
   void initState() {
-    initializedFuturePlay = Future.delayed(const Duration(milliseconds: 500));
     super.initState();
+
+    initializedFuturePlay = Future.delayed(const Duration(milliseconds: 500));
   }
 
   @override
@@ -242,8 +243,9 @@ class _PostMediaWidgetState extends State<PostMediaWidget> {
 
   @override
   void initState() {
-    postCurrentPageIndex = 0;
     super.initState();
+
+    postCurrentPageIndex = 0;
   }
 
   @override

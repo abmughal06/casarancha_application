@@ -27,8 +27,9 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
 
   @override
   void dispose() {
-    story.disposeMedia();
     super.dispose();
+
+    story.disposeMedia();
   }
 
   @override

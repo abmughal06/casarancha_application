@@ -50,8 +50,9 @@ class _PostCommentTileState extends State<PostCommentTile> {
 
   @override
   void initState() {
-    isReplyShow = false;
     super.initState();
+
+    isReplyShow = false;
   }
 
   @override
