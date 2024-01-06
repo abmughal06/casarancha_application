@@ -118,5 +118,12 @@
 	<false/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+  		<key>NSAllowsArbitraryLoads</key>
+  		<true/>
+	</dict>
 </dict>
 </plist>

@@ -206,7 +206,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white, size: 26.sp),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12.w),
                           child: InkWell(
@@ -234,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         Platform.isIOS
                             ? Padding(
-                                padding: EdgeInsets.only(right: 12.w),
+                                padding: EdgeInsets.only(right: 0.w),
                                 child: InkWell(
                                   onTap: () {
                                     context
@@ -257,39 +256,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               )
                             : Container(),
-                        // Padding(
-                        //   padding: EdgeInsets.only(right: 12.w),
-                        //   child: InkWell(
-                        //     onTap: () {
-                        //       context
-                        //           .read<AuthenticationProvider>()
-                        //           .callTwitterSignIn();
-                        //     },
-                        //     child: Container(
-                        //       height: 40.w,
-                        //       width: 40.w,
-                        //       decoration: BoxDecoration(
-                        //           borderRadius: BorderRadius.circular(7),
-                        //           image: const DecorationImage(
-                        //               image: AssetImage(imgTwitterSignIn))),
-                        //     ),
-                        //   ),
-                        // ),
-                        InkWell(
-                          onTap: () {
-                            context
-                                .read<AuthenticationProvider>()
-                                .callFaceBookSignIn();
-                          },
-                          child: Container(
-                            height: 40.w,
-                            width: 40.w,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(7),
-                                image: const DecorationImage(
-                                    image: AssetImage(imgFaceBookSignIn))),
-                          ),
-                        ),
                       ],
                     ),
                     heightBox(24.h),
@@ -344,18 +310,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-/* 
-twitter 
-API KEY : HaPI0dQRItR56omPwCGmNBoVi
-API KEY SECRET : Y3oaX4cUFdMldsr3ZefKxOjC8WVoqVhHFUloOTTZ4y1p5mCf3P
-API KEY TOKEN : AAAAAAAAAAAAAAAAAAAAAG89lQEAAAAADtMQgZYB9lE4Ur5VF0PHX6EJqvs%3DJpZlttWUWJyYGg8uhQhRFCaFGVRUcmdulDQjQ42Ns6u7lTVMwV
- */ /* 
- SU7uog+SDftgfrZmG+QqL+BWDas=
- VzSiQcXRmi2kyjzcA+mYLEtbGVs=
-
- */
-
-
-
-

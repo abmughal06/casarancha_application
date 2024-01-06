@@ -56,6 +56,8 @@ class ChatProvider extends ChangeNotifier {
     }
     try {
       var textMessage = messageController.text;
+      messageController.clear();
+      notifyListeners();
 
       final messageRefForCurrentUser = userRef
           .doc(currentUser!.id)
@@ -148,10 +150,7 @@ class ChatProvider extends ChangeNotifier {
       );
     } catch (e) {
       GlobalSnackBar(message: e.toString());
-    } finally {
-      messageController.clear();
-      notifyListeners();
-    }
+    } finally {}
   }
 
   Future<void> sentMessageGhost(
@@ -648,7 +647,7 @@ class ChatProvider extends ChangeNotifier {
         // final String fileType;
         final String fileName = basename(element.path);
         Size? imageSize;
-        double? videoAspectRatio;
+        // double? videoAspectRatio;
 
         // log('===> 1 $photosList');
         // log('===> 2 $voiceList');
@@ -672,7 +671,7 @@ class ChatProvider extends ChangeNotifier {
           imageSize = await getImageSize(element);
         }
         if (fileType == 'InChatVideo') {
-          videoAspectRatio = await getVideoAspectRatio(element);
+          // videoAspectRatio = await getVideoAspectRatio(element);
         }
 
         final storageFileRef =
@@ -717,7 +716,7 @@ class ChatProvider extends ChangeNotifier {
             name: fileName,
             type: fileType,
             link: fileUrl,
-            videoAspectRatio: videoAspectRatio.toString(),
+            videoAspectRatio: '0.58',
           );
         } else {
           mediaDetails = MediaDetails(

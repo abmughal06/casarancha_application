@@ -1,6 +1,7 @@
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
+import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -186,19 +187,24 @@ class MessageTiles extends StatelessWidget {
               : () => Get.to(() => ChatMediaFullScreenView(
                     media: media!,
                   )),
-          child: ChatVideoTile(
-            key: videos == null ? null : ValueKey(videos.link),
-            mediaLength: media == null
-                ? null
-                : media.length > 1
-                    ? media.length
-                    : null,
-            link: videos?.link,
-            appUserId: message.sentToId,
-            isSeen: message.isSeen,
-            isMe: isMe,
-            date: message.createdAt,
-          ),
+          child: media == null
+              ? AspectRatio(
+                  aspectRatio: 9 / 13,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: colorBlack.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(15)),
+                    child: centerLoader(),
+                  ))
+              : ChatVideoTile(
+                  key: videos == null ? null : ValueKey(videos.link),
+                  mediaLength: media.length > 1 ? media.length : null,
+                  link: videos?.link,
+                  appUserId: message.sentToId,
+                  isSeen: message.isSeen,
+                  isMe: isMe,
+                  date: message.createdAt,
+                ),
         );
       case 'Video':
         final prePost = message.content;
