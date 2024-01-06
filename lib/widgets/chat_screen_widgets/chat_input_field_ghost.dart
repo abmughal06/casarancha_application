@@ -8,8 +8,8 @@ import 'package:casarancha/widgets/chat_screen_widgets/chat_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:native_video_view/native_video_view.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../../models/user_model.dart';
 import '../../../resources/color_resources.dart';
@@ -268,18 +268,35 @@ class ShowMediaToSendInChatGhost extends StatelessWidget {
                                 : media.musicList.length,
                     itemBuilder: (context, index) {
                       if (media.videosList.isNotEmpty) {
-                        VideoPlayerController videoPlayerController;
-                        videoPlayerController =
-                            VideoPlayerController.file(media.videosList[index])
-                              ..initialize().then((value) {});
+                        // VideoPlayerController videoPlayerController;
+                        // videoPlayerController =
+                        //     VideoPlayerController.file(media.videosList[index])
+                        //       ..initialize().then((value) {});
                         return AspectRatio(
                           aspectRatio: 9 / 13,
                           child: Stack(
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: VideoPlayer(
-                                  videoPlayerController,
+                                child: NativeVideoView(
+                                  useExoPlayer: false,
+                                  keepAspectRatio: false,
+                                  showMediaController: true,
+                                  onCreated: (VideoViewController controller) {
+                                    controller.setVideoSource(
+                                        media.videosList[index].path,
+                                        sourceType: VideoSourceType.file);
+                                  },
+                                  onPrepared: (VideoViewController controller,
+                                      VideoInfo videoInfo) {
+                                    controller
+                                        .play()
+                                        .then((value) =>
+                                            const Duration(milliseconds: 1000))
+                                        .then((value) => controller.pause());
+                                  },
+                                  onCompletion:
+                                      (VideoViewController controller) {},
                                 ),
                               ),
                               Positioned(

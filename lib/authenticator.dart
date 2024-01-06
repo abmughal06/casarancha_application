@@ -1,7 +1,8 @@
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/setup_profile_details.dart';
 import 'package:casarancha/screens/dashboard/dashboard.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,53 +14,24 @@ class Authenticate extends StatelessWidget {
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User?>();
 
-    if (firebaseUser != null) {
-      return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseAuth.instance.currentUser?.uid != null
-            ? FirebaseFirestore.instance
-                .collection("users")
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .snapshots()
-            : null,
-        initialData: null,
-        builder: (context, snapshot) {
-          // printLog(currentUserUID);
-
-          if (snapshot.hasData) {
-            if (snapshot.data!.exists) {
-              // printLog(snapshot.data!['name'].toString());
-              return const DashBoard();
-            } else {
-              return const SetupProfileScreen();
-            }
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            );
-          } else if (snapshot.hasError) {
+    if (firebaseUser == null) {
+      return const LoginScreen();
+    } else {
+      return Consumer<UserModel?>(
+        builder: (context, user, child) {
+          if (user == null) {
             return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("An unkown error occured"),
-                    ElevatedButton(
-                      onPressed: () {
-                        // setState(() {});
-                      },
-                      child: const Text('Reload'),
-                    )
-                  ],
-                ),
-              ),
+              body: centerLoader(),
             );
+          } else if (user.name.isEmpty ||
+              user.email.isEmpty ||
+              user.username.isEmpty) {
+            return const SetupProfileScreen();
+          } else {
+            return const DashBoard();
           }
-          return const SetupProfileScreen();
         },
       );
     }
-    return const LoginScreen();
   }
 }

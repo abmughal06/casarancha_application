@@ -12,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../models/media_details.dart';
 import '../../models/post_model.dart';
@@ -231,6 +232,7 @@ class PostMediaWidget extends StatefulWidget {
 class _PostMediaWidgetState extends State<PostMediaWidget> {
   final PageController postPageController = PageController();
   int postCurrentPageIndex = 0;
+  late double videoAspectRatio;
 
   changeIndex(v) {
     if (mounted) {
@@ -244,8 +246,19 @@ class _PostMediaWidgetState extends State<PostMediaWidget> {
   @override
   void initState() {
     super.initState();
+    getVideoAspectRatio(widget.post.mediaData.first.link);
 
     postCurrentPageIndex = 0;
+  }
+
+  getVideoAspectRatio(url) async {
+    if (widget.post.mediaData.first.type == 'Video') {
+      final video = VideoPlayerController.networkUrl(Uri.parse(url));
+      videoAspectRatio =
+          await video.initialize().then((value) => video.value.aspectRatio);
+    } else {
+      videoAspectRatio = 0.0;
+    }
   }
 
   @override

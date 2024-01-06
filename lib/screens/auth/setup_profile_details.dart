@@ -64,6 +64,12 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    provider.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: primaryAppbar(

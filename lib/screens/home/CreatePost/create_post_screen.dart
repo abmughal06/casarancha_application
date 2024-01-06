@@ -6,7 +6,6 @@ import 'package:casarancha/resources/image_resources.dart';
 
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/utils/app_constants.dart';
-import 'package:casarancha/utils/snackbar.dart';
 
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/primary_tabbar.dart';
@@ -15,9 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:native_video_view/native_video_view.dart';
 import 'package:provider/provider.dart';
-
-import 'package:video_player/video_player.dart';
 
 import '../../../resources/color_resources.dart';
 import '../../../resources/localization_text_strings.dart';
@@ -397,83 +395,105 @@ class VideoPlayerWithFile extends StatefulWidget {
 }
 
 class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
-  late VideoPlayerController videoPlayerController;
-  bool isLoadingVideo = true;
-  bool isPlayingVideo = false;
-  bool isError = false;
-  @override
-  void initState() {
-    super.initState();
-    initVideo();
-  }
+  // late VideoPlayerController videoPlayerController;
+  // bool isLoadingVideo = true;
+  // bool isPlayingVideo = false;
+  // bool isError = false;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   initVideo();
+  // }
 
-  initVideo() {
-    videoPlayerController = VideoPlayerController.file(
-      widget.videoFile,
-    );
-    videoPlayerController.initialize().then((value) {
-      setState(() {
-        isLoadingVideo = false;
-      });
-    }).catchError((e) {
-      GlobalSnackBar.show(
-          message: "video format not supported, please try another one.");
-      isLoadingVideo = false;
-      isPlayingVideo = false;
-      isError = true;
-      if (mounted) {
-        setState(() {});
-      }
-    });
-  }
+  // initVideo() {
+  //   videoPlayerController = VideoPlayerController.file(
+  //     widget.videoFile,
+  //   );
+  //   Future.delayed(const Duration(milliseconds: 1000)).then((value) {
+  //     videoPlayerController.initialize().then((value) {
+  //       setState(() {
+  //         isLoadingVideo = false;
+  //       });
+  //     }).catchError((e) {
+  //       GlobalSnackBar.show(
+  //           message: "video format not supported, please try another one.");
+  //       isLoadingVideo = false;
+  //       isPlayingVideo = false;
+  //       isError = true;
+  //       if (mounted) {
+  //         setState(() {});
+  //       }
+  //     });
+  //   });
+  // }
 
-  @override
-  void dispose() {
-    super.dispose();
-    videoPlayerController.dispose();
-    isLoadingVideo = true;
-    isPlayingVideo = false;
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   videoPlayerController.dispose();
+  //   isLoadingVideo = true;
+  //   isPlayingVideo = false;
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return isError
-        ? const Center(
-            child: TextWidget(text: 'File not supported'),
-          )
-        : Stack(
-            children: [
-              VideoPlayer(
-                videoPlayerController,
-              ),
-              Center(
-                child: isLoadingVideo
-                    ? const CircularProgressIndicator.adaptive()
-                    : Container(),
-              ),
-              if (!isLoadingVideo)
-                Align(
-                  alignment: Alignment.center,
-                  child: IconButton(
-                    onPressed: () async {
-                      if (isPlayingVideo) {
-                        await videoPlayerController.pause();
-                        isPlayingVideo = false;
-                      } else {
-                        await videoPlayerController.play();
-                        isPlayingVideo = true;
-                      }
-                      setState(() {});
-                    },
-                    icon: Icon(
-                      isPlayingVideo
-                          ? Icons.pause_circle_filled_rounded
-                          : Icons.play_circle_fill_rounded,
-                    ),
-                  ),
-                )
-            ],
-          );
+    return NativeVideoView(
+      keepAspectRatio: false,
+      showMediaController: true,
+      useExoPlayer: false,
+      enableVolumeControl: true,
+      onCreated: (controller) {
+        controller.setVideoSource(
+          widget.videoFile.path,
+          sourceType: VideoSourceType.file,
+        );
+      },
+      onPrepared: (controller, info) {
+        controller
+            .play()
+            .then((value) => const Duration(milliseconds: 1000))
+            .then((value) => controller.pause());
+      },
+      onCompletion: (controller) {},
+    );
+
+    // isError
+    //     ? const Center(
+    //         child: TextWidget(text: 'File not supported'),
+    //       )
+    //     : Stack(
+    //         children: [
+    //           VideoPlayer(
+    //             videoPlayerController,
+    //           ),
+    //           Center(
+    //             child: isLoadingVideo
+    //                 ? const CircularProgressIndicator.adaptive()
+    //                 : Container(),
+    //           ),
+    //           if (!isLoadingVideo)
+    //             Align(
+    //               alignment: Alignment.center,
+    //               child: IconButton(
+    //                 onPressed: () async {
+    //                   if (isPlayingVideo) {
+    //                     await videoPlayerController.pause();
+    //                     isPlayingVideo = false;
+    //                   } else {
+    //                     await videoPlayerController.play();
+    //                     isPlayingVideo = true;
+    //                   }
+    //                   setState(() {});
+    //                 },
+    //                 icon: Icon(
+    //                   isPlayingVideo
+    //                       ? Icons.pause_circle_filled_rounded
+    //                       : Icons.play_circle_fill_rounded,
+    //                 ),
+    //               ),
+    //             )
+    //         ],
+    //       );
   }
 }
 
