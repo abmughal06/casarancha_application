@@ -195,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                 ),
-
+                //posts section
                 StreamProvider.value(
                   value: ghostProvider.checkGhostMode
                       ? DataProvider().ghostModePosts(

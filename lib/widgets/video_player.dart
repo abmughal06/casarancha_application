@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -65,19 +64,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
 
-    if (widget.videoUrl != null) {
-      videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoUrl!),
-      )..initialize().then((value) {
-          if (mounted) {
-            setState(() {
-              // print(true);
-            });
-          }
-        });
-
-      videoPlayerController.setLooping(true);
-    }
+    videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl!),
+    );
 
     videoPlayerController.addListener(() {
       duration = videoPlayerController.value.duration;
@@ -85,6 +74,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       isVideoPlaying = videoPlayerController.value.isPlaying;
       if (mounted) {
         setState(() {});
+      }
+    });
+    videoPlayerController.setLooping(true);
+
+    videoPlayerController.initialize().then((value) {
+      if (mounted) {
+        setState(() {
+          // print(true);
+        });
       }
     });
   }

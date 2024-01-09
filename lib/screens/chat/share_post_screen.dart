@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/utils/app_constants.dart';
@@ -84,99 +85,103 @@ class _SharePostScreenState extends State<SharePostScreen> {
               },
             ),
           ),
-          Consumer<List<UserModel>?>(
-            builder: (context, users, b) {
-              if (users == null) {
-                return Container();
-              } else {
-                var currentUser = users
-                    .where((element) => element.id == currentUserUID)
-                    .first;
-                var filterList = users
-                    .where((element) =>
-                        currentUser.followersIds.contains(element.id) ||
-                        currentUser.followingsIds.contains(element.id))
-                    .toList();
+          StreamProvider.value(
+            value: DataProvider().allUsers(),
+            initialData: null,
+            catchError: (context, error) => null,
+            child: Consumer<List<UserModel>?>(
+              builder: (context, users, b) {
+                if (users == null) {
+                  return Container();
+                } else {
+                  var currentUser = users
+                      .where((element) => element.id == currentUserUID)
+                      .first;
+                  // var filterList = users
+                  //     .where((element) =>
+                  //         currentUser.followersIds.contains(element.id) ||
+                  //         currentUser.followingsIds.contains(element.id))
+                  //     .toList();
 
-                var appUsers = users
-                    .where((element) =>
-                        element.id != currentUserUID &&
-                        !currentUser.followersIds.contains(element.id) &&
-                        !currentUser.followingsIds.contains(element.id))
-                    .toList();
+                  // var appUsers = users
+                  //     .where((element) =>
+                  //         element.id != currentUserUID &&
+                  //         !currentUser.followersIds.contains(element.id) &&
+                  //         !currentUser.followingsIds.contains(element.id))
+                  //     .toList();
 
-                var newList = filterList + appUsers;
+                  // var newList = filterList + appUsers;
 
-                if (searchController.text.isEmpty) {
-                  return Expanded(
-                    child: ListView.builder(
-                      padding: EdgeInsets.only(bottom: 120.h),
-                      itemCount: newList.length,
-                      itemBuilder: (context, index) {
-                        return SharePostTile(
-                          appUser: newList[index],
-                          postModel: widget.postModel,
-                          currentUser: currentUser,
-                          isSent: postProvider.recieverIds
-                              .contains(newList[index].id),
-                          ontapSend: () {
-                            postProvider.sharePostData(
-                              currentUser: currentUser,
-                              groupId: widget.groupId,
-                              appUser: newList[index],
-                              postModel: widget.postModel,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  );
+                  if (searchController.text.isEmpty) {
+                    return Expanded(
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(bottom: 120.h),
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          return SharePostTile(
+                            appUser: users[index],
+                            postModel: widget.postModel,
+                            currentUser: currentUser,
+                            isSent: postProvider.recieverIds
+                                .contains(users[index].id),
+                            ontapSend: () {
+                              postProvider.sharePostData(
+                                currentUser: currentUser,
+                                groupId: widget.groupId,
+                                appUser: users[index],
+                                postModel: widget.postModel,
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  }
+                  if (searchController.text.isNotEmpty) {
+                    var searchList = users
+                        .where((e) =>
+                            e.name.toLowerCase().contains(
+                                searchController.text.toLowerCase()) ||
+                            e.username
+                                .toLowerCase()
+                                .contains(searchController.text.toLowerCase()))
+                        .toList();
+                    return Expanded(
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(bottom: 120.h),
+                        itemCount: searchList.length,
+                        itemBuilder: (context, index) {
+                          return SharePostTile(
+                            appUser: searchList[index],
+                            postModel: widget.postModel,
+                            currentUser: currentUser,
+                            isSent: postProvider.recieverIds
+                                .contains(searchList[index].id),
+                            ontapSend: () {
+                              postProvider.sharePostData(
+                                currentUser: currentUser,
+                                groupId: widget.groupId,
+                                appUser: searchList[index],
+                                postModel: widget.postModel,
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  }
+
+                  if (users.isEmpty) {
+                    return const Center(
+                      child: TextWidget(
+                        text: 'No user to share the app',
+                      ),
+                    );
+                  }
+                  return heightBox(1);
                 }
-                if (searchController.text.isNotEmpty) {
-                  var searchList = newList
-                      .where((e) =>
-                          e.name
-                              .toLowerCase()
-                              .contains(searchController.text.toLowerCase()) ||
-                          e.username
-                              .toLowerCase()
-                              .contains(searchController.text.toLowerCase()))
-                      .toList();
-                  return Expanded(
-                    child: ListView.builder(
-                      padding: EdgeInsets.only(bottom: 120.h),
-                      itemCount: searchList.length,
-                      itemBuilder: (context, index) {
-                        return SharePostTile(
-                          appUser: searchList[index],
-                          postModel: widget.postModel,
-                          currentUser: currentUser,
-                          isSent: postProvider.recieverIds
-                              .contains(searchList[index].id),
-                          ontapSend: () {
-                            postProvider.sharePostData(
-                              currentUser: currentUser,
-                              groupId: widget.groupId,
-                              appUser: searchList[index],
-                              postModel: widget.postModel,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  );
-                }
-
-                if (newList.isEmpty) {
-                  return const Center(
-                    child: TextWidget(
-                      text: 'No user to share the app',
-                    ),
-                  );
-                }
-                return heightBox(1);
-              }
-            },
+              },
+            ),
           ),
         ],
       ),

@@ -225,6 +225,22 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Future<PostModel?> singlePostFuture(
+      {String? groupId, required String postId}) {
+    try {
+      final ref = groupId == null
+          ? FirebaseFirestore.instance.collection('posts').doc(postId)
+          : FirebaseFirestore.instance
+              .collection('groups')
+              .doc(groupId)
+              .collection('posts')
+              .doc(postId);
+      return ref.get().then((value) => PostModel.fromMap(value.data()!));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<Story?>? myStory() {
     try {
       if (FirebaseAuth.instance.currentUser?.uid != null) {

@@ -29,7 +29,7 @@ class StoryViewScreen extends StatefulWidget {
 }
 
 class _StoryViewScreenState extends State<StoryViewScreen> {
-  StoryController? controller;
+  late StoryController controller;
   late TextEditingController commentController;
   final FocusNode _commentFocus = FocusNode();
 
@@ -61,7 +61,7 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
   void dispose() {
     super.dispose();
 
-    controller!.dispose();
+    controller.dispose();
     commentController.dispose();
     currentIndex.value = 0;
   }
@@ -71,7 +71,7 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    controller = StoryController();
+    // controller = StoryController();
     final ghost = Provider.of<DashboardProvider>(context);
     storyItems = widget.story.mediaDetailsList
         .where((element) => isDateAfter24Hour(DateTime.parse(element.id)))
@@ -90,16 +90,16 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                             key: ValueKey(e.key),
                             url: e.value.link,
                             duration: const Duration(seconds: 10),
-                            controller: controller!,
+                            controller: controller,
                           )
                         : StoryItem.pageVideo(e.value.link,
                             key: ValueKey(e.key),
-                            controller: controller!,
+                            controller: controller,
                             duration: const Duration(seconds: 15));
                   },
                 )
               ],
-              controller: controller!,
+              controller: controller,
               onComplete: () {
                 Get.back();
               },
@@ -152,22 +152,22 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
             StoryTextField(
               commentFocus: _commentFocus,
               onfocusChange: (hasFocus) {
-                hasFocus ? controller!.pause() : controller!.play();
+                hasFocus ? controller.pause() : controller.play();
                 setState(() {});
               },
               textEditingController: commentController,
               onchange: (c) {
-                controller!.pause();
+                controller.pause();
               },
               onFieldSubmitted: (val) {
                 FocusScope.of(context).unfocus();
                 commentController.text = "";
-                controller!.play();
+                controller.play();
               },
               onEditCompleted: () {
                 FocusScope.of(context).unfocus();
                 commentController.text = "";
-                controller!.play();
+                controller.play();
               },
               ontapSend: () async {
                 if (ghost.checkGhostMode) {
@@ -332,7 +332,7 @@ class _StoryViewScreenState extends State<StoryViewScreen> {
                 );
                 _commentFocus.unfocus();
                 commentController.text = "";
-                controller!.play();
+                controller.play();
               },
             )
           ],

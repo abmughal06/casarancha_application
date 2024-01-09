@@ -55,7 +55,7 @@ android {
         applicationId "com.zb.casarancha"
         minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
         targetSdk localProperties.getProperty('flutter.targetSdkVersion').toInteger()
-        versionCode localProperties.getProperty('flutter.versionCode').toInteger()
+        versionCode 17
         versionName localProperties.getProperty('flutter.versionCode').toString()
     }
     signingConfigs {

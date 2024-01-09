@@ -14,6 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       name: 'Casarancha', options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
