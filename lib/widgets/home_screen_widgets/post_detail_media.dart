@@ -49,14 +49,14 @@ class CheckMediaAndShowPost extends StatefulWidget {
 }
 
 class _CheckMediaAndShowPostState extends State<CheckMediaAndShowPost> {
-  late Future<void> initializedFuturePlay;
+  // late Future<void> initializedFuturePlay;
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    initializedFuturePlay = Future.delayed(const Duration(milliseconds: 500));
-  }
+  //   initializedFuturePlay = Future.delayed(const Duration(milliseconds: 500));
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -123,18 +123,14 @@ class _CheckMediaAndShowPostState extends State<CheckMediaAndShowPost> {
                     postModel: widget.postModel,
                     groupId: widget.groupId,
                   )),
-          child: FutureBuilder(
-              future: initializedFuturePlay,
-              builder: (context, snapshot) {
-                return VideoPlayerWidget(
-                  key: ValueKey(widget.mediaData.link),
-                  media: widget.mediaData,
-                  videoUrl: widget.mediaData.link,
-                  postModel: widget.postModel,
-                  isPostDetailScreen:
-                      widget.isFullScreen ? false : widget.isPostDetail,
-                );
-              }),
+          child: VideoPlayerWidget(
+            key: ValueKey(widget.mediaData.link),
+            media: widget.mediaData,
+            videoUrl: widget.mediaData.link,
+            postModel: widget.postModel,
+            isPostDetailScreen:
+                widget.isFullScreen ? false : widget.isPostDetail,
+          ),
         );
       case "Music":
         return InkWell(
@@ -211,8 +207,8 @@ double getQouteAspectRatio(String text, bool isPostDetail) {
   }
 }
 
-class PostMediaWidget extends StatefulWidget {
-  const PostMediaWidget({
+class PostMediaWidgetForQuoteAndPoll extends StatefulWidget {
+  const PostMediaWidgetForQuoteAndPoll({
     super.key,
     required this.post,
     required this.isPostDetail,
@@ -226,10 +222,12 @@ class PostMediaWidget extends StatefulWidget {
   final String? groupId;
 
   @override
-  State<PostMediaWidget> createState() => _PostMediaWidgetState();
+  State<PostMediaWidgetForQuoteAndPoll> createState() =>
+      _PostMediaWidgetForQuoteAndPollState();
 }
 
-class _PostMediaWidgetState extends State<PostMediaWidget> {
+class _PostMediaWidgetForQuoteAndPollState
+    extends State<PostMediaWidgetForQuoteAndPoll> {
   final PageController postPageController = PageController();
   int postCurrentPageIndex = 0;
   late double videoAspectRatio;
@@ -298,7 +296,7 @@ class _PostMediaWidgetState extends State<PostMediaWidget> {
                     ? double.parse(media.imageWidth!) /
                         double.parse(media.imageHeight!)
                     : media.type == 'Video'
-                        ? double.parse(media.videoAspectRatio!)
+                        ? 9 / 16
                         : MediaQuery.of(context).size.width / 200,
                 child: CheckMediaAndShowPost(
                   groupId: widget.groupId,
@@ -361,6 +359,99 @@ class _PostMediaWidgetState extends State<PostMediaWidget> {
   }
 }
 
+class PostMediaWidgetForOtherTypes extends StatefulWidget {
+  const PostMediaWidgetForOtherTypes({
+    super.key,
+    required this.post,
+    required this.isPostDetail,
+    this.isFullScreen = false,
+    required this.groupId,
+  });
+
+  final PostModel post;
+  final bool isPostDetail;
+  final bool isFullScreen;
+  final String? groupId;
+
+  @override
+  State<PostMediaWidgetForOtherTypes> createState() =>
+      _PostMediaWidgetForOtherTypesState();
+}
+
+class _PostMediaWidgetForOtherTypesState
+    extends State<PostMediaWidgetForOtherTypes> {
+  final PageController postPageController = PageController();
+  int postCurrentPageIndex = 0;
+
+  changeIndex(v) {
+    if (mounted) {
+      setState(() {
+        postCurrentPageIndex = v;
+        postPageController.jumpToPage(postCurrentPageIndex);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // getVideoAspectRatio(widget.post.mediaData.first.link);
+
+    postCurrentPageIndex = 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final prov = Provider.of<PostProvider>(context);
+    if (widget.post.mediaData.isEmpty) {
+      return const SizedBox(
+        width: double.infinity,
+        height: 500,
+        child: Center(
+          child: Text('Post is deleted'),
+        ),
+      );
+    }
+    return AspectRatio(
+      aspectRatio: widget.post.mediaData.first.type == 'Photo'
+          ? double.parse(widget.post.mediaData.first.imageWidth!) /
+              double.parse(widget.post.mediaData.first.imageHeight!)
+          : widget.post.mediaData.first.type == 'Video'
+              ? double.parse(widget.post.mediaData.first.videoAspectRatio!)
+              : MediaQuery.of(context).size.width / 200,
+      child: Container(
+        color: colorBlack,
+        child: PageView.builder(
+          itemCount: widget.post.mediaData.length,
+          controller: postPageController,
+          onPageChanged: (value) {
+            if (mounted) {
+              setState(() {
+                postCurrentPageIndex = value;
+              });
+            }
+          },
+          itemBuilder: (context, index) {
+            var media = widget.post.mediaData[index];
+            return Center(
+              child: CheckMediaAndShowPost(
+                groupId: widget.groupId,
+                isPostDetail: widget.isPostDetail,
+                postModel: widget.post,
+                ondoubleTap: () => prov.toggleLikeDislike(
+                    postModel: widget.post, groupId: widget.groupId),
+                mediaData: media,
+                postId: widget.post.id,
+                isFullScreen: widget.isFullScreen,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
 class PostFullScreenView extends StatelessWidget {
   const PostFullScreenView({
     super.key,
@@ -382,12 +473,18 @@ class PostFullScreenView extends StatelessWidget {
           children: [
             Align(
               alignment: Alignment.center,
-              child: PostMediaWidget(
-                groupId: groupId,
-                isPostDetail: isPostDetail,
-                post: post,
-                isFullScreen: true,
-              ),
+              child: post.mediaData.first.type == 'Quote' ||
+                      post.mediaData.first.type == 'Poll'
+                  ? PostMediaWidgetForQuoteAndPoll(
+                      post: post,
+                      isPostDetail: false,
+                      groupId: groupId,
+                    )
+                  : PostMediaWidgetForOtherTypes(
+                      post: post,
+                      isPostDetail: false,
+                      groupId: groupId,
+                    ),
             ),
             Positioned(
               right: 20,

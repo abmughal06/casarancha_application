@@ -1,3 +1,4 @@
+import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -36,15 +37,10 @@ class MyStoryWidget extends StatelessWidget {
         return Stack(
           children: [
             InkWell(
-              onTap: () => Get.to(() => MyStoryViewScreen(story: stories!)),
-              child: Container(
-                height: 50.h,
-                width: 50.h,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(stories!.creatorDetails.imageUrl))),
+              onTap: () => Get.to(() => MyStoryViewScreen(stories: stories!)),
+              child: ProfilePic(
+                heightAndWidth: 50.h,
+                pic: stories!.creatorDetails.imageUrl,
               ),
             ),
             Positioned(
@@ -90,29 +86,27 @@ class AppUserStoryWidget extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Get.to(
-            () => StoryViewScreen(story: story),
+            () => StoryViewScreen(
+              stories: story,
+            ),
           );
         },
         child: Stack(
           children: [
-            Container(
-              height: 50.h,
-              width: 50.h,
-              padding: const EdgeInsets.all(0.2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(story.creatorDetails.imageUrl),
-                ),
-              ),
+            ProfilePic(
+              pic: story.creatorDetails.imageUrl,
+              heightAndWidth: 50.w,
             ),
             Visibility(
               visible: story.creatorDetails.isVerified,
               child: Positioned(
-                bottom: 10,
+                bottom: 0,
                 right: 0,
-                child: SvgPicture.asset(icVerifyBadge),
+                child: SvgPicture.asset(
+                  icVerifyBadge,
+                  height: 17.h,
+                  width: 17.h,
+                ),
               ),
             )
           ],

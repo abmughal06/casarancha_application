@@ -12,7 +12,6 @@ import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_controller.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
-import 'package:casarancha/screens/home/providers/story_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
@@ -32,7 +31,6 @@ class ProviderApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<AuthenticationProvider>(
             create: (_) => AuthenticationProvider(FirebaseAuth.instance)),
-        // ChangeNotifierProvider<DataProvider>(create: (_) => DataProvider()),
         StreamProvider(
           create: (context) => context.read<AuthenticationProvider>().authState,
           initialData: null,
@@ -43,40 +41,6 @@ class ProviderApp extends StatelessWidget {
           initialData: null,
           catchError: (context, error) => null,
         ),
-        // StreamProvider.value(
-        //   value: userDataProvider.posts,
-        //   initialData: null,
-        // ),
-        // StreamProvider.value(
-        //   value: userDataProvider.stories,
-        //   initialData: null,
-        //   catchError: (context, error) => null,
-        // ),
-        // StreamProvider.value(
-        //   value: userDataProvider.users,
-        //   initialData: null,
-        //   catchError: (context, error) => null,
-        // ),
-        // StreamProvider.value(
-        //   value: userDataProvider.notifications,
-        //   initialData: null,
-        //   catchError: (context, error) => null,
-        // ),
-        // StreamProvider.value(
-        //   value: userDataProvider.chatListUsers,
-        //   initialData: null,
-        //   catchError: (context, error) => null,
-        // ),
-        // StreamProvider.value(
-        //   value: userDataProvider.ghostChatListUsers,
-        //   initialData: null,
-        //   catchError: (context, error) => null,
-        // ),
-        // StreamProvider.value(
-        //   value: userDataProvider.groups,
-        //   initialData: null,
-        //   catchError: (context, error) => null,
-        // ),
         ChangeNotifierProvider<LoginProvider>(create: (_) => LoginProvider()),
         ChangeNotifierProvider<RegisterProvider>(
             create: (_) => RegisterProvider()),
@@ -88,7 +52,6 @@ class ProviderApp extends StatelessWidget {
             create: (_) => DashboardProvider()),
         ChangeNotifierProvider<ProfileProvider>(
             create: (_) => ProfileProvider()),
-        ChangeNotifierProvider<StoryProvider>(create: (_) => StoryProvider()),
         ChangeNotifierProvider<PostProvider>(create: (_) => PostProvider()),
         ChangeNotifierProvider<NewGroupProvider>(
             create: (_) => NewGroupProvider()),

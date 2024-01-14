@@ -36,10 +36,7 @@ class PostSkeleton extends StatelessWidget {
     return ListView.separated(
         itemCount: 10,
         separatorBuilder: (context, index) => heightBox(10),
-        shrinkWrap: true,
         padding: EdgeInsets.only(bottom: 80.h),
-        physics: const NeverScrollableScrollPhysics(),
-        addAutomaticKeepAlives: true,
         itemBuilder: (context, index) {
           return Column(
             children: [

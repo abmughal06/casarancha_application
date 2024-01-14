@@ -108,10 +108,9 @@ class _HomeScreenState extends State<HomeScreen>
                 strokeWidth: 2.w,
               ),
             )
-          : ListView(
+          : Column(
               // shrinkWrap: true,
-              controller: ghostProvider.scrollController,
-              key: const PageStorageKey(0),
+
               children: [
                 // story section
                 Padding(
@@ -209,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Consumer<List<PostModel>?>(
                     builder: (context, posts, b) {
                       if (posts == null) {
-                        return const PostSkeleton();
+                        return const Expanded(child: PostSkeleton());
                       }
                       var filterPosts = posts
                           .where((element) =>
@@ -222,18 +221,21 @@ class _HomeScreenState extends State<HomeScreen>
                         );
                       }
 
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.only(bottom: 80.h),
-                        physics: const NeverScrollableScrollPhysics(),
-                        addAutomaticKeepAlives: true,
-                        itemCount: filterPosts.length,
-                        itemBuilder: (context, index) {
-                          return PostCard(
-                            post: filterPosts[index],
-                            postCreatorId: filterPosts[index].creatorId,
-                          );
-                        },
+                      return Expanded(
+                        child: ListView.builder(
+                          padding: EdgeInsets.only(bottom: 80.h),
+                          controller: ghostProvider.scrollController,
+                          key: const PageStorageKey(0),
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: filterPosts.length,
+                          cacheExtent: 5,
+                          itemBuilder: (context, index) {
+                            return PostCard(
+                              post: filterPosts[index],
+                              postCreatorId: filterPosts[index].creatorId,
+                            );
+                          },
+                        ),
                       );
                     },
                   ),

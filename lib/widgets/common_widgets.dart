@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/text_editing_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -106,15 +107,9 @@ Widget imgProVerified(
         aspectRatio: 1,
         child: Stack(
           children: [
-            Padding(
-              padding: EdgeInsets.all(3.w),
-              child: ClipOval(
-                child: FadeInImage(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(profileImg!),
-                  placeholder: const AssetImage(imgUserPlaceHolder),
-                ),
-              ),
+            ProfilePic(
+              pic: profileImg,
+              heightAndWidth: 40.w,
             ),
             Positioned(
                 right: 0,

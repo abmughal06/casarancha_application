@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
+                          padding: EdgeInsets.only(left: 12.w),
                           child: InkWell(
                             onTap: () {
                               context
@@ -233,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         Platform.isIOS
                             ? Padding(
-                                padding: EdgeInsets.only(right: 0.w),
+                                padding: EdgeInsets.only(left: 18.w),
                                 child: InkWell(
                                   onTap: () {
                                     context

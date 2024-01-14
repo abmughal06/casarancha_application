@@ -55,8 +55,8 @@ android {
         applicationId "com.zb.casarancha"
         minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
         targetSdk localProperties.getProperty('flutter.targetSdkVersion').toInteger()
-        versionCode 17
-        versionName localProperties.getProperty('flutter.versionCode').toString()
+        versionCode localProperties.getProperty('flutter.versionCode').toInteger()
+        versionName localProperties.getProperty('flutter.versionName').toString()
     }
     signingConfigs {
         release {
@@ -86,5 +86,6 @@ dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    // implementation ('com.google.android.exoplayer:exoplayer:2.19.1')
     implementation 'com.google.firebase:firebase-analytics'
 }

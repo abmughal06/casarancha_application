@@ -4,7 +4,6 @@ import 'package:casarancha/models/user_model.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:native_video_view/native_video_view.dart';
 import 'package:path/path.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
@@ -15,6 +14,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 // import 'package:video_player/video_player.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
 
@@ -230,14 +230,14 @@ class CreatePostMethods extends ChangeNotifier {
         final String fileType;
         final String fileName = basename(element.path);
         Size? imageSize;
-        // double? videoAspectRatio;
+        double? videoAspectRatio;
 
         if (photosList.contains(element)) {
           fileType = 'Photo';
           imageSize = await getImageSize(element);
         } else if (videosList.contains(element)) {
           fileType = 'Video';
-          // videoAspectRatio = await getVideoAspectRatio(element);
+          videoAspectRatio = await getVideoAspectRatio(element);
         } else {
           fileType = 'Music';
         }
@@ -271,7 +271,7 @@ class CreatePostMethods extends ChangeNotifier {
             name: fileName,
             type: fileType,
             link: fileUrl,
-            videoAspectRatio: '0.58',
+            videoAspectRatio: videoAspectRatio.toString(),
           );
         } else {
           mediaDetails = MediaDetails(
@@ -386,13 +386,14 @@ Future<Size> getImageSize(File image) async {
 }
 
 Future<double> getVideoAspectRatio(File video) async {
-  VideoViewController? viewController;
-  viewController!.setVideoSource(video.path, sourceType: VideoSourceType.file);
-  return viewController.videoFile!.info!.aspectRatio;
+  VideoPlayerController videoPlayerController =
+      VideoPlayerController.file(video);
+  // viewController!.setVideoSource(video.path, sourceType: VideoSourceType.file);
+  // return viewController.videoFile!.info!.aspectRatio;
 
-  // return await videoPlayerController
-  //     .initialize()
-  //     .then((value) => videoPlayerController.value.aspectRatio);
+  return await videoPlayerController
+      .initialize()
+      .then((value) => videoPlayerController.value.aspectRatio);
 }
 
 Future<File?> profileCropImage(String path) async {
