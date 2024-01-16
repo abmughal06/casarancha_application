@@ -74,9 +74,8 @@ class _MusicPlayerWithFileState extends State<MusicPlayerUrl> {
 
   @override
   void dispose() {
-    super.dispose();
-
     audioPlayer.pause();
+    super.dispose();
   }
 
   String formatTime(Duration duration) {

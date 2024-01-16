@@ -31,10 +31,9 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     prov.question = '';
     prov.options = [];
+    super.dispose();
   }
 
   @override

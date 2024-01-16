@@ -30,9 +30,8 @@ class _SharePostScreenState extends State<SharePostScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     postProvider.restoreReciverList();
+    super.dispose();
   }
 
   TextEditingController searchController = TextEditingController();

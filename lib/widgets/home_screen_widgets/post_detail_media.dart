@@ -420,7 +420,7 @@ class _PostMediaWidgetForOtherTypesState
               ? double.parse(widget.post.mediaData.first.videoAspectRatio!)
               : MediaQuery.of(context).size.width / 200,
       child: Container(
-        color: colorBlack,
+        color: colorBlack.withOpacity(0.1),
         child: PageView.builder(
           itemCount: widget.post.mediaData.length,
           controller: postPageController,

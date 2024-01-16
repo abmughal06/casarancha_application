@@ -89,13 +89,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   void dispose() {
-    super.dispose();
-
     videoPlayerController.removeListener(() {});
     duration = Duration.zero;
     position = Duration.zero;
     isVideoPlaying = false;
     videoPlayerController.dispose();
+    super.dispose();
   }
 
   @override
@@ -104,7 +103,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     return VisibilityDetector(
       key: ValueKey(widget.videoUrl!),
       onVisibilityChanged: (visibilityInfo) {
-        isVisible = visibilityInfo.visibleFraction > 0.6;
+        isVisible = visibilityInfo.visibleFraction > 0.8;
         if (isVisible) {
           if (isVideoMute) {
             videoPlayerController.setVolume(0.0); // Mute the video initially

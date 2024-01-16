@@ -46,7 +46,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
 
   late TextEditingController commentController;
   final FocusNode _commentFocus = FocusNode();
-  List storyItems = [];
+  List<MediaDetails> storyItems = [];
 
   int _currentIndex = 0;
   bool isVideoPlaying = true;
@@ -155,30 +155,6 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                           ),
                         );
                       }
-                    // return NativeVideoView(
-                    //   useExoPlayer: false,
-                    //   showMediaController: false,
-                    //   enableVolumeControl: true,
-                    //   keepAspectRatio: false,
-                    //   onCreated: (controller) {
-                    //     // _videoController = controller;
-                    //     controller.setVideoSource(story.link,
-                    //         sourceType: VideoSourceType.network);
-
-                    //     if (isVideoPlaying) {
-                    //       controller.play();
-                    //       _animController.forward();
-                    //     } else {
-                    //       controller.pause();
-                    //       _animController.stop();
-                    //     }
-                    //   },
-                    //   onPrepared: (con, info) {
-                    //     // _videoController = con;
-                    //   },
-                    //   onProgress: (elapsedTime, duration) {},
-                    //   onCompletion: (con) {},
-                    // );
                   }
                   return const SizedBox.shrink();
                 },
@@ -270,7 +246,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                             .split('')
                       ],
                       creatorDetails: widget.stories.creatorDetails,
-                      createdAt: DateTime.now().toIso8601String(),
+                      createdAt: DateTime.now().toUtc().toString(),
                       firstMessage: currentUser.id,
                     );
 
@@ -287,7 +263,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                         imageUrl: currentUser.imageStr,
                         isVerified: currentUser.isVerified,
                       ),
-                      createdAt: DateTime.now().toIso8601String(),
+                      createdAt: DateTime.now().toUtc().toString(),
                       firstMessage: currentUser.id,
                     );
 
@@ -319,7 +295,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                             .split('')
                       ],
                       creatorDetails: widget.stories.creatorDetails,
-                      createdAt: DateTime.now().toIso8601String(),
+                      createdAt: DateTime.now().toUtc().toString(),
                     );
 
                     final MessageDetails currentUserMessageDetails =
@@ -335,7 +311,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                         imageUrl: currentUser.imageStr,
                         isVerified: currentUser.isVerified,
                       ),
-                      createdAt: DateTime.now().toIso8601String(),
+                      createdAt: DateTime.now().toUtc().toString(),
                     );
 
                     await FirebaseFirestore.instance
@@ -388,7 +364,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                     content: mediaDetail,
                     caption: commentController.text,
                     type: "story-${story[_currentIndex].type}",
-                    createdAt: DateTime.now().toIso8601String(),
+                    createdAt: DateTime.now().toUtc().toString(),
                     isSeen: false,
                   );
 
@@ -460,40 +436,42 @@ class _StoryViewScreenState extends State<StoryViewScreen>
   void _onTapDown(TapDownDetails details, MediaDetails story) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double dx = details.globalPosition.dx;
-    if (dx < screenWidth / 3) {
-      setState(() {
-        if (_currentIndex - 1 >= 0) {
-          _currentIndex -= 1;
-          _loadStory(story: storyItems[_currentIndex]);
+    if (!_commentFocus.hasFocus) {
+      if (dx < screenWidth / 3) {
+        setState(() {
+          if (_currentIndex - 1 >= 0) {
+            _currentIndex -= 1;
+            _loadStory(story: storyItems[_currentIndex]);
+          }
+        });
+      } else if (dx > 2 * screenWidth / 3) {
+        setState(() {
+          if (_currentIndex + 1 < storyItems.length) {
+            _currentIndex += 1;
+            _loadStory(story: storyItems[_currentIndex]);
+          } else {
+            // Out of bounds - loop story
+            // You can also Navigator.of(context).pop() here
+            Get.back();
+            _currentIndex = 0;
+            _loadStory(story: storyItems[_currentIndex]);
+          }
+        });
+      } else {
+        if (story.type == 'Video') {
+          if (_videoController != null && _videoController!.value.isPlaying) {
+            _videoController!.pause();
+            _animController.stop();
+          } else if (_videoController != null) {
+            _videoController!.play();
+            _animController.forward();
+          }
+          // if (isVideoPlaying) {
+          //   _animController.forward();
+          // } else {
+          //   _animController.stop();
+          // }
         }
-      });
-    } else if (dx > 2 * screenWidth / 3) {
-      setState(() {
-        if (_currentIndex + 1 < storyItems.length) {
-          _currentIndex += 1;
-          _loadStory(story: storyItems[_currentIndex]);
-        } else {
-          // Out of bounds - loop story
-          // You can also Navigator.of(context).pop() here
-          Get.back();
-          _currentIndex = 0;
-          _loadStory(story: storyItems[_currentIndex]);
-        }
-      });
-    } else {
-      if (story.type == 'Video') {
-        if (_videoController != null && _videoController!.value.isPlaying) {
-          _videoController!.pause();
-          _animController.stop();
-        } else if (_videoController != null) {
-          _videoController!.play();
-          _animController.forward();
-        }
-        // if (isVideoPlaying) {
-        //   _animController.forward();
-        // } else {
-        //   _animController.stop();
-        // }
       }
     }
   }
@@ -501,6 +479,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
   void _loadStory({required MediaDetails story, bool animateToPage = true}) {
     _animController.stop();
     _animController.reset();
+    countStoryViews(mediaList: storyItems);
     switch (story.type) {
       case 'Photo':
         _animController.duration = const Duration(seconds: 10);

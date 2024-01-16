@@ -55,12 +55,11 @@ class FriendChatList extends StatefulWidget {
 }
 
 class _FriendChatListState extends State<FriendChatList> {
+  List<String> messageUserIds = [];
+
   @override
   Widget build(BuildContext context) {
     final chatQuery = Provider.of<ChatListController>(context);
-    // final users = context.watch<List<UserModel>?>();
-
-    List<String> messageUserIds = [];
     return ListView(
       children: [
         StreamProvider.value(

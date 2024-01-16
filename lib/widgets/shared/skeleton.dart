@@ -123,7 +123,7 @@ class StorySkeleton extends StatelessWidget {
     return SizedBox(
       height: 50.h,
       child: ListView.separated(
-        // padding: const EdgeInsets.only(left: 15),
+        padding: const EdgeInsets.only(left: 12),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) => shimmerImg(

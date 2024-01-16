@@ -38,9 +38,8 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
   late ChatProvider chatProvider;
   @override
   void dispose() {
-    super.dispose();
-
     chatProvider.clearMessageController();
+    super.dispose();
   }
 
   @override

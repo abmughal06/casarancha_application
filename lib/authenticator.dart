@@ -23,9 +23,7 @@ class Authenticate extends StatelessWidget {
             return Scaffold(
               body: centerLoader(),
             );
-          } else if (user.name.isEmpty ||
-              user.email.isEmpty ||
-              user.username.isEmpty) {
+          } else if (user.name.isEmpty || user.username.isEmpty) {
             return const SetupProfileScreen();
           } else {
             return const DashBoard();

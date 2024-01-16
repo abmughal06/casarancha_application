@@ -30,10 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     _emailController.dispose();
     _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -233,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         Platform.isIOS
                             ? Padding(
-                                padding: EdgeInsets.only(left: 18.w),
+                                padding: EdgeInsets.only(left: 12.w),
                                 child: InkWell(
                                   onTap: () {
                                     context

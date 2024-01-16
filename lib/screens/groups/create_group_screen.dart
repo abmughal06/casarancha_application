@@ -46,11 +46,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     _searchControllr.dispose();
     _groupNameController.dispose();
     _groupDescriptionController.dispose();
+    super.dispose();
   }
 
   List<String> membersIds = [];

@@ -35,11 +35,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     chatProvider.clearMessageController();
     chatProvider.clearListsondispose();
     chatProvider.recordedFilePath = null;
+    super.dispose();
   }
 
   @override
@@ -98,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     padding: const EdgeInsets.only(top: 12),
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      // log(message.content.toString());
+                      print(message.createdAt);
 
                       final isMe = message.sentToId == widget.appUserId;
                       if (messages.isNotEmpty) {

@@ -77,9 +77,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     createPost.clearLists();
+    super.dispose();
   }
 
   @override
@@ -432,10 +431,10 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
 
   @override
   void dispose() {
-    super.dispose();
     videoPlayerController.dispose();
     isLoadingVideo = true;
     isPlayingVideo = false;
+    super.dispose();
   }
 
   @override
@@ -545,8 +544,8 @@ class _MusicPlayerWithFileState extends State<MusicPlayerWithFile> {
 
   @override
   void dispose() {
-    super.dispose();
     audioPlayer.dispose();
+    super.dispose();
   }
 
   String formatTime(Duration duration) {
