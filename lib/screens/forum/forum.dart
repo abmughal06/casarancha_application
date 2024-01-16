@@ -79,31 +79,20 @@ class _ForumsScreenState extends State<ForumsScreen>
           if (posts == null) {
             return const PostSkeleton();
           }
-          return ListView(
-            controller: ghostProvider.forumScrollController,
+          return ListView.builder(
             key: const PageStorageKey(1),
-            children: [
-              ListView.builder(
-                itemCount: posts.length,
-                padding: const EdgeInsets.only(top: 10, bottom: 100),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  if (posts.isEmpty) {
-                    return const AlertText(
-                        text: 'Forums does not have any posts yet');
-                  }
-                  var post = posts[index];
-                  // var appUser = users
-                  //     .where(
-                  //       (element) => element.id == post.creatorId,
-                  //     )
-                  //     .first;
+            itemCount: posts.length,
+            controller: ghostProvider.forumScrollController,
+            padding: const EdgeInsets.only(top: 10, bottom: 100),
+            itemBuilder: (context, index) {
+              if (posts.isEmpty) {
+                return const AlertText(
+                    text: 'Forums does not have any posts yet');
+              }
+              var post = posts[index];
 
-                  return PostCard(post: post, postCreatorId: post.creatorId);
-                },
-              ),
-            ],
+              return PostCard(post: post, postCreatorId: post.creatorId);
+            },
           );
         }),
       ),

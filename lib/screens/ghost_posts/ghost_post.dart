@@ -41,23 +41,18 @@ class _GhostPostsState extends State<GhostPosts>
                 if (posts == null) {
                   return const PostSkeleton();
                 }
-                return ListView(
+                return ListView.builder(
+                  key: const PageStorageKey(2),
+                  itemCount: posts.length,
                   controller: dashboardProvider.ghostPostScrollController,
-                  children: [
-                    ListView.builder(
-                      itemCount: posts.length,
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.only(top: 10, bottom: 100),
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (co, index) {
-                        return PostCard(
-                          isGhostPost: posts[index].isGhostPost,
-                          post: posts[index],
-                          postCreatorId: posts[index].creatorId,
-                        );
-                      },
-                    ),
-                  ],
+                  padding: const EdgeInsets.only(top: 10, bottom: 100),
+                  itemBuilder: (co, index) {
+                    return PostCard(
+                      isGhostPost: posts[index].isGhostPost,
+                      post: posts[index],
+                      postCreatorId: posts[index].creatorId,
+                    );
+                  },
                 );
               },
             ),

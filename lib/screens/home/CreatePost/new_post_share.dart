@@ -41,11 +41,10 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     createPostMethods.selectedUsers.clear();
     createPostMethods.locationController.clear();
     createPostMethods.showPostTime = false;
+    super.dispose();
   }
 
   @override

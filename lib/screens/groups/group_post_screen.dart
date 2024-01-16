@@ -63,7 +63,7 @@ class GroupPostScreen extends StatelessWidget {
           widthBox(15.w),
         ],
       ),
-      body: ListView(
+      body: Column(
         children: [
           heightBox(15.h),
           Container(
@@ -116,17 +116,6 @@ class GroupPostScreen extends StatelessWidget {
                   return Container();
                 }
 
-                // List<PostModel> filterList = [];
-                // List<UserModel> postCreator = [];
-                // for (var p in post) {
-                //   for (var u in users) {
-                //     if (p.creatorId == u.id) {
-                //       filterList.add(p);
-                //       postCreator.add(u);
-                //     }
-                //   }
-                // }
-
                 if (posts.isEmpty) {
                   return const Center(
                     child: TextWidget(
@@ -135,19 +124,19 @@ class GroupPostScreen extends StatelessWidget {
                   );
                 }
 
-                return ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.only(bottom: 80.h),
-                  physics: const NeverScrollableScrollPhysics(),
-                  addAutomaticKeepAlives: true,
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    return PostCard(
-                      groupId: group.id,
-                      post: posts[index],
-                      postCreatorId: posts[index].creatorId,
-                    );
-                  },
+                return Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(bottom: 80.h),
+                    cacheExtent: 10,
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      return PostCard(
+                        groupId: group.id,
+                        post: posts[index],
+                        postCreatorId: posts[index].creatorId,
+                      );
+                    },
+                  ),
                 );
               },
             ),

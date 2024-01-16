@@ -106,12 +106,18 @@ class PostCard extends StatelessWidget {
             navigateToAppUserScreen(post.creatorId, context);
           },
         ),
-        PostMediaWidget(
-          post: post,
-          isPostDetail: false,
-          groupId: groupId,
-        ),
-        // buildPostCards(post.mediaData),
+        post.mediaData.first.type == 'Qoute' ||
+                post.mediaData.first.type == 'poll'
+            ? PostMediaWidgetForQuoteAndPoll(
+                post: post,
+                isPostDetail: false,
+                groupId: groupId,
+              )
+            : PostMediaWidgetForOtherTypes(
+                post: post,
+                isPostDetail: false,
+                groupId: groupId,
+              ),
         heightBox(10.h),
         CustomPostFooter(
           groupId: groupId,

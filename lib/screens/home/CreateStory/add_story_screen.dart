@@ -114,19 +114,24 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                                 final data = snapshot.data!;
                                 double progress =
                                     data.bytesTransferred / data.totalBytes;
-
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 15.w, vertical: 8.h),
-                                  child: LinearProgressIndicator(
-                                    value: progress,
-                                    minHeight: 10.h,
-                                    semanticsValue:
-                                        '${(100 * progress).roundToDouble().toInt()}%',
-                                    semanticsLabel:
-                                        '${(100 * progress).roundToDouble().toInt()}%',
-                                  ),
-                                );
+                                var value =
+                                    (100 * progress).roundToDouble().toInt();
+                                if (value.isNaN || value.isInfinite) {
+                                  return const SizedBox(
+                                    height: 50,
+                                  );
+                                } else {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 15.w, vertical: 8.h),
+                                    child: LinearProgressIndicator(
+                                      value: progress,
+                                      minHeight: 10.h,
+                                      semanticsValue: '$value%',
+                                      semanticsLabel: '$value%',
+                                    ),
+                                  );
+                                }
                               } else {
                                 return const SizedBox(
                                   height: 50,

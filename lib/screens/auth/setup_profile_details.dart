@@ -65,8 +65,8 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     provider.dispose();
+    super.dispose();
   }
 
   @override

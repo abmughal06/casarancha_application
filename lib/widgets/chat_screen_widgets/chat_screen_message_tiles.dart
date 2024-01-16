@@ -2,6 +2,7 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
+import 'package:casarancha/widgets/full_screen_video_player.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -184,8 +185,8 @@ class MessageTiles extends StatelessWidget {
           },
           onTap: message.caption.isNotEmpty
               ? () {}
-              : () => Get.to(() => ChatMediaFullScreenView(
-                    media: media!,
+              : () => Get.to(() => FullScreenVideoPlayer(
+                    videoLink: media!.first.link,
                   )),
           child: media == null
               ? AspectRatio(
@@ -219,8 +220,8 @@ class MessageTiles extends StatelessWidget {
               docId: message.id,
             );
           },
-          onTap: () => Get.to(() => PostDetailScreen(
-                postModel: postModel,
+          onTap: () => Get.to(() => FullScreenVideoPlayer(
+                videoLink: postModel.mediaData.first.link,
               )),
           child: ChatVideoTile(
             key: ValueKey(postModel.mediaData.first.link),
@@ -344,8 +345,8 @@ class MessageTiles extends StatelessWidget {
                     docId: message.id,
                   );
                 },
-                onTap: () => Get.to(() => ChatMediaFullScreenView(
-                      media: [story],
+                onTap: () => Get.to(() => FullScreenVideoPlayer(
+                      videoLink: story.link,
                     )),
                 child: ChatStoryVideoTile(
                   key: ValueKey(story.link),

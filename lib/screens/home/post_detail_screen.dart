@@ -62,11 +62,19 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 children: [
                                   Stack(
                                     children: [
-                                      PostMediaWidget(
-                                        groupId: widget.groupId,
-                                        post: post,
-                                        isPostDetail: true,
-                                      ),
+                                      post.mediaData.first.type == 'Quote' ||
+                                              post.mediaData.first.type ==
+                                                  'poll'
+                                          ? PostMediaWidgetForQuoteAndPoll(
+                                              post: post,
+                                              isPostDetail: false,
+                                              groupId: widget.groupId,
+                                            )
+                                          : PostMediaWidgetForOtherTypes(
+                                              post: post,
+                                              isPostDetail: false,
+                                              groupId: widget.groupId,
+                                            ),
                                       Positioned(
                                         top: 60,
                                         left: 20,

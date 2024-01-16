@@ -1,4 +1,5 @@
 import 'package:casarancha/models/media_details.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_input_field.dart';
@@ -12,7 +13,6 @@ import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../models/post_model.dart';
-import '../resources/color_resources.dart';
 
 bool isVideoMute = true;
 
@@ -65,7 +65,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.initState();
 
     videoPlayerController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.videoUrl!),
+      Uri.parse(widget.media.link),
     );
 
     videoPlayerController.addListener(() {
@@ -76,7 +76,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         setState(() {});
       }
     });
-    videoPlayerController.setLooping(true);
 
     videoPlayerController.initialize().then((value) {
       if (mounted) {
@@ -85,17 +84,17 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         });
       }
     });
+    videoPlayerController.setLooping(true);
   }
 
   @override
   void dispose() {
-    super.dispose();
-
     videoPlayerController.removeListener(() {});
     duration = Duration.zero;
     position = Duration.zero;
     isVideoPlaying = false;
     videoPlayerController.dispose();
+    super.dispose();
   }
 
   @override
@@ -104,7 +103,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     return VisibilityDetector(
       key: ValueKey(widget.videoUrl!),
       onVisibilityChanged: (visibilityInfo) {
-        isVisible = visibilityInfo.visibleFraction > 0.6;
+        isVisible = visibilityInfo.visibleFraction > 0.8;
         if (isVisible) {
           if (isVideoMute) {
             videoPlayerController.setVolume(0.0); // Mute the video initially

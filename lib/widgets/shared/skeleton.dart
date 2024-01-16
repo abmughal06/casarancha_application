@@ -36,10 +36,7 @@ class PostSkeleton extends StatelessWidget {
     return ListView.separated(
         itemCount: 10,
         separatorBuilder: (context, index) => heightBox(10),
-        shrinkWrap: true,
         padding: EdgeInsets.only(bottom: 80.h),
-        physics: const NeverScrollableScrollPhysics(),
-        addAutomaticKeepAlives: true,
         itemBuilder: (context, index) {
           return Column(
             children: [
@@ -126,7 +123,7 @@ class StorySkeleton extends StatelessWidget {
     return SizedBox(
       height: 50.h,
       child: ListView.separated(
-        // padding: const EdgeInsets.only(left: 15),
+        padding: const EdgeInsets.only(left: 12),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) => shimmerImg(

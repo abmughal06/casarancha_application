@@ -5,6 +5,7 @@ import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_user_list_tile.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
+import 'package:casarancha/widgets/shared/shimmer_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,12 +55,11 @@ class FriendChatList extends StatefulWidget {
 }
 
 class _FriendChatListState extends State<FriendChatList> {
+  List<String> messageUserIds = [];
+
   @override
   Widget build(BuildContext context) {
     final chatQuery = Provider.of<ChatListController>(context);
-    // final users = context.watch<List<UserModel>?>();
-
-    List<String> messageUserIds = [];
     return ListView(
       children: [
         StreamProvider.value(
@@ -69,18 +69,8 @@ class _FriendChatListState extends State<FriendChatList> {
           child: Consumer<List<MessageDetails>?>(
             builder: (context, messages, b) {
               if (messages == null) {
-                return Container();
+                return const ChatShimmerList();
               } else {
-                // List<MessageDetails> messages = [];
-                // List<UserModel> messagePerson = [];
-                // for (var m in messages1) {
-                //   for (var u in users) {
-                //     if (m.id == u.id) {
-                //       messages.add(m);
-                //       messagePerson.add(u);
-                //     }
-                //   }
-                // }
                 messageUserIds = messages.map((e) => e.id).toList();
 
                 if (chatQuery.searchController.text.isEmpty ||

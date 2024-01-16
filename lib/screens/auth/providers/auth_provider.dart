@@ -11,7 +11,6 @@ import 'package:crypto/crypto.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -240,35 +239,35 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> callFaceBookSignIn() async {
-    try {
-      isSigningIn = true;
-      notifyListeners();
+  // Future<void> callFaceBookSignIn() async {
+  //   try {
+  //     isSigningIn = true;
+  //     notifyListeners();
 
-      LoginResult loginResult = await FacebookAuth.instance
-          .login(permissions: const ['email', 'public_profile']);
+  //     LoginResult loginResult = await FacebookAuth.instance
+  //         .login(permissions: const ['email', 'public_profile']);
 
-      if (loginResult.status == LoginStatus.success) {
-        AuthCredential credential = FacebookAuthProvider.credential(
-            loginResult.accessToken?.token ?? "");
-        await FirebaseAuth.instance.signInWithCredential(credential);
-        saveTokenAndNavigateToNext();
-      }
-    } on FirebaseAuthException catch (e) {
-      isSigningIn = false;
-      notifyListeners();
+  //     if (loginResult.status == LoginStatus.success) {
+  //       AuthCredential credential = FacebookAuthProvider.credential(
+  //           loginResult.accessToken?.token ?? "");
+  //       await FirebaseAuth.instance.signInWithCredential(credential);
+  //       saveTokenAndNavigateToNext();
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     isSigningIn = false;
+  //     notifyListeners();
 
-      GlobalSnackBar.show(message: 'Please enter ${e.message}');
-    } catch (e) {
-      isSigningIn = false;
-      notifyListeners();
+  //     GlobalSnackBar.show(message: 'Please enter ${e.message}');
+  //   } catch (e) {
+  //     isSigningIn = false;
+  //     notifyListeners();
 
-      GlobalSnackBar.show(message: 'Facebook login cancelled');
-    } finally {
-      isSigningIn = false;
-      notifyListeners();
-    }
-  }
+  //     GlobalSnackBar.show(message: 'Facebook login cancelled');
+  //   } finally {
+  //     isSigningIn = false;
+  //     notifyListeners();
+  //   }
+  // }
 
   Future<void> callAppleSignIn() async {
     String generateNonce([int length = 32]) {
