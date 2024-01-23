@@ -97,7 +97,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     padding: const EdgeInsets.only(top: 12),
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      print(message.createdAt);
 
                       final isMe = message.sentToId == widget.appUserId;
                       if (messages.isNotEmpty) {

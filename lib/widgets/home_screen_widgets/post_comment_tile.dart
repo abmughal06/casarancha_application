@@ -4,6 +4,7 @@ import 'package:casarancha/models/comment_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/share_post_screen.dart';
+import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/utils/app_constants.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/group_model.dart';
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
 import '../../resources/image_resources.dart';
@@ -260,70 +262,189 @@ class _PostCommentTileState extends State<PostCommentTile> {
                       ),
                     ],
                   ),
-                  InkWell(
-                    onTap: () {
-                      Get.bottomSheet(
-                        Container(
-                          decoration: const BoxDecoration(color: colorWhite),
-                          height: 200.h,
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Align(
-                                alignment: Alignment.center,
-                                child: SvgPicture.asset(icBottomSheetScroller),
+                  StreamProvider.value(
+                    value: DataProvider().singleGroup(widget.groupId),
+                    initialData: null,
+                    catchError: null,
+                    child: Consumer<GroupModel?>(builder: (context, group, b) {
+                      if (group == null) {
+                        return InkWell(
+                          onTap: () {
+                            Get.bottomSheet(
+                              Container(
+                                decoration:
+                                    const BoxDecoration(color: colorWhite),
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: SvgPicture.asset(
+                                          icBottomSheetScroller),
+                                    ),
+                                    heightBox(15.h),
+                                    TextWidget(
+                                      onTap: () => Get.to(() => SharePostScreen(
+                                          postModel: widget.postModel!)),
+                                      text: "Share",
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    heightBox(10.h),
+                                    widget.cmnt.creatorId != currentUserUID
+                                        ? ReportPostorComment(
+                                            btnName: 'Report Comment')
+                                        : heightBox(0),
+                                    heightBox(10.h),
+                                    widget.cmnt.creatorId == currentUserUID
+                                        ? TextWidget(
+                                            text: "Delete",
+                                            color: colorPrimaryA05,
+                                            fontWeight: FontWeight.w600,
+                                            onTap: () async {
+                                              Get.back();
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (_) =>
+                                                      CustomAdaptiveAlertDialog(
+                                                          alertMsg:
+                                                              "Are you sure you want to delete your comment?",
+                                                          actiionBtnName:
+                                                              'Delete',
+                                                          onAction: () {
+                                                            postProvider
+                                                                .deleteComment(
+                                                              groupId: widget
+                                                                  .groupId,
+                                                              postId: widget
+                                                                  .cmnt.postId,
+                                                              cmntId: widget
+                                                                  .cmnt.id,
+                                                            );
+                                                          }));
+                                            })
+                                        : heightBox(0),
+                                    heightBox(30.h),
+                                  ],
+                                ),
                               ),
-                              heightBox(15.h),
-                              TextWidget(
-                                onTap: () => Get.to(() => SharePostScreen(
-                                    postModel: widget.postModel!)),
-                                text: "Share",
-                                fontWeight: FontWeight.w600,
-                              ),
-                              heightBox(10.h),
-                              widget.cmnt.creatorId != currentUserUID
-                                  ? ReportPostorComment(
-                                      btnName: 'Report Comment')
-                                  : heightBox(0),
-                              heightBox(10.h),
-                              widget.cmnt.creatorId == currentUserUID
-                                  ? TextWidget(
+                              isScrollControlled: true,
+                            );
+                          },
+                          child: const Icon(
+                            Icons.more_vert,
+                            color: Color(0xffafafaf),
+                          ),
+                        );
+                      }
+                      return InkWell(
+                        onTap: () {
+                          Get.bottomSheet(
+                            Container(
+                              decoration:
+                                  const BoxDecoration(color: colorWhite),
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child:
+                                        SvgPicture.asset(icBottomSheetScroller),
+                                  ),
+                                  heightBox(15.h),
+                                  TextWidget(
+                                    onTap: () => Get.to(() => SharePostScreen(
+                                        postModel: widget.postModel!)),
+                                    text: "Share",
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  heightBox(10.h),
+                                  widget.cmnt.creatorId != currentUserUID
+                                      ? ReportPostorComment(
+                                          btnName: 'Report Comment')
+                                      : heightBox(0),
+                                  heightBox(10.h),
+                                  Visibility(
+                                    visible: widget.cmnt.creatorId ==
+                                            currentUserUID ||
+                                        group.adminIds
+                                            .contains(currentUserUID) ||
+                                        group.creatorId == currentUserUID,
+                                    child: TextWidget(
                                       text: "Delete",
                                       color: colorPrimaryA05,
                                       fontWeight: FontWeight.w600,
                                       onTap: () async {
                                         Get.back();
                                         showDialog(
-                                            context: context,
-                                            builder: (_) =>
-                                                CustomAdaptiveAlertDialog(
-                                                    alertMsg:
-                                                        "Are you sure you want to delete your comment?",
-                                                    actiionBtnName: 'Delete',
-                                                    onAction: () {
-                                                      postProvider
-                                                          .deleteComment(
-                                                        groupId: widget.groupId,
-                                                        postId:
-                                                            widget.cmnt.postId,
-                                                        cmntId: widget.cmnt.id,
-                                                      );
-                                                    }));
+                                          context: context,
+                                          builder: (_) =>
+                                              CustomAdaptiveAlertDialog(
+                                            alertMsg:
+                                                "Are you sure you want to delete this comment?",
+                                            actiionBtnName: 'Delete',
+                                            onAction: () {
+                                              postProvider.deleteComment(
+                                                groupId: widget.groupId,
+                                                postId: widget.cmnt.postId,
+                                                cmntId: widget.cmnt.id,
+                                              );
+                                            },
+                                          ),
+                                        );
                                       },
-                                    )
-                                  : heightBox(0),
-                            ],
-                          ),
+                                    ),
+                                  ),
+                                  heightBox(10.h),
+                                  Visibility(
+                                    visible: group.adminIds
+                                            .contains(currentUserUID) ||
+                                        group.creatorId == currentUserUID,
+                                    child: TextWidget(
+                                      text: "Ban user from Comments",
+                                      color: colorPrimaryA05,
+                                      fontWeight: FontWeight.w600,
+                                      onTap: () async {
+                                        Get.back();
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) =>
+                                              CustomAdaptiveAlertDialog(
+                                            alertMsg:
+                                                "Are you sure you want to ban this users from post comments?",
+                                            actiionBtnName: 'Ban',
+                                            onAction: () {
+                                              context
+                                                  .read<NewGroupProvider>()
+                                                  .banUserFromComments(
+                                                    id: widget.cmnt.creatorId,
+                                                    groupId: group.id,
+                                                  );
+                                              Get.back();
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  heightBox(30.h),
+                                ],
+                              ),
+                            ),
+                            isScrollControlled: true,
+                          );
+                        },
+                        child: const Icon(
+                          Icons.more_vert,
+                          color: Color(0xffafafaf),
                         ),
-                        isScrollControlled: true,
                       );
-                    },
-                    child: const Icon(
-                      Icons.more_vert,
-                      color: Color(0xffafafaf),
-                    ),
+                    }),
                   ),
                 ],
               ),

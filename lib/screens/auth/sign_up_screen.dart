@@ -1,6 +1,5 @@
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
-import 'package:casarancha/screens/auth/providers/register_privder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,12 +14,36 @@ import '../../widgets/common_widgets.dart';
 import '../../widgets/text_editing_widget.dart';
 import '../../widgets/text_widget.dart';
 
-class SignUpScreen extends StatelessWidget {
-  SignUpScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPwdController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  bool isPasswordVisible = false;
+  bool isConfirmPasswordVisible = false;
+
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmPasswordFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,93 +83,91 @@ class SignUpScreen extends StatelessWidget {
                   ),
                 ),
                 heightBox(20.w),
-                Consumer<RegisterProvider>(
-                    builder: (context, registerProvider, b) {
-                  return Focus(
-                    focusNode: registerProvider.emailFocus,
-                    onFocusChange: (hasFocus) {
-                      registerProvider.emailFocusChange();
-                    },
-                    child: TextEditingWidget(
-                      controller: _emailController,
-                      isShadowEnable: false,
-                      hint: strEmailAddress,
-                      color: registerProvider.emailFillClr ?? colorFF3,
-                      fieldBorderClr: registerProvider.emailBorderClr,
-                      textInputType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (val) =>
-                          FocusScope.of(context).nextFocus(),
-                      suffixIconWidget: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
+                Focus(
+                  focusNode: _emailFocus,
+                  onFocusChange: (hasFocus) {
+                    setState(() {});
+                  },
+                  child: TextEditingWidget(
+                    controller: _emailController,
+                    hint: strEmailAddress,
+                    color: _emailFocus.hasFocus ? colorFDF : colorFF3,
+                    fieldBorderClr: _emailFocus.hasFocus ? colorF73 : color080,
+                    isBorderEnable: true,
+                    textInputType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (val) =>
+                        FocusScope.of(context).nextFocus(),
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                    suffixIconWidget: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: SvgPicture.asset(_emailFocus.hasFocus
+                          ? icSelectEmail
+                          : icDeselectEmail),
+                    ),
+                  ),
+                ),
+                heightBox(10.h),
+                Focus(
+                  focusNode: _passwordFocus,
+                  onFocusChange: (hasFocus) {
+                    setState(() {});
+                  },
+                  child: TextEditingWidget(
+                    controller: _passwordController,
+                    hint: strPassword,
+                    fieldBorderClr: _passwordFocus.hasFocus ? colorF73 : null,
+                    textInputType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    passwordVisible: !isPasswordVisible,
+                    color: _passwordFocus.hasFocus ? colorFDF : colorFF3,
+                    onEditingComplete: () => FocusScope.of(context).unfocus(),
+                    suffixIconWidget: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: GestureDetector(
+                        onTap: () {
+                          isPasswordVisible = !isPasswordVisible;
+                          setState(() {});
+                        },
                         child: SvgPicture.asset(
-                            registerProvider.icEmailSvg ?? icDeselectEmail),
-                      ),
-                    ),
-                  );
-                }),
-                heightBox(10.w),
-                Consumer<RegisterProvider>(
-                    builder: (context, registerProvider, b) {
-                  return Focus(
-                    focusNode: registerProvider.passwordFocus,
-                    onFocusChange: (hasFocus) {
-                      registerProvider.pwdFocusChange();
-                    },
-                    child: TextEditingWidget(
-                      controller: _passwordController,
-                      hint: strPassword,
-                      isShadowEnable: false,
-                      fieldBorderClr: registerProvider.passwordBorderClr,
-                      passwordVisible: registerProvider.passwordVisible,
-                      textInputType: TextInputType.visiblePassword,
-                      textInputAction: TextInputAction.next,
-                      color: registerProvider.passwordFillClr ?? colorFF3,
-                      onFieldSubmitted: (val) =>
-                          FocusScope.of(context).nextFocus(),
-                      suffixIconWidget: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: GestureDetector(
-                          onTap: () => registerProvider.setPwdVisibility(),
-                          child: SvgPicture.asset(
-                              registerProvider.icPasswordSvg ?? icHidePassword),
+                          isPasswordVisible ? icShowPassword : icHidePassword,
                         ),
                       ),
                     ),
-                  );
-                }),
-                heightBox(10.w),
-                Consumer<RegisterProvider>(
-                    builder: (context, registerProvider, b) {
-                  return Focus(
-                    focusNode: registerProvider.confirmPwdFocus,
-                    onFocusChange: (hasFocus) {
-                      registerProvider.confirmPwdFocusChange();
-                    },
-                    child: TextEditingWidget(
-                      controller: _confirmPwdController,
-                      hint: strConfirmPassword,
-                      isShadowEnable: false,
-                      fieldBorderClr: registerProvider.confirmPwdBorderClr,
-                      passwordVisible: registerProvider.confirmPasswordVisible,
-                      textInputType: TextInputType.visiblePassword,
-                      textInputAction: TextInputAction.done,
-                      color: registerProvider.confirmPwdFillClr ?? colorFF3,
-                      onFieldSubmitted: (val) =>
-                          FocusScope.of(context).unfocus(),
-                      suffixIconWidget: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: GestureDetector(
-                          onTap: () =>
-                              registerProvider.setConfirmPwdVisibility(),
-                          child: SvgPicture.asset(
-                            registerProvider.icConfirmPwdSvg ?? icHidePassword,
-                          ),
+                  ),
+                ),
+                heightBox(10.h),
+                Focus(
+                  focusNode: _confirmPasswordFocus,
+                  onFocusChange: (hasFocus) {
+                    setState(() {});
+                  },
+                  child: TextEditingWidget(
+                    controller: _confirmPasswordController,
+                    hint: "Confirm $strPassword",
+                    fieldBorderClr:
+                        _confirmPasswordFocus.hasFocus ? colorF73 : null,
+                    textInputType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    passwordVisible: !isConfirmPasswordVisible,
+                    color: _confirmPasswordFocus.hasFocus ? colorFDF : colorFF3,
+                    onEditingComplete: () => FocusScope.of(context).unfocus(),
+                    suffixIconWidget: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: GestureDetector(
+                        onTap: () {
+                          isConfirmPasswordVisible = !isConfirmPasswordVisible;
+                          setState(() {});
+                        },
+                        child: SvgPicture.asset(
+                          isConfirmPasswordVisible
+                              ? icShowPassword
+                              : icHidePassword,
                         ),
                       ),
                     ),
-                  );
-                }),
+                  ),
+                ),
                 heightBox(20.w),
                 Consumer<AuthenticationProvider>(
                   builder: (context, registerProvider, b) {
@@ -158,7 +179,7 @@ class SignUpScreen extends StatelessWidget {
                         context.read<AuthenticationProvider>().signUp(
                             email: _emailController.text,
                             password: _passwordController.text,
-                            confirmPassword: _confirmPwdController.text);
+                            confirmPassword: _confirmPasswordController.text);
                       },
                     );
                   },

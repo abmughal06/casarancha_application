@@ -42,40 +42,31 @@ class _SharePostScreenState extends State<SharePostScreen> {
     final search = Provider.of<SearchProvider>(context);
 
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(
-            height: 100.h,
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 65.h),
-                    child: TextWidget(
-                      text: "Share Post",
-                      fontSize: 18.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 20.w,
-                  top: 65.h,
-                  child: InkWell(
-                    onTap: () => Get.back(),
-                    child: Icon(
-                      Icons.close,
-                      size: 20.w,
-                    ),
-                  ),
-                ),
-              ],
+      appBar: AppBar(
+        title: TextWidget(
+          text: "Share Post",
+          fontSize: 18.sp,
+          color: Colors.black,
+          fontWeight: FontWeight.w600,
+        ),
+        backgroundColor: colorWhite,
+        elevation: 0,
+        leading: const SizedBox(),
+        actions: [
+          IconButton(
+            onPressed: () => Get.back(),
+            icon: Icon(
+              Icons.close,
+              size: 20.w,
+              color: colorBlack,
             ),
           ),
+        ],
+      ),
+      body: Column(
+        children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10),
             child: searchTextField(
               context: context,
               controller: searchController,
@@ -96,20 +87,6 @@ class _SharePostScreenState extends State<SharePostScreen> {
                   var currentUser = users
                       .where((element) => element.id == currentUserUID)
                       .first;
-                  // var filterList = users
-                  //     .where((element) =>
-                  //         currentUser.followersIds.contains(element.id) ||
-                  //         currentUser.followingsIds.contains(element.id))
-                  //     .toList();
-
-                  // var appUsers = users
-                  //     .where((element) =>
-                  //         element.id != currentUserUID &&
-                  //         !currentUser.followersIds.contains(element.id) &&
-                  //         !currentUser.followingsIds.contains(element.id))
-                  //     .toList();
-
-                  // var newList = filterList + appUsers;
 
                   if (searchController.text.isEmpty) {
                     return Expanded(
@@ -182,16 +159,17 @@ class _SharePostScreenState extends State<SharePostScreen> {
               },
             ),
           ),
+          CommonButton(
+            text: 'Done',
+            height: 58.w,
+            verticalOutMargin: 20.w,
+            horizontalOutMargin: 20.w,
+            onTap: () => Get.back(),
+          ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: CommonButton(
-        text: 'Done',
-        height: 58.w,
-        verticalOutMargin: 10.w,
-        horizontalOutMargin: 10.w,
-        onTap: () => Get.back(),
-      ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton:
     );
   }
 }

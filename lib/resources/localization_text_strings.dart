@@ -132,6 +132,7 @@ const strLogin = "Login";
 const strContinue = "Continue";
 const strSave = "Save";
 const strChangeNow = "Change Now";
+
 //Hint
 const strEmailAddress = "Email Address";
 const strUserName = "Username";
@@ -170,6 +171,7 @@ const strMessages = "Messages";
 const strTermsCondition = "Terms & Conditions";
 const strPrivacyPolicy = "Privacy Policy";
 const strAbout = "About";
+const strHelp = "Help";
 const strLeaveGrp = 'Leave Group';
 
 //forums

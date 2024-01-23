@@ -129,6 +129,21 @@ class _StoryViewScreenState extends State<StoryViewScreen>
       body: SafeArea(
         child: GestureDetector(
           onTapDown: (details) => _onTapDown(details, story),
+          onVerticalDragStart: (details) => Get.back(),
+          onLongPress: () {
+            _animController.stop();
+            if (story.type == 'Video') {
+              _videoController!.pause();
+            }
+            setState(() {});
+          },
+          onLongPressEnd: (b) {
+            _animController.forward();
+            if (story.type == 'Video') {
+              _videoController!.play();
+            }
+            setState(() {});
+          },
           child: Stack(
             children: <Widget>[
               PageView.builder(
@@ -206,9 +221,16 @@ class _StoryViewScreenState extends State<StoryViewScreen>
               ),
               Visibility(
                 visible: _commentFocus.hasFocus,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.black87,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _commentFocus.unfocus();
+                    });
+                  },
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
               ),

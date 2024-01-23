@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:casarancha/screens/auth/phone_login_screen.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
-import 'package:casarancha/screens/auth/providers/login_provider.dart';
 import 'package:casarancha/screens/auth/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,18 +27,16 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  bool isPasswordVisible = false;
+
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
   }
 
   @override
@@ -83,65 +80,65 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     heightBox(15.h),
-                    Consumer<LoginProvider>(
-                        builder: (context, emailProvider, b) {
-                      return Focus(
-                        focusNode: emailProvider.emailFocus,
-                        onFocusChange: (hasFocus) {
-                          emailProvider.emailFocusChange();
-                        },
-                        child: TextEditingWidget(
-                          controller: _emailController,
-                          hint: strEmailAddress,
-                          color: emailProvider.emailFillClr ?? colorFF3,
-                          fieldBorderClr: emailProvider.emailBorderClr,
-                          textInputType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (val) =>
-                              FocusScope.of(context).nextFocus(),
-                          onEditingComplete: () =>
-                              FocusScope.of(context).nextFocus(),
-                          suffixIconWidget: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w),
-                            child: SvgPicture.asset(
-                                emailProvider.icEmailSvg ?? icDeselectEmail),
-                          ),
+                    Focus(
+                      focusNode: _emailFocus,
+                      onFocusChange: (hasFocus) {
+                        setState(() {});
+                      },
+                      child: TextEditingWidget(
+                        controller: _emailController,
+                        hint: strEmailAddress,
+                        color: _emailFocus.hasFocus ? colorFDF : colorFF3,
+                        fieldBorderClr:
+                            _emailFocus.hasFocus ? colorF73 : color080,
+                        isBorderEnable: true,
+                        textInputType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (val) =>
+                            FocusScope.of(context).nextFocus(),
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                        suffixIconWidget: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: SvgPicture.asset(_emailFocus.hasFocus
+                              ? icSelectEmail
+                              : icDeselectEmail),
                         ),
-                      );
-                    }),
+                      ),
+                    ),
                     heightBox(16.h),
-                    Consumer<LoginProvider>(
-                        builder: (context, passwordProvider, b) {
-                      return Focus(
-                        focusNode: passwordProvider.passwordFocus,
-                        onFocusChange: (hasFocus) {
-                          passwordProvider.pwdFocusChange();
-                        },
-                        child: TextEditingWidget(
-                          controller: _passwordController,
-                          hint: strPassword,
-                          fieldBorderClr: passwordProvider.passwordBorderClr,
-                          textInputType: TextInputType.visiblePassword,
-                          textInputAction: TextInputAction.done,
-                          // onFieldSubmitted: (str) =>
-                          //     push(context, enterPage: const SignUpScreen()),
-                          passwordVisible: passwordProvider.passwordVisible,
-                          color: passwordProvider.passwordFillClr ?? colorFF3,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).unfocus(),
-                          suffixIconWidget: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w),
-                            child: GestureDetector(
-                              onTap: () => passwordProvider.setPwdVisibility(),
-                              child: SvgPicture.asset(
-                                passwordProvider.icPasswordSvg ??
-                                    icHidePassword,
-                              ),
+                    Focus(
+                      focusNode: _passwordFocus,
+                      onFocusChange: (hasFocus) {
+                        setState(() {});
+                      },
+                      child: TextEditingWidget(
+                        controller: _passwordController,
+                        hint: strPassword,
+                        fieldBorderClr:
+                            _passwordFocus.hasFocus ? colorF73 : null,
+                        textInputType: TextInputType.visiblePassword,
+                        textInputAction: TextInputAction.done,
+                        passwordVisible: !isPasswordVisible,
+                        color: _passwordFocus.hasFocus ? colorFDF : colorFF3,
+                        onEditingComplete: () =>
+                            FocusScope.of(context).unfocus(),
+                        suffixIconWidget: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: GestureDetector(
+                            onTap: () {
+                              isPasswordVisible = !isPasswordVisible;
+                              setState(() {});
+                            },
+                            child: SvgPicture.asset(
+                              isPasswordVisible
+                                  ? icShowPassword
+                                  : icHidePassword,
                             ),
                           ),
                         ),
-                      );
-                    }),
+                      ),
+                    ),
                     heightBox(24.h),
                     Align(
                       alignment: Alignment.center,

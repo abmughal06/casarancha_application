@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
-import 'package:casarancha/screens/auth/providers/phone_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -34,57 +33,54 @@ class PhoneOTPScreen extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Consumer<PhoneProvider>(builder: (context, prov, b) {
-            return ListView(
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 7.h),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextWidget(
-                        text: "Phone Login",
-                        fontSize: 26.sp,
-                        color: color13F,
-                        fontWeight: FontWeight.w800,
-                      ),
-                      heightBox(4.h),
-                      TextWidget(
-                        textAlign: TextAlign.center,
-                        text:
-                            "Please Enter your verification\ncode below to continue login",
-                        fontSize: 16.sp,
-                        color: color080,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      heightBox(42.h),
-                      Align(
-                          alignment: Alignment.center,
-                          child: OtpFields(controller: otpController)),
-                      heightBox(20.h),
-                      Consumer<AuthenticationProvider>(
-                          builder: (context, auth, b) {
-                        return CommonButton(
-                          showLoading: auth.isSigningIn,
-                          onTap: () {
-                            auth.checkOtpVerification(
-                              otpController.text,
-                              verificationId,
-                            );
-                          },
-                          text: 'Continue',
-                          width: double.infinity,
-                        );
-                      }),
-                    ],
-                  ),
+          child: ListView(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 7.h),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextWidget(
+                      text: "Phone Login",
+                      fontSize: 26.sp,
+                      color: color13F,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    heightBox(4.h),
+                    TextWidget(
+                      textAlign: TextAlign.center,
+                      text:
+                          "Please Enter your verification\ncode below to continue login",
+                      fontSize: 16.sp,
+                      color: color080,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    heightBox(42.h),
+                    Align(
+                        alignment: Alignment.center,
+                        child: OtpFields(controller: otpController)),
+                    heightBox(20.h),
+                    Consumer<AuthenticationProvider>(
+                        builder: (context, auth, b) {
+                      return CommonButton(
+                        showLoading: auth.isSigningIn,
+                        onTap: () {
+                          auth.checkOtpVerification(
+                            otpController.text,
+                            verificationId,
+                          );
+                        },
+                        text: 'Continue',
+                        width: double.infinity,
+                      );
+                    }),
+                  ],
                 ),
-              ],
-            );
-          }),
+              ),
+            ],
+          ),
         ),
       ],
     ));

@@ -7,15 +7,16 @@ import '../../resources/strings.dart';
 import '../../widgets/common_widgets.dart';
 
 class StoryTextField extends StatelessWidget {
-  const StoryTextField(
-      {super.key,
-      required this.commentFocus,
-      required this.onfocusChange,
-      required this.textEditingController,
-      required this.onchange,
-      required this.onFieldSubmitted,
-      required this.onEditCompleted,
-      required this.ontapSend});
+  const StoryTextField({
+    super.key,
+    required this.commentFocus,
+    required this.onfocusChange,
+    required this.textEditingController,
+    required this.onchange,
+    required this.onFieldSubmitted,
+    required this.onEditCompleted,
+    required this.ontapSend,
+  });
   final FocusNode commentFocus;
   final Function(bool) onfocusChange;
   final TextEditingController textEditingController;
@@ -36,8 +37,11 @@ class StoryTextField extends StatelessWidget {
           child: TextFormField(
             controller: textEditingController,
             onChanged: onchange,
+            maxLength: 2000,
+            maxLines: 3,
+            minLines: 1,
             style: TextStyle(
-              color: color887,
+              color: colorWhite,
               fontSize: 16.sp,
               fontFamily: strFontName,
               fontWeight: FontWeight.w500,
@@ -45,7 +49,7 @@ class StoryTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: strWriteCommentHere,
               hintStyle: TextStyle(
-                color: color887,
+                color: colorWhite,
                 fontSize: 14.sp,
                 fontFamily: strFontName,
                 fontWeight: FontWeight.w400,
@@ -66,15 +70,16 @@ class StoryTextField extends StatelessWidget {
                   borderSide: BorderSide.none),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30.r),
-                borderSide: const BorderSide(
-                  color: color887,
+                borderSide: BorderSide(
+                  color: colorWhite,
+                  width: 1.h,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30.r),
-                borderSide: const BorderSide(
-                  color: color887,
-                  width: 1.0,
+                borderSide: BorderSide(
+                  color: colorWhite,
+                  width: 1.h,
                 ),
               ),
             ),

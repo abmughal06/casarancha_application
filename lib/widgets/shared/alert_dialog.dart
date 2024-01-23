@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -37,7 +38,7 @@ class CustomAdaptiveAlertDialog extends StatelessWidget {
             onPressed: onAction,
             child: TextWidget(
               text: actiionBtnName,
-              color: actionBtnColor ?? Colors.red,
+              color: actionBtnColor ?? colorPrimaryA05,
             ),
           ),
         ],
@@ -57,7 +58,7 @@ class CustomAdaptiveAlertDialog extends StatelessWidget {
             onPressed: onAction,
             child: TextWidget(
               text: actiionBtnName,
-              color: actionBtnColor ?? Colors.red,
+              color: actionBtnColor ?? colorPrimaryA05,
             ),
           ),
         ],

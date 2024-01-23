@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/custom_dialog.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../models/media_details.dart';
 import '../../models/post_model.dart';
@@ -24,7 +24,7 @@ import '../poll.dart';
 import '../text_widget.dart';
 import '../video_player.dart';
 
-class CheckMediaAndShowPost extends StatefulWidget {
+class CheckMediaAndShowPost extends StatelessWidget {
   const CheckMediaAndShowPost({
     super.key,
     required this.mediaData,
@@ -45,50 +45,36 @@ class CheckMediaAndShowPost extends StatefulWidget {
   final String? groupId;
 
   @override
-  State<CheckMediaAndShowPost> createState() => _CheckMediaAndShowPostState();
-}
-
-class _CheckMediaAndShowPostState extends State<CheckMediaAndShowPost> {
-  // late Future<void> initializedFuturePlay;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   initializedFuturePlay = Future.delayed(const Duration(milliseconds: 500));
-  // }
-
-  @override
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context);
 
-    switch (widget.mediaData.type) {
+    switch (mediaData.type) {
       case "Photo":
         postProvider.countVideoViews(
-          postModel: widget.postModel,
-          groupId: widget.groupId,
+          postModel: postModel,
+          groupId: groupId,
         );
         return InkWell(
-          onDoubleTap: widget.ondoubleTap,
+          onDoubleTap: ondoubleTap,
           onLongPress: () {
-            widget.isPostDetail
+            isPostDetail
                 ? showDialog(
                     context: context,
                     builder: (context) {
                       return CustomDownloadDialog(
-                        url: widget.mediaData.link,
+                        url: mediaData.link,
                         path:
-                            '${widget.mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(widget.mediaData.type)}',
+                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
                       );
                     })
                 : null;
           },
-          onTap: widget.isPostDetail
+          onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
-                  post: widget.postModel, isPostDetail: widget.isPostDetail))
+                  post: postModel, isPostDetail: isPostDetail))
               : () => Get.to(() => PostDetailScreen(
-                    postModel: widget.postModel,
-                    groupId: widget.groupId,
+                    postModel: postModel,
+                    groupId: groupId,
                   )),
           child: CachedNetworkImage(
             progressIndicatorBuilder: (context, url, progress) => Container(
@@ -96,53 +82,52 @@ class _CheckMediaAndShowPostState extends State<CheckMediaAndShowPost> {
               // width: MediaQuery.of(context).size.width,
               // height: double.parse(mediaData.imageHeight!),
             ),
-            imageUrl: widget.mediaData.link,
+            imageUrl: mediaData.link,
           ),
         );
 
       case "Video":
         return InkWell(
           onLongPress: () {
-            widget.isPostDetail
+            isPostDetail
                 ? showDialog(
                     context: context,
                     builder: (context) {
                       return CustomDownloadDialog(
-                        url: widget.mediaData.link,
+                        url: mediaData.link,
                         path:
-                            '${widget.mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(widget.mediaData.type)}',
+                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
                       );
                     })
                 : null;
           },
-          onDoubleTap: widget.ondoubleTap,
-          onTap: widget.isPostDetail
+          onDoubleTap: ondoubleTap,
+          onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
-                  post: widget.postModel, isPostDetail: widget.isPostDetail))
+                  post: postModel, isPostDetail: isPostDetail))
               : () => Get.to(() => PostDetailScreen(
-                    postModel: widget.postModel,
-                    groupId: widget.groupId,
+                    postModel: postModel,
+                    groupId: groupId,
                   )),
           child: VideoPlayerWidget(
-            key: ValueKey(widget.mediaData.link),
-            media: widget.mediaData,
-            videoUrl: widget.mediaData.link,
-            postModel: widget.postModel,
-            isPostDetailScreen:
-                widget.isFullScreen ? false : widget.isPostDetail,
+            key: ValueKey(mediaData.link),
+            media: mediaData,
+            videoUrl: mediaData.link,
+            postModel: postModel,
+            isPostDetailScreen: isFullScreen ? false : isPostDetail,
           ),
         );
       case "Music":
         return InkWell(
-          key: ValueKey(widget.postModel.mediaData.first.link),
-          onDoubleTap: widget.ondoubleTap,
+          key: ValueKey(postModel.mediaData.first.link),
+          onDoubleTap: ondoubleTap,
           child: MusicPlayerUrl(
-            key: ValueKey(widget.postModel.mediaData.first.link),
-            postModel: widget.postModel,
+            key: ValueKey(postModel.mediaData.first.link),
+            postModel: postModel,
             border: 0,
-            musicDetails: widget.mediaData,
+            musicDetails: mediaData,
             ontap: () {},
-            isPostDetail: widget.isPostDetail,
+            isPostDetail: isPostDetail,
           ),
         );
 
@@ -150,39 +135,42 @@ class _CheckMediaAndShowPostState extends State<CheckMediaAndShowPost> {
         return Container(
             // height: 200,
             // width: MediaQuery.of(context).size.width,
-            padding: widget.isPostDetail
+            padding: isPostDetail
                 ? EdgeInsets.only(
                     top: 100.h, left: 12.h, right: 12.h, bottom: 12.h)
                 : EdgeInsets.all(12.h),
-            child: Poll(postModel: widget.postModel));
+            child: Poll(postModel: postModel));
 
       default:
-        postProvider.countVideoViews(
-            postModel: widget.postModel, groupId: widget.groupId);
+        postProvider.countVideoViews(postModel: postModel, groupId: groupId);
         return InkWell(
-          onTap: widget.isPostDetail
+          onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
-                  post: widget.postModel, isPostDetail: widget.isPostDetail))
+                  post: postModel, isPostDetail: isPostDetail))
               : () => Get.to(() => PostDetailScreen(
-                    postModel: widget.postModel,
-                    groupId: widget.groupId,
+                    postModel: postModel,
+                    groupId: groupId,
                   )),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.only(
-              left: widget.isPostDetail ? 20 : 15,
-              right: widget.isPostDetail ? 20 : 15,
-              top: widget.isPostDetail ? 130 : 15,
-              bottom: 20,
-            ),
-            child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            // padding: EdgeInsets.only(
+            //   left: widget.isPostDetail ? 20 : 15,
+            //   right: widget.isPostDetail ? 20 : 15,
+            //   top: widget.isPostDetail ? 130 : 0,
+            //   bottom: 0,
+            // ),
+            child: Align(
+              alignment:
+                  isPostDetail ? Alignment.bottomCenter : Alignment.topLeft,
               child: SelectableTextWidget(
-                text: widget.mediaData.link,
-                textAlign:
-                    widget.isFullScreen ? TextAlign.center : TextAlign.left,
+                text: mediaData.link,
+                textAlign: isFullScreen || isPostDetail
+                    ? TextAlign.center
+                    : TextAlign.left,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
-                color: widget.isFullScreen ? colorFF3 : color221,
+                color: isFullScreen ? colorFF3 : color221,
               ),
             ),
           ),
@@ -191,23 +179,7 @@ class _CheckMediaAndShowPostState extends State<CheckMediaAndShowPost> {
   }
 }
 
-double getQouteAspectRatio(String text, bool isPostDetail) {
-  if (isPostDetail) {
-    if (text.length > 400) {
-      return 9 / 13;
-    } else {
-      return 1 / 1;
-    }
-  } else {
-    if (text.length > 400) {
-      return 9 / 13;
-    } else {
-      return 17 / 9;
-    }
-  }
-}
-
-class PostMediaWidgetForQuoteAndPoll extends StatefulWidget {
+class PostMediaWidgetForQuoteAndPoll extends StatelessWidget {
   const PostMediaWidgetForQuoteAndPoll({
     super.key,
     required this.post,
@@ -222,47 +194,9 @@ class PostMediaWidgetForQuoteAndPoll extends StatefulWidget {
   final String? groupId;
 
   @override
-  State<PostMediaWidgetForQuoteAndPoll> createState() =>
-      _PostMediaWidgetForQuoteAndPollState();
-}
-
-class _PostMediaWidgetForQuoteAndPollState
-    extends State<PostMediaWidgetForQuoteAndPoll> {
-  final PageController postPageController = PageController();
-  int postCurrentPageIndex = 0;
-  late double videoAspectRatio;
-
-  changeIndex(v) {
-    if (mounted) {
-      setState(() {
-        postCurrentPageIndex = v;
-        postPageController.jumpToPage(postCurrentPageIndex);
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getVideoAspectRatio(widget.post.mediaData.first.link);
-
-    postCurrentPageIndex = 0;
-  }
-
-  getVideoAspectRatio(url) async {
-    if (widget.post.mediaData.first.type == 'Video') {
-      final video = VideoPlayerController.networkUrl(Uri.parse(url));
-      videoAspectRatio =
-          await video.initialize().then((value) => video.value.aspectRatio);
-    } else {
-      videoAspectRatio = 0.0;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    if (widget.post.mediaData.isEmpty) {
+    if (post.mediaData.isEmpty) {
       return const SizedBox(
         width: double.infinity,
         height: 500,
@@ -272,94 +206,25 @@ class _PostMediaWidgetForQuoteAndPollState
       );
     }
     return ExpandablePageView.builder(
-      itemCount: widget.post.mediaData.length,
-      controller: postPageController,
-      // estimatedPageSize: 400,
-      onPageChanged: (value) {
-        if (mounted) {
-          setState(() {
-            postCurrentPageIndex = value;
-          });
-        }
-      },
+      itemCount: post.mediaData.length,
       itemBuilder: (context, index) {
-        var media = widget.post.mediaData[index];
-        return Stack(
-          fit: StackFit.loose,
-          children: [
-            Visibility(
-              visible: media.type == 'Photo' ||
-                  media.type == 'Video' ||
-                  media.type == 'Music',
-              child: AspectRatio(
-                aspectRatio: media.type == 'Photo'
-                    ? double.parse(media.imageWidth!) /
-                        double.parse(media.imageHeight!)
-                    : media.type == 'Video'
-                        ? 9 / 16
-                        : MediaQuery.of(context).size.width / 200,
-                child: CheckMediaAndShowPost(
-                  groupId: widget.groupId,
-                  isPostDetail: widget.isPostDetail,
-                  postModel: widget.post,
-                  ondoubleTap: () => prov.toggleLikeDislike(
-                      postModel: widget.post, groupId: widget.groupId),
-                  mediaData: media,
-                  postId: widget.post.id,
-                  isFullScreen: widget.isFullScreen,
-                ),
-              ),
-            ),
-            Visibility(
-              visible: media.type == 'Qoute' || media.type == 'poll',
-              child: CheckMediaAndShowPost(
-                groupId: widget.groupId,
-                isPostDetail: widget.isPostDetail,
-                postModel: widget.post,
-                ondoubleTap: () => prov.toggleLikeDislike(
-                    postModel: widget.post, groupId: widget.groupId),
-                mediaData: media,
-                postId: widget.post.id,
-                isFullScreen: widget.isFullScreen,
-              ),
-            ),
-            Visibility(
-              visible: widget.post.mediaData.length > 1,
-              child: Positioned(
-                width: MediaQuery.of(context).size.width,
-                bottom: 12,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      List.generate(widget.post.mediaData.length, (index) {
-                    return InkWell(
-                      onTap: () {
-                        changeIndex(index);
-                      },
-                      child: Container(
-                        height: 8.h,
-                        width: 8.h,
-                        margin: EdgeInsets.all(3.w),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: postCurrentPageIndex == index
-                              ? colorFF7
-                              : colorDD9.withOpacity(0.3),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-          ],
+        var media = post.mediaData[index];
+        return CheckMediaAndShowPost(
+          groupId: groupId,
+          isPostDetail: isPostDetail,
+          postModel: post,
+          ondoubleTap: () =>
+              prov.toggleLikeDislike(postModel: post, groupId: groupId),
+          mediaData: media,
+          postId: post.id,
+          isFullScreen: isFullScreen,
         );
       },
     );
   }
 }
 
-class PostMediaWidgetForOtherTypes extends StatefulWidget {
+class PostMediaWidgetForOtherTypes extends StatelessWidget {
   const PostMediaWidgetForOtherTypes({
     super.key,
     required this.post,
@@ -374,36 +239,9 @@ class PostMediaWidgetForOtherTypes extends StatefulWidget {
   final String? groupId;
 
   @override
-  State<PostMediaWidgetForOtherTypes> createState() =>
-      _PostMediaWidgetForOtherTypesState();
-}
-
-class _PostMediaWidgetForOtherTypesState
-    extends State<PostMediaWidgetForOtherTypes> {
-  final PageController postPageController = PageController();
-  int postCurrentPageIndex = 0;
-
-  changeIndex(v) {
-    if (mounted) {
-      setState(() {
-        postCurrentPageIndex = v;
-        postPageController.jumpToPage(postCurrentPageIndex);
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // getVideoAspectRatio(widget.post.mediaData.first.link);
-
-    postCurrentPageIndex = 0;
-  }
-
-  @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    if (widget.post.mediaData.isEmpty) {
+    if (post.mediaData.isEmpty) {
       return const SizedBox(
         width: double.infinity,
         height: 500,
@@ -412,42 +250,33 @@ class _PostMediaWidgetForOtherTypesState
         ),
       );
     }
-    return AspectRatio(
-      aspectRatio: widget.post.mediaData.first.type == 'Photo'
-          ? double.parse(widget.post.mediaData.first.imageWidth!) /
-              double.parse(widget.post.mediaData.first.imageHeight!)
-          : widget.post.mediaData.first.type == 'Video'
-              ? double.parse(widget.post.mediaData.first.videoAspectRatio!)
-              : MediaQuery.of(context).size.width / 200,
-      child: Container(
-        color: colorBlack.withOpacity(0.1),
-        child: PageView.builder(
-          itemCount: widget.post.mediaData.length,
-          controller: postPageController,
-          onPageChanged: (value) {
-            if (mounted) {
-              setState(() {
-                postCurrentPageIndex = value;
-              });
-            }
-          },
-          itemBuilder: (context, index) {
-            var media = widget.post.mediaData[index];
-            return Center(
-              child: CheckMediaAndShowPost(
-                groupId: widget.groupId,
-                isPostDetail: widget.isPostDetail,
-                postModel: widget.post,
-                ondoubleTap: () => prov.toggleLikeDislike(
-                    postModel: widget.post, groupId: widget.groupId),
-                mediaData: media,
-                postId: widget.post.id,
-                isFullScreen: widget.isFullScreen,
-              ),
-            );
-          },
-        ),
+    return CarouselSlider.builder(
+      itemCount: post.mediaData.length,
+      options: CarouselOptions(
+        viewportFraction: 1,
+        enableInfiniteScroll: false,
+        aspectRatio: post.mediaData.first.type == 'Photo'
+            ? double.parse(post.mediaData.first.imageWidth!) /
+                double.parse(post.mediaData.first.imageHeight!)
+            : post.mediaData.first.type == 'Video'
+                ? double.parse(post.mediaData.first.videoAspectRatio!)
+                : MediaQuery.of(context).size.width / 200,
       ),
+      itemBuilder: (context, index, i) {
+        var media = post.mediaData[i];
+        return Center(
+          child: CheckMediaAndShowPost(
+            groupId: groupId,
+            isPostDetail: isPostDetail,
+            postModel: post,
+            ondoubleTap: () =>
+                prov.toggleLikeDislike(postModel: post, groupId: groupId),
+            mediaData: media,
+            postId: post.id,
+            isFullScreen: isFullScreen,
+          ),
+        );
+      },
     );
   }
 }

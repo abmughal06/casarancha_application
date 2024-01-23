@@ -12,9 +12,12 @@ class GroupModel {
   String creatorId;
   CreatorDetails creatorDetails;
   String createdAt;
-  List<String> postIds;
-  List<String> memberIds;
-  List<String> joinRequestIds;
+  List<dynamic> postIds;
+  List<dynamic> memberIds;
+  List<dynamic> joinRequestIds;
+  List<dynamic> banUsersIds;
+  List<dynamic> banFromCmntUsersIds;
+  List<dynamic> adminIds;
   bool isPublic;
   bool isVerified;
 
@@ -28,6 +31,9 @@ class GroupModel {
     required this.createdAt,
     this.postIds = const [],
     this.memberIds = const [],
+    this.banUsersIds = const [],
+    this.banFromCmntUsersIds = const [],
+    required this.adminIds,
     required this.joinRequestIds,
     required this.isVerified,
     required this.isPublic,
@@ -42,9 +48,12 @@ class GroupModel {
     String? creatorId,
     CreatorDetails? creatorDetails,
     String? createdAt,
-    List<String>? postIds,
-    List<String>? memberIds,
-    List<String>? joinRequestIds,
+    List<dynamic>? postIds,
+    List<dynamic>? memberIds,
+    List<dynamic>? joinRequestIds,
+    List<dynamic>? banUsersIds,
+    List<dynamic>? banFromCmntUsersIds,
+    List<dynamic>? adminIds,
     bool? isPublic,
   }) {
     return GroupModel(
@@ -58,6 +67,9 @@ class GroupModel {
       postIds: postIds ?? this.postIds,
       memberIds: memberIds ?? this.memberIds,
       joinRequestIds: joinRequestIds ?? this.joinRequestIds,
+      banUsersIds: banUsersIds ?? this.banUsersIds,
+      banFromCmntUsersIds: banFromCmntUsersIds ?? this.banFromCmntUsersIds,
+      adminIds: adminIds ?? this.adminIds,
       isPublic: isPublic ?? this.isPublic,
       isVerified: isVerified ?? this.isVerified,
     );
@@ -75,6 +87,9 @@ class GroupModel {
       'postIds': postIds,
       'memberIds': memberIds,
       'joinRequestIds': joinRequestIds,
+      'banUsersIds': banUsersIds,
+      'banFromCmntUsersIds': banFromCmntUsersIds,
+      'adminIds': adminIds,
       'isPublic': isPublic,
       'isVerified': isVerified,
     };
@@ -89,9 +104,12 @@ class GroupModel {
       creatorId: map['creatorId'] ?? '',
       creatorDetails: CreatorDetails.fromMap(map['creatorDetails']),
       createdAt: map['createdAt'] ?? '',
-      postIds: List<String>.from(map['postIds']),
-      memberIds: List<String>.from(map['memberIds']),
-      joinRequestIds: List<String>.from(map['joinRequestIds']),
+      postIds: map['postIds'],
+      memberIds: map['memberIds'],
+      joinRequestIds: map['joinRequestIds'],
+      banUsersIds: map['banUsersIds'] ?? [],
+      banFromCmntUsersIds: map['banFromCmntUsersIds'] ?? [],
+      adminIds: map['adminIds'] ?? [],
       isPublic: map['isPublic'] ?? false,
       isVerified: map['isVerified'] ?? false,
     );

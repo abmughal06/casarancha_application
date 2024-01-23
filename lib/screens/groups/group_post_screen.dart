@@ -2,7 +2,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/resources/localization_text_strings.dart';
-import 'package:casarancha/screens/groups/group_member_screen.dart';
+import 'package:casarancha/screens/groups/group_settings.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -57,10 +57,15 @@ class GroupPostScreen extends StatelessWidget {
         ),
         elevation: 0.2,
         actions: [
-          GestureDetector(
-              onTap: () => Get.to(() => GroupMembersScreen(group: group)),
-              child: SvgPicture.asset(icGroupMember)),
-          widthBox(15.w),
+          IconButton(
+            onPressed: () => Get.to(() => GroupSettings(
+                  group: group,
+                )),
+            icon: const Icon(
+              Icons.settings,
+              color: color887,
+            ),
+          )
         ],
       ),
       body: Column(

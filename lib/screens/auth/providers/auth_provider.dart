@@ -87,7 +87,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  //SIGN IN METHOD
   Future<void> signIn({String? email, String? password}) async {
     if (checkValidDataLogin(email: email, password: password)) {
       try {
@@ -239,36 +238,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  // Future<void> callFaceBookSignIn() async {
-  //   try {
-  //     isSigningIn = true;
-  //     notifyListeners();
-
-  //     LoginResult loginResult = await FacebookAuth.instance
-  //         .login(permissions: const ['email', 'public_profile']);
-
-  //     if (loginResult.status == LoginStatus.success) {
-  //       AuthCredential credential = FacebookAuthProvider.credential(
-  //           loginResult.accessToken?.token ?? "");
-  //       await FirebaseAuth.instance.signInWithCredential(credential);
-  //       saveTokenAndNavigateToNext();
-  //     }
-  //   } on FirebaseAuthException catch (e) {
-  //     isSigningIn = false;
-  //     notifyListeners();
-
-  //     GlobalSnackBar.show(message: 'Please enter ${e.message}');
-  //   } catch (e) {
-  //     isSigningIn = false;
-  //     notifyListeners();
-
-  //     GlobalSnackBar.show(message: 'Facebook login cancelled');
-  //   } finally {
-  //     isSigningIn = false;
-  //     notifyListeners();
-  //   }
-  // }
-
   Future<void> callAppleSignIn() async {
     String generateNonce([int length = 32]) {
       const charset =
@@ -334,35 +303,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  // Future<void> callTwitterSignIn() async {
-  //   try {
-  //     isSigningIn = true;
-  //     notifyListeners();
-
-  //     TwitterLogin login = TwitterLogin(
-  //       apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
-  //       apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
-  //       redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler",
-  //     );
-  //     AuthResult authResult = await login.loginV2();
-  //     if (authResult.authToken != null && authResult.authTokenSecret != null) {
-  //       AuthCredential credential = TwitterAuthProvider.credential(
-  //           accessToken: authResult.authToken!,
-  //           secret: authResult.authTokenSecret!);
-  //       FirebaseAuth.instance.signInWithCredential(credential);
-  //       saveTokenAndNavigateToNext();
-  //     }
-  //   } on FirebaseAuthException catch (e) {
-  //     isSigningIn = false;
-  //     notifyListeners();
-
-  //     GlobalSnackBar.show(message: 'Please enter ${e.message}');
-  //   } finally {
-  //     isSigningIn = false;
-  //     notifyListeners();
-  //   }
-  // }
-
   bool checkValidDataLogin({String? email, String? password}) {
     if (email!.isEmpty) {
       GlobalSnackBar.show(message: 'Please enter $strEmailAddress');
@@ -408,4 +348,112 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<void> signOut() async {
     await firebaseAuth.signOut();
   }
+
+  Future<void> linkPhoneWithEmailAccount(
+      {required String email, required String password}) async {
+    try {
+      isSigningIn = true;
+      notifyListeners();
+      final credential =
+          EmailAuthProvider.credential(email: email, password: password);
+      final userCredential = await FirebaseAuth.instance.currentUser
+          ?.linkWithCredential(credential);
+
+      if (userCredential != null) {
+        GlobalSnackBar.show(message: "Account Linked Successfully");
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .update({
+          "email": email,
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case "provider-already-linked":
+          GlobalSnackBar.show(
+              message: "The provider has already been linked to the user.");
+          break;
+        case "invalid-credential":
+          GlobalSnackBar.show(
+              message: "The provider's credential is not valid.");
+          break;
+        case "credential-already-in-use":
+          GlobalSnackBar.show(
+              message:
+                  "The account corresponding to the credential already exists, "
+                  "or is already linked to a Firebase User.");
+          break;
+        default:
+        // GlobalSnackBar.show(message: "Unknown error.");
+      }
+    } finally {
+      isSigningIn = false;
+      notifyListeners();
+    }
+  }
 }
+
+  
+
+// Future<void> callTwitterSignIn() async {
+  //   try {
+  //     isSigningIn = true;
+  //     notifyListeners();
+
+  //     TwitterLogin login = TwitterLogin(
+  //       apiKey: "IsOL30I1dqNnJ81lPuHxTKTYF",
+  //       apiSecretKey: "cdCKCY75t8Okzwf2ENlOPzvnBMrnins8JtDTE1kp8cLHRuVqfn",
+  //       redirectURI: "https://casa-rancha.firebaseapp.com/__/auth/handler",
+  //     );
+  //     AuthResult authResult = await login.loginV2();
+  //     if (authResult.authToken != null && authResult.authTokenSecret != null) {
+  //       AuthCredential credential = TwitterAuthProvider.credential(
+  //           accessToken: authResult.authToken!,
+  //           secret: authResult.authTokenSecret!);
+  //       FirebaseAuth.instance.signInWithCredential(credential);
+  //       saveTokenAndNavigateToNext();
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     isSigningIn = false;
+  //     notifyListeners();
+
+  //     GlobalSnackBar.show(message: 'Please enter ${e.message}');
+  //   } finally {
+  //     isSigningIn = false;
+  //     notifyListeners();
+  //   }
+  // }
+
+  //=======================
+
+
+  // Future<void> callFaceBookSignIn() async {
+  //   try {
+  //     isSigningIn = true;
+  //     notifyListeners();
+
+  //     LoginResult loginResult = await FacebookAuth.instance
+  //         .login(permissions: const ['email', 'public_profile']);
+
+  //     if (loginResult.status == LoginStatus.success) {
+  //       AuthCredential credential = FacebookAuthProvider.credential(
+  //           loginResult.accessToken?.token ?? "");
+  //       await FirebaseAuth.instance.signInWithCredential(credential);
+  //       saveTokenAndNavigateToNext();
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     isSigningIn = false;
+  //     notifyListeners();
+
+  //     GlobalSnackBar.show(message: 'Please enter ${e.message}');
+  //   } catch (e) {
+  //     isSigningIn = false;
+  //     notifyListeners();
+
+  //     GlobalSnackBar.show(message: 'Facebook login cancelled');
+  //   } finally {
+  //     isSigningIn = false;
+  //     notifyListeners();
+  //   }
+  // }

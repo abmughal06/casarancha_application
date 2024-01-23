@@ -79,6 +79,7 @@ class NewGroupProvider extends ChangeNotifier {
         isPublic: isPublic,
         memberIds: membersIds,
         joinRequestIds: [],
+        adminIds: [currentUser.id],
       );
 
       await groupRef.set(group.toMap());
@@ -105,11 +106,82 @@ class NewGroupProvider extends ChangeNotifier {
     }
   }
 
+  addGroupAdmins({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'adminIds': FieldValue.arrayUnion([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  banUserFromGroup({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'banUsersIds': FieldValue.arrayUnion([id]),
+          'memberIds': FieldValue.arrayRemove([id]),
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  unBanUserFromGroup({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'banUsersIds': FieldValue.arrayRemove([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  togglePrivate({isPublic, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'isPublic': !isPublic,
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
   removeGroupMembers({id, groupId}) async {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
         {
           'memberIds': FieldValue.arrayRemove([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  banUserFromComments({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'banFromCmntUsersIds': FieldValue.arrayUnion([id])
         },
       );
     } catch (e) {

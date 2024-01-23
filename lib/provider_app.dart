@@ -1,8 +1,5 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
-import 'package:casarancha/screens/auth/providers/login_provider.dart';
-import 'package:casarancha/screens/auth/providers/phone_provider.dart';
-import 'package:casarancha/screens/auth/providers/register_privder.dart';
 import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_controller.dart';
@@ -15,7 +12,6 @@ import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
-import 'package:casarancha/utils/providers/date_picker_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,13 +37,8 @@ class ProviderApp extends StatelessWidget {
           initialData: null,
           catchError: (context, error) => null,
         ),
-        ChangeNotifierProvider<LoginProvider>(create: (_) => LoginProvider()),
-        ChangeNotifierProvider<RegisterProvider>(
-            create: (_) => RegisterProvider()),
         ChangeNotifierProvider<SetupProfileProvider>(
             create: (_) => SetupProfileProvider()),
-        ChangeNotifierProvider<DatePickerModel>(
-            create: (_) => DatePickerModel()),
         ChangeNotifierProvider<DashboardProvider>(
             create: (_) => DashboardProvider()),
         ChangeNotifierProvider<ProfileProvider>(
@@ -65,7 +56,6 @@ class ProviderApp extends StatelessWidget {
         ChangeNotifierProvider<ChatListController>(
             create: (_) => ChatListController()),
         ChangeNotifierProvider<SearchProvider>(create: (_) => SearchProvider()),
-        ChangeNotifierProvider<PhoneProvider>(create: (_) => PhoneProvider()),
         ChangeNotifierProvider<DownloadProvider>(
             create: (_) => DownloadProvider()),
       ],

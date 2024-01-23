@@ -1,3 +1,4 @@
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
@@ -244,76 +245,84 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               ],
             ),
           ),
-          Consumer<List<UserModel>?>(
-            builder: (context, users, b) {
-              if (users == null) {
-                return centerLoader();
-              }
-              List<UserModel> filterList = users
-                  .where((element) =>
-                      widget.currentUser.followersIds.contains(element.id) ||
-                      widget.currentUser.followingsIds.contains(element.id))
-                  .toList();
+          StreamProvider.value(
+            value: DataProvider().filterUserList(
+                widget.currentUser.followersIds +
+                    widget.currentUser.followingsIds),
+            initialData: null,
+            catchError: (context, error) => null,
+            child: Consumer<List<UserModel>?>(
+              builder: (context, users, b) {
+                if (users == null) {
+                  return centerLoader();
+                }
+                // List<UserModel> filterList = users
+                //     .where((element) =>
+                //         widget.currentUser.followersIds.contains(element.id) ||
+                //         widget.currentUser.followingsIds.contains(element.id))
+                //     .toList();
 
-              if (_searchControllr.text.isEmpty ||
-                  _searchControllr.text == '') {
+                if (_searchControllr.text.isEmpty ||
+                    _searchControllr.text == '') {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: users.length,
+                    padding:
+                        const EdgeInsets.only(bottom: 100, left: 5, right: 5),
+                    itemBuilder: (context, index) {
+                      return FollowFollowingTile(
+                        user: users[index],
+                        ontapToggleFollow: () {
+                          if (membersIds.contains(users[index].id)) {
+                            membersIds.remove(users[index].id);
+                          } else {
+                            membersIds.add(users[index].id);
+                          }
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                        btnName: membersIds.contains(users[index].id)
+                            ? strRemove
+                            : strAdd,
+                      );
+                    },
+                  );
+                }
+                var searchList = users
+                    .where((element) => element.name
+                        .toLowerCase()
+                        .contains(_searchControllr.text.toLowerCase()))
+                    .toList();
+
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filterList.length,
+                  itemCount: searchList.length,
                   padding:
                       const EdgeInsets.only(bottom: 100, left: 5, right: 5),
                   itemBuilder: (context, index) {
                     return FollowFollowingTile(
-                      user: filterList[index],
+                      user: searchList[index],
                       ontapToggleFollow: () {
-                        if (membersIds.contains(filterList[index].id)) {
-                          membersIds.remove(filterList[index].id);
+                        if (membersIds.contains(searchList[index].id)) {
+                          membersIds.remove(searchList[index].id);
                         } else {
-                          membersIds.add(filterList[index].id);
+                          membersIds.add(searchList[index].id);
                         }
                         if (mounted) {
                           setState(() {});
                         }
                       },
-                      btnName: membersIds.contains(filterList[index].id)
+                      btnName: membersIds.contains(searchList[index].id)
                           ? strRemove
                           : strAdd,
                     );
                   },
                 );
-              }
-              var searchList = filterList
-                  .where((element) => element.name
-                      .toLowerCase()
-                      .contains(_searchControllr.text.toLowerCase()))
-                  .toList();
-
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: searchList.length,
-                padding: const EdgeInsets.only(bottom: 100, left: 5, right: 5),
-                itemBuilder: (context, index) {
-                  return FollowFollowingTile(
-                    user: searchList[index],
-                    ontapToggleFollow: () {
-                      if (membersIds.contains(searchList[index].id)) {
-                        membersIds.remove(searchList[index].id);
-                      } else {
-                        membersIds.add(searchList[index].id);
-                      }
-                      if (mounted) {
-                        setState(() {});
-                      }
-                    },
-                    btnName: membersIds.contains(searchList[index].id)
-                        ? strRemove
-                        : strAdd,
-                  );
-                },
-              );
-            },
+              },
+            ),
           ),
         ],
       ),

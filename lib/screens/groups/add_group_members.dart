@@ -11,7 +11,6 @@ import '../../models/group_model.dart';
 import '../../models/user_model.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/profle_screen_widgets/follow_following_tile.dart';
-import '../../widgets/text_widget.dart';
 import '../search/search_screen.dart';
 
 class AddGroupMembers extends StatelessWidget {
@@ -23,7 +22,6 @@ class AddGroupMembers extends StatelessWidget {
   Widget build(BuildContext context) {
     final search = Provider.of<SearchProvider>(context);
     final prov = Provider.of<NewGroupProvider>(context);
-    final allUsers = context.watch<List<UserModel>?>();
     final currentUser = context.watch<UserModel?>();
 
     return Scaffold(
@@ -41,74 +39,109 @@ class AddGroupMembers extends StatelessWidget {
               },
             ),
           ),
-          Expanded(
-            child: StreamProvider.value(
-              value: DataProvider().singleGroup(group.id),
-              initialData: null,
-              catchError: (context, error) => null,
-              child: Consumer<GroupModel?>(
-                builder: (context, grp, b) {
-                  if (allUsers == null || grp == null || currentUser == null) {
-                    return centerLoader();
-                  }
+          currentUser == null
+              ? centerLoader()
+              : Expanded(
+                  child: StreamProvider.value(
+                    value: group.isPublic
+                        ? DataProvider().allUsers()
+                        : DataProvider().filterUserList(
+                            currentUser.followersIds +
+                                currentUser.followingsIds),
+                    initialData: null,
+                    catchError: (context, error) => null,
+                    child: Consumer<List<UserModel>?>(
+                      builder: (context, user, b) {
+                        if (user == null) {
+                          return centerLoader();
+                        }
 
-                  if (searchController.text.isEmpty ||
-                      searchController.text == '') {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 60),
-                        child: TextWidget(
-                          textAlign: TextAlign.center,
-                          text: strAlertAddGrpMem,
-                        ),
-                      ),
-                    );
-                  }
+                        if (searchController.text.isEmpty ||
+                            searchController.text == '') {
+                          return ListView.builder(
+                            itemCount: user.length,
+                            padding: const EdgeInsets.only(bottom: 50),
+                            itemBuilder: (context, index) {
+                              var userSnap = user[index];
 
-                  var users = grp.isPublic
-                      ? allUsers
-                      : allUsers
-                          .where((element) =>
-                              currentUser.followersIds.contains(element.id) ||
-                              currentUser.followingsIds.contains(element.id))
-                          .toList();
+                              return StreamProvider.value(
+                                value: DataProvider().singleGroup(group.id),
+                                initialData: null,
+                                catchError: (context, error) => null,
+                                child: Consumer<GroupModel?>(
+                                    builder: (context, grp, b) {
+                                  if (grp == null) {
+                                    return const SizedBox();
+                                  }
+                                  return FollowFollowingTile(
+                                    user: userSnap,
+                                    ontapToggleFollow: () {
+                                      if (grp.memberIds.contains(userSnap.id)) {
+                                        prov.removeGroupMembers(
+                                            id: userSnap.id, groupId: grp.id);
+                                      } else {
+                                        prov.addGroupMembers(
+                                            id: userSnap.id, groupId: grp.id);
+                                      }
+                                    },
+                                    btnName: grp.memberIds.contains(userSnap.id)
+                                        ? strRemove
+                                        : strAdd,
+                                  );
+                                }),
+                              );
+                            },
+                          );
+                        }
 
-                  var filterList = users
-                      .where((element) =>
-                          (element.name.toLowerCase().contains(
-                                  searchController.text.toLowerCase()) ||
-                              element.username.toLowerCase().contains(
-                                  searchController.text.toLowerCase())) &&
-                          element.id != FirebaseAuth.instance.currentUser!.uid)
-                      .toList();
+                        var filterList = user
+                            .where((element) =>
+                                (element.name.toLowerCase().contains(
+                                        searchController.text.toLowerCase()) ||
+                                    element.username.toLowerCase().contains(
+                                        searchController.text.toLowerCase())) &&
+                                element.id !=
+                                    FirebaseAuth.instance.currentUser!.uid)
+                            .toList();
 
-                  return ListView.builder(
-                    itemCount: filterList.length,
-                    padding: const EdgeInsets.only(bottom: 100),
-                    itemBuilder: (context, index) {
-                      var userSnap = filterList[index];
+                        return ListView.builder(
+                          itemCount: filterList.length,
+                          padding: const EdgeInsets.only(bottom: 100),
+                          itemBuilder: (context, index) {
+                            var userSnap = filterList[index];
 
-                      return FollowFollowingTile(
-                        user: userSnap,
-                        ontapToggleFollow: () {
-                          if (grp.memberIds.contains(userSnap.id)) {
-                            prov.removeGroupMembers(
-                                id: userSnap.id, groupId: grp.id);
-                          } else {
-                            prov.addGroupMembers(
-                                id: userSnap.id, groupId: grp.id);
-                          }
-                        },
-                        btnName: grp.memberIds.contains(userSnap.id)
-                            ? strRemove
-                            : strAdd,
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
+                            return StreamProvider.value(
+                              value: DataProvider().singleGroup(group.id),
+                              initialData: null,
+                              catchError: (context, error) => null,
+                              child: Consumer<GroupModel?>(
+                                  builder: (context, grp, b) {
+                                if (grp == null) {
+                                  return const SizedBox();
+                                }
+                                return FollowFollowingTile(
+                                  user: userSnap,
+                                  ontapToggleFollow: () {
+                                    if (grp.memberIds.contains(userSnap.id)) {
+                                      prov.removeGroupMembers(
+                                          id: userSnap.id, groupId: grp.id);
+                                    } else {
+                                      prov.addGroupMembers(
+                                          id: userSnap.id, groupId: grp.id);
+                                    }
+                                  },
+                                  btnName: grp.memberIds.contains(userSnap.id)
+                                      ? strRemove
+                                      : strAdd,
+                                );
+                              }),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
         ],
       ),
     );

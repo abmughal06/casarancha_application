@@ -1,3 +1,4 @@
+import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/screens/chat/share_post_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -18,7 +19,6 @@ import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
 import '../../utils/app_utils.dart';
 import '../common_widgets.dart';
-import '../shared/skeleton.dart';
 import '../text_widget.dart';
 
 class CustomPostFooter extends StatelessWidget {
@@ -283,41 +283,53 @@ class CustomPostFooter extends StatelessWidget {
                 DataProvider().comment(cmntId: postModel.id, groupId: groupId),
             initialData: null,
             catchError: (context, error) => null,
-            child: Consumer<List<Comment>?>(
-              builder: (context, comments, b) {
-                if (comments == null) {
-                  return Row(
-                    children: [
-                      Skeleton(
-                        height: 44.w,
-                        width: 44.w,
-                        radius: 1000.r,
-                      ),
-                      widthBox(15.w),
-                      Column(
-                        children: [
-                          Skeleton(height: 10.h, width: 250.w, radius: 10),
-                          heightBox(10.h),
-                          Skeleton(height: 10.h, width: 180.w, radius: 10),
-                        ],
-                      )
-                    ],
-                  );
-                }
+            child: StreamProvider.value(
+              value: DataProvider().singleGroup(groupId),
+              initialData: null,
+              catchError: (context, error) => null,
+              child: Consumer2<List<Comment>?, GroupModel?>(
+                builder: (context, comments, group, b) {
+                  if (comments == null || group == null) {
+                    return Row(
+                      children: [
+                        shimmerImg(
+                          height: 44.w,
+                          width: 44.w,
+                          borderRadius: 1000.r,
+                        ),
+                        widthBox(15.w),
+                        Column(
+                          children: [
+                            shimmerImg(
+                                height: 10.h, width: 250.w, borderRadius: 10),
+                            heightBox(10.h),
+                            shimmerImg(
+                                height: 10.h, width: 180.w, borderRadius: 10),
+                          ],
+                        )
+                      ],
+                    );
+                  }
+                  var cmnts = comments
+                      .where((element) => !group.banFromCmntUsersIds
+                          .contains(element.creatorId))
+                      .toList();
 
-                if (comments.isEmpty) {
-                  return Container();
-                }
-                var cmnt = comments.first;
-                return cmnt.message.isEmpty
-                    ? Container()
-                    : FeedPostCommentTile(
-                        cmnt: cmnt,
-                        isFeedTile: true,
-                        postModel: postModel,
-                        groupId: groupId,
-                      );
-              },
+                  if (cmnts.isEmpty) {
+                    return Container();
+                  }
+
+                  var cmnt = cmnts.first;
+                  return cmnt.message.isEmpty
+                      ? Container()
+                      : FeedPostCommentTile(
+                          cmnt: cmnt,
+                          isFeedTile: true,
+                          postModel: postModel,
+                          groupId: groupId,
+                        );
+                },
+              ),
             ),
           ),
         ),

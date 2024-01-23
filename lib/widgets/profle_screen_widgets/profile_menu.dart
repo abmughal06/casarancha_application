@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
+import 'package:casarancha/screens/profile/account_recovery.dart';
 import 'package:casarancha/screens/profile/get_verified.dart';
+import 'package:casarancha/screens/profile/help.dart';
 import 'package:casarancha/screens/profile/settings/settings.dart';
 import 'package:casarancha/widgets/shared/alert_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,54 +23,58 @@ import 'dynamic_links.dart';
 
 bottomSheetProfile(context) {
   showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(40.r), topRight: Radius.circular(40.r)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-            height: 550,
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisSize: MainAxisSize.min,
-                children: [
-                  heightBox(10.h),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                      height: 6.h,
-                      width: 78.w,
-                      decoration: BoxDecoration(
-                        color: colorDD9,
-                        borderRadius: BorderRadius.all(Radius.circular(30.r)),
-                      ),
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(40.r), topRight: Radius.circular(40.r)),
+    ),
+    builder: (BuildContext context) {
+      return Container(
+        height: 550,
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          // mainAxisSize: MainAxisSize.min,
+          children: [
+            heightBox(10.h),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                height: 6.h,
+                width: 78.w,
+                decoration: BoxDecoration(
+                  color: colorDD9,
+                  borderRadius: BorderRadius.all(Radius.circular(30.r)),
+                ),
+              ),
+            ),
+            heightBox(10.h),
+            Expanded(
+              child: ListView.builder(
+                itemCount: AppConstant.profileBottomSheetList.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14.0),
+                    child: textMenuItem(
+                      text: AppConstant.profileBottomSheetList[index],
+                      color: index > 9 ? Colors.red : null,
+                      onTap: () {
+                        Get.back();
+                        _onTapSheetItem(index: index, context: context);
+                      },
                     ),
-                  ),
-                  heightBox(10.h),
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: AppConstant.profileBottomSheetList.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 14.0),
-                            child: textMenuItem(
-                                text: AppConstant.profileBottomSheetList[index],
-                                color: index > 7 ? Colors.red : null,
-                                onTap: () {
-                                  Get.back();
-                                  _onTapSheetItem(
-                                      index: index, context: context);
-                                }),
-                          );
-                        }),
-                  )
-                ]));
-      });
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 _onTapSheetItem({required int index, required BuildContext context}) async {
@@ -80,37 +86,43 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
       Get.to(() => const SavedPostScreen());
       break;
     case 2:
+      Get.to(() => const AccountRecovery());
+      break;
+    case 3:
       //getVerify
       Get.to(() => const GetVerifiedScreen());
       break;
-    case 3:
+    case 4:
       Get.to(() => const ProfileSettings());
       break;
 
-    case 4:
+    case 5:
       //invite freinds
       inviteFriends();
-      // DynamicLinksProvider().createLink('123');
       break;
 
-    case 5:
+    case 6:
       //about
       launchUrls("https://casarancha.com/about/");
       break;
 
-    case 6:
+    case 7:
       //terms
 
       launchUrls("https://casarancha.com/terms-conditions/");
       break;
-    case 7:
+    case 8:
       //privacy
 
       launchUrls("https://casarancha.com/privacy-policy/");
       break;
-    case 8:
+    case 9:
+      //privacy
+
+      Get.to(() => const HelpCenter());
+      break;
+    case 10:
       //logout
-      // profileScreenController.logout();
       showDialog(
           context: context,
           builder: (_) => CustomAdaptiveAlertDialog(
@@ -125,7 +137,7 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
                   })));
 
       break;
-    case 9:
+    case 11:
       //logout
       showDialog(
         context: context,

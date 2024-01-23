@@ -348,6 +348,31 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Stream<List<Comment>?> recentComment({cmntId, groupId}) {
+    try {
+      var ref = groupId == null
+          ? FirebaseFirestore.instance
+              .collection(cPosts)
+              .doc(cmntId)
+              .collection(cComments)
+          : FirebaseFirestore.instance
+              .collection(cGroups)
+              .doc(groupId)
+              .collection(cPosts)
+              .doc(cmntId)
+              .collection(cComments);
+      return ref.orderBy("createdAt", descending: true).snapshots().map(
+          (event) => event.docs
+              .where((element) =>
+                  element.data().isNotEmpty &&
+                  element.data().containsKey('postId'))
+              .map((e) => Comment.fromMap(e.data()))
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<List<Comment>?> commentReply({postId, groupId, cmntId}) {
     try {
       var ref = groupId == null

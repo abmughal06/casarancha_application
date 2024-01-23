@@ -44,6 +44,7 @@ class _GhostPostsState extends State<GhostPosts>
                 return ListView.builder(
                   key: const PageStorageKey(2),
                   itemCount: posts.length,
+                  cacheExtent: 100,
                   controller: dashboardProvider.ghostPostScrollController,
                   padding: const EdgeInsets.only(top: 10, bottom: 100),
                   itemBuilder: (co, index) {

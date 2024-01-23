@@ -94,6 +94,21 @@ class _MyStoryViewScreenState extends State<MyStoryViewScreen>
       body: SafeArea(
         child: GestureDetector(
           onTapDown: (details) => _onTapDown(details, story),
+          onVerticalDragStart: (details) => Get.back(),
+          onLongPress: () {
+            _animController.stop();
+            if (story.type == 'Video') {
+              _videoController!.pause();
+            }
+            setState(() {});
+          },
+          onLongPressEnd: (b) {
+            _animController.forward();
+            if (story.type == 'Video') {
+              _videoController!.play();
+            }
+            setState(() {});
+          },
           child: Stack(
             children: <Widget>[
               PageView.builder(
