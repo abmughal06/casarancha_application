@@ -100,52 +100,92 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               ],
               body: Stack(
                 children: [
-                  StreamProvider.value(
-                    value: DataProvider().comment(
-                        cmntId: widget.postModel.id, groupId: widget.groupId),
-                    initialData: null,
-                    catchError: (context, error) => null,
-                    child: StreamProvider.value(
-                      value: DataProvider().singleGroup(widget.groupId),
-                      initialData: null,
-                      catchError: (context, error) => null,
-                      child: Consumer2<List<Comment>?, GroupModel?>(
-                        builder: (context, comment, group, b) {
-                          if (comment == null || group == null) {
-                            return const ChatShimmerList();
-                          }
+                  widget.groupId != null
+                      ? StreamProvider.value(
+                          value: DataProvider().comment(
+                              cmntId: widget.postModel.id,
+                              groupId: widget.groupId),
+                          initialData: null,
+                          catchError: (context, error) => null,
+                          child: StreamProvider.value(
+                            value: DataProvider().singleGroup(widget.groupId),
+                            initialData: null,
+                            catchError: (context, error) => null,
+                            child: Consumer2<List<Comment>?, GroupModel?>(
+                              builder: (context, comment, group, b) {
+                                if (comment == null || group == null) {
+                                  return const ChatShimmerList();
+                                }
 
-                          var filterList = comment
-                              .where((element) => !group.banFromCmntUsersIds
-                                  .contains(element.creatorId))
-                              .toList();
+                                var filterList = comment
+                                    .where((element) => !group
+                                        .banFromCmntUsersIds
+                                        .contains(element.creatorId))
+                                    .toList();
 
-                          return ListView.builder(
-                            itemCount: filterList.length,
-                            padding: const EdgeInsets.only(
-                              bottom: 70,
+                                return ListView.builder(
+                                  itemCount: filterList.length,
+                                  padding: const EdgeInsets.only(
+                                    bottom: 70,
+                                  ),
+                                  itemBuilder: (context, index) {
+                                    var data = filterList[index];
+                                    var cmnt = data;
+                                    if (cmnt.creatorDetails.name.isNotEmpty) {
+                                      return cmnt.message.isEmpty
+                                          ? Container()
+                                          : PostCommentTile(
+                                              cmnt: cmnt,
+                                              postModel: widget.postModel,
+                                              isFeedTile: false,
+                                              groupId: widget.groupId,
+                                            );
+                                    } else {
+                                      return Container();
+                                    }
+                                  },
+                                );
+                              },
                             ),
-                            itemBuilder: (context, index) {
-                              var data = filterList[index];
-                              var cmnt = data;
-                              if (cmnt.creatorDetails.name.isNotEmpty) {
-                                return cmnt.message.isEmpty
-                                    ? Container()
-                                    : PostCommentTile(
-                                        cmnt: cmnt,
-                                        postModel: widget.postModel,
-                                        isFeedTile: false,
-                                        groupId: widget.groupId,
-                                      );
-                              } else {
-                                return Container();
+                          ),
+                        )
+                      : StreamProvider.value(
+                          value: DataProvider().comment(
+                              cmntId: widget.postModel.id,
+                              groupId: widget.groupId),
+                          initialData: null,
+                          catchError: (context, error) => null,
+                          child: Consumer<List<Comment>?>(
+                            builder: (context, comment, b) {
+                              if (comment == null) {
+                                return const ChatShimmerList();
                               }
+
+                              return ListView.builder(
+                                itemCount: comment.length,
+                                padding: const EdgeInsets.only(
+                                  bottom: 70,
+                                ),
+                                itemBuilder: (context, index) {
+                                  var data = comment[index];
+                                  var cmnt = data;
+                                  if (cmnt.creatorDetails.name.isNotEmpty) {
+                                    return cmnt.message.isEmpty
+                                        ? Container()
+                                        : PostCommentTile(
+                                            cmnt: cmnt,
+                                            postModel: widget.postModel,
+                                            isFeedTile: false,
+                                            groupId: widget.groupId,
+                                          );
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              );
                             },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                          ),
+                        ),
                   PostCommentField(
                     postModel: widget.postModel,
                     groupId: widget.groupId,

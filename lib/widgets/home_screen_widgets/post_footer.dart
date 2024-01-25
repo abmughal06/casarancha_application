@@ -31,6 +31,7 @@ class CustomPostFooter extends StatelessWidget {
   final List<String> savepostIds;
   final PostModel postModel;
   final String? groupId;
+  final bool isGroupAdmin;
 
   const CustomPostFooter({
     super.key,
@@ -43,6 +44,7 @@ class CustomPostFooter extends StatelessWidget {
     required this.postModel,
     required this.savepostIds,
     this.groupId,
+    this.isGroupAdmin = false,
   });
 
   @override
@@ -91,14 +93,18 @@ class CustomPostFooter extends StatelessWidget {
                 ),
                 widthBox(12.w),
                 GestureDetector(
-                  onTap: groupId != null
-                      ? () {
-                          GlobalSnackBar.show(message: 'coming soon');
-                        }
-                      : () => Get.to(() => SharePostScreen(
+                  onTap: () => groupId == null
+                      ? Get.to(() => SharePostScreen(
                             postModel: postModel,
                             groupId: groupId,
-                          )),
+                          ))
+                      : isGroupAdmin
+                          ? Get.to(() => SharePostScreen(
+                                postModel: postModel,
+                                groupId: groupId,
+                              ))
+                          : GlobalSnackBar.show(
+                              message: "only Admins can share"),
                   child: const Icon(
                     Icons.share,
                     color: color887,
@@ -277,7 +283,57 @@ class CustomPostFooter extends StatelessWidget {
         ),
 
         Visibility(
-          visible: isPostDetail! ? false : postModel.commentIds.isNotEmpty,
+          visible: (isPostDetail! ? false : postModel.commentIds.isNotEmpty) &&
+              groupId == null,
+          child: StreamProvider.value(
+            value:
+                DataProvider().comment(cmntId: postModel.id, groupId: groupId),
+            initialData: null,
+            catchError: (context, error) => null,
+            child: Consumer<List<Comment>?>(
+              builder: (context, comments, b) {
+                if (comments == null) {
+                  return Row(
+                    children: [
+                      shimmerImg(
+                        height: 44.w,
+                        width: 44.w,
+                        borderRadius: 1000.r,
+                      ),
+                      widthBox(15.w),
+                      Column(
+                        children: [
+                          shimmerImg(
+                              height: 10.h, width: 250.w, borderRadius: 10),
+                          heightBox(10.h),
+                          shimmerImg(
+                              height: 10.h, width: 180.w, borderRadius: 10),
+                        ],
+                      )
+                    ],
+                  );
+                }
+
+                if (comments.isEmpty) {
+                  return Container();
+                }
+
+                var cmnt = comments.first;
+                return cmnt.message.isEmpty
+                    ? Container()
+                    : FeedPostCommentTile(
+                        cmnt: cmnt,
+                        isFeedTile: true,
+                        postModel: postModel,
+                        groupId: groupId,
+                      );
+              },
+            ),
+          ),
+        ),
+        Visibility(
+          visible: (isPostDetail! ? false : postModel.commentIds.isNotEmpty) &&
+              groupId != null,
           child: StreamProvider.value(
             value:
                 DataProvider().comment(cmntId: postModel.id, groupId: groupId),

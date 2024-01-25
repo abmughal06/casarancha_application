@@ -5,6 +5,7 @@ import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/group_widgets/group_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -93,15 +94,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
                         if (searchController.text.isEmpty ||
                             searchController.text == '') {
-                          // return const Center(
-                          //   child: Padding(
-                          //     padding: EdgeInsets.symmetric(horizontal: 60),
-                          //     child: TextWidget(
-                          //       textAlign: TextAlign.center,
-                          //       text: strAlertSearch,
-                          //     ),
-                          //   ),
-                          // );
                           var filterList = users
                               .where(
                                 (element) =>
@@ -189,15 +181,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
                         if (searchController.text.isEmpty ||
                             searchController.text == '') {
-                          // return const Center(
-                          //   child: Padding(
-                          //     padding: EdgeInsets.symmetric(horizontal: 60),
-                          //     child: TextWidget(
-                          //       textAlign: TextAlign.center,
-                          //       text: strAlertSearch,
-                          //     ),
-                          //   ),
-                          // );
                           var filterList = groups
                               .where(
                                 (element) =>
@@ -205,6 +188,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                         FirebaseAuth
                                             .instance.currentUser!.uid &&
                                     element.isPublic &&
+                                    !element.banFromCmntUsersIds
+                                        .contains(currentUserUID) &&
                                     element.isVerified,
                               )
                               .toList();
@@ -243,7 +228,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                     searchController.text.toLowerCase())) &&
                                 element.creatorId !=
                                     FirebaseAuth.instance.currentUser!.uid &&
-                                element.isPublic)
+                                element.isPublic &&
+                                !element.banFromCmntUsersIds
+                                    .contains(currentUserUID))
                             .toList();
 
                         return ListView.builder(
@@ -296,20 +283,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
                         if (searchController.text.isEmpty ||
                             searchController.text == '') {
-                          // return const Center(
-                          //   child: Padding(
-                          //     padding: EdgeInsets.symmetric(horizontal: 60),
-                          //     child: TextWidget(
-                          //       textAlign: TextAlign.center,
-                          //       text: strAlertSearch,
-                          //     ),
-                          //   ),
-                          // );
                           var groupsList = groups
                               .where((element) =>
                                   element.isVerified &&
                                   element.creatorId !=
                                       FirebaseAuth.instance.currentUser!.uid &&
+                                  !element.banFromCmntUsersIds
+                                      .contains(currentUserUID) &&
                                   element.isPublic)
                               .toList();
 

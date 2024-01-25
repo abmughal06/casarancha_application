@@ -1,7 +1,12 @@
+import 'package:casarancha/models/group_model.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
+import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 import '../../resources/image_resources.dart';
 import '../common_widgets.dart';
@@ -9,11 +14,18 @@ import '../text_widget.dart';
 
 class BottomSheetWidget extends StatelessWidget {
   const BottomSheetWidget(
-      {super.key, this.ontapBlock, this.onTapDownload, required this.blockText});
+      {super.key,
+      this.ontapBlock,
+      this.onTapDownload,
+      required this.blockText,
+      this.groupId,
+      this.ontapDeletePost});
 
   final VoidCallback? ontapBlock;
   final VoidCallback? onTapDownload;
   final String blockText;
+  final String? groupId;
+  final VoidCallback? ontapDeletePost;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +60,29 @@ class BottomSheetWidget extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
           heightBox(20.h),
+          Visibility(
+            visible: groupId != null,
+            child: StreamProvider.value(
+              value: DataProvider().singleGroup(groupId),
+              initialData: null,
+              catchError: (context, error) => null,
+              child: Consumer<GroupModel?>(builder: (context, group, b) {
+                if (group == null) {
+                  return Container();
+                }
+                if (group.adminIds.contains(currentUserUID) ||
+                    group.creatorId == currentUserUID) {
+                  return TextWidget(
+                    onTap: ontapDeletePost,
+                    text: 'Delete Post',
+                    color: colorPrimaryA05,
+                    fontWeight: FontWeight.w600,
+                  );
+                }
+                return Container();
+              }),
+            ),
+          ),
         ],
       ),
     );

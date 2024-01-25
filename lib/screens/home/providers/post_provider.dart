@@ -820,7 +820,9 @@ class PostProvider extends ChangeNotifier {
         .collection('messages')
         .doc(messageRefForCurrentUser.id);
 
-    var post = postModel!.toMap();
+    var p = postModel!.copyWith(groupId: groupId);
+
+    var post = p.toMap();
 
     final MessageDetails appUserMessageDetails = MessageDetails(
       id: appUser.id,

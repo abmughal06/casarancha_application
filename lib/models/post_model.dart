@@ -23,6 +23,7 @@ class PostModel {
   int? reportCount;
   String? postBlockStatus;
   List<dynamic> videoViews;
+  String? groupId;
   bool isForumPost;
   bool isGhostPost;
 
@@ -46,6 +47,7 @@ class PostModel {
     this.showPostTime = true,
     this.reportCount = 0,
     this.postBlockStatus,
+    this.groupId,
   });
 
   PostModel copyWith(
@@ -66,7 +68,8 @@ class PostModel {
       bool? isForumPost,
       int? reportCount,
       bool? isGhostPost,
-      String? postBlockStatus}) {
+      String? postBlockStatus,
+      String? groupId}) {
     return PostModel(
       videoViews: videoViews ?? this.videoViews,
       id: id ?? this.id,
@@ -79,6 +82,7 @@ class PostModel {
       mediaData: mediaData ?? this.mediaData,
       likesIds: likesIds ?? this.likesIds,
       commentIds: commentIds ?? this.commentIds,
+      groupId: groupId ?? this.groupId,
       tagsIds: tagsIds ?? this.tagsIds,
       showPostTime: showPostTime ?? this.showPostTime,
       reportCount: reportCount ?? this.reportCount,
@@ -98,6 +102,7 @@ class PostModel {
       'createdAt': createdAt,
       'description': description,
       'locationName': locationName,
+      'groupId': groupId,
       'shareCount': shareCount,
       'shareLink': shareLink,
       'mediaData': mediaData.map((x) => x.toMap()).toList(),
@@ -121,6 +126,7 @@ class PostModel {
         creatorId: map['creatorId'] ?? '',
         creatorDetails: CreatorDetails.fromMap(map['creatorDetails']),
         createdAt: map['createdAt'] ?? '',
+        groupId: map['groupId'],
         description: map['description'] ?? '',
         shareCount: map['shareCount'] ?? [],
         locationName: map['locationName'] ?? '',

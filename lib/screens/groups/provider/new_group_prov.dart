@@ -191,6 +191,20 @@ class NewGroupProvider extends ChangeNotifier {
     }
   }
 
+  unBanUserFromComments({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'banFromCmntUsersIds': FieldValue.arrayRemove([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
   deleteGroup(groupId) async {
     try {
       await FirebaseFirestore.instance

@@ -130,6 +130,7 @@ class MessageTiles extends StatelessWidget {
           },
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
+                groupId: postModel.groupId,
               )),
           child: ChatPostTile(
             key: ValueKey(postModel.mediaData.first.link),
@@ -155,6 +156,7 @@ class MessageTiles extends StatelessWidget {
           },
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
+                groupId: postModel.groupId,
               )),
           child: ChatQouteTile(
             key: ValueKey(postModel.mediaData.first.link),
@@ -272,6 +274,7 @@ class MessageTiles extends StatelessWidget {
           },
           onTap: () => Get.to(() => PostDetailScreen(
                 postModel: postModel,
+                groupId: postModel.groupId,
               )),
           child: ChatMusicTile(
             key: ValueKey(postModel.mediaData.first.link),

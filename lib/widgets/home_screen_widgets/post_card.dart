@@ -8,6 +8,7 @@ import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_header.dart';
 import 'package:casarancha/widgets/home_screen_widgets/report_sheet.dart';
+import 'package:casarancha/widgets/shared/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -27,7 +28,8 @@ class PostCard extends StatelessWidget {
       this.initializedFuturePlay,
       required this.postCreatorId,
       this.groupId,
-      this.isGhostPost = false});
+      this.isGhostPost = false,
+      this.isGroupAdmin = false});
 
   final PostModel post;
   final Future<void>? initializedFuturePlay;
@@ -35,6 +37,7 @@ class PostCard extends StatelessWidget {
 
   final String? groupId;
   final bool isGhostPost;
+  final bool isGroupAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +80,22 @@ class PostCard extends StatelessWidget {
               } else {
                 Get.bottomSheet(
                   BottomSheetWidget(
+                    groupId: groupId,
+                    ontapDeletePost: () {
+                      Get.back();
+                      showDialog(
+                        context: context,
+                        builder: (c) => CustomAdaptiveAlertDialog(
+                          alertMsg:
+                              'Are you sure you want to delete this user post',
+                          actiionBtnName: 'Delete',
+                          onAction: () {
+                            postPorvider.deletePost(
+                                postModel: post, groupId: groupId);
+                          },
+                        ),
+                      );
+                    },
                     blockText: curruentUser.blockIds.contains(post.creatorId)
                         ? 'Unblock User'
                         : 'Block User',
@@ -120,6 +139,7 @@ class PostCard extends StatelessWidget {
               ),
         heightBox(10.h),
         CustomPostFooter(
+          isGroupAdmin: isGroupAdmin,
           groupId: groupId,
           isLike: post.likesIds.contains(curruentUser!.id),
           ontapLike: () {
