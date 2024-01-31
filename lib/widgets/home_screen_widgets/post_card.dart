@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -50,6 +51,7 @@ class PostCard extends StatelessWidget {
         CustomPostHeader(
           postCreatorId: postCreatorId,
           postModel: post,
+          isGroupAdmin: isGroupAdmin,
           isGhostPost: isGhostPost,
           onVertItemClick: () {
             if (curruentUser != null) {
@@ -80,18 +82,28 @@ class PostCard extends StatelessWidget {
               } else {
                 Get.bottomSheet(
                   BottomSheetWidget(
+                    isGroupAdmin: isGroupAdmin,
                     groupId: groupId,
                     ontapDeletePost: () {
                       Get.back();
                       showDialog(
                         context: context,
                         builder: (c) => CustomAdaptiveAlertDialog(
-                          alertMsg:
-                              'Are you sure you want to delete this user post',
-                          actiionBtnName: 'Delete',
+                          alertMsg: isGroupAdmin
+                              ? 'Are you sure you want to ban this user from group posting'
+                              : 'Are you sure you want to delete this user post',
+                          actiionBtnName: 'Ban',
                           onAction: () {
-                            postPorvider.deletePost(
-                                postModel: post, groupId: groupId);
+                            if (isGroupAdmin) {
+                              context
+                                  .read<NewGroupProvider>()
+                                  .banUsersFromPostsGroup(
+                                      groupId: groupId, id: post.creatorId);
+                              Get.back();
+                            } else {
+                              postPorvider.deletePost(
+                                  postModel: post, groupId: groupId);
+                            }
                           },
                         ),
                       );

@@ -6,6 +6,7 @@ import 'package:casarancha/screens/groups/group_member_screen.dart';
 import 'package:casarancha/screens/groups/group_settings.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/utils/app_constants.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
@@ -102,10 +103,16 @@ class GroupPostScreen extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Get.to(() => CreatePostScreen(
-                          groupId: group.id,
-                          isForum: false,
-                        ));
+                    if (group.banFromPostUsersIds.contains(currentUserUID)) {
+                      GlobalSnackBar.show(
+                          message:
+                              "You can't post anymore in this group, you're banned by group admin for violating group policies.");
+                    } else {
+                      Get.to(() => CreatePostScreen(
+                            groupId: group.id,
+                            isForum: false,
+                          ));
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 3, right: 3),

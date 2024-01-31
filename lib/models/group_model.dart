@@ -18,6 +18,7 @@ class GroupModel {
   List<dynamic> banUsersIds;
   List<dynamic> banFromCmntUsersIds;
   List<dynamic> adminIds;
+  List<dynamic> banFromPostUsersIds;
   bool isPublic;
   bool isVerified;
 
@@ -33,6 +34,7 @@ class GroupModel {
     this.memberIds = const [],
     this.banUsersIds = const [],
     this.banFromCmntUsersIds = const [],
+    this.banFromPostUsersIds = const [],
     required this.adminIds,
     required this.joinRequestIds,
     required this.isVerified,
@@ -54,6 +56,7 @@ class GroupModel {
     List<dynamic>? banUsersIds,
     List<dynamic>? banFromCmntUsersIds,
     List<dynamic>? adminIds,
+    List<dynamic>? banFromPostUsersIds,
     bool? isPublic,
   }) {
     return GroupModel(
@@ -65,6 +68,7 @@ class GroupModel {
       creatorDetails: creatorDetails ?? this.creatorDetails,
       createdAt: createdAt ?? this.createdAt,
       postIds: postIds ?? this.postIds,
+      banFromPostUsersIds: banFromPostUsersIds ?? this.banFromPostUsersIds,
       memberIds: memberIds ?? this.memberIds,
       joinRequestIds: joinRequestIds ?? this.joinRequestIds,
       banUsersIds: banUsersIds ?? this.banUsersIds,
@@ -82,6 +86,7 @@ class GroupModel {
       'description': description,
       'imageUrl': imageUrl,
       'creatorId': creatorId,
+      'banFromPostUsersIds': banFromPostUsersIds,
       'creatorDetails': creatorDetails.toMap(),
       'createdAt': createdAt,
       'postIds': postIds,
@@ -99,6 +104,7 @@ class GroupModel {
     return GroupModel(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
+      banFromPostUsersIds: map['banFromPostUsersIds'] ?? [],
       description: map['description'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
       creatorId: map['creatorId'] ?? '',

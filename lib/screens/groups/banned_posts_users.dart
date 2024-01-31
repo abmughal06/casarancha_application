@@ -12,15 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class BannedUserScreen extends StatelessWidget {
-  const BannedUserScreen({super.key, required this.groupId});
+class BannedFromPostsUsers extends StatelessWidget {
+  const BannedFromPostsUsers({super.key, required this.groupId});
   final String groupId;
 
   @override
   Widget build(BuildContext context) {
     final grpProv = Provider.of<NewGroupProvider>(context);
+
     return Scaffold(
-      appBar: primaryAppbar(title: 'Banned User Screens'),
+      appBar: primaryAppbar(title: 'Posts Banned Users'),
       body: StreamProvider.value(
         value: DataProvider().singleGroup(groupId),
         initialData: null,
@@ -31,7 +32,7 @@ class BannedUserScreen extends StatelessWidget {
               return centerLoader();
             }
             return StreamProvider.value(
-              value: DataProvider().filterUserList(group.banUsersIds),
+              value: DataProvider().filterUserList(group.banFromPostUsersIds),
               initialData: null,
               catchError: (context, error) => null,
               child: Consumer<List<UserModel>?>(
@@ -46,8 +47,6 @@ class BannedUserScreen extends StatelessWidget {
                     itemCount: users.length,
                     itemBuilder: (_, index) {
                       return GroupBannedMemberTile(
-                        user: users[index],
-                        group: group,
                         onTapAction: () {
                           showDialog(
                             context: context,
@@ -55,10 +54,10 @@ class BannedUserScreen extends StatelessWidget {
                               return CustomAdaptiveAlertDialog(
                                 title: 'Unban User?',
                                 alertMsg:
-                                    '''Are you sure you want to unban this user?.''',
+                                    '''Are you sure you want to unban this user from posts?.''',
                                 actiionBtnName: 'Unban',
                                 onAction: () {
-                                  grpProv.unBanUserFromGroup(
+                                  grpProv.unBanUsersFromPostsGroup(
                                       groupId: groupId, id: users[index].id);
                                   Get.back();
                                 },
@@ -66,6 +65,8 @@ class BannedUserScreen extends StatelessWidget {
                             },
                           );
                         },
+                        user: users[index],
+                        group: group,
                       );
                     },
                   );

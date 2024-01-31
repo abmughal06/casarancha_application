@@ -23,16 +23,19 @@ class CustomPostHeader extends StatelessWidget {
   final VoidCallback? onVertItemClick;
   final String postCreatorId;
   final bool isGhostPost;
+  final bool isGroupAdmin;
 
-  const CustomPostHeader(
-      {super.key,
-      this.ontap,
-      this.isVideoPost = false,
-      this.headerOnTap,
-      this.onVertItemClick,
-      required this.postCreatorId,
-      required this.postModel,
-      this.isGhostPost = false});
+  const CustomPostHeader({
+    super.key,
+    this.ontap,
+    this.isVideoPost = false,
+    this.headerOnTap,
+    this.onVertItemClick,
+    required this.postCreatorId,
+    required this.postModel,
+    this.isGhostPost = false,
+    this.isGroupAdmin = false,
+  });
 
   @override
   Widget build(BuildContext context) {

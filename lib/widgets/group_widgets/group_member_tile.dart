@@ -19,7 +19,6 @@ import '../shared/alert_dialog.dart';
 class GroupMemberTile extends StatelessWidget {
   const GroupMemberTile({super.key, required this.user, required this.group});
   final UserModel user;
-  // final bool isAdmin;
   final GroupModel group;
 
   @override
@@ -85,13 +84,15 @@ class GroupMemberTile extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                        color: colorF03,
+                        color: group.creatorId == user.id
+                            ? colorPrimaryA05
+                            : colorF03,
                         borderRadius: BorderRadius.circular(5)),
                     child: TextWidget(
-                      text: 'Admin',
-                      color: color221,
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
+                      text: group.creatorId == user.id ? 'Owner' : 'Admin',
+                      color: group.creatorId == user.id ? colorWhite : color221,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
                     ),
                   )
                 : group.creatorId == currentUserUID ||
@@ -239,21 +240,18 @@ class GroupMemberTile extends StatelessWidget {
 }
 
 class GroupBannedMemberTile extends StatelessWidget {
-  const GroupBannedMemberTile(
-      {super.key,
-      required this.user,
-      required this.group,
-      required this.isCommentBan,
-      this.isAdmin = false});
+  const GroupBannedMemberTile({
+    super.key,
+    required this.user,
+    required this.group,
+    required this.onTapAction,
+  });
   final UserModel user;
   final GroupModel group;
-  final bool isCommentBan;
-  final bool isAdmin;
+  final VoidCallback onTapAction;
 
   @override
   Widget build(BuildContext context) {
-    final prov = Provider.of<NewGroupProvider>(context);
-
     return Card(
       elevation: 0.5,
       color: Colors.white,
@@ -307,61 +305,123 @@ class GroupBannedMemberTile extends StatelessWidget {
                 ),
               ],
             ),
-            isAdmin
-                ? PopupMenuButton(
-                    icon: const Icon(Icons.more_vert),
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (_) => [
-                      PopupMenuItem(
-                        onTap: () {
-                          if (isCommentBan) {
-                            showDialog(
-                                context: context,
-                                builder: (_) {
-                                  return CustomAdaptiveAlertDialog(
-                                      title: 'Unban User?',
-                                      alertMsg:
-                                          '''Are you sure you want to unban this user from comments?.''',
-                                      actiionBtnName: 'Unban',
-                                      onAction: () {
-                                        prov.unBanUserFromComments(
-                                            id: user.id, groupId: group.id);
+            TextButton(
+              onPressed: onTapAction,
+              child: TextWidget(
+                text: 'Unban',
+                color: colorPrimaryA05,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-                                        Get.back();
-                                      });
-                                });
-                          } else {
-                            showDialog(
-                                context: context,
-                                builder: (_) {
-                                  return CustomAdaptiveAlertDialog(
-                                      title: 'Unban User?',
-                                      alertMsg:
-                                          '''Are you sure you want to unban this user?.''',
-                                      actiionBtnName: 'Unban',
-                                      onAction: () {
-                                        prov.unBanUserFromGroup(
-                                            id: user.id, groupId: group.id);
+class GroupAdminMemberTile extends StatelessWidget {
+  const GroupAdminMemberTile({
+    super.key,
+    required this.user,
+    required this.group,
+    required this.onTapAction,
+    required this.isCreator,
+  });
+  final UserModel user;
+  final GroupModel group;
+  final VoidCallback onTapAction;
+  final bool isCreator;
 
-                                        Get.back();
-                                      });
-                                });
-                          }
-                        },
-                        child: TextWidget(
-                          text: (isCommentBan
-                                  ? group.banFromCmntUsersIds.contains(user.id)
-                                  : group.banUsersIds.contains(user.id))
-                              ? 'Unban User'
-                              : 'Ban user',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14.sp,
-                          color: colorPrimaryA05,
-                        ),
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0.5,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.sp)),
+      margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                InkWell(
+                  onTap: () {
+                    navigateToAppUserScreen(user.id, context);
+                  },
+                  child: ProfilePic(
+                    pic: user.imageStr,
+                    heightAndWidth: 50.h,
+                  ),
+                ),
+                widthBox(12.w),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        navigateToAppUserScreen(user.id, context);
+                      },
+                      child: Row(
+                        children: [
+                          TextWidget(
+                              text: user.username,
+                              fontSize: 14.sp,
+                              color: const Color(0xff212121),
+                              fontWeight: FontWeight.w600),
+                          widthBox(4.w),
+                          if (user.isVerified) SvgPicture.asset(icVerifyBadge),
+                        ],
                       ),
-                    ],
+                    ),
+                    heightBox(2.h),
+                    TextWidget(
+                      text: user.name,
+                      fontSize: 12.sp,
+                      color: const Color(0xff5f5f5f),
+                      fontWeight: FontWeight.w400,
+                      textOverflow: TextOverflow.visible,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            isCreator
+                ? Container(
+                    margin: const EdgeInsets.only(right: 15),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                        color: colorPrimaryA05,
+                        borderRadius: BorderRadius.circular(5)),
+                    child: TextWidget(
+                      text: 'Owner',
+                      color: colorWhite,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   )
-                : Container(),
+                : TextButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (_) {
+                            return CustomAdaptiveAlertDialog(
+                              title: 'Remove Admin?',
+                              alertMsg:
+                                  '''Are you sure you want to remove this user from admins?.''',
+                              actiionBtnName: 'Remove',
+                              onAction: onTapAction,
+                            );
+                          });
+                    },
+                    child: const TextWidget(
+                      text: 'Remove',
+                      color: colorPrimaryA05,
+                    )),
           ],
         ),
       ),

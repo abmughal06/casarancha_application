@@ -2,6 +2,7 @@ import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/groups/banned_cmnt_users.dart';
+import 'package:casarancha/screens/groups/banned_posts_users.dart';
 import 'package:casarancha/screens/groups/banned_user_screen.dart';
 import 'package:casarancha/screens/groups/group_admins.dart';
 import 'package:casarancha/screens/groups/group_member_screen.dart';
@@ -57,6 +58,16 @@ class GroupSettings extends StatelessWidget {
                 leading: SvgPicture.asset(icGroupMember),
                 title: const TextWidget(
                   text: 'Banned from comments members',
+                ),
+                horizontalTitleGap: 0,
+                trailing: const Icon(Icons.navigate_next),
+              ),
+              ListTile(
+                onTap: () =>
+                    Get.to(() => BannedFromPostsUsers(groupId: group.id)),
+                leading: SvgPicture.asset(icGroupMember),
+                title: const TextWidget(
+                  text: 'Banned from Posts members',
                 ),
                 horizontalTitleGap: 0,
                 trailing: const Icon(Icons.navigate_next),

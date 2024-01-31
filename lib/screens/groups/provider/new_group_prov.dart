@@ -120,6 +120,48 @@ class NewGroupProvider extends ChangeNotifier {
     }
   }
 
+  banUsersFromPostsGroup({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'banFromPostUsersIds': FieldValue.arrayUnion([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  unBanUsersFromPostsGroup({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'banFromPostUsersIds': FieldValue.arrayRemove([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  removeGroupAdmins({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'adminIds': FieldValue.arrayRemove([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
   banUserFromGroup({id, groupId}) async {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
@@ -198,6 +240,25 @@ class NewGroupProvider extends ChangeNotifier {
           'banFromCmntUsersIds': FieldValue.arrayRemove([id])
         },
       );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  leaveGroup({groupId, id}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'banFromCmntUsersIds': FieldValue.arrayRemove([id]),
+          'memberIds': FieldValue.arrayRemove([id]),
+          'banUsersIds': FieldValue.arrayRemove([id]),
+        },
+      );
+      Get.back();
+      Get.back();
+      Get.back();
     } catch (e) {
       printLog(e.toString());
     } finally {

@@ -19,12 +19,14 @@ class BottomSheetWidget extends StatelessWidget {
       this.onTapDownload,
       required this.blockText,
       this.groupId,
-      this.ontapDeletePost});
+      this.ontapDeletePost,
+      required this.isGroupAdmin});
 
   final VoidCallback? ontapBlock;
   final VoidCallback? onTapDownload;
   final String blockText;
   final String? groupId;
+  final bool isGroupAdmin;
   final VoidCallback? ontapDeletePost;
 
   @override
@@ -77,6 +79,32 @@ class BottomSheetWidget extends StatelessWidget {
                     text: 'Delete Post',
                     color: colorPrimaryA05,
                     fontWeight: FontWeight.w600,
+                  );
+                }
+                return Container();
+              }),
+            ),
+          ),
+          Visibility(
+            visible: groupId != null && isGroupAdmin,
+            child: StreamProvider.value(
+              value: DataProvider().singleGroup(groupId),
+              initialData: null,
+              catchError: (context, error) => null,
+              child: Consumer<GroupModel?>(builder: (context, group, b) {
+                if (group == null) {
+                  return Container();
+                }
+                if (group.adminIds.contains(currentUserUID) ||
+                    group.creatorId == currentUserUID) {
+                  return Padding(
+                    padding: EdgeInsets.only(top: 20.h),
+                    child: TextWidget(
+                      onTap: ontapDeletePost,
+                      text: 'Ban user from posting',
+                      color: colorPrimaryA05,
+                      fontWeight: FontWeight.w600,
+                    ),
                   );
                 }
                 return Container();

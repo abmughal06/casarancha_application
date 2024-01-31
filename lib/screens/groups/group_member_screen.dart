@@ -2,9 +2,12 @@ import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/add_group_members.dart';
+import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/common_button.dart';
 import 'package:casarancha/widgets/group_widgets/group_member_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/shared/alert_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,8 +27,40 @@ class GroupMembersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAdmin = (grp.isPublic ||
         grp.creatorId == FirebaseAuth.instance.currentUser!.uid);
+    final grpProv = Provider.of<NewGroupProvider>(context);
     return Scaffold(
-      appBar: primaryAppbar(title: '${grp.name} Members', elevation: 0.2),
+      appBar: primaryAppbar(
+        title: '${grp.name.capitalize} Members',
+        elevation: 0.2,
+        actions: [
+          grp.creatorId == currentUserUID
+              ? widthBox(0)
+              : TextButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) {
+                        return CustomAdaptiveAlertDialog(
+                          actiionBtnName: 'Leave',
+                          actionBtnColor: colorPrimaryA05,
+                          alertMsg: 'Are you sure you want to leave the group?',
+                          onAction: () {
+                            grpProv.leaveGroup(
+                              groupId: grp.id,
+                              id: currentUserUID,
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                  child: const TextWidget(
+                    text: 'Leave',
+                    color: colorPrimaryA05,
+                  ),
+                )
+        ],
+      ),
       body: StreamProvider.value(
         value: DataProvider().singleGroup(grp.id),
         initialData: null,

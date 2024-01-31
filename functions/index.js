@@ -11,21 +11,21 @@ if (!admin.apps.length) {
 exports.deleteUserFromAuthentication = functions.https.onCall(async(data, context) => {
     var data = JSON.parse(data).data;
 
-   try {
-    await admin
-        .auth()
-        .deleteUser(data.uid)
+    try {
+        await admin
+            .auth()
+            .deleteUser(data.uid)
         console.log('Successfully deleted user');
         return {
             status: true,
             message: "success"
         };
-   } catch (error) {
+    } catch (error) {
         return {
             status: false,
             message: error
         };
-   }
-       
+    }
+
 
 });
