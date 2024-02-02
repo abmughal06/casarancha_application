@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/text_editing_widget.dart';
@@ -62,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: TextWidget(
-                        text: strWelcome,
+                        text: appText(context).strWelcome,
                         fontSize: 20.sp,
                         color: color13F,
                         textHeight: 1.5,
@@ -73,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: TextWidget(
-                        text: strPleaseSignInYouAccount,
+                        text: appText(context).strPleaseSignInYouAccount,
                         fontSize: 16.sp,
                         color: color080,
                         fontWeight: FontWeight.w400,
@@ -87,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: TextEditingWidget(
                         controller: _emailController,
-                        hint: strEmailAddress,
+                        hint: appText(context).strEmailAddress,
                         color: _emailFocus.hasFocus ? colorFDF : colorFF3,
                         fieldBorderClr:
                             _emailFocus.hasFocus ? colorF73 : color080,
@@ -114,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: TextEditingWidget(
                         controller: _passwordController,
-                        hint: strPassword,
+                        hint: appText(context).strPassword,
                         fieldBorderClr:
                             _passwordFocus.hasFocus ? colorF73 : null,
                         textInputType: TextInputType.visiblePassword,
@@ -147,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           () => const pass.ForgotPasswordScreen(),
                         ),
                         child: TextWidget(
-                          text: strForgotPassword,
+                          text: appText(context).strForgotPassword,
                           fontSize: 14.sp,
                           color: color080,
                           fontWeight: FontWeight.w400,
@@ -160,9 +159,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         context.read<AuthenticationProvider>().signIn(
                               email: _emailController.text,
                               password: _passwordController.text,
+                              context: context,
                             );
                       },
-                      text: strSignInSp,
+                      text: appText(context).strSignInSp,
                       width: double.infinity,
                     ),
                     heightBox(26.h),
@@ -171,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         horizonLine(width: 80.w, horizontalMargin: 18.w),
                         TextWidget(
-                          text: strWith,
+                          text: appText(context).strWith,
                           fontSize: 14.sp,
                           color: color080,
                           fontWeight: FontWeight.w500,
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         InkWell(
                           onTap: () {
-                            Get.to(() => PhoneLoginScreen());
+                            Get.to(() => const PhoneLoginScreen());
                           },
                           child: Container(
                             height: 40.w,
@@ -259,15 +259,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextWidget(
-                          text: strYouDontHaveAccount,
+                          text: appText(context).strYouDontHaveAccount,
                           fontSize: 12.sp,
                           color: color080,
                           fontWeight: FontWeight.w500,
                         ),
                         widthBox(4.w),
                         TextWidget(
-                          onTap: () => Get.to(() => SignUpScreen()),
-                          text: strSignUp,
+                          onTap: () => Get.to(() => const SignUpScreen()),
+                          text: appText(context).strSignUp,
                           fontSize: 16.sp,
                           color: color13F,
                           fontWeight: FontWeight.w600,
@@ -279,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextWidget(
                         onTap: () {},
                         fontFamily: "PrometoTrial",
-                        text: strRexFamily,
+                        text: appText(context).strRexFamily,
                         fontSize: 15.sp,
                         color: colorPrimaryA05,
                         fontWeight: FontWeight.w400,

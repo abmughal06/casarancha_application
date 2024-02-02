@@ -1,7 +1,6 @@
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/widgets/common_button.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -70,7 +69,7 @@ class _AccountRecoveryState extends State<AccountRecovery> {
                       },
                       child: TextEditingWidget(
                         controller: _emailController,
-                        hint: strEmailAddress,
+                        hint: appText(context).strEmailAddress,
                         color: _emailFocus.hasFocus ? colorFDF : colorFF3,
                         fieldBorderClr:
                             _emailFocus.hasFocus ? colorF73 : color080,
@@ -97,7 +96,7 @@ class _AccountRecoveryState extends State<AccountRecovery> {
                       },
                       child: TextEditingWidget(
                         controller: _passwordController,
-                        hint: strPassword,
+                        hint: appText(context).strPassword,
                         fieldBorderClr:
                             _passwordFocus.hasFocus ? colorF73 : null,
                         textInputType: TextInputType.visiblePassword,
@@ -130,7 +129,7 @@ class _AccountRecoveryState extends State<AccountRecovery> {
                       },
                       child: TextEditingWidget(
                         controller: _confirmPasswordController,
-                        hint: "Confirm $strPassword",
+                        hint: "Confirm ${appText(context).strPassword}",
                         fieldBorderClr:
                             _confirmPasswordFocus.hasFocus ? colorF73 : null,
                         textInputType: TextInputType.visiblePassword,
@@ -160,7 +159,7 @@ class _AccountRecoveryState extends State<AccountRecovery> {
                     ),
                     heightBox(20),
                     CommonButton(
-                      text: strSave,
+                      text: appText(context).strSave,
                       horizontalOutMargin: 0,
                       onTap: () {
                         context

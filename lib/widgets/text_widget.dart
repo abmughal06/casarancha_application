@@ -3,6 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../resources/color_resources.dart';
 import '../resources/strings.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+AppLocalizations appText(context) {
+  return AppLocalizations.of(context)!;
+}
 
 class TextWidget extends StatelessWidget {
   final String? text;
@@ -43,7 +48,7 @@ class TextWidget extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Text(
-        text ?? "",
+        text ?? '',
         textAlign: textAlign,
         maxLines: maxLines,
         overflow: textOverflow,

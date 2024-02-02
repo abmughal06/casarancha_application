@@ -19,7 +19,6 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../resources/color_resources.dart';
-import '../../../resources/localization_text_strings.dart';
 
 import '../../../widgets/common_button.dart';
 import '../../../widgets/common_widgets.dart';
@@ -42,13 +41,6 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
-  final List<Widget> _createPostTabs = const [
-    Tab(text: strQuote),
-    Tab(text: 'Photo'),
-    Tab(text: 'Video'),
-    Tab(text: strMusic),
-  ];
-
   Widget musicTitle({required double width, required String title}) {
     return Container(
       height: 45.h,
@@ -83,19 +75,25 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> createPostTabs = [
+      Tab(text: appText(context).strQuote),
+      Tab(text: appText(context).strPhoto),
+      Tab(text: appText(context).strVideo),
+      Tab(text: appText(context).strMusic),
+    ];
     createPost = Provider.of<CreatePostMethods>(context, listen: false);
     return DefaultTabController(
-      length: _createPostTabs.length,
+      length: createPostTabs.length,
       child: Scaffold(
         appBar: primaryAppbar(
           elevation: 1,
           title: widget.isGhostPost
-              ? 'Create Ghost Post'
+              ? appText(context).strCreateGhostPost
               : widget.isForum
-                  ? 'Create Forum Post'
-                  : 'Create Post',
+                  ? appText(context).strCreateForumPost
+                  : appText(context).strCreatePost,
           bottom: primaryTabBar(
-            tabs: _createPostTabs,
+            tabs: createPostTabs,
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -120,8 +118,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       maxLines: null,
                       keyboardType: TextInputType.multiline,
                       maxLength: 2000,
-                      decoration: const InputDecoration.collapsed(
-                        hintText: strWriteQuote,
+                      decoration: InputDecoration.collapsed(
+                        hintText: appText(context).strWriteQuote,
                       ),
                       textInputAction: TextInputAction.newline,
                     ),
@@ -130,9 +128,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   //Photo Tab
 
                   widget.isGhostPost
-                      ? const Center(
+                      ? Center(
                           child: TextWidget(
-                            text: 'You cannot share pictures in ghost posts',
+                            text: appText(context).strAlertGhostPhoto,
                           ),
                         )
                       : Padding(
@@ -145,7 +143,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             children: [
                               PrimaryTextButton(
                                 onPressed: createPost.getPhoto,
-                                title: strAddPhotos,
+                                title: appText(context).strAddPhotos,
                                 icon: SvgPicture.asset(
                                   icAddPostRed,
                                 ),
@@ -223,9 +221,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
                   //Video Tab
                   widget.isGhostPost
-                      ? const Center(
+                      ? Center(
                           child: TextWidget(
-                            text: 'You cannot share Videos in ghost posts',
+                            text: appText(context).strAlertGhostVideo,
                           ),
                         )
                       : Padding(
@@ -238,14 +236,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             children: [
                               PrimaryTextButton(
                                 onPressed: createPost.getVideo,
-                                title: strAddVideos,
+                                title: appText(context).strAddVideos,
                                 icon: SvgPicture.asset(
                                   icAddPostRed,
                                 ),
                               ),
                               heightBox(10.w),
                               SizedBox(
-                                height: MediaQuery.of(context).size.height * .6,
+                                height: MediaQuery.of(context).size.height * .5,
                                 child: Consumer<CreatePostMethods>(
                                   builder: (context, state, b) {
                                     return ListView.builder(
@@ -313,9 +311,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   // Music Tab
 
                   widget.isGhostPost
-                      ? const Center(
+                      ? Center(
                           child: TextWidget(
-                            text: 'You cannot share Musics in ghost posts',
+                            text: appText(context).strAlertGhostMusic,
                           ),
                         )
                       : Padding(
@@ -328,7 +326,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             children: [
                               PrimaryTextButton(
                                 onPressed: createPost.getMusic,
-                                title: strAddMusic,
+                                title: appText(context).strAddMusic,
                                 icon: SvgPicture.asset(
                                   icAddPostRed,
                                 ),
@@ -364,7 +362,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
             CommonButton(
-              text: strContinue,
+              text: appText(context).strContinue,
               height: 58.w,
               verticalOutMargin: 25.h,
               horizontalOutMargin: 30.w,
@@ -374,7 +372,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     isPoll: false,
                     isForum: widget.isForum,
                     isGhostPost: widget.isGhostPost,
-                    // createPostController: createPost,
                     groupId: widget.groupId,
                   ),
                 );
@@ -439,64 +436,43 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
 
   @override
   Widget build(BuildContext context) {
-    return
-        //  NativeVideoView(
-        //   keepAspectRatio: false,
-        //   showMediaController: true,
-        //   useExoPlayer: false,
-        //   enableVolumeControl: true,
-        //   onCreated: (controller) {
-        //     controller.setVideoSource(
-        //       widget.videoFile.path,
-        //       sourceType: VideoSourceType.file,
-        //     );
-        //   },
-        //   onPrepared: (controller, info) {
-        //     controller
-        //         .play()
-        //         .then((value) => const Duration(milliseconds: 1000))
-        //         .then((value) => controller.pause());
-        //   },
-        //   onCompletion: (controller) {},
-        // );
-
-        isError
-            ? const Center(
-                child: TextWidget(text: 'File not supported'),
-              )
-            : Stack(
-                children: [
-                  VideoPlayer(
-                    videoPlayerController,
+    return isError
+        ? const Center(
+            child: TextWidget(text: 'File not supported'),
+          )
+        : Stack(
+            children: [
+              VideoPlayer(
+                videoPlayerController,
+              ),
+              Center(
+                child: isLoadingVideo
+                    ? const CircularProgressIndicator.adaptive()
+                    : Container(),
+              ),
+              if (!isLoadingVideo)
+                Align(
+                  alignment: Alignment.center,
+                  child: IconButton(
+                    onPressed: () async {
+                      if (isPlayingVideo) {
+                        await videoPlayerController.pause();
+                        isPlayingVideo = false;
+                      } else {
+                        await videoPlayerController.play();
+                        isPlayingVideo = true;
+                      }
+                      setState(() {});
+                    },
+                    icon: Icon(
+                      isPlayingVideo
+                          ? Icons.pause_circle_filled_rounded
+                          : Icons.play_circle_fill_rounded,
+                    ),
                   ),
-                  Center(
-                    child: isLoadingVideo
-                        ? const CircularProgressIndicator.adaptive()
-                        : Container(),
-                  ),
-                  if (!isLoadingVideo)
-                    Align(
-                      alignment: Alignment.center,
-                      child: IconButton(
-                        onPressed: () async {
-                          if (isPlayingVideo) {
-                            await videoPlayerController.pause();
-                            isPlayingVideo = false;
-                          } else {
-                            await videoPlayerController.play();
-                            isPlayingVideo = true;
-                          }
-                          setState(() {});
-                        },
-                        icon: Icon(
-                          isPlayingVideo
-                              ? Icons.pause_circle_filled_rounded
-                              : Icons.play_circle_fill_rounded,
-                        ),
-                      ),
-                    )
-                ],
-              );
+                )
+            ],
+          );
   }
 }
 

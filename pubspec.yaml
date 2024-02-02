@@ -110,6 +110,8 @@ dependencies:
   dotted_border: ^2.1.0
   flutter_mentions: ^2.0.1
   expandable_page_view: ^1.0.17
+  flutter_localizations:
+    sdk: flutter
 flutter_icons:
   android: "launcher_icon"
   ios: true
@@ -135,6 +137,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true # Add this line
 
   # To add assets to your application, add an assets section, like this:
   assets:

@@ -12,7 +12,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
@@ -89,7 +88,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     final prov = Provider.of<NewGroupProvider>(context);
     final searchProvider = Provider.of<SearchProvider>(context);
     return Scaffold(
-      appBar: primaryAppbar(title: strCreateGroup, elevation: 0.2),
+      appBar:
+          primaryAppbar(title: appText(context).strCreateGroup, elevation: 0.2),
       body: ListView(
         children: [
           Padding(
@@ -132,7 +132,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   controller: _groupNameController,
                   hintColor: color080,
                   isShadowEnable: false,
-                  hint: strGroupName,
+                  hint: appText(context).strGroupName,
                   color: colorFF4,
                   textInputType: TextInputType.text,
                   textInputAction: TextInputAction.done,
@@ -172,7 +172,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    hintText: strBio,
+                    hintText: appText(context).strBio,
                     hintStyle: TextStyle(
                       color: const Color(0xFF3B3B3B).withOpacity(0.5),
                       fontSize: 16.sp,
@@ -187,8 +187,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
                 ),
                 heightBox(20.w),
-                const TextWidget(
-                  text: strKeepInGrp,
+                TextWidget(
+                  text: appText(context).strKeepInGrp,
                   fontWeight: FontWeight.w500,
                   color: color221,
                 ),
@@ -197,7 +197,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   children: [
                     grpTypeBtn(
                         isSelected: isPublic,
-                        strText: strPublic,
+                        strText: appText(context).strPublic,
                         onTap: () {
                           setState(() {
                             isPublic = true;
@@ -206,7 +206,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     widthBox(8.w),
                     grpTypeBtn(
                       isSelected: !isPublic,
-                      strText: strPrivate,
+                      strText: appText(context).strPrivate,
                       onTap: () {
                         setState(() {
                           isPublic = false;
@@ -222,7 +222,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 ),
                 heightBox(15.h),
                 TextWidget(
-                  text: strAddMember,
+                  text: appText(context).strAddMember,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   color: color221,
@@ -232,7 +232,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   controller: _searchControllr,
                   hintColor: color080,
                   isShadowEnable: false,
-                  hint: strSearch,
+                  hint: appText(context).strSearch,
                   color: colorFF4,
                   prefixIcon: const Icon(Icons.search),
                   textInputType: TextInputType.text,
@@ -284,8 +284,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           }
                         },
                         btnName: membersIds.contains(users[index].id)
-                            ? strRemove
-                            : strAdd,
+                            ? appText(context).strRemove
+                            : appText(context).strAdd,
                       );
                     },
                   );
@@ -316,8 +316,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         }
                       },
                       btnName: membersIds.contains(searchList[index].id)
-                          ? strRemove
-                          : strAdd,
+                          ? appText(context).strRemove
+                          : appText(context).strAdd,
                     );
                   },
                 );
@@ -332,7 +332,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         child: CommonButton(
           showLoading: prov.isCreating,
           height: 56.h,
-          text: strCreateGroup,
+          text: appText(context).strCreateGroup,
           width: double.infinity,
           onTap: () async => prov.createGroup(
               gName: _groupNameController.text,

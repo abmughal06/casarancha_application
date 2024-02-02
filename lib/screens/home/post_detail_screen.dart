@@ -27,6 +27,8 @@ class PostDetailScreen extends StatefulWidget {
 class _PostDetailScreenState extends State<PostDetailScreen> {
   final coommenController = TextEditingController();
 
+  final ScrollController scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +38,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               child: Text('Post deleted'),
             )
           : NestedScrollView(
+              controller: scrollController,
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 SliverToBoxAdapter(
                   child: StreamProvider.value(

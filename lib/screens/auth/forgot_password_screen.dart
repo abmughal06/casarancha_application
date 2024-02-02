@@ -7,7 +7,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../resources/color_resources.dart';
-import '../../resources/localization_text_strings.dart';
 
 import '../../utils/snackbar.dart';
 
@@ -78,7 +77,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextWidget(
-                        text: strForgotPassword,
+                        text: appText(context).strForgotPassword,
                         fontSize: 26.sp,
                         color: color13F,
                         fontWeight: FontWeight.w800,
@@ -86,7 +85,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       heightBox(4.h),
                       TextWidget(
                         textAlign: TextAlign.center,
-                        text: strEnterEmail,
+                        text: appText(context).strEnterEmail,
                         fontSize: 16.sp,
                         color: color080,
                         fontWeight: FontWeight.w400,
@@ -100,7 +99,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         child: TextEditingWidget(
                           controller: _emailController,
                           isShadowEnable: false,
-                          hint: strEmailAddress,
+                          hint: appText(context).strEmailAddress,
                           color: emailFillClr ?? colorFF3,
                           fieldBorderClr: emailBorderClr,
                           textInputType: TextInputType.emailAddress,
@@ -127,10 +126,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               await FirebaseAuth.instance
                                   .sendPasswordResetEmail(
                                 email: _emailController.text.trim(),
-                              );
-                              GlobalSnackBar.show(
-                                message: strResetPassword,
-                              );
+                              )
+                                  .whenComplete(() {
+                                GlobalSnackBar.show(
+                                  message: appText(context).strResetPassword,
+                                );
+                              });
+
                               Get.back();
                               setState(() {
                                 isLoading = false;
@@ -143,11 +145,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           } else {
                             GlobalSnackBar.show(
                               context: context,
-                              message: strEnterEmailTxt,
+                              message: appText(context).strEnterEmailTxt,
                             );
                           }
                         },
-                        text: strSendNow,
+                        text: appText(context).strSendNow,
                         width: double.infinity,
                       ),
                     ],

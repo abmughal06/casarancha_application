@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../models/user_model.dart';
-import '../../../../resources/localization_text_strings.dart';
 import '../../../../utils/snackbar.dart';
 import '../../../home/CreatePost/create_post_controller.dart';
 
@@ -67,16 +66,16 @@ class EditProfileProvider extends ChangeNotifier {
 
   bool checkValidData() {
     if (firstNameController.text.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strFirstName');
+      GlobalSnackBar.show(message: 'Please enter first name');
       return false;
     } else if (lastNameController.text.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strLastName');
+      GlobalSnackBar.show(message: 'Please enter last name ');
       return false;
     } else if (userNameController.text.isEmpty) {
-      GlobalSnackBar.show(message: "Please Enter $strUserName");
+      GlobalSnackBar.show(message: "Please Enter username");
       return false;
     } else if (selectedDob == null || selectedDob == "") {
-      GlobalSnackBar.show(message: 'Please enter $strDateOfBirth');
+      GlobalSnackBar.show(message: 'Please enter date of birth');
       return false;
     }
     //  else if (imageFilePicked == null && profileImage == null) {

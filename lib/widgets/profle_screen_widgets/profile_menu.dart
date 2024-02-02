@@ -5,6 +5,7 @@ import 'package:casarancha/screens/profile/get_verified.dart';
 import 'package:casarancha/screens/profile/help.dart';
 import 'package:casarancha/screens/profile/settings/settings.dart';
 import 'package:casarancha/widgets/shared/alert_dialog.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,7 +16,6 @@ import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/providers/auth_provider.dart';
 import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/saved_post_screen.dart';
-import '../../utils/app_constants.dart';
 import '../../utils/app_utils.dart';
 import '../common_widgets.dart';
 import '../home_page_widgets.dart';
@@ -31,6 +31,20 @@ bottomSheetProfile(context) {
           topLeft: Radius.circular(40.r), topRight: Radius.circular(40.r)),
     ),
     builder: (BuildContext context) {
+      List<String> profileBottomSheetList = [
+        appText(context).strEditProfile,
+        appText(context).strSavedPosts,
+        appText(context).strAccountRecovery,
+        appText(context).strGetVerified,
+        appText(context).strSettings,
+        appText(context).strInviteFrnds,
+        appText(context).strAbout,
+        appText(context).strTermsCondition,
+        appText(context).strPrivacyPolicy,
+        appText(context).strHelp,
+        appText(context).strLogout,
+        appText(context).strDeleteAct,
+      ];
       return Container(
         height: 550,
         padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -54,12 +68,12 @@ bottomSheetProfile(context) {
             heightBox(10.h),
             Expanded(
               child: ListView.builder(
-                itemCount: AppConstant.profileBottomSheetList.length,
+                itemCount: profileBottomSheetList.length,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14.0),
                     child: textMenuItem(
-                      text: AppConstant.profileBottomSheetList[index],
+                      text: profileBottomSheetList[index],
                       color: index > 9 ? Colors.red : null,
                       onTap: () {
                         Get.back();

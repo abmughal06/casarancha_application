@@ -11,9 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../resources/color_resources.dart';
-import '../resources/localization_text_strings.dart';
 import '../resources/strings.dart';
-import 'home_page_widgets.dart';
 
 Widget heightBox(double height) {
   return SizedBox(height: height);
@@ -186,100 +184,100 @@ Widget cardProfileStrAction(
   return Container();
 }
 
-Widget acceptDeclineBtn(
-    {required bool isAcceptBtn, GestureTapCallback? onTap}) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      height: 24.h,
-      width: 67.w,
-      decoration: BoxDecoration(
-        color: isAcceptBtn ? colorF03 : colorAA3,
-        borderRadius: BorderRadius.all(
-          Radius.circular(7.r),
-        ),
-      ),
-      child: Center(
-        child: TextWidget(
-          text: isAcceptBtn ? strAccept : strDecline,
-          color: isAcceptBtn ? color13F : colorWhite,
-          fontWeight: FontWeight.w600,
-          fontSize: 12.sp,
-        ),
-      ),
-    ),
-  );
-}
+// Widget acceptDeclineBtn(
+//     {required bool isAcceptBtn, GestureTapCallback? onTap}) {
+//   return GestureDetector(
+//     onTap: onTap,
+//     child: Container(
+//       height: 24.h,
+//       width: 67.w,
+//       decoration: BoxDecoration(
+//         color: isAcceptBtn ? colorF03 : colorAA3,
+//         borderRadius: BorderRadius.all(
+//           Radius.circular(7.r),
+//         ),
+//       ),
+//       child: Center(
+//         child: TextWidget(
+//           text: isAcceptBtn ? appText(context).strAccept : strDecline,
+//           color: isAcceptBtn ? color13F : colorWhite,
+//           fontWeight: FontWeight.w600,
+//           fontSize: 12.sp,
+//         ),
+//       ),
+//     ),
+//   );
+// }
 
-Widget profileAcceptDecline(
-    {String? imgUserNet,
-    String? userName,
-    String? subText,
-    String? timeAgo = strMinAgo,
-    GestureTapCallback? onTapAccept,
-    GestureTapCallback? onTapOtherProfile,
-    GestureTapCallback? onTapDecline}) {
-  return Padding(
-    padding: EdgeInsets.all(12.h),
-    child: Container(
-      height: 100.h,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          color: colorWhite,
-          borderRadius: BorderRadius.circular(16.0),
-          boxShadow: [
-            BoxShadow(
-              color: colorPrimaryA05.withOpacity(.20),
-              blurRadius: 1,
-              offset: const Offset(0, 2),
-            ),
-            BoxShadow(
-              color: Colors.grey.shade300,
-// offset: const Offset(-5,0),
-            ),
-            BoxShadow(
-              color: Colors.grey.shade300,
-// offset: const Offset(5,0),
-            )
-          ]),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              profileImgName(
-                  onTapOtherProfile: onTapOtherProfile,
-                  imgUserNet: imgUserNet,
-                  isVerifyWithName: true,
-                  idIsVerified: true,
-                  userName: userName,
-                  userNameFontWeight: FontWeight.w600,
-                  subText: subText,
-                  subTxtFontSize: 12.sp,
-                  subTxtClr: colorAA3),
-              const Spacer(),
-              TextWidget(
-                text: timeAgo,
-                color: color55F,
-                fontWeight: FontWeight.w400,
-                fontSize: 10.sp,
-              ),
-            ],
-          ),
-          heightBox(8.h),
-          Row(
-            children: [
-              widthBox(50.w),
-              acceptDeclineBtn(isAcceptBtn: true, onTap: onTapAccept),
-              widthBox(10.w),
-              acceptDeclineBtn(isAcceptBtn: false, onTap: onTapDecline),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
+// Widget profileAcceptDecline(
+//     {String? imgUserNet,
+//     String? userName,
+//     String? subText,
+//     String? timeAgo = strMinAgo,
+//     GestureTapCallback? onTapAccept,
+//     GestureTapCallback? onTapOtherProfile,
+//     GestureTapCallback? onTapDecline}) {
+//   return Padding(
+//     padding: EdgeInsets.all(12.h),
+//     child: Container(
+//       height: 100.h,
+//       padding: const EdgeInsets.all(12),
+//       decoration: BoxDecoration(
+//           color: colorWhite,
+//           borderRadius: BorderRadius.circular(16.0),
+//           boxShadow: [
+//             BoxShadow(
+//               color: colorPrimaryA05.withOpacity(.20),
+//               blurRadius: 1,
+//               offset: const Offset(0, 2),
+//             ),
+//             BoxShadow(
+//               color: Colors.grey.shade300,
+// // offset: const Offset(-5,0),
+//             ),
+//             BoxShadow(
+//               color: Colors.grey.shade300,
+// // offset: const Offset(5,0),
+//             )
+//           ]),
+//       child: Column(
+//         children: [
+//           Row(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               profileImgName(
+//                   onTapOtherProfile: onTapOtherProfile,
+//                   imgUserNet: imgUserNet,
+//                   isVerifyWithName: true,
+//                   idIsVerified: true,
+//                   userName: userName,
+//                   userNameFontWeight: FontWeight.w600,
+//                   subText: subText,
+//                   subTxtFontSize: 12.sp,
+//                   subTxtClr: colorAA3),
+//               const Spacer(),
+//               TextWidget(
+//                 text: timeAgo,
+//                 color: color55F,
+//                 fontWeight: FontWeight.w400,
+//                 fontSize: 10.sp,
+//               ),
+//             ],
+//           ),
+//           heightBox(8.h),
+//           Row(
+//             children: [
+//               widthBox(50.w),
+//               acceptDeclineBtn(isAcceptBtn: true, onTap: onTapAccept),
+//               widthBox(10.w),
+//               acceptDeclineBtn(isAcceptBtn: false, onTap: onTapDecline),
+//             ],
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }
 
 Widget shimmerImg(
     {double? height,
@@ -315,7 +313,7 @@ Widget searchTextField(
   return TextEditingWidget(
     controller: controller,
     onChanged: onChange,
-    hint: hintText ?? strSearchHint,
+    hint: hintText ?? appText(context).strSearchHint,
     color: colorFF4,
     suffixIconWidget: suffixIcon,
     fontWeightHint: FontWeight.w400,

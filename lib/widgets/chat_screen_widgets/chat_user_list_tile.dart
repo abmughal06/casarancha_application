@@ -294,7 +294,7 @@ class ChatUserListTileForNoChat extends StatelessWidget {
           ],
         ),
         subtitle: TextWidget(
-          text: "Start chat with ${userModel.username}",
+          text: appText(context).strStartChat(userModel.username),
           textOverflow: TextOverflow.ellipsis,
           fontWeight: FontWeight.w400,
           fontSize: 14.sp,

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/resources/color_resources.dart';
 
 import 'package:casarancha/widgets/text_widget.dart';
@@ -9,9 +8,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:video_player/video_player.dart';
 
 import '../resources/image_resources.dart';
-import '../resources/localization_text_strings.dart';
-import '../utils/app_constants.dart';
-
 import 'common_widgets.dart';
 
 enum PostType { image, video, music, quote }
@@ -111,155 +107,155 @@ Widget textMenuItem(
   );
 }
 
-Widget reportListWidget() {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      heightBox(15.h),
-      TextWidget(
-        text: strReport,
-        color: color13F,
-        fontSize: 18.sp,
-        fontWeight: FontWeight.w500,
-      ),
-      heightBox(8.h),
-      Text(
-        strReportReasonChoose,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: color55F,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-    ],
-  );
-}
+// Widget reportListWidget() {
+//   return Column(
+//     mainAxisAlignment: MainAxisAlignment.start,
+//     crossAxisAlignment: CrossAxisAlignment.center,
+//     mainAxisSize: MainAxisSize.min,
+//     children: [
+//       heightBox(15.h),
+//       TextWidget(
+//         text: strReport,
+//         color: color13F,
+//         fontSize: 18.sp,
+//         fontWeight: FontWeight.w500,
+//       ),
+//       heightBox(8.h),
+//       Text(
+//         strReportReasonChoose,
+//         textAlign: TextAlign.center,
+//         style: TextStyle(
+//           color: color55F,
+//           fontSize: 14.sp,
+//           fontWeight: FontWeight.w400,
+//         ),
+//       ),
+//     ],
+//   );
+// }
 
-Widget reportDoneWidget() {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      heightBox(34.h),
-      SvgPicture.asset(icReportPostDone),
-      heightBox(34.h),
-      TextWidget(
-        text: strThanksForReport,
-        color: color221,
-        fontSize: 18.sp,
-        fontWeight: FontWeight.w600,
-      ),
-      heightBox(6.h),
-      TextWidget(
-        text: strSparmReport,
-        color: color55F,
-        fontSize: 14.sp,
-        fontWeight: FontWeight.w400,
-      ),
-      heightBox(69.h),
-    ],
-  );
-}
+// Widget reportDoneWidget() {
+//   return Column(
+//     mainAxisAlignment: MainAxisAlignment.start,
+//     crossAxisAlignment: CrossAxisAlignment.center,
+//     mainAxisSize: MainAxisSize.min,
+//     children: [
+//       heightBox(34.h),
+//       SvgPicture.asset(icReportPostDone),
+//       heightBox(34.h),
+//       TextWidget(
+//         text: strThanksForReport,
+//         color: color221,
+//         fontSize: 18.sp,
+//         fontWeight: FontWeight.w600,
+//       ),
+//       heightBox(6.h),
+//       TextWidget(
+//         text: strSparmReport,
+//         color: color55F,
+//         fontSize: 14.sp,
+//         fontWeight: FontWeight.w400,
+//       ),
+//       heightBox(69.h),
+//     ],
+//   );
+// }
 
-Widget menuPostWidget(context) {
-  return Padding(
-    padding: EdgeInsets.only(bottom: 40.h),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        textMenuItem(
-            text: strReportPost,
-            onTap: () {
-              Navigator.pop(context);
-              Future.delayed(const Duration(milliseconds: 500), () {
-                bottomSheetPostMenu(
-                    contextMenu: context,
-                    bottomSheetMenuType: BottomSheetMenuType.isReportPost);
-              });
-            }),
-        heightBox(22.h),
-        textMenuItem(text: strBlockUser, onTap: () => Navigator.pop(context)),
-      ],
-    ),
-  );
-}
+// Widget menuPostWidget(context) {
+//   return Padding(
+//     padding: EdgeInsets.only(bottom: 40.h),
+//     child: Column(
+//       mainAxisAlignment: MainAxisAlignment.start,
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       mainAxisSize: MainAxisSize.min,
+//       children: [
+//         textMenuItem(
+//             text: strReportPost,
+//             onTap: () {
+//               Navigator.pop(context);
+//               Future.delayed(const Duration(milliseconds: 500), () {
+//                 bottomSheetPostMenu(
+//                     contextMenu: context,
+//                     bottomSheetMenuType: BottomSheetMenuType.isReportPost);
+//               });
+//             }),
+//         heightBox(22.h),
+//         textMenuItem(text: strBlockUser, onTap: () => Navigator.pop(context)),
+//       ],
+//     ),
+//   );
+// }
 
-bottomSheetPostMenu({
-  required bottomSheetMenuType,
-  required contextMenu,
-}) {
-  showModalBottomSheet(
-    context: contextMenu,
-    backgroundColor: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(40.r), topRight: Radius.circular(40.r)),
-    ),
-    builder: (BuildContext context) {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            heightBox(14.h),
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                height: 6.h,
-                width: 78.w,
-                decoration: BoxDecoration(
-                  color: colorDD9,
-                  borderRadius: BorderRadius.all(Radius.circular(30.r)),
-                ),
-              ),
-            ),
-            bottomSheetMenuType == BottomSheetMenuType.isReportPost
-                ? reportListWidget()
-                : Container(),
-            heightBox(14.h),
-            bottomSheetMenuType == BottomSheetMenuType.isReportPost
-                ? Expanded(
-                    child: ListView.builder(
-                        itemCount: reportList.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 9.0),
-                            child: textMenuItem(
-                                text: reportList[index],
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  Future.delayed(
-                                      const Duration(milliseconds: 500), () {
-                                    bottomSheetPostMenu(
-                                        bottomSheetMenuType:
-                                            BottomSheetMenuType.isDoneReport,
-                                        contextMenu: contextMenu);
-                                  });
-                                }),
-                          );
-                        }),
-                  )
-                : bottomSheetMenuType == BottomSheetMenuType.isDoneReport
-                    ? Center(child: reportDoneWidget())
-                    : menuPostWidget(contextMenu)
-          ],
-        ),
-      );
-      //   ListView.builder(itemBuilder:
-      //     (context, index) {
-      //   return TextWidget(text: "Report Post",);
-      // });
-    },
-  );
-}
+// bottomSheetPostMenu({
+//   required bottomSheetMenuType,
+//   required contextMenu,
+// }) {
+//   showModalBottomSheet(
+//     context: contextMenu,
+//     backgroundColor: Colors.white,
+//     shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.only(
+//           topLeft: Radius.circular(40.r), topRight: Radius.circular(40.r)),
+//     ),
+//     builder: (BuildContext context) {
+//       return Padding(
+//         padding: EdgeInsets.symmetric(horizontal: 24.w),
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.start,
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             heightBox(14.h),
+//             Align(
+//               alignment: Alignment.center,
+//               child: Container(
+//                 height: 6.h,
+//                 width: 78.w,
+//                 decoration: BoxDecoration(
+//                   color: colorDD9,
+//                   borderRadius: BorderRadius.all(Radius.circular(30.r)),
+//                 ),
+//               ),
+//             ),
+//             bottomSheetMenuType == BottomSheetMenuType.isReportPost
+//                 ? reportListWidget()
+//                 : Container(),
+//             heightBox(14.h),
+//             bottomSheetMenuType == BottomSheetMenuType.isReportPost
+//                 ? Expanded(
+//                     child: ListView.builder(
+//                         itemCount: reportList.length,
+//                         itemBuilder: (context, index) {
+//                           return Padding(
+//                             padding: const EdgeInsets.symmetric(vertical: 9.0),
+//                             child: textMenuItem(
+//                                 text: reportList[index],
+//                                 onTap: () {
+//                                   Navigator.pop(context);
+//                                   Future.delayed(
+//                                       const Duration(milliseconds: 500), () {
+//                                     bottomSheetPostMenu(
+//                                         bottomSheetMenuType:
+//                                             BottomSheetMenuType.isDoneReport,
+//                                         contextMenu: contextMenu);
+//                                   });
+//                                 }),
+//                           );
+//                         }),
+//                   )
+//                 : bottomSheetMenuType == BottomSheetMenuType.isDoneReport
+//                     ? Center(child: reportDoneWidget())
+//                     : menuPostWidget(contextMenu)
+//           ],
+//         ),
+//       );
+//       //   ListView.builder(itemBuilder:
+//       //     (context, index) {
+//       //   return TextWidget(text: "Report Post",);
+//       // });
+//     },
+//   );
+// }
 
 sharePostBottomSheet({required BuildContext context}) {
 //   showModalBottomSheet(
@@ -408,103 +404,103 @@ Widget shareWithTxt(
   );
 }
 
-Widget sendButton({GestureTapCallback? onTap, required bool isSelected}) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      height: 25.h,
-      width: 49.w,
-      margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 17.h),
-      decoration: BoxDecoration(
-        color: isSelected ? colorPrimaryA05 : colorPrimaryA05.withOpacity(0.16),
-        borderRadius: BorderRadius.all(Radius.circular(90.r)),
-      ),
-      child: Center(
-        child: TextWidget(
-          text: strSend,
-          color: isSelected ? colorWhite : colorPrimaryA05,
-          fontWeight: FontWeight.w600,
-          fontSize: 11.sp,
-        ),
-      ),
-    ),
-  );
-}
+// Widget sendButton({GestureTapCallback? onTap, required bool isSelected}) {
+//   return GestureDetector(
+//     onTap: onTap,
+//     child: Container(
+//       height: 25.h,
+//       width: 49.w,
+//       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 17.h),
+//       decoration: BoxDecoration(
+//         color: isSelected ? colorPrimaryA05 : colorPrimaryA05.withOpacity(0.16),
+//         borderRadius: BorderRadius.all(Radius.circular(90.r)),
+//       ),
+//       child: Center(
+//         child: TextWidget(
+//           text: strSend,
+//           color: isSelected ? colorWhite : colorPrimaryA05,
+//           fontWeight: FontWeight.w600,
+//           fontSize: 11.sp,
+//         ),
+//       ),
+//     ),
+//   );
+// }
 
-Widget shareProfileCard(
-    {String? imgUserNet,
-    subName,
-    userName,
-    bool? isVerify,
-    bool? isSelected,
-    GestureTapCallback? onSelectUser}) {
-  return Container(
-    margin: EdgeInsets.symmetric(
-      vertical: 5.h,
-    ),
-    padding: EdgeInsets.only(left: 17.w),
-    height: 59.h,
-    decoration: BoxDecoration(
-        color: colorWhite,
-        borderRadius: BorderRadius.all(Radius.circular(15.r)),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              blurRadius: 1.0,
-              offset: const Offset(0, 2)),
-        ]),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        CachedNetworkImage(
-          imageUrl: imgUserNet!,
-          imageBuilder: (context, imageProvider) =>
-              CircleAvatar(radius: 20.r, backgroundImage: imageProvider),
-          placeholder: (context, url) => shimmerImg(
-              child: CircleAvatar(
-            radius: 20.r,
-          )),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  TextWidget(
-                    text: userName ?? "",
-                    color: color221,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14.sp,
-                  ),
-                  widthBox(6.w),
-                  isVerify != null
-                      ? isVerify
-                          ? SvgPicture.asset(icVerifyBadge)
-                          : Container()
-                      : Container()
-                ],
-              ),
-              TextWidget(
-                text: subName ?? "",
-                color: color55F,
-                fontWeight: FontWeight.w400,
-                fontSize: 11.sp,
-              ),
-            ],
-          ),
-        ),
-        const Spacer(),
-        sendButton(onTap: onSelectUser, isSelected: isSelected ?? false)
-      ],
-    ),
-  );
-}
+// Widget shareProfileCard(
+//     {String? imgUserNet,
+//     subName,
+//     userName,
+//     bool? isVerify,
+//     bool? isSelected,
+//     GestureTapCallback? onSelectUser}) {
+//   return Container(
+//     margin: EdgeInsets.symmetric(
+//       vertical: 5.h,
+//     ),
+//     padding: EdgeInsets.only(left: 17.w),
+//     height: 59.h,
+//     decoration: BoxDecoration(
+//         color: colorWhite,
+//         borderRadius: BorderRadius.all(Radius.circular(15.r)),
+//         boxShadow: [
+//           BoxShadow(
+//               color: Colors.grey.withOpacity(0.5),
+//               blurRadius: 1.0,
+//               offset: const Offset(0, 2)),
+//         ]),
+//     child: Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       crossAxisAlignment: CrossAxisAlignment.center,
+//       mainAxisSize: MainAxisSize.max,
+//       children: [
+//         CachedNetworkImage(
+//           imageUrl: imgUserNet!,
+//           imageBuilder: (context, imageProvider) =>
+//               CircleAvatar(radius: 20.r, backgroundImage: imageProvider),
+//           placeholder: (context, url) => shimmerImg(
+//               child: CircleAvatar(
+//             radius: 20.r,
+//           )),
+//           errorWidget: (context, url, error) => const Icon(Icons.error),
+//         ),
+//         Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 10.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               Row(
+//                 children: [
+//                   TextWidget(
+//                     text: userName ?? "",
+//                     color: color221,
+//                     fontWeight: FontWeight.w500,
+//                     fontSize: 14.sp,
+//                   ),
+//                   widthBox(6.w),
+//                   isVerify != null
+//                       ? isVerify
+//                           ? SvgPicture.asset(icVerifyBadge)
+//                           : Container()
+//                       : Container()
+//                 ],
+//               ),
+//               TextWidget(
+//                 text: subName ?? "",
+//                 color: color55F,
+//                 fontWeight: FontWeight.w400,
+//                 fontSize: 11.sp,
+//               ),
+//             ],
+//           ),
+//         ),
+//         const Spacer(),
+//         sendButton(onTap: onSelectUser, isSelected: isSelected ?? false)
+//       ],
+//     ),
+//   );
+// }
 
 Widget profileImgName({
   double? dpRadius,

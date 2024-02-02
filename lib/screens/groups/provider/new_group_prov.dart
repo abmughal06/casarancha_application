@@ -120,6 +120,49 @@ class NewGroupProvider extends ChangeNotifier {
     }
   }
 
+  requestPrivateGroup({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'joinRequestIds': FieldValue.arrayUnion([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  removeRequestPrivateGroup({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'joinRequestIds': FieldValue.arrayUnion([id])
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  acceptMembers({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'joinRequestIds': FieldValue.arrayRemove([id]),
+          'memberIds': FieldValue.arrayUnion([id]),
+        },
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
   banUsersFromPostsGroup({id, groupId}) async {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
@@ -167,7 +210,8 @@ class NewGroupProvider extends ChangeNotifier {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
         {
           'banUsersIds': FieldValue.arrayUnion([id]),
-          'memberIds': FieldValue.arrayRemove([id]),
+          'banFromCmntUsersIds': FieldValue.arrayUnion([id]),
+          'banFromPostUsersIds': FieldValue.arrayUnion([id]),
         },
       );
     } catch (e) {
@@ -181,7 +225,9 @@ class NewGroupProvider extends ChangeNotifier {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
         {
-          'banUsersIds': FieldValue.arrayRemove([id])
+          'banUsersIds': FieldValue.arrayRemove([id]),
+          'banFromCmntUsersIds': FieldValue.arrayRemove([id]),
+          'banFromPostUsersIds': FieldValue.arrayRemove([id]),
         },
       );
     } catch (e) {

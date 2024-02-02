@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 
 import '../../utils/app_utils.dart';
 import '../../utils/custom_date_picker.dart';
@@ -152,7 +151,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     controller: edit.firstNameController,
                     hintColor: color080,
                     isShadowEnable: false,
-                    hint: strFirstName,
+                    hint: appText(context).strFirstName,
                     color: colorFF4,
                     textInputType: TextInputType.text,
                     textInputAction: TextInputAction.next,
@@ -163,7 +162,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     controller: edit.lastNameController,
                     hintColor: color080,
                     isShadowEnable: false,
-                    hint: strLastName,
+                    hint: appText(context).strLastName,
                     color: colorFF4,
                     textInputType: TextInputType.text,
                     textInputAction: TextInputAction.next,
@@ -174,7 +173,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     controller: edit.userNameController,
                     hintColor: color080,
                     isShadowEnable: false,
-                    hint: strUserName,
+                    hint: appText(context).strUserName,
                     maxLength: 150,
                     color: colorFF4,
                     textInputType: TextInputType.text,
@@ -186,7 +185,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     controller: edit.bioController,
                     hintColor: color080,
                     isShadowEnable: false,
-                    hint: strBio,
+                    hint: appText(context).strBio,
                     maxLength: 300,
                     maxLines: 5,
                     color: colorFF4,
@@ -199,7 +198,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     controller: edit.educationController,
                     hintColor: color080,
                     isShadowEnable: false,
-                    hint: strEducation,
+                    hint: appText(context).strEducation,
                     maxLength: 150,
                     maxLines: 2,
                     color: colorFF4,
@@ -212,7 +211,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     controller: edit.workController,
                     hintColor: color080,
                     isShadowEnable: false,
-                    hint: strWork,
+                    hint: appText(context).strWork,
                     maxLength: 150,
                     maxLines: 2,
                     color: colorFF4,
@@ -249,7 +248,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               padding: EdgeInsets.all(20.w),
               child: CommonButton(
                 height: 56.h,
-                text: strSave,
+                text: appText(context).strSave,
                 showLoading: edit.isLoading,
                 onTap: () => edit.updateData(currentUser: user),
                 width: double.infinity,

@@ -1,5 +1,4 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
@@ -35,7 +34,7 @@ class _ForumsScreenState extends State<ForumsScreen>
 
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: strForum,
+        title: appText(context).strForum,
         elevation: 0.1,
         leading: const GhostModeBtn(),
         actions: [

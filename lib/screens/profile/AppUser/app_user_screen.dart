@@ -18,7 +18,6 @@ import 'package:provider/provider.dart';
 
 import '../../../models/providers/user_data_provider.dart';
 import '../../../models/user_model.dart';
-import '../../../resources/localization_text_strings.dart';
 
 import '../../../resources/strings.dart';
 import '../../../widgets/common_widgets.dart';
@@ -155,7 +154,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                         return profileCounter(
                                             ontap: null,
                                             count: '0',
-                                            strText: strProfilePost);
+                                            strText: appText(context)
+                                                .strProfilePost);
                                       }
                                       return profileCounter(
                                           ontap: null,
@@ -165,7 +165,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                               .toList()
                                               .length
                                               .toString(),
-                                          strText: strProfilePost);
+                                          strText:
+                                              appText(context).strProfilePost);
                                     })),
                                 verticalLine(
                                     height: 24.h, horizontalMargin: 30.w),
@@ -177,7 +178,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                           )),
                                   child: PostFollowCount(
                                     count: user.followersIds.length,
-                                    countText: strProfileFollowers,
+                                    countText:
+                                        appText(context).strProfileFollowers,
                                   ),
                                 ),
                                 verticalLine(
@@ -189,7 +191,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                           )),
                                   child: PostFollowCount(
                                     count: user.followingsIds.length,
-                                    countText: strProfileFollowing,
+                                    countText:
+                                        appText(context).strProfileFollowing,
                                   ),
                                 ),
                               ],
@@ -326,8 +329,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                           child: TextWidget(
                                             text: currentUser.followingsIds
                                                     .contains(user.id)
-                                                ? strUnFollow
-                                                : strSrcFollow,
+                                                ? appText(context).strUnFollow
+                                                : appText(context).strSrcFollow,
                                             color: color13F,
                                             fontSize: 18.sp,
                                             fontWeight: FontWeight.w600,
@@ -397,18 +400,18 @@ class _AppUserScreenState extends State<AppUserScreen> {
                     indicatorPadding:
                         EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
                     dividerColor: Colors.transparent,
-                    tabs: const [
+                    tabs: [
                       Tab(
-                        child: Text(strQuote),
+                        child: TextWidget(text: appText(context).strQuote),
                       ),
                       Tab(
-                        child: Text(strImages),
+                        child: TextWidget(text: appText(context).strImages),
                       ),
                       Tab(
-                        child: Text(strVideos),
+                        child: TextWidget(text: appText(context).strVideos),
                       ),
                       Tab(
-                        child: Text(strMusic),
+                        child: TextWidget(text: appText(context).strMusic),
                       ),
                     ],
                   ),

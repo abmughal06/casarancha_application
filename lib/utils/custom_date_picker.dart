@@ -1,5 +1,4 @@
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -112,7 +111,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
           child: comp == PickerDateComponent.day
               ? _dropDowns(
                   dymList: dateInMonthList,
-                  hint: strDay,
+                  hint: appText(context).strDay,
                   onChanged: (val) {
                     setState(() {
                       selectedDay = val;
@@ -129,7 +128,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                       : convertDate(inputString: widget.userDateTime, list: 1))
               : comp == PickerDateComponent.month
                   ? _dropDowns(
-                      hint: strMonth,
+                      hint: appText(context).strMonth,
                       dymList: monthList,
                       onChanged: (val) {
                         setState(() {
@@ -159,7 +158,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                               inputString: widget.userDateTime, list: 2))
                   : _dropDowns(
                       dymList: yearList,
-                      hint: strYear,
+                      hint: appText(context).strYear,
                       onChanged: (val) {
                         setState(() {
                           selectedYear = val;
@@ -339,7 +338,7 @@ class _CustomDatePicker2State extends State<CustomDatePicker2> {
           child: comp == PickerDateComponent.day
               ? _dropDowns(
                   dymList: dateInMonthList,
-                  hint: strDay,
+                  hint: appText(context).strDay,
                   onChanged: (val) {
                     setState(() {
                       selectedDay = val;
@@ -354,7 +353,7 @@ class _CustomDatePicker2State extends State<CustomDatePicker2> {
                   buttonValue: widget.showSelected[0] ? selectedDay : null)
               : comp == PickerDateComponent.month
                   ? _dropDowns(
-                      hint: strMonth,
+                      hint: appText(context).strMonth,
                       dymList: monthList,
                       onChanged: (val) {
                         setState(() {
@@ -382,7 +381,7 @@ class _CustomDatePicker2State extends State<CustomDatePicker2> {
                           widget.showSelected[1] ? selectedMonth : null)
                   : _dropDowns(
                       dymList: yearList,
-                      hint: strYear,
+                      hint: appText(context).strYear,
                       onChanged: (val) {
                         setState(() {
                           selectedYear = val;

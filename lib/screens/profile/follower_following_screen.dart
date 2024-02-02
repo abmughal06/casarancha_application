@@ -11,28 +11,27 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../resources/color_resources.dart';
-import '../../resources/localization_text_strings.dart';
 
 class CurruentUserFollowerFollowingScreen extends StatelessWidget {
   const CurruentUserFollowerFollowingScreen({super.key, this.follow = false});
 
   final bool? follow;
-  final List<Widget> _myTabs = const [
-    Tab(text: strProfileFollowers),
-    Tab(text: strProfileFollowing),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> myTabs = [
+      Tab(text: appText(context).strProfileFollowers),
+      Tab(text: appText(context).strProfileFollowing),
+    ];
     final currentUser = context.watch<UserModel?>();
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
     return DefaultTabController(
-      length: _myTabs.length,
+      length: myTabs.length,
       initialIndex: follow! ? 0 : 1,
       child: Scaffold(
         appBar: primaryAppbar(
-          title: strFollowersFollowing,
+          title: appText(context).strFollowersFollowing,
           elevation: 0,
           bottom: TabBar(
             labelColor: colorPrimaryA05,
@@ -45,7 +44,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
             indicatorPadding:
                 EdgeInsets.symmetric(vertical: 5.h, horizontal: 40.w),
             dividerColor: Colors.transparent,
-            tabs: _myTabs,
+            tabs: myTabs,
           ),
         ),
         body: currentUser == null
@@ -70,9 +69,9 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                               child: CircularProgressIndicator.adaptive());
                         }
                         if (users.isEmpty) {
-                          return const Center(
+                          return Center(
                             child: TextWidget(
-                              text: strAlertFollowing,
+                              text: appText(context).strAlertFollowing,
                             ),
                           );
                         }
@@ -88,7 +87,9 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                                   profileProvider.toggleFollowBtn(
                                       userModel: currentUser,
                                       appUserId: user.id),
-                              btnName: isFriend ? strFriends : strSrcFollow,
+                              btnName: isFriend
+                                  ? appText(context).strFriends
+                                  : appText(context).strSrcFollow,
                             );
                           },
                         );
@@ -108,9 +109,9 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                             child: CircularProgressIndicator.adaptive());
                       }
                       if (users.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: TextWidget(
-                            text: strAlertFollow,
+                            text: appText(context).strAlertFollow,
                           ),
                         );
                       }
@@ -123,7 +124,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                             ontapToggleFollow: () =>
                                 profileProvider.toggleFollowBtn(
                                     userModel: currentUser, appUserId: user.id),
-                            btnName: strRemove,
+                            btnName: appText(context).strRemove,
                           );
                         },
                       );
@@ -142,26 +143,26 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
       {super.key, this.follow = false, required this.appUser});
 
   final bool? follow;
-  final List<Widget> _myTabs = const [
-    Tab(text: strProfileFollowers),
-    Tab(text: strProfileFollowing),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> myTabs = [
+      Tab(text: appText(context).strProfileFollowers),
+      Tab(text: appText(context).strProfileFollowing),
+    ];
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
     final currentUser = context.watch<UserModel?>();
 
     return DefaultTabController(
-      length: _myTabs.length,
+      length: myTabs.length,
       initialIndex: follow! ? 0 : 1,
       child: Scaffold(
         appBar: primaryAppbar(
-          title: strFollowersFollowing,
+          title: appText(context).strFollowersFollowing,
           elevation: 0,
           bottom: primaryTabBar(
-            tabs: _myTabs,
+            tabs: myTabs,
           ),
         ),
         body: currentUser == null
@@ -182,14 +183,11 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                         return const Center(
                             child: CircularProgressIndicator.adaptive());
                       }
-                      // var currentUser = users
-                      //     .where((element) =>
-                      //         element.id == FirebaseAuth.instance.currentUser!.uid)
-                      //     .first;
+
                       if (users.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: TextWidget(
-                            text: strAlertAppUsrFollow,
+                            text: appText(context).strAlertAppUsrFollow,
                           ),
                         );
                       }
@@ -209,8 +207,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                             btnName: user.id == currentUser.id
                                 ? ""
                                 : isFriend
-                                    ? strFriends
-                                    : strSrcFollow,
+                                    ? appText(context).strFriends
+                                    : appText(context).strSrcFollow,
                           );
                         },
                       );
@@ -228,9 +226,9 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                               child: CircularProgressIndicator.adaptive());
                         } else {
                           if (users.isEmpty) {
-                            return const Center(
+                            return Center(
                               child: TextWidget(
-                                text: strAlertAppUsrFollowings,
+                                text: appText(context).strAlertAppUsrFollowings,
                               ),
                             );
                           }
@@ -250,8 +248,8 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                 btnName: user.id == currentUser.id
                                     ? ""
                                     : !isFriend
-                                        ? strFriends
-                                        : strSrcFollow,
+                                        ? appText(context).strFriends
+                                        : appText(context).strSrcFollow,
                               );
                             },
                           );

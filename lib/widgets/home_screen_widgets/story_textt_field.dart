@@ -1,8 +1,8 @@
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -47,7 +47,7 @@ class StoryTextField extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
-              hintText: strWriteCommentHere,
+              hintText: appText(context).strWriteCommentHere,
               hintStyle: TextStyle(
                 color: colorWhite,
                 fontSize: 14.sp,

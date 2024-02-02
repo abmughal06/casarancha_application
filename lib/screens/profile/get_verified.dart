@@ -1,5 +1,4 @@
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/profile/get_verified_screens/verify_screen.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -14,7 +13,7 @@ class GetVerifiedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: primaryAppbar(
-        title: strGetVerified,
+        title: appText(context).strGetVerified,
         elevation: 0.2,
       ),
       body: Column(
@@ -23,21 +22,21 @@ class GetVerifiedScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           CustomExpansionTile(
-            title: 'Get Name Verify',
+            title: appText(context).strNameVerify,
             children: [
               ExpansionChildrenListTile(
-                  text: 'Userename',
+                  text: appText(context).strUserName,
                   ontap: () =>
                       Get.to(() => const VerifyScreen(isUsername: true))),
               ExpansionChildrenListTile(
-                  text: 'Organisation',
+                  text: appText(context).strOraganisation,
                   ontap: () =>
                       Get.to(() => const VerifyScreen(isOrganization: true))),
               ExpansionChildrenListTile(
-                  text: 'Group',
+                  text: appText(context).strGroupName,
                   ontap: () => Get.to(() => const VerifyScreen(isGroup: true))),
               ExpansionChildrenListTile(
-                  text: 'Forum',
+                  text: appText(context).strForum,
                   ontap: () => Get.to(() => const VerifyScreen(isForum: true))),
             ],
           ),

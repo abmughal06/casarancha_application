@@ -103,7 +103,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     return VisibilityDetector(
       key: ValueKey(widget.videoUrl!),
       onVisibilityChanged: (visibilityInfo) {
-        isVisible = visibilityInfo.visibleFraction > 0.8;
+        isVisible = visibilityInfo.visibleFraction > 0.6;
         if (isVisible) {
           if (isVideoMute) {
             videoPlayerController.setVolume(0.0); // Mute the video initially

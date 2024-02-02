@@ -1,7 +1,7 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -85,8 +85,8 @@ class AddGroupMembers extends StatelessWidget {
                                       }
                                     },
                                     btnName: grp.memberIds.contains(userSnap.id)
-                                        ? strRemove
-                                        : strAdd,
+                                        ? appText(context).strRemove
+                                        : appText(context).strAdd,
                                   );
                                 }),
                               );
@@ -131,8 +131,8 @@ class AddGroupMembers extends StatelessWidget {
                                     }
                                   },
                                   btnName: grp.memberIds.contains(userSnap.id)
-                                      ? strRemove
-                                      : strAdd,
+                                      ? appText(context).strRemove
+                                      : appText(context).strAdd,
                                 );
                               }),
                             );

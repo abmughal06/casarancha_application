@@ -1,6 +1,5 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
@@ -8,6 +7,7 @@ import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provid
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/group_widgets/group_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,28 +26,27 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final List<Widget> _myTabs = const [
-    Tab(text: strSrcPeople),
-    Tab(text: strSrcGroup),
-    Tab(text: 'Mental Health'),
-    Tab(text: strSrcLocation),
-  ];
-
   TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> myTabs = [
+      Tab(text: appText(context).strSrcPeople),
+      Tab(text: appText(context).strSrcGroup),
+      Tab(text: appText(context).strMentalHealth),
+      Tab(text: appText(context).strSrcLocation),
+    ];
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
     final search = Provider.of<SearchProvider>(context);
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: strSearch,
+        title: appText(context).strSearch,
         elevation: 0,
         leading: const GhostModeBtn(),
       ),
       body: DefaultTabController(
-        length: _myTabs.length,
+        length: myTabs.length,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -72,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
               indicatorPadding:
                   EdgeInsets.symmetric(vertical: 5.h, horizontal: 25.w),
               dividerColor: Colors.transparent,
-              tabs: _myTabs,
+              tabs: myTabs,
             ),
             heightBox(10.w),
             Expanded(
@@ -122,8 +121,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
                                 btnName: currentUser.followingsIds
                                         .contains(userSnap.id)
-                                    ? strUnFollow
-                                    : strSrcFollow,
+                                    ? appText(context).strUnFollow
+                                    : appText(context).strSrcFollow,
                               );
                             },
                           );
@@ -157,8 +156,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                               btnName: currentUser.followingsIds
                                       .contains(userSnap.id)
-                                  ? strUnFollow
-                                  : strSrcFollow,
+                                  ? appText(context).strUnFollow
+                                  : appText(context).strSrcFollow,
                             );
                           },
                         );
@@ -187,7 +186,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                     element.creatorId !=
                                         FirebaseAuth
                                             .instance.currentUser!.uid &&
-                                    element.isPublic &&
                                     !element.banFromCmntUsersIds
                                         .contains(currentUserUID) &&
                                     element.isVerified,
@@ -206,18 +204,34 @@ class _SearchScreenState extends State<SearchScreen> {
                                 group: groupSnap,
                                 ontapTrailing: () {
                                   if (!isCurrentUserGroupMember) {
-                                    context
-                                        .read<NewGroupProvider>()
-                                        .addGroupMembers(
-                                            id: FirebaseAuth
-                                                .instance.currentUser!.uid,
-                                            groupId: groupSnap.id);
+                                    if (groupSnap.isPublic) {
+                                      context
+                                          .read<NewGroupProvider>()
+                                          .addGroupMembers(
+                                              id: FirebaseAuth
+                                                  .instance.currentUser!.uid,
+                                              groupId: groupSnap.id);
+                                    } else {
+                                      context
+                                          .read<NewGroupProvider>()
+                                          .requestPrivateGroup(
+                                              id: FirebaseAuth
+                                                  .instance.currentUser!.uid,
+                                              groupId: groupSnap.id);
+                                    }
                                   }
                                 },
                                 isSearchScreen: true,
-                                btnText: isCurrentUserGroupMember
-                                    ? strJoined
-                                    : strSrcJoin,
+                                btnText: groupSnap.isPublic
+                                    ? isCurrentUserGroupMember
+                                        ? appText(context).strJoined
+                                        : appText(context).strSrcJoin
+                                    : isCurrentUserGroupMember
+                                        ? groupSnap.joinRequestIds
+                                                .contains(currentUserUID)
+                                            ? "Request Sent"
+                                            : appText(context).strJoined
+                                        : appText(context).strSrcJoin,
                               );
                             },
                           );
@@ -228,7 +242,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                     searchController.text.toLowerCase())) &&
                                 element.creatorId !=
                                     FirebaseAuth.instance.currentUser!.uid &&
-                                element.isPublic &&
                                 !element.banFromCmntUsersIds
                                     .contains(currentUserUID))
                             .toList();
@@ -246,18 +259,34 @@ class _SearchScreenState extends State<SearchScreen> {
                               group: groupSnap,
                               ontapTrailing: () {
                                 if (!isCurrentUserGroupMember) {
-                                  context
-                                      .read<NewGroupProvider>()
-                                      .addGroupMembers(
-                                          id: FirebaseAuth
-                                              .instance.currentUser!.uid,
-                                          groupId: groupSnap.id);
+                                  if (groupSnap.isPublic) {
+                                    context
+                                        .read<NewGroupProvider>()
+                                        .addGroupMembers(
+                                            id: FirebaseAuth
+                                                .instance.currentUser!.uid,
+                                            groupId: groupSnap.id);
+                                  } else {
+                                    context
+                                        .read<NewGroupProvider>()
+                                        .requestPrivateGroup(
+                                            id: FirebaseAuth
+                                                .instance.currentUser!.uid,
+                                            groupId: groupSnap.id);
+                                  }
                                 }
                               },
                               isSearchScreen: true,
-                              btnText: isCurrentUserGroupMember
-                                  ? strJoined
-                                  : strSrcJoin,
+                              btnText: groupSnap.isPublic
+                                  ? isCurrentUserGroupMember
+                                      ? appText(context).strJoined
+                                      : appText(context).strSrcJoin
+                                  : groupSnap.joinRequestIds
+                                          .contains(currentUserUID)
+                                      ? "Request Sent"
+                                      : isCurrentUserGroupMember
+                                          ? appText(context).strJoined
+                                          : appText(context).strSrcJoin,
                             );
                           },
                         );
@@ -326,8 +355,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                     },
                                     isSearchScreen: true,
                                     btnText: isCurrentUserGroupMember
-                                        ? strJoined
-                                        : strSrcJoin,
+                                        ? appText(context).strJoined
+                                        : appText(context).strSrcJoin,
                                   );
                                 },
                               ),
@@ -354,8 +383,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ),
                                     btnName: currentUser.followingsIds
                                             .contains(userSnap.id)
-                                        ? strUnFollow
-                                        : strSrcFollow,
+                                        ? appText(context).strUnFollow
+                                        : appText(context).strSrcFollow,
                                   );
                                 },
                               )
@@ -412,8 +441,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                   },
                                   isSearchScreen: true,
                                   btnText: isCurrentUserGroupMember
-                                      ? strJoined
-                                      : strSrcJoin,
+                                      ? appText(context).strJoined
+                                      : appText(context).strSrcJoin,
                                 );
                               },
                             ),
@@ -439,8 +468,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ),
                                   btnName: currentUser.followingsIds
                                           .contains(userSnap.id)
-                                      ? strUnFollow
-                                      : strSrcFollow,
+                                      ? appText(context).strUnFollow
+                                      : appText(context).strSrcFollow,
                                 );
                               },
                             )

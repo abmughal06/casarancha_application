@@ -1,6 +1,7 @@
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +11,6 @@ import 'package:provider/provider.dart';
 
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 
 class ChatTextField extends StatelessWidget {
@@ -48,7 +48,7 @@ class ChatTextField extends StatelessWidget {
               isDense: true,
               counterText: "",
               border: InputBorder.none,
-              hintText: strSaySomething,
+              hintText: appText(context).strSaySomething,
               hintStyle: TextStyle(
                 color: color55F,
                 fontSize: 14.sp,
@@ -210,7 +210,7 @@ class ChatTextFieldGhost extends StatelessWidget {
               isDense: true,
               counterText: "",
               border: InputBorder.none,
-              hintText: strSaySomething,
+              hintText: appText(context).strSaySomething,
               hintStyle: TextStyle(
                 color: color55F,
                 fontSize: 14.sp,

@@ -68,7 +68,7 @@ class PostCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           TextWidget(
-                            text: "Delete Post",
+                            text: appText(context).strDeletePost,
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w500,
                             color: Colors.white,
@@ -92,7 +92,7 @@ class PostCard extends StatelessWidget {
                           alertMsg: isGroupAdmin
                               ? 'Are you sure you want to ban this user from group posting'
                               : 'Are you sure you want to delete this user post',
-                          actiionBtnName: 'Ban',
+                          actiionBtnName: appText(context).strBan,
                           onAction: () {
                             if (isGroupAdmin) {
                               context
@@ -109,8 +109,8 @@ class PostCard extends StatelessWidget {
                       );
                     },
                     blockText: curruentUser.blockIds.contains(post.creatorId)
-                        ? 'Unblock User'
-                        : 'Block User',
+                        ? appText(context).strUnblock
+                        : appText(context).strBlock,
                     ontapBlock: () {
                       Get.back();
                       postPorvider.blockUnblockUser(

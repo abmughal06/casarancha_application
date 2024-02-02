@@ -1,7 +1,7 @@
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/follow_following_tile.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +11,44 @@ import '../../widgets/common_widgets.dart';
 
 class BlockAccountsScreen extends StatelessWidget {
   const BlockAccountsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final currentUser = context.watch<UserModel?>();
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
+    return Scaffold(
+      appBar: primaryAppbar(
+          title: appText(context).strBlockAccounts, elevation: 0.2),
+      body: Consumer<List<UserModel>?>(builder: (context, users, b) {
+        if (users == null || currentUser == null) {
+          return centerLoader();
+        }
+        final filterList = users
+            .where((element) => currentUser.blockIds.contains(element.id))
+            .toList();
+        if (filterList.isEmpty) {
+          return Center(
+            child: Text(appText(context).strAlertBlockAct),
+          );
+        }
+        return ListView.builder(
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            itemCount: filterList.length,
+            itemBuilder: (context, index) {
+              return FollowFollowingTile(
+                  user: filterList[index],
+                  ontapToggleFollow: () => postProvider.blockUnblockUser(
+                      currentUser: currentUser, appUser: filterList[index].id),
+                  btnName: appText(context).strRemove);
+            });
+      }),
+    );
+  }
+}
+
+
 
   // bottomSheetBlockAccount(context) {
   //   showModalBottomSheet(
@@ -81,38 +119,3 @@ class BlockAccountsScreen extends StatelessWidget {
   //             ]));
   //       });
   // }
-
-  @override
-  Widget build(BuildContext context) {
-    final currentUser = context.watch<UserModel?>();
-    final postProvider = Provider.of<PostProvider>(context, listen: false);
-    return Scaffold(
-      appBar: primaryAppbar(title: strBlockAccounts, elevation: 0.2),
-      body: Consumer<List<UserModel>?>(builder: (context, users, b) {
-        if (users == null || currentUser == null) {
-          return centerLoader();
-        }
-        final filterList = users
-            .where((element) => currentUser.blockIds.contains(element.id))
-            .toList();
-        if (filterList.isEmpty) {
-          return const Center(
-            child: Text(strAlertBlockAct),
-          );
-        }
-        return ListView.builder(
-            padding: EdgeInsets.symmetric(vertical: 20.h),
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemCount: filterList.length,
-            itemBuilder: (context, index) {
-              return FollowFollowingTile(
-                  user: filterList[index],
-                  ontapToggleFollow: () => postProvider.blockUnblockUser(
-                      currentUser: currentUser, appUser: filterList[index].id),
-                  btnName: strRemove);
-            });
-      }),
-    );
-  }
-}
