@@ -179,15 +179,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   ),
                                   children: [
                                     WidgetSpan(
-                                      child: Visibility(
-                                        visible: notification
-                                            .createdDetails!.isVerified,
-                                        child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 4.0),
-                                            child: SvgPicture.asset(
-                                                icVerifyBadge)),
-                                      ),
+                                      child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4.0),
+                                          child: verifyBadge(notification
+                                              .createdDetails!.isVerified)),
                                     ),
                                     TextSpan(
                                         text: " ${notification.msg!}",

@@ -123,14 +123,10 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                     ),
                                   ),
                                   WidgetSpan(
-                                    child: Visibility(
-                                      visible: user.isVerified,
-                                      child: SvgPicture.asset(
-                                        icVerifyBadge,
-                                        height: 17,
-                                      ),
-                                    ),
-                                  ),
+                                      child: verifyBadge(
+                                    user.isVerified,
+                                    size: 17,
+                                  )),
                                 ],
                               ),
                             ),
@@ -203,9 +199,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Visibility(
-                                    visible: user.education.isNotEmpty,
-                                    child: SelectableText.rich(
+                                  if (user.education.isNotEmpty)
+                                    SelectableText.rich(
                                       TextSpan(
                                         children: [
                                           WidgetSpan(
@@ -224,21 +219,15 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                             ),
                                           ),
                                           WidgetSpan(
-                                              child: Visibility(
-                                                  visible:
-                                                      user.isEducationVerified,
-                                                  child: SvgPicture.asset(
-                                                    icVerifyBadge,
-                                                    height: 15,
-                                                  ))),
+                                              child: verifyBadge(
+                                                  user.isEducationVerified,
+                                                  size: 15)),
                                         ],
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-                                  ),
-                                  Visibility(
-                                    visible: user.work.isNotEmpty,
-                                    child: SelectableText.rich(
+                                  if (user.work.isNotEmpty)
+                                    SelectableText.rich(
                                       TextSpan(
                                         children: [
                                           WidgetSpan(
@@ -257,26 +246,20 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                             ),
                                           ),
                                           WidgetSpan(
-                                              child: Visibility(
-                                                  visible: user.isWorkVerified,
-                                                  child: SvgPicture.asset(
-                                                    icVerifyBadge,
-                                                    height: 15,
-                                                  ))),
+                                              child: verifyBadge(
+                                                  user.isWorkVerified,
+                                                  size: 15)),
                                         ],
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-                                  ),
-                                  Visibility(
-                                    visible: user.bio.isNotEmpty,
-                                    child: SelectableTextWidget(
+                                  if (user.bio.isNotEmpty)
+                                    SelectableTextWidget(
                                       text: user.bio,
                                       textAlign: TextAlign.center,
                                       color: color55F,
                                       fontSize: 12.sp,
                                     ),
-                                  ),
                                 ],
                               ),
                             ),

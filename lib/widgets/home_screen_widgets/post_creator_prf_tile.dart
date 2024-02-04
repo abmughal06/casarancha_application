@@ -7,7 +7,6 @@ import 'package:casarancha/widgets/home_screen_widgets/post_footer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
@@ -138,13 +137,10 @@ class PostCreatorProfileTile extends StatelessWidget {
                                               ),
                                             ),
                                     ),
-                                    Visibility(
-                                      visible: appUser.isVerified,
-                                      child: Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: SvgPicture.asset(icVerifyBadge),
-                                      ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: verifyBadge(appUser.isVerified),
                                     ),
                                   ],
                                 ),

@@ -216,9 +216,8 @@ class CustomPostFooter extends StatelessWidget {
             ),
           ],
         ),
-        Visibility(
-          visible: !isPostDetail! && postModel.description.isNotEmpty,
-          child: Align(
+        if (!isPostDetail! && postModel.description.isNotEmpty)
+          Align(
             alignment: Alignment.topLeft,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 6.h),
@@ -230,10 +229,8 @@ class CustomPostFooter extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        Visibility(
-          visible: !isPostDetail! && postModel.tagsIds.isNotEmpty,
-          child: Align(
+        if (!isPostDetail! && postModel.tagsIds.isNotEmpty)
+          Align(
             alignment: Alignment.topLeft,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.w),
@@ -280,12 +277,9 @@ class CustomPostFooter extends StatelessWidget {
               ),
             ),
           ),
-        ),
-
-        Visibility(
-          visible: (isPostDetail! ? false : postModel.commentIds.isNotEmpty) &&
-              groupId == null,
-          child: StreamProvider.value(
+        if ((isPostDetail! ? false : postModel.commentIds.isNotEmpty) &&
+            groupId == null)
+          StreamProvider.value(
             value:
                 DataProvider().comment(cmntId: postModel.id, groupId: groupId),
             initialData: null,
@@ -330,11 +324,9 @@ class CustomPostFooter extends StatelessWidget {
               },
             ),
           ),
-        ),
-        Visibility(
-          visible: (isPostDetail! ? false : postModel.commentIds.isNotEmpty) &&
-              groupId != null,
-          child: StreamProvider.value(
+        if ((isPostDetail! ? false : postModel.commentIds.isNotEmpty) &&
+            groupId != null)
+          StreamProvider.value(
             value:
                 DataProvider().comment(cmntId: postModel.id, groupId: groupId),
             initialData: null,
@@ -388,8 +380,6 @@ class CustomPostFooter extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        // heightBox(12.h),
       ],
     );
   }

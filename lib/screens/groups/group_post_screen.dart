@@ -6,10 +6,10 @@ import 'package:casarancha/screens/groups/group_settings.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/shared/skeleton.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -61,15 +61,7 @@ class _GroupPostScreenState extends State<GroupPostScreen> {
                         fontSize: 16.sp,
                       ),
                     ),
-                    WidgetSpan(
-                      child: Visibility(
-                        visible: widget.group.isVerified,
-                        child: SvgPicture.asset(
-                          icVerifyBadge,
-                          height: 17,
-                        ),
-                      ),
-                    )
+                    WidgetSpan(child: verifyBadge(widget.group.isVerified))
                   ],
                 ),
               ),

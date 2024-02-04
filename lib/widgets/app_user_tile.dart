@@ -1,12 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AppUserTile extends StatelessWidget {
   const AppUserTile({
@@ -37,7 +35,7 @@ class AppUserTile extends StatelessWidget {
           children: [
             Text(appUser.name),
             widthBox(5.w),
-            if (appUser.isVerified) SvgPicture.asset(icVerifyBadge),
+            verifyBadge(appUser.isVerified),
           ],
         ),
         subtitle: TextWidget(

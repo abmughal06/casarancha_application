@@ -109,12 +109,7 @@ Widget imgProVerified(
               pic: profileImg,
               heightAndWidth: 40.w,
             ),
-            Positioned(
-                right: 0,
-                bottom: 0,
-                child: Visibility(
-                    visible: idIsVerified,
-                    child: SvgPicture.asset(icVerifyBadge)))
+            Positioned(right: 0, bottom: 0, child: verifyBadge(idIsVerified))
           ],
         ),
       ));
@@ -182,6 +177,17 @@ Widget cardProfileStrAction(
     GestureTapCallback? onTapAction,
     GestureTapCallback? onTapOtherProfile}) {
   return Container();
+}
+
+Widget verifyBadge(isShown, {double? size}) {
+  if (isShown) {
+    return SvgPicture.asset(
+      icVerifyBadge,
+      height: size,
+      width: size,
+    );
+  }
+  return widthBox(0.w);
 }
 
 // Widget acceptDeclineBtn(

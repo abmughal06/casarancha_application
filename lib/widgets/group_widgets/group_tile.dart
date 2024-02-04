@@ -1,13 +1,11 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/groups/group_post_screen.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 class GroupTile extends StatelessWidget {
@@ -55,9 +53,8 @@ class GroupTile extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: color221,
                           ),
-                          Visibility(
-                            visible: group.isVerified,
-                            child: SvgPicture.asset(icVerifyBadge),
+                          verifyBadge(
+                            group.isVerified,
                           )
                         ],
                       ),
@@ -162,10 +159,7 @@ class GroupTilePrivate extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: color221,
                           ),
-                          Visibility(
-                            visible: group.isVerified,
-                            child: SvgPicture.asset(icVerifyBadge),
-                          )
+                          verifyBadge(group.isVerified)
                         ],
                       ),
                       heightBox(3.h),

@@ -4,11 +4,9 @@ import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
-import '../../resources/image_resources.dart';
 
 Widget storyViews({required List viwersIds}) {
   return Container(
@@ -66,13 +64,10 @@ Widget storyViews({required List viwersIds}) {
                           ),
                         ),
                         WidgetSpan(
-                          child: Visibility(
-                            visible: userModel.isVerified,
-                            child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: SvgPicture.asset(icVerifyBadge)),
-                          ),
+                          child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: verifyBadge(userModel.isVerified)),
                         ),
                       ],
                     ),

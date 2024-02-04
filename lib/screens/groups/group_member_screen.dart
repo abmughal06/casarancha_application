@@ -96,11 +96,10 @@ class GroupMembersScreen extends StatelessWidget {
                         Tab(
                           text: appText(context).strJoinRequest,
                         ),
-                        Visibility(
-                          visible: group.joinRequestIds.isNotEmpty &&
-                              (group.creatorId == currentUserUID ||
-                                  group.adminIds.contains(currentUserUID)),
-                          child: Row(
+                        if (group.joinRequestIds.isNotEmpty &&
+                            (group.creatorId == currentUserUID ||
+                                group.adminIds.contains(currentUserUID)))
+                          Row(
                             children: [
                               widthBox(5.w),
                               const CircleAvatar(
@@ -109,7 +108,6 @@ class GroupMembersScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
                       ],
                     ),
                   ],
