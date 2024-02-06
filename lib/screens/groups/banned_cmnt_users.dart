@@ -8,6 +8,7 @@ import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/shared/alert_dialog.dart';
 import 'package:casarancha/widgets/shared/alert_text.dart';
 import 'package:casarancha/widgets/shared/shimmer_list.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,7 @@ class BannedFromCmntUsers extends StatelessWidget {
     final grpProv = Provider.of<NewGroupProvider>(context);
 
     return Scaffold(
-      appBar: primaryAppbar(title: 'Comments Banned Users'),
+      appBar: primaryAppbar(title: appText(context).grpCmntBan),
       body: StreamProvider.value(
         value: DataProvider().singleGroup(groupId),
         initialData: null,
@@ -41,7 +42,7 @@ class BannedFromCmntUsers extends StatelessWidget {
                     return const ChatShimmerList();
                   }
                   if (users.isEmpty) {
-                    return const AlertText(text: 'No User is banned yet');
+                    return AlertText(text: appText(context).alertgrpNoBan);
                   }
                   return ListView.builder(
                     itemCount: users.length,
@@ -52,10 +53,9 @@ class BannedFromCmntUsers extends StatelessWidget {
                             context: context,
                             builder: (_) {
                               return CustomAdaptiveAlertDialog(
-                                title: 'Unban User?',
-                                alertMsg:
-                                    '''Are you sure you want to unban this user from comments?.''',
-                                actiionBtnName: 'Unban',
+                                title: appText(context).alertTitileUnban,
+                                alertMsg: appText(context).alertMsgUnban,
+                                actiionBtnName: appText(context).unban,
                                 onAction: () {
                                   grpProv.unBanUserFromComments(
                                       groupId: groupId, id: users[index].id);

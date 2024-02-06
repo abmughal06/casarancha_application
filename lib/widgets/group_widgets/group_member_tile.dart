@@ -67,12 +67,36 @@ class GroupMemberTile extends StatelessWidget {
                       ),
                     ),
                     heightBox(2.h),
-                    TextWidget(
-                      text: user.name,
-                      fontSize: 12.sp,
-                      color: const Color(0xff5f5f5f),
-                      fontWeight: FontWeight.w400,
-                      textOverflow: TextOverflow.visible,
+                    Row(
+                      children: [
+                        TextWidget(
+                          text: user.name,
+                          fontSize: 12.sp,
+                          color: const Color(0xff5f5f5f),
+                          fontWeight: FontWeight.w400,
+                          textOverflow: TextOverflow.visible,
+                        ),
+                        widthBox(5.w),
+                        if ((group.creatorId == currentUserUID ||
+                                group.adminIds.contains(currentUserUID)) &&
+                            (group.banUsersIds.contains(user.id) ||
+                                group.banFromCmntUsersIds.contains(user.id) ||
+                                group.banFromPostUsersIds.contains(user.id)))
+                          Container(
+                            margin: const EdgeInsets.only(right: 15),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 3),
+                            decoration: BoxDecoration(
+                                color: colorPrimaryA05,
+                                borderRadius: BorderRadius.circular(5)),
+                            child: TextWidget(
+                              text: appText(context).banned,
+                              color: colorWhite,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                      ],
                     ),
                   ],
                 ),
@@ -89,7 +113,9 @@ class GroupMemberTile extends StatelessWidget {
                             : colorF03,
                         borderRadius: BorderRadius.circular(5)),
                     child: TextWidget(
-                      text: group.creatorId == user.id ? 'Owner' : 'Admin',
+                      text: group.creatorId == user.id
+                          ? appText(context).strOwner
+                          : appText(context).strAdmin,
                       color: group.creatorId == user.id ? colorWhite : color221,
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
@@ -110,7 +136,8 @@ class GroupMemberTile extends StatelessWidget {
                                       title: 'Remove User?',
                                       alertMsg:
                                           '''Are you sure you want to remove this user from group?.''',
-                                      actiionBtnName: 'Remove',
+                                      actiionBtnName:
+                                          appText(context).strRemove,
                                       onAction: () {
                                         prov.removeGroupMembers(
                                             id: user.id, groupId: group.id);
@@ -120,7 +147,7 @@ class GroupMemberTile extends StatelessWidget {
                                   });
                             },
                             child: TextWidget(
-                              text: 'Remove',
+                              text: appText(context).strRemove,
                               fontWeight: FontWeight.w500,
                               fontSize: 14.sp,
                               color: colorPrimaryA05,
@@ -136,7 +163,8 @@ class GroupMemberTile extends StatelessWidget {
                                           title: 'Unban User?',
                                           alertMsg:
                                               '''Are you sure you want to unban this user?.''',
-                                          actiionBtnName: 'Unban',
+                                          actiionBtnName:
+                                              appText(context).strUnban,
                                           onAction: () {
                                             prov.unBanUserFromGroup(
                                                 id: user.id, groupId: group.id);
@@ -152,7 +180,7 @@ class GroupMemberTile extends StatelessWidget {
                                         title: 'Ban User?',
                                         alertMsg:
                                             '''Are you sure you want to ban this user from group?.''',
-                                        actiionBtnName: 'Ban',
+                                        actiionBtnName: appText(context).strBan,
                                         onAction: () {
                                           prov.banUserFromGroup(
                                               id: user.id, groupId: group.id);
@@ -164,8 +192,80 @@ class GroupMemberTile extends StatelessWidget {
                             },
                             child: TextWidget(
                               text: group.banUsersIds.contains(user.id)
-                                  ? 'Unban User'
-                                  : 'Ban user',
+                                  ? appText(context).strUnban
+                                  : appText(context).strBan,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14.sp,
+                              color: colorPrimaryA05,
+                            ),
+                          ),
+                          PopupMenuItem(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) {
+                                  return CustomAdaptiveAlertDialog(
+                                    title: 'Ban user from posting?',
+                                    alertMsg:
+                                        '''Are you sure you want to ban this user from posting in group?.''',
+                                    actiionBtnName: appText(context).strYes,
+                                    actionBtnColor: colorPrimaryA05,
+                                    onAction: () {
+                                      Get.back();
+                                      if (group.banFromPostUsersIds
+                                          .contains(user.id)) {
+                                        prov.unBanUsersFromPostsGroup(
+                                            id: user.id, groupId: group.id);
+                                      } else {
+                                        prov.banUsersFromPostsGroup(
+                                            id: user.id, groupId: group.id);
+                                      }
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            enabled: !group.banUsersIds.contains(user.id),
+                            child: TextWidget(
+                              text: !group.banFromPostUsersIds.contains(user.id)
+                                  ? 'Ban from posting'
+                                  : 'Unban from posting',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14.sp,
+                              color: colorPrimaryA05,
+                            ),
+                          ),
+                          PopupMenuItem(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) {
+                                  return CustomAdaptiveAlertDialog(
+                                    title: 'Ban from Comments?',
+                                    alertMsg:
+                                        '''Are you sure you want to bann this user from comments in group post?.''',
+                                    actiionBtnName: appText(context).strYes,
+                                    actionBtnColor: colorPrimaryA05,
+                                    onAction: () {
+                                      Get.back();
+                                      if (group.banFromCmntUsersIds
+                                          .contains(user.id)) {
+                                        prov.unBanUserFromComments(
+                                            id: user.id, groupId: group.id);
+                                      } else {
+                                        prov.banUserFromComments(
+                                            id: user.id, groupId: group.id);
+                                      }
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            enabled: !group.banUsersIds.contains(user.id),
+                            child: TextWidget(
+                              text: group.banFromCmntUsersIds.contains(user.id)
+                                  ? "Unban from Comments"
+                                  : 'Ban from Comments',
                               fontWeight: FontWeight.w500,
                               fontSize: 14.sp,
                               color: colorPrimaryA05,
@@ -180,7 +280,7 @@ class GroupMemberTile extends StatelessWidget {
                                     title: 'Make admin?',
                                     alertMsg:
                                         '''Are you sure you want to make this user admin of group?.''',
-                                    actiionBtnName: 'Yes',
+                                    actiionBtnName: appText(context).strYes,
                                     actionBtnColor: Colors.black,
                                     onAction: () {
                                       Get.back();
@@ -214,7 +314,8 @@ class GroupMemberTile extends StatelessWidget {
                                       title: 'Remove User?',
                                       alertMsg:
                                           '''Are you sure you want to remove this user from group?.''',
-                                      actiionBtnName: 'Remove',
+                                      actiionBtnName:
+                                          appText(context).strRemove,
                                       onAction: () {
                                         prov.removeGroupMembers(
                                             id: user.id, groupId: group.id);
@@ -224,7 +325,7 @@ class GroupMemberTile extends StatelessWidget {
                                   });
                             },
                             child: TextWidget(
-                              text: 'Remove',
+                              text: appText(context).strRemove,
                               fontWeight: FontWeight.w500,
                               fontSize: 14.sp,
                               color: colorPrimaryA05,
@@ -232,6 +333,149 @@ class GroupMemberTile extends StatelessWidget {
                           ),
                         ],
                       ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GroupJoinRequestCard extends StatelessWidget {
+  const GroupJoinRequestCard(
+      {super.key, required this.user, required this.group});
+  final UserModel user;
+  final GroupModel group;
+
+  @override
+  Widget build(BuildContext context) {
+    final prov = Provider.of<NewGroupProvider>(context);
+
+    return Card(
+      elevation: 0.5,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.sp)),
+      margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () {
+                    navigateToAppUserScreen(user.id, context);
+                  },
+                  child: ProfilePic(
+                    pic: user.imageStr,
+                    heightAndWidth: 50.h,
+                  ),
+                ),
+                widthBox(12.w),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        navigateToAppUserScreen(user.id, context);
+                      },
+                      child: Row(
+                        children: [
+                          TextWidget(
+                              text: user.username,
+                              fontSize: 14.sp,
+                              color: const Color(0xff212121),
+                              fontWeight: FontWeight.w600),
+                          widthBox(4.w),
+                          if (user.isVerified) SvgPicture.asset(icVerifyBadge),
+                        ],
+                      ),
+                    ),
+                    heightBox(2.h),
+                    TextWidget(
+                      text: user.name,
+                      fontSize: 12.sp,
+                      color: const Color(0xff5f5f5f),
+                      fontWeight: FontWeight.w400,
+                      textOverflow: TextOverflow.visible,
+                    ),
+                    heightBox(10.h),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => CustomAdaptiveAlertDialog(
+                                alertMsg:
+                                    'Are you sure you want to accept this user request?',
+                                actiionBtnName: 'Yes',
+                                onAction: () {
+                                  Get.back();
+                                  prov.acceptMembers(
+                                      id: user.id, groupId: group.id);
+                                },
+                                actionBtnColor: color221,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 4.h),
+                            decoration: BoxDecoration(
+                              color: const Color(0xffFBCA03),
+                              borderRadius: BorderRadius.circular(7.sp),
+                            ),
+                            child: TextWidget(
+                              text: "Accept",
+                              fontSize: 12.sp,
+                              color: color13F,
+                              fontWeight: FontWeight.w600,
+                              textOverflow: TextOverflow.visible,
+                            ),
+                          ),
+                        ),
+                        widthBox(10.w),
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => CustomAdaptiveAlertDialog(
+                                alertMsg:
+                                    'Are you sure you want to decline this user request?',
+                                actiionBtnName: 'Yes',
+                                onAction: () {
+                                  prov.removeRequestPrivateGroup(
+                                      id: user.id, groupId: group.id);
+                                },
+                                actionBtnColor: colorPrimaryA05,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 4.h),
+                            decoration: BoxDecoration(
+                              color: colorAA3,
+                              borderRadius: BorderRadius.circular(7.sp),
+                            ),
+                            child: TextWidget(
+                              text: "Decline",
+                              fontSize: 12.sp,
+                              color: colorWhite,
+                              fontWeight: FontWeight.w600,
+                              textOverflow: TextOverflow.visible,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -308,7 +552,7 @@ class GroupBannedMemberTile extends StatelessWidget {
             TextButton(
               onPressed: onTapAction,
               child: TextWidget(
-                text: 'Unban',
+                text: appText(context).strUnban,
                 color: colorPrimaryA05,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
@@ -398,7 +642,7 @@ class GroupAdminMemberTile extends StatelessWidget {
                         color: colorPrimaryA05,
                         borderRadius: BorderRadius.circular(5)),
                     child: TextWidget(
-                      text: 'Owner',
+                      text: appText(context).strOwner,
                       color: colorWhite,
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
@@ -413,15 +657,16 @@ class GroupAdminMemberTile extends StatelessWidget {
                               title: 'Remove Admin?',
                               alertMsg:
                                   '''Are you sure you want to remove this user from admins?.''',
-                              actiionBtnName: 'Remove',
+                              actiionBtnName: appText(context).strRemove,
                               onAction: onTapAction,
                             );
                           });
                     },
-                    child: const TextWidget(
-                      text: 'Remove',
+                    child: TextWidget(
+                      text: appText(context).strRemove,
                       color: colorPrimaryA05,
-                    )),
+                    ),
+                  ),
           ],
         ),
       ),

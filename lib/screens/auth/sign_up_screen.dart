@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../resources/color_resources.dart';
-import '../../resources/localization_text_strings.dart';
 
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
@@ -66,7 +65,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextWidget(
-                    text: strSignUpSp,
+                    text: appText(context).strSignUpSp,
                     fontSize: 26.sp,
                     color: color13F,
                     fontWeight: FontWeight.w800,
@@ -76,7 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextWidget(
-                    text: strCreateYourNewAccount,
+                    text: appText(context).strCreateYourNewAccount,
                     fontSize: 16.sp,
                     color: color080,
                     fontWeight: FontWeight.w400,
@@ -90,7 +89,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                   child: TextEditingWidget(
                     controller: _emailController,
-                    hint: strEmailAddress,
+                    hint: appText(context).strEmailAddress,
                     color: _emailFocus.hasFocus ? colorFDF : colorFF3,
                     fieldBorderClr: _emailFocus.hasFocus ? colorF73 : color080,
                     isBorderEnable: true,
@@ -115,7 +114,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                   child: TextEditingWidget(
                     controller: _passwordController,
-                    hint: strPassword,
+                    hint: appText(context).strPassword,
                     fieldBorderClr: _passwordFocus.hasFocus ? colorF73 : null,
                     textInputType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.done,
@@ -144,7 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                   child: TextEditingWidget(
                     controller: _confirmPasswordController,
-                    hint: "Confirm $strPassword",
+                    hint: "Confirm ${appText(context).strPassword}",
                     fieldBorderClr:
                         _confirmPasswordFocus.hasFocus ? colorF73 : null,
                     textInputType: TextInputType.visiblePassword,
@@ -172,7 +171,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Consumer<AuthenticationProvider>(
                   builder: (context, registerProvider, b) {
                     return CommonButton(
-                      text: strSignUpSp,
+                      text: appText(context).strSignUpSp,
                       width: double.infinity,
                       showLoading: registerProvider.isSigningIn,
                       onTap: () {
@@ -195,7 +194,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextWidget(
-                      text: strHaveAnAccount,
+                      text: appText(context).strHaveAnAccount,
                       fontSize: 12.sp,
                       color: color080,
                       fontWeight: FontWeight.w500,
@@ -203,7 +202,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     widthBox(4.w),
                     TextWidget(
                       onTap: () => Get.back(),
-                      text: strLogin,
+                      text: appText(context).strLogin,
                       fontSize: 16.sp,
                       color: color13F,
                       fontWeight: FontWeight.w600,
@@ -214,7 +213,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   alignment: Alignment.center,
                   child: TextWidget(
                     onTap: () {},
-                    text: strRexFamily,
+                    text: appText(context).strRexFamily,
                     fontSize: 15.sp,
                     color: colorPrimaryA05,
                     fontWeight: FontWeight.w400,

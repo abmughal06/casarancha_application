@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'authenticator.dart';
 import 'utils/app_constants.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +37,20 @@ class MyApp extends StatelessWidget {
               app: Portal(
                 child: GetMaterialApp(
                   navigatorKey: rootNavigatorKey,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate, // Add this line
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  locale: const Locale('en'),
+                  supportedLocales: const [
+                    Locale('en'), // English
+                    Locale('es'), // Spanish
+                    Locale('fr'), // French
+                    Locale('pt'), // Portuguese
+                    Locale('ar'), // Arabic
+                  ],
                   debugShowCheckedModeBanner: false,
                   theme: ThemeData(
                     primarySwatch: Colors.red,

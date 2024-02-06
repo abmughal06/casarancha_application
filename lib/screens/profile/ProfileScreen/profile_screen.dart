@@ -1,8 +1,8 @@
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -78,18 +78,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   indicatorPadding:
                       EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
                   dividerColor: Colors.transparent,
-                  tabs: const [
+                  tabs: [
                     Tab(
-                      child: Text(strQuote),
+                      child: TextWidget(text: appText(context).strQuote),
                     ),
                     Tab(
-                      child: Text(strImages),
+                      child: TextWidget(text: appText(context).strImages),
                     ),
                     Tab(
-                      child: Text(strVideos),
+                      child: TextWidget(text: appText(context).strVideos),
                     ),
                     Tab(
-                      child: Text(strMusic),
+                      child: TextWidget(text: appText(context).strMusic),
                     ),
                   ],
                 ),

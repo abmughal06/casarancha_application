@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/image_resources.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/utils/firebase_collection.dart';
@@ -42,7 +41,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: primaryAppbar(title: strNotifications, elevation: 0),
+      appBar:
+          primaryAppbar(title: appText(context).strNotifications, elevation: 0),
       body: DefaultTabController(
         length: 2,
         child: Column(
@@ -58,12 +58,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
               indicatorPadding:
                   EdgeInsets.symmetric(vertical: 5.h, horizontal: 35.w),
               dividerColor: Colors.transparent,
-              tabs: const [
+              tabs: [
                 Tab(
-                  text: strNotification,
+                  text: appText(context).strNotification,
                 ),
                 Tab(
-                  text: strRecentlyFollowedYou,
+                  text: appText(context).strRecentlyFollowedYou,
                 ),
               ],
             ),
@@ -82,9 +82,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           return centerLoader();
                         }
                         if (notifications.isEmpty) {
-                          return const Center(
+                          return Center(
                             child: TextWidget(
-                              text: strAlertNotification,
+                              text: appText(context).strAlertNotification,
                             ),
                           );
                         }
@@ -179,15 +179,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   ),
                                   children: [
                                     WidgetSpan(
-                                      child: Visibility(
-                                        visible: notification
-                                            .createdDetails!.isVerified,
-                                        child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 4.0),
-                                            child: SvgPicture.asset(
-                                                icVerifyBadge)),
-                                      ),
+                                      child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4.0),
+                                          child: verifyBadge(notification
+                                              .createdDetails!.isVerified)),
                                     ),
                                     TextSpan(
                                         text: " ${notification.msg!}",
@@ -255,9 +251,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           return centerLoader();
                         }
                         if (notifications.isEmpty) {
-                          return const Center(
+                          return Center(
                             child: TextWidget(
-                              text: strAlertNotification,
+                              text: appText(context).strAlertNotification,
                             ),
                           );
                         }

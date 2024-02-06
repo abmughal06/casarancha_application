@@ -1,6 +1,5 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/create_group_screen.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -28,7 +27,7 @@ class GroupScreen extends StatelessWidget {
     final groupPovider = Provider.of<NewGroupProvider>(context);
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: strMyGroups,
+        title: appText(context).strMyGroups,
         elevation: 0.1,
         leading: const GhostModeBtn(),
       ),
@@ -47,12 +46,12 @@ class GroupScreen extends StatelessWidget {
               indicatorPadding:
                   EdgeInsets.symmetric(vertical: 5.h, horizontal: 60.w),
               dividerColor: Colors.transparent,
-              tabs: const [
+              tabs: [
                 Tab(
-                  text: strMyGroups,
+                  text: appText(context).strMyGroups,
                 ),
                 Tab(
-                  text: strMyCreatedGroups,
+                  text: appText(context).strMyCreatedGroups,
                 ),
               ],
             ),
@@ -72,9 +71,9 @@ class GroupScreen extends StatelessWidget {
                         }
 
                         if (groups.isEmpty) {
-                          return const Center(
+                          return Center(
                             child: TextWidget(
-                              text: strAlertGroup,
+                              text: appText(context).strAlertGroup,
                             ),
                           );
                         }
@@ -90,7 +89,7 @@ class GroupScreen extends StatelessWidget {
                                             id: FirebaseAuth
                                                 .instance.currentUser!.uid,
                                             groupId: groups[index].id),
-                                    text: strLeaveGrp);
+                                    text: appText(context).strLeaveGrp);
                               },
                               group: groups[index],
                             );
@@ -113,9 +112,9 @@ class GroupScreen extends StatelessWidget {
                             }
 
                             if (groups.isEmpty) {
-                              return const Center(
+                              return Center(
                                 child: TextWidget(
-                                  text: strAlertGroupCreated,
+                                  text: appText(context).strAlertGroupCreated,
                                 ),
                               );
                             }
@@ -126,7 +125,7 @@ class GroupScreen extends StatelessWidget {
                                   group: groups[index],
                                   ontapTrailing: () {
                                     deleteBottomSheet(
-                                        text: strDeleteGrp,
+                                        text: appText(context).strDeleteGrp,
                                         ontap: () => groupPovider
                                             .deleteGroup(groups[index].id));
                                   },

@@ -12,7 +12,6 @@ import '../../models/providers/user_data_provider.dart';
 import '../../models/user_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../screens/profile/follower_following_screen.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
@@ -125,13 +124,20 @@ class ProfileTopLoader extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            profileCounter(ontap: null, count: "0", strText: strProfilePost),
+            profileCounter(
+                ontap: null,
+                count: "0",
+                strText: appText(context).strProfilePost),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
-                ontap: null, count: '0', strText: strProfileFollowers),
+                ontap: null,
+                count: '0',
+                strText: appText(context).strProfileFollowers),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
-                ontap: null, count: '0', strText: strProfileFollowing),
+                ontap: null,
+                count: '0',
+                strText: appText(context).strProfileFollowing),
           ],
         ),
         heightBox(14.h),
@@ -184,15 +190,7 @@ class ProfileTop extends StatelessWidget {
                   fontSize: 16.sp,
                 ),
               ),
-              WidgetSpan(
-                child: Visibility(
-                  visible: user.isVerified,
-                  child: SvgPicture.asset(
-                    icVerifyBadge,
-                    height: 17,
-                  ),
-                ),
-              ),
+              WidgetSpan(child: verifyBadge(user.isVerified, size: 17)),
             ],
           ),
         ),
@@ -213,7 +211,9 @@ class ProfileTop extends StatelessWidget {
                 child: Consumer<List<PostModel>?>(builder: (context, post, b) {
                   if (post == null) {
                     return profileCounter(
-                        ontap: null, count: '0', strText: strProfilePost);
+                        ontap: null,
+                        count: '0',
+                        strText: appText(context).strProfilePost);
                   }
                   return profileCounter(
                       ontap: null,
@@ -222,7 +222,7 @@ class ProfileTop extends StatelessWidget {
                           .toList()
                           .length
                           .toString(),
-                      strText: strProfilePost);
+                      strText: appText(context).strProfilePost);
                 })),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
@@ -231,13 +231,13 @@ class ProfileTop extends StatelessWidget {
                           follow: true,
                         )),
                 count: user.followersIds.length.toString(),
-                strText: strProfileFollowers),
+                strText: appText(context).strProfileFollowers),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
                 ontap: () =>
                     Get.to(() => const CurruentUserFollowerFollowingScreen()),
                 count: user.followingsIds.length.toString(),
-                strText: strProfileFollowing),
+                strText: appText(context).strProfileFollowing),
           ],
         ),
         heightBox(20.h),
@@ -246,9 +246,8 @@ class ProfileTop extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Visibility(
-                visible: user.education.isNotEmpty,
-                child: SelectableText.rich(
+              if (user.education.isNotEmpty)
+                SelectableText.rich(
                   TextSpan(
                     children: [
                       WidgetSpan(
@@ -267,20 +266,14 @@ class ProfileTop extends StatelessWidget {
                         ),
                       ),
                       WidgetSpan(
-                          child: Visibility(
-                              visible: user.isEducationVerified,
-                              child: SvgPicture.asset(
-                                icVerifyBadge,
-                                height: 15,
-                              ))),
+                          child:
+                              verifyBadge(user.isEducationVerified, size: 15)),
                     ],
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ),
-              Visibility(
-                visible: user.work.isNotEmpty,
-                child: SelectableText.rich(
+              if (user.work.isNotEmpty)
+                SelectableText.rich(
                   TextSpan(
                     children: [
                       WidgetSpan(
@@ -299,26 +292,18 @@ class ProfileTop extends StatelessWidget {
                         ),
                       ),
                       WidgetSpan(
-                          child: Visibility(
-                              visible: user.isWorkVerified,
-                              child: SvgPicture.asset(
-                                icVerifyBadge,
-                                height: 15,
-                              ))),
+                          child: verifyBadge(user.isWorkVerified, size: 15)),
                     ],
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ),
-              Visibility(
-                visible: user.bio.isNotEmpty,
-                child: SelectableTextWidget(
+              if (user.bio.isNotEmpty)
+                SelectableTextWidget(
                   text: user.bio,
                   textAlign: TextAlign.center,
                   color: color55F,
                   fontSize: 12.sp,
                 ),
-              ),
             ],
           ),
         ),

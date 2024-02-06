@@ -497,7 +497,7 @@ class VoiceRecordingWidgetGhost extends StatelessWidget {
             isRecorderLock
                 ? Container()
                 : TextWidget(
-                    text: 'Slide to Cancel',
+                    text: appText(context).slideCancel,
                     fontWeight: FontWeight.w400,
                     fontSize: 16.sp,
                     color: color221,

@@ -43,7 +43,7 @@ Future showMessageMennu({context, url, path, friendId, docId}) async {
             }
           },
           child: TextWidget(
-            text: 'Download Media',
+            text: appText(context).btnDownloadMedia,
             fontSize: 16.sp,
             color: color221,
             fontWeight: FontWeight.w400,
@@ -61,7 +61,7 @@ Future showMessageMennu({context, url, path, friendId, docId}) async {
                 });
           },
           child: TextWidget(
-            text: 'Delete Message',
+            text: appText(context).btnDeleteMsg,
             fontSize: 16.sp,
             color: colorPrimaryA05,
             fontWeight: FontWeight.w400,
@@ -71,8 +71,8 @@ Future showMessageMennu({context, url, path, friendId, docId}) async {
       onPressed: () {
         Get.back();
       },
-      child: const Text(
-        'Cancel',
+      child: Text(
+        appText(context).strCancel,
       ),
     ),
   ));

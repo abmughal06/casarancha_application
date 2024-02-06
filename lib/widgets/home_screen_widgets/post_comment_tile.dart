@@ -297,13 +297,15 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                               SharePostScreen(
                                                   postModel:
                                                       widget.postModel!)),
-                                          text: "Share",
+                                          text: appText(context).strShare,
                                           fontWeight: FontWeight.w600,
                                         ),
                                         heightBox(10.h),
                                         widget.cmnt.creatorId != currentUserUID
                                             ? ReportPostorComment(
-                                                btnName: 'Report Comment')
+                                                btnName: appText(context)
+                                                    .strReportPost,
+                                              )
                                             : heightBox(0),
                                         heightBox(10.h),
                                         Visibility(
@@ -313,7 +315,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                   .contains(currentUserUID) ||
                                               group.creatorId == currentUserUID,
                                           child: TextWidget(
-                                            text: "Delete",
+                                            text: appText(context).strDelete,
                                             color: colorPrimaryA05,
                                             fontWeight: FontWeight.w600,
                                             onTap: () async {
@@ -324,7 +326,9 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                     CustomAdaptiveAlertDialog(
                                                   alertMsg:
                                                       "Are you sure you want to delete this comment?",
-                                                  actiionBtnName: 'Delete',
+                                                  actiionBtnName:
+                                                      appText(context)
+                                                          .strDelete,
                                                   onAction: () {
                                                     postProvider.deleteComment(
                                                       groupId: widget.groupId,
@@ -355,7 +359,8 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                     CustomAdaptiveAlertDialog(
                                                   alertMsg:
                                                       "Are you sure you want to ban this users from post comments?",
-                                                  actiionBtnName: 'Ban',
+                                                  actiionBtnName:
+                                                      appText(context).strBan,
                                                   onAction: () {
                                                     context
                                                         .read<
@@ -417,18 +422,19 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                               SharePostScreen(
                                                   postModel:
                                                       widget.postModel!)),
-                                          text: "Share",
+                                          text: appText(context).strShare,
                                           fontWeight: FontWeight.w600,
                                         ),
                                         heightBox(10.h),
                                         widget.cmnt.creatorId != currentUserUID
-                                            ? ReportPostorComment(
+                                            ? const ReportPostorComment(
                                                 btnName: 'Report Comment')
                                             : heightBox(0),
                                         heightBox(10.h),
                                         widget.cmnt.creatorId == currentUserUID
                                             ? TextWidget(
-                                                text: "Delete",
+                                                text:
+                                                    appText(context).strDelete,
                                                 color: colorPrimaryA05,
                                                 fontWeight: FontWeight.w600,
                                                 onTap: () async {
@@ -439,7 +445,9 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                         CustomAdaptiveAlertDialog(
                                                       alertMsg:
                                                           "Are you sure you want to delete your comment?",
-                                                      actiionBtnName: 'Delete',
+                                                      actiionBtnName:
+                                                          appText(context)
+                                                              .strDelete,
                                                       onAction: () {
                                                         postProvider
                                                             .deleteComment(
@@ -958,7 +966,7 @@ class PostCommentReplyTile extends StatelessWidget {
                                           ),
                                           heightBox(10.h),
                                           comment.creatorId != currentUserUID
-                                              ? ReportPostorComment(
+                                              ? const ReportPostorComment(
                                                   btnName: 'Report Comment')
                                               : heightBox(0),
                                           heightBox(10.h),

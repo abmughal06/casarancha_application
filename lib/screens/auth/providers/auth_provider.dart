@@ -15,10 +15,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:path/path.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../resources/color_resources.dart';
-import '../../../resources/localization_text_strings.dart';
 import '../../../utils/app_constants.dart';
 import '../../../utils/snackbar.dart';
 import '../../../widgets/common_widgets.dart';
@@ -45,9 +45,8 @@ class AuthenticationProvider extends ChangeNotifier {
             .createUserWithEmailAndPassword(email: email!, password: password!)
             .whenComplete(() => saveTokenAndNavigateToNext());
       } on FirebaseAuthException catch (e) {
-        isSigningIn = false;
-        notifyListeners();
-        GlobalSnackBar.show(message: 'Please enter ${e.message}');
+        GlobalSnackBar.show(message: appText(context).strUnknownError);
+        printLog(e);
       } finally {
         isSigningIn = false;
         notifyListeners();
@@ -87,21 +86,21 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signIn({String? email, String? password}) async {
-    if (checkValidDataLogin(email: email, password: password)) {
+  Future<void> signIn(
+      {String? email, String? password, required BuildContext context}) async {
+    if (checkValidDataLogin(
+        email: email, password: password, context: context)) {
       try {
         isSigningIn = true;
         notifyListeners();
 
-        await firebaseAuth.signInWithEmailAndPassword(
-            email: email!, password: password!);
-        // .whenComplete(() => );
-        saveTokenAndNavigateToNext();
+        await firebaseAuth
+            .signInWithEmailAndPassword(email: email!, password: password!)
+            .whenComplete(() => saveTokenAndNavigateToNext());
       } on FirebaseAuthException catch (e) {
-        isSigningIn = false;
-        notifyListeners();
-
-        GlobalSnackBar.show(message: 'Please enter ${e.message}');
+        // ignore: use_build_context_synchronously
+        GlobalSnackBar.show(message: appText(context).strUnknownError);
+        printLog(e);
       } finally {
         isSigningIn = false;
         notifyListeners();
@@ -120,7 +119,7 @@ class AuthenticationProvider extends ChangeNotifier {
           const CircularProgressIndicator.adaptive(),
           widthBox(15.w),
           TextWidget(
-            text: 'Verifying number...',
+            text: appText(context).verifyingNumber,
             color: color55F,
             fontSize: 15.sp,
             fontWeight: FontWeight.w400,
@@ -138,7 +137,7 @@ class AuthenticationProvider extends ChangeNotifier {
         verificationFailed: (FirebaseAuthException e) {
           dev.log('failed $e');
           Get.back();
-          GlobalSnackBar.show(message: 'Verification Failed Pleasy try later');
+          GlobalSnackBar.show(message: appText(context).strPhoneVerifyFailed);
         },
         codeSent: (String verificationId, int? resendToken) {
           dev.log('code sent');
@@ -178,7 +177,7 @@ class AuthenticationProvider extends ChangeNotifier {
           const CircularProgressIndicator.adaptive(),
           widthBox(15.w),
           TextWidget(
-            text: 'Verifying OTP ...',
+            text: appText(context).verifyingOTP,
             color: color55F,
             fontSize: 15.sp,
             fontWeight: FontWeight.w400,
@@ -235,6 +234,34 @@ class AuthenticationProvider extends ChangeNotifier {
         isSigningIn = false;
         notifyListeners();
       }
+    }
+  }
+
+  Future<void> updateEmail(
+      {required String oldEmail,
+      required String password,
+      required String newEmail}) async {
+    try {
+      isSigningIn = true;
+      notifyListeners();
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: oldEmail.trim(), password: password.trim());
+      if (userCredential.user != null) {
+        await userCredential.user?.updateEmail(newEmail.trim());
+      }
+    } on FirebaseAuthException catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+      print(e);
+    } finally {
+      isSigningIn = false;
+      notifyListeners();
     }
   }
 
@@ -303,15 +330,16 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  bool checkValidDataLogin({String? email, String? password}) {
+  bool checkValidDataLogin(
+      {String? email, String? password, required BuildContext context}) {
     if (email!.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strEmailAddress');
+      GlobalSnackBar.show(message: appText(context).strErrorEmail);
       return false;
     } else if (!EmailValidator.validate(email)) {
-      GlobalSnackBar.show(message: 'Please enter valid $strEmailAddress');
+      GlobalSnackBar.show(message: appText(context).strErrorValidEmail);
       return false;
     } else if (password!.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strPassword');
+      GlobalSnackBar.show(message: appText(context).strErrorPassword);
       return false;
     }
     return true;
@@ -320,25 +348,22 @@ class AuthenticationProvider extends ChangeNotifier {
   bool checkValidDataRegister(
       {String? email, String? password, String? confirmPassword}) {
     if (email!.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strEmailAddress');
+      GlobalSnackBar.show(message: appText(context).strErrorEmail);
       return false;
     } else if (!EmailValidator.validate(email.trim())) {
-      GlobalSnackBar.show(message: 'Please enter valid $strEmailAddress');
+      GlobalSnackBar.show(message: appText(context).strErrorValidEmail);
       return false;
     } else if (password!.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strPassword');
+      GlobalSnackBar.show(message: appText(context).strErrorPassword);
       return false;
     } else if (password.length < AppConstant.passwordMinText) {
-      GlobalSnackBar.show(
-          message:
-              '$strPassword should be minimum ${AppConstant.passwordMinText} characters');
+      GlobalSnackBar.show(message: appText(context).strErrorMinPsdReq);
       return false;
     } else if (confirmPassword!.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strConfirmPassword');
+      GlobalSnackBar.show(message: appText(context).strErrorConfirmPassword);
       return false;
     } else if (password != confirmPassword) {
-      GlobalSnackBar.show(
-          message: '$strPassword & $strConfirmPassword must be same');
+      GlobalSnackBar.show(message: appText(context).strErrorSamePassword);
       return false;
     }
     return true;
@@ -393,8 +418,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 }
-
-  
 
 // Future<void> callTwitterSignIn() async {
   //   try {

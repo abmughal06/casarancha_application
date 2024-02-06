@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -50,8 +50,8 @@ class ImageGridView extends StatelessWidget {
         Visibility(
           visible:
               imageList!.isEmpty && imageList!.map((e) => e.mediaData).isEmpty,
-          child: const AlertText(
-            text: strAlertImage,
+          child: AlertText(
+            text: appText(context).strAlertImage,
           ),
         )
       ],

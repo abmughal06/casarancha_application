@@ -2,6 +2,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +11,6 @@ import 'package:provider/provider.dart';
 import '../../models/post_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../profile_pic.dart';
 
@@ -64,7 +64,7 @@ class PostCommentField extends StatelessWidget {
                 minLines: 1,
                 decoration: InputDecoration(
                   isDense: true,
-                  hintText: strWriteComment,
+                  hintText: appText(context).strWriteComment,
                   hintStyle: TextStyle(
                     color: color55F,
                     fontSize: 14.sp,

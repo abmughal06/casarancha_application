@@ -3,10 +3,7 @@ import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-
-import '../../resources/image_resources.dart';
 import '../common_widgets.dart';
 import '../profile_pic.dart';
 
@@ -41,9 +38,7 @@ class ChatScreenUserAppBar extends StatelessWidget {
                         ),
                         WidgetSpan(child: widthBox(5.w)),
                         WidgetSpan(
-                          child: Visibility(
-                              visible: appUser.isVerified,
-                              child: SvgPicture.asset(icVerifyBadge)),
+                          child: verifyBadge(appUser.isVerified),
                         )
                       ],
                     ),

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/providers/setup_profile_provider.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +13,6 @@ import 'package:provider/provider.dart';
 
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/custom_date_picker.dart';
@@ -140,7 +140,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       controller: _firstNameController,
                       hintColor: color080,
                       isShadowEnable: false,
-                      hint: strFirstName,
+                      hint: appText(context).strFirstName,
                       color: colorFF4,
                       textInputType: TextInputType.text,
                       textInputAction: TextInputAction.next,
@@ -152,7 +152,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       controller: _lastNameController,
                       hintColor: color080,
                       isShadowEnable: false,
-                      hint: strLastName,
+                      hint: appText(context).strLastName,
                       color: colorFF4,
                       textInputType: TextInputType.text,
                       textInputAction: TextInputAction.next,
@@ -164,7 +164,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       controller: _userNameController,
                       hintColor: color080,
                       isShadowEnable: false,
-                      hint: strUserName,
+                      hint: appText(context).strUserName,
                       maxLength: 150,
                       color: colorFF4,
                       textInputType: TextInputType.text,
@@ -182,7 +182,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                         setState(() {});
                       },
                       limitfield: 300,
-                      hintText: strBio,
+                      hintText: appText(context).strBio,
                       maxlines: 5,
                       countText: "${provider.bioTxtCount}/300",
                       inputHeight: 150,
@@ -197,7 +197,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                         setState(() {});
                       },
                       limitfield: 150,
-                      hintText: strEducation,
+                      hintText: appText(context).strEducation,
                       maxlines: 3,
                       countText: "${provider.educationTxtCount}/300",
                       inputHeight: 100,
@@ -212,23 +212,22 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                         setState(() {});
                       },
                       limitfield: 150,
-                      hintText: strWork,
+                      hintText: appText(context).strWork,
                       maxlines: 3,
                       countText: "${provider.workTxtCount}/300",
                       inputHeight: 100,
                     ),
                     heightBox(10.w),
                     Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Birthday',
-                          style: TextStyle(
-                            color: const Color(0xFF3B3B3B).withOpacity(0.8),
-                            fontSize: 16.sp,
-                            fontFamily: strFontName,
-                            fontWeight: FontWeight.w300,
-                          ),
-                        )),
+                      alignment: Alignment.centerLeft,
+                      child: TextWidget(
+                        text: appText(context).strBirthday,
+                        color: const Color(0xFF3B3B3B).withOpacity(0.8),
+                        fontSize: 16.sp,
+                        fontFamily: strFontName,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
                     heightBox(5.w),
                     CustomDatePicker2(
                       getDateTime: provider.getDateTime,
@@ -256,10 +255,11 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                 padding: EdgeInsets.all(20.w),
                 child: CommonButton(
                   height: 56.h,
-                  text: strContinue,
+                  text: appText(context).strContinue,
                   showLoading: provider.isLoading,
                   onTap: () async {
                     await provider.setupProfileData(
+                      context: context,
                       fname: _firstNameController.text,
                       lname: _lastNameController.text,
                       username: _userNameController.text,

@@ -7,6 +7,7 @@ import 'package:casarancha/widgets/group_widgets/group_member_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/shared/shimmer_list.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class GroupAdmins extends StatelessWidget {
@@ -42,6 +43,7 @@ class GroupAdmins extends StatelessWidget {
                     itemBuilder: (_, index) {
                       return GroupAdminMemberTile(
                         onTapAction: () {
+                          Get.back();
                           prov.removeGroupAdmins(
                               id: users[index].id, groupId: groupId);
                         },

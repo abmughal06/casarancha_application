@@ -12,7 +12,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/color_resources.dart';
-import '../../../resources/localization_text_strings.dart';
 import '../../../widgets/common_button.dart';
 import '../../../widgets/text_editing_widget.dart';
 import '../../../widgets/text_widget.dart';
@@ -55,7 +54,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
 
     return Scaffold(
       appBar: primaryAppbar(
-        title: strNewPost,
+        title: appText(context).strNewPost,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: user == null
@@ -71,7 +70,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                 }
                 return CommonButton(
                   showLoading: createPostMethods.isSharingPost,
-                  text: strSharePost,
+                  text: appText(context).strSharePost,
                   height: 58.w,
                   verticalOutMargin: 10.w,
                   horizontalOutMargin: 10.w,
@@ -106,7 +105,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                 TextEditingWidget(
                   controller: createPostMethods.captionController,
                   hintColor: color887,
-                  hint: strWriteCaption,
+                  hint: appText(context).strWriteCaption,
                   color: colorFF4,
                   textInputType: TextInputType.multiline,
                   maxLines: 3,
@@ -193,7 +192,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                 TextEditingWidget(
                   controller: createPostMethods.locationController,
                   hintColor: color887,
-                  hint: strLocation,
+                  hint: appText(context).strLocation,
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: SvgPicture.asset(icLocationPost),
@@ -208,7 +207,7 @@ class _NewPostShareScreenState extends State<NewPostShareScreen> {
                   builder: (context, m, b) {
                     return SwitchListTile(
                       visualDensity: const VisualDensity(horizontal: -3),
-                      title: const Text(strShowPstTime),
+                      title: Text(appText(context).strShowPstTime),
                       value: m.showPostTime,
                       onChanged: (value) {
                         m.togglePostTime();

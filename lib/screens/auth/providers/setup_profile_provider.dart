@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,7 +12,6 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../models/user_model.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
-import '../../../resources/localization_text_strings.dart';
 import '../../../utils/app_utils.dart';
 import '../../../utils/snackbar.dart';
 import '../../../view_models/profile_vm/edit_profie_view_model.dart';
@@ -78,21 +78,25 @@ class SetupProfileProvider extends ChangeNotifier {
     }
   }
 
-  bool checkValidData({String? fname, String? lname, String? username}) {
+  bool checkValidData(
+      {String? fname,
+      String? lname,
+      String? username,
+      required BuildContext context}) {
     if (fname!.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strFirstName');
+      GlobalSnackBar.show(message: appText(context).strErrorEmail);
 
       return false;
     } else if (lname!.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter $strLastName');
+      GlobalSnackBar.show(message: "Please enter the last name");
 
       return false;
     } else if (username!.isEmpty) {
-      GlobalSnackBar.show(message: "Please Enter $strUserName");
+      GlobalSnackBar.show(message: "Please enter the username");
 
       return false;
     } else if (selectedDob == null || selectedDob == "") {
-      GlobalSnackBar.show(message: 'Please enter $strDateOfBirth');
+      GlobalSnackBar.show(message: "Please enter the date of birth");
 
       return false;
     }
@@ -113,9 +117,11 @@ class SetupProfileProvider extends ChangeNotifier {
       String? username,
       String? bio,
       String? education,
-      String? work}) async {
+      String? work,
+      required BuildContext context}) async {
     try {
-      if (checkValidData(fname: fname, lname: lname, username: username)) {
+      if (checkValidData(
+          fname: fname, lname: lname, username: username, context: context)) {
         isLoading = true;
         notifyListeners();
 

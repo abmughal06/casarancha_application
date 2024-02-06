@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../resources/localization_text_strings.dart';
 import '../../resources/strings.dart';
 import '../../utils/country_list.dart';
 import '../../widgets/common_button.dart';
@@ -61,7 +60,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextWidget(
-                          text: "Phone Login",
+                          text: appText(context).strPhoneLogin,
                           fontSize: 26.sp,
                           color: color13F,
                           fontWeight: FontWeight.w800,
@@ -69,8 +68,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                         heightBox(4.h),
                         TextWidget(
                           textAlign: TextAlign.center,
-                          text:
-                              "Please Enter your phone\nnumber below to continue login",
+                          text: appText(context).strPhoneSlogan,
                           fontSize: 16.sp,
                           color: color080,
                           fontWeight: FontWeight.w400,
@@ -110,7 +108,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                                 child: TextEditingWidget(
                                   controller: phoneController,
                                   isShadowEnable: false,
-                                  hint: 'Phone Number',
+                                  hint: appText(context).strPhoneNumber,
                                   color:
                                       phoneFocus.hasFocus ? colorFDF : colorFF3,
                                   fieldBorderClr:
@@ -134,7 +132,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                                 auth.verifyPhoneNumber(
                                     '$phoneDialCode ${phoneController.text.trim()}');
                               },
-                              text: strSendNow,
+                              text: appText(context).strSendNow,
                               width: double.infinity,
                             );
                           },

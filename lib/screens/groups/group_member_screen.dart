@@ -1,6 +1,5 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/groups/add_group_members.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/utils/app_constants.dart';
@@ -30,7 +29,7 @@ class GroupMembersScreen extends StatelessWidget {
     final grpProv = Provider.of<NewGroupProvider>(context);
     return Scaffold(
       appBar: primaryAppbar(
-        title: '${grp.name.capitalize} Members',
+        title: '${grp.name.capitalize} ${appText(context).strMembers}',
         elevation: 0.2,
         actions: [
           grp.creatorId == currentUserUID
@@ -41,7 +40,7 @@ class GroupMembersScreen extends StatelessWidget {
                       context: context,
                       builder: (_) {
                         return CustomAdaptiveAlertDialog(
-                          actiionBtnName: 'Leave',
+                          actiionBtnName: appText(context).strLeave,
                           actionBtnColor: colorPrimaryA05,
                           alertMsg: 'Are you sure you want to leave the group?',
                           onAction: () {
@@ -54,9 +53,11 @@ class GroupMembersScreen extends StatelessWidget {
                       },
                     );
                   },
-                  child: const TextWidget(
-                    text: 'Leave',
+                  child: TextWidget(
+                    text: appText(context).strLeave,
                     color: colorPrimaryA05,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
                   ),
                 )
         ],
@@ -83,14 +84,31 @@ class GroupMembersScreen extends StatelessWidget {
                   ),
                   indicatorColor: colorF03,
                   indicatorPadding:
-                      EdgeInsets.symmetric(vertical: 5.h, horizontal: 60.w),
+                      EdgeInsets.symmetric(vertical: 5.h, horizontal: 70.w),
                   dividerColor: Colors.transparent,
-                  tabs: const [
+                  tabs: [
                     Tab(
-                      text: strMembers,
+                      text: appText(context).strMembers,
                     ),
-                    Tab(
-                      text: strJoinRequest,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Tab(
+                          text: appText(context).strJoinRequest,
+                        ),
+                        if (group.joinRequestIds.isNotEmpty &&
+                            (group.creatorId == currentUserUID ||
+                                group.adminIds.contains(currentUserUID)))
+                          Row(
+                            children: [
+                              widthBox(5.w),
+                              const CircleAvatar(
+                                radius: 4,
+                                backgroundColor: colorPrimaryA05,
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
                   ],
                 ),
@@ -120,7 +138,34 @@ class GroupMembersScreen extends StatelessWidget {
                           },
                         ),
                       ),
-                      const Center(child: TextWidget(text: strAlertNoJoinReq)),
+                      group.creatorId == currentUserUID ||
+                              group.adminIds.contains(currentUserUID)
+                          ? StreamProvider.value(
+                              value: DataProvider()
+                                  .filterUserList(group.joinRequestIds),
+                              initialData: null,
+                              catchError: (context, error) => null,
+                              child: Consumer<List<UserModel>?>(
+                                builder: (context, value, child) {
+                                  if (value == null) {
+                                    return centerLoader();
+                                  }
+
+                                  return ListView.builder(
+                                    itemCount: value.length,
+                                    itemBuilder: (context, index) {
+                                      return GroupJoinRequestCard(
+                                        user: value[index],
+                                        group: group,
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            )
+                          : Center(
+                              child: TextWidget(
+                                  text: appText(context).strAlertNoJoinReq)),
                     ],
                   ),
                 )
@@ -133,7 +178,7 @@ class GroupMembersScreen extends StatelessWidget {
       floatingActionButton: isAdmin
           ? CommonButton(
               onTap: () => Get.to(() => AddGroupMembers(group: grp)),
-              text: strAddMembers,
+              text: appText(context).strAddMembers,
               height: 58.w,
               verticalOutMargin: 10.w,
               horizontalOutMargin: 20.w,

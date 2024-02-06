@@ -48,7 +48,7 @@ class BottomSheetWidget extends StatelessWidget {
             child: SvgPicture.asset(icBottomSheetScroller),
           ),
           heightBox(12.h),
-          ReportPostorComment(btnName: 'Report Post'),
+          ReportPostorComment(btnName: appText(context).strReportPost),
           heightBox(20.h),
           TextWidget(
             onTap: ontapBlock,
@@ -58,7 +58,7 @@ class BottomSheetWidget extends StatelessWidget {
           heightBox(20.h),
           TextWidget(
             onTap: onTapDownload,
-            text: "Download",
+            text: appText(context).strDownload,
             fontWeight: FontWeight.w600,
           ),
           heightBox(20.h),
@@ -76,7 +76,7 @@ class BottomSheetWidget extends StatelessWidget {
                     group.creatorId == currentUserUID) {
                   return TextWidget(
                     onTap: ontapDeletePost,
-                    text: 'Delete Post',
+                    text: appText(context).strDeletePost,
                     color: colorPrimaryA05,
                     fontWeight: FontWeight.w600,
                   );
@@ -101,7 +101,7 @@ class BottomSheetWidget extends StatelessWidget {
                     padding: EdgeInsets.only(top: 20.h),
                     child: TextWidget(
                       onTap: ontapDeletePost,
-                      text: 'Ban user from posting',
+                      text: appText(context).strBanPost,
                       color: colorPrimaryA05,
                       fontWeight: FontWeight.w600,
                     ),
@@ -118,20 +118,22 @@ class BottomSheetWidget extends StatelessWidget {
 }
 
 class ReportPostorComment extends StatelessWidget {
-  ReportPostorComment({super.key, required this.btnName});
+  const ReportPostorComment({super.key, required this.btnName});
 
   final String btnName;
-  final List reportList = [
-    "It's a spam",
-    "Nudity or sexual activity",
-    "I just don't like it",
-    "Scam or fraud",
-    "False Information",
-    "Hate speech or symbols",
-  ];
 
   @override
   Widget build(BuildContext context) {
+    // final List reportList = appText(context).repo
+
+    final List reportList = [
+      appText(context).strSpan,
+      appText(context).strNudity,
+      appText(context).strDislike,
+      appText(context).strScam,
+      appText(context).strFalse,
+      appText(context).strHate,
+    ];
     return TextWidget(
       onTap: () {
         Get.back();

@@ -1,5 +1,4 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/resources/localization_text_strings.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
 import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
@@ -35,7 +34,7 @@ class _ForumsScreenState extends State<ForumsScreen>
 
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: strForum,
+        title: appText(context).strForum,
         elevation: 0.1,
         leading: const GhostModeBtn(),
         actions: [
@@ -49,21 +48,21 @@ class _ForumsScreenState extends State<ForumsScreen>
                         Get.back();
                         Get.to(() => const CreatePostScreen(isForum: true));
                       },
-                      child: const TextWidget(text: 'Upload Post'),
+                      child: TextWidget(text: appText(context).uploadPost),
                     ),
                     CupertinoActionSheetAction(
                       onPressed: () {
                         Get.back();
                         Get.to(() => const CreatePollScreen());
                       },
-                      child: const TextWidget(text: 'Upload Poll'),
+                      child: TextWidget(text: appText(context).uploadPoll),
                     ),
                   ],
                   cancelButton: CupertinoActionSheetAction(
                     onPressed: () {
                       Get.back();
                     },
-                    child: const Text('Cancel'),
+                    child: Text(appText(context).strCancel),
                   ),
                 ),
               );
@@ -86,8 +85,7 @@ class _ForumsScreenState extends State<ForumsScreen>
             padding: const EdgeInsets.only(top: 10, bottom: 100),
             itemBuilder: (context, index) {
               if (posts.isEmpty) {
-                return const AlertText(
-                    text: 'Forums does not have any posts yet');
+                return AlertText(text: appText(context).alertForum);
               }
               var post = posts[index];
 

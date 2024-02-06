@@ -8,6 +8,7 @@ import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/shared/alert_dialog.dart';
 import 'package:casarancha/widgets/shared/alert_text.dart';
 import 'package:casarancha/widgets/shared/shimmer_list.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class BannedUserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final grpProv = Provider.of<NewGroupProvider>(context);
     return Scaffold(
-      appBar: primaryAppbar(title: 'Banned User Screens'),
+      appBar: primaryAppbar(title: appText(context).grpUsersBan),
       body: StreamProvider.value(
         value: DataProvider().singleGroup(groupId),
         initialData: null,
@@ -40,7 +41,7 @@ class BannedUserScreen extends StatelessWidget {
                     return const ChatShimmerList();
                   }
                   if (users.isEmpty) {
-                    return const AlertText(text: 'No User is banned yet');
+                    return AlertText(text: appText(context).alertgrpNoBan);
                   }
                   return ListView.builder(
                     itemCount: users.length,
@@ -53,10 +54,9 @@ class BannedUserScreen extends StatelessWidget {
                             context: context,
                             builder: (_) {
                               return CustomAdaptiveAlertDialog(
-                                title: 'Unban User?',
-                                alertMsg:
-                                    '''Are you sure you want to unban this user?.''',
-                                actiionBtnName: 'Unban',
+                                title: appText(context).alertTitileUnban,
+                                alertMsg: appText(context).alertMsgUserUnban,
+                                actiionBtnName: appText(context).unban,
                                 onAction: () {
                                   grpProv.unBanUserFromGroup(
                                       groupId: groupId, id: users[index].id);

@@ -2,7 +2,6 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../models/ghost_message_details.dart';
 import '../../models/message_details.dart';
@@ -46,9 +45,7 @@ class ChatUserListTile extends StatelessWidget {
                 color: const Color(0xff222939),
               ),
               widthBox(5.w),
-              Visibility(
-                  visible: personDetail.isVerified,
-                  child: SvgPicture.asset(icVerifyBadge))
+              verifyBadge(personDetail.isVerified)
             ],
           ),
           subtitle: TextWidget(
@@ -126,9 +123,9 @@ class GhostChatListTile extends StatelessWidget {
               color: const Color(0xff222939),
             ),
             widthBox(5.w),
-            Visibility(
-                visible: messageDetails.creatorDetails.isVerified,
-                child: SvgPicture.asset(icVerifyBadge))
+            verifyBadge(
+              messageDetails.creatorDetails.isVerified,
+            )
           ],
         ),
         subtitle: TextWidget(
@@ -288,13 +285,13 @@ class ChatUserListTileForNoChat extends StatelessWidget {
               color: const Color(0xff222939),
             ),
             widthBox(5.w),
-            Visibility(
-                visible: userModel.isVerified,
-                child: SvgPicture.asset(icVerifyBadge))
+            verifyBadge(
+              userModel.isVerified,
+            )
           ],
         ),
         subtitle: TextWidget(
-          text: "Start chat with ${userModel.username}",
+          text: appText(context).strStartChat(userModel.username),
           textOverflow: TextOverflow.ellipsis,
           fontWeight: FontWeight.w400,
           fontSize: 14.sp,

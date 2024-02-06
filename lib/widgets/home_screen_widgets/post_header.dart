@@ -4,7 +4,6 @@ import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_model.dart';
@@ -101,21 +100,14 @@ class CustomPostHeader extends StatelessWidget {
                                     color: isVideoPost! ? colorFF7 : color221,
                                   ),
                                   widthBox(5.w),
-                                  Visibility(
-                                    visible:
-                                        !isGhostPost && postCreator.isVerified,
-                                    child: SvgPicture.asset(
-                                      icVerifyBadge,
-                                      width: 15.w,
-                                      height: 15.h,
-                                    ),
-                                  )
+                                  verifyBadge(
+                                      !isGhostPost && postCreator.isVerified,
+                                      size: 15.w)
                                 ],
                               ),
-                              Visibility(
-                                visible: !isGhostPost &&
-                                    postCreator.education.isNotEmpty,
-                                child: SelectableText.rich(
+                              if (!isGhostPost &&
+                                  postCreator.education.isNotEmpty)
+                                SelectableText.rich(
                                   TextSpan(
                                     children: [
                                       WidgetSpan(
@@ -134,22 +126,15 @@ class CustomPostHeader extends StatelessWidget {
                                         ),
                                       ),
                                       WidgetSpan(
-                                          child: Visibility(
-                                              visible: postCreator
-                                                  .isEducationVerified,
-                                              child: SvgPicture.asset(
-                                                icVerifyBadge,
-                                                height: 13,
-                                              ))),
+                                          child: verifyBadge(
+                                              postCreator.isEducationVerified,
+                                              size: 13)),
                                     ],
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
-                              ),
-                              Visibility(
-                                visible:
-                                    !isGhostPost && postCreator.work.isNotEmpty,
-                                child: SelectableText.rich(
+                              if (!isGhostPost && postCreator.work.isNotEmpty)
+                                SelectableText.rich(
                                   TextSpan(
                                     children: [
                                       WidgetSpan(
@@ -168,22 +153,16 @@ class CustomPostHeader extends StatelessWidget {
                                         ),
                                       ),
                                       WidgetSpan(
-                                          child: Visibility(
-                                              visible:
-                                                  postCreator.isWorkVerified,
-                                              child: SvgPicture.asset(
-                                                icVerifyBadge,
-                                                height: 13,
-                                              ))),
+                                          child: verifyBadge(
+                                              postCreator.isWorkVerified,
+                                              size: 13)),
                                     ],
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
-                              ),
-                              Visibility(
-                                visible: postModel.showPostTime ||
-                                    postModel.locationName.isNotEmpty,
-                                child: TextWidget(
+                              if (postModel.showPostTime ||
+                                  postModel.locationName.isNotEmpty)
+                                TextWidget(
                                   text:
                                       "${postModel.showPostTime ? "${convertDateIntoTime(postModel.createdAt)} " : ""}${postModel.locationName.isEmpty ? "" : "at ${postModel.locationName}"}",
                                   fontSize: 11.sp,
@@ -192,7 +171,6 @@ class CustomPostHeader extends StatelessWidget {
                                       ? colorFF7.withOpacity(0.6)
                                       : const Color(0xff5f5f5f),
                                 ),
-                              ),
                             ],
                           ),
                         ),

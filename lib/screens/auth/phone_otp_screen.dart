@@ -43,7 +43,7 @@ class PhoneOTPScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextWidget(
-                      text: "Phone Login",
+                      text: appText(context).strPhoneLogin,
                       fontSize: 26.sp,
                       color: color13F,
                       fontWeight: FontWeight.w800,
@@ -51,8 +51,7 @@ class PhoneOTPScreen extends StatelessWidget {
                     heightBox(4.h),
                     TextWidget(
                       textAlign: TextAlign.center,
-                      text:
-                          "Please Enter your verification\ncode below to continue login",
+                      text: appText(context).strOtpSlogan,
                       fontSize: 16.sp,
                       color: color080,
                       fontWeight: FontWeight.w400,
@@ -72,7 +71,7 @@ class PhoneOTPScreen extends StatelessWidget {
                             verificationId,
                           );
                         },
-                        text: 'Continue',
+                        text: appText(context).strContinue,
                         width: double.infinity,
                       );
                     }),

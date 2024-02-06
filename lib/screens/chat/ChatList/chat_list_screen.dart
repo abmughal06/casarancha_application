@@ -2,6 +2,7 @@ import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class ChatListScreen extends StatelessWidget {
     return GhostScaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: primaryAppbar(
-        title: 'Messages',
+        title: appText(context).strMessages,
         elevation: 0,
         leading: const GhostModeBtn(),
         actions: [
@@ -68,12 +69,12 @@ class ChatListScreen extends StatelessWidget {
                   dividerColor: Colors.transparent,
                   indicatorPadding:
                       EdgeInsets.symmetric(vertical: 5.h, horizontal: 65.w),
-                  tabs: const [
+                  tabs: [
                     Tab(
-                      text: "Friends",
+                      text: appText(context).strFriends,
                     ),
                     Tab(
-                      text: "Ghosts",
+                      text: appText(context).strGhost,
                     ),
                   ],
                 ),

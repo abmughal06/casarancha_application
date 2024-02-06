@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../resources/localization_text_strings.dart';
-
 enum BottomSheetMenuType { isPostMenu, isReportPost, isDoneReport }
 
 String? get currentUserUID => FirebaseAuth.instance.currentUser!.uid;
@@ -58,21 +56,6 @@ class AppConstant {
         ),
     ]));
   }
-
-  static List<String> profileBottomSheetList = [
-    strEditProfile,
-    strSavedPosts,
-    "Account Recovery",
-    strGetVerified,
-    strSettings,
-    strInviteFrnds,
-    strAbout,
-    strTermsCondition,
-    strPrivacyPolicy,
-    strHelp,
-    strLogout,
-    strDeleteAct,
-  ];
 }
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
