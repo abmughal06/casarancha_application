@@ -247,7 +247,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                 ),
                                 btnName: user.id == currentUser.id
                                     ? ""
-                                    : !isFriend
+                                    : isFriend
                                         ? appText(context).strFriends
                                         : appText(context).strSrcFollow,
                               );

@@ -126,6 +126,7 @@ class PostProvider extends ChangeNotifier {
   void blockUnblockUser({
     UserModel? currentUser,
     String? appUser,
+    context,
   }) async {
     try {
       var ref =
@@ -152,7 +153,7 @@ class PostProvider extends ChangeNotifier {
                 SvgPicture.asset(icReportPostDone),
                 heightBox(15.h),
                 TextWidget(
-                  text: "The user is unblocked now",
+                  text: appText(context).alertUserBlock,
                   fontWeight: FontWeight.w600,
                   fontSize: 18.sp,
                   color: const Color(0xff212121),
@@ -184,7 +185,7 @@ class PostProvider extends ChangeNotifier {
                 SvgPicture.asset(icReportPostDone),
                 heightBox(15.h),
                 TextWidget(
-                  text: "The user is blocked now",
+                  text: appText(context).alertUserUnBlock,
                   fontWeight: FontWeight.w600,
                   fontSize: 16.sp,
                   color: const Color(0xff212121),

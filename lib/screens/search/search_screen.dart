@@ -229,7 +229,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     : isCurrentUserGroupMember
                                         ? groupSnap.joinRequestIds
                                                 .contains(currentUserUID)
-                                            ? "Request Sent"
+                                            ? appText(context).reqSent
                                             : appText(context).strJoined
                                         : appText(context).strSrcJoin,
                               );
@@ -283,7 +283,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       : appText(context).strSrcJoin
                                   : groupSnap.joinRequestIds
                                           .contains(currentUserUID)
-                                      ? "Request Sent"
+                                      ? appText(context).reqSent
                                       : isCurrentUserGroupMember
                                           ? appText(context).strJoined
                                           : appText(context).strSrcJoin,
@@ -318,8 +318,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   element.creatorId !=
                                       FirebaseAuth.instance.currentUser!.uid &&
                                   !element.banFromCmntUsersIds
-                                      .contains(currentUserUID) &&
-                                  element.isPublic)
+                                      .contains(currentUserUID))
                               .toList();
 
                           var usersList = users
@@ -397,8 +396,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 (element.name.toLowerCase().contains(
                                     searchController.text.toLowerCase())) &&
                                 element.creatorId !=
-                                    FirebaseAuth.instance.currentUser!.uid &&
-                                element.isPublic)
+                                    FirebaseAuth.instance.currentUser!.uid)
                             .toList();
 
                         var usersList = users

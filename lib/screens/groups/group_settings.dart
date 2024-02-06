@@ -26,7 +26,7 @@ class GroupSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: primaryAppbar(title: 'Group Settings'),
+      appBar: primaryAppbar(title: appText(context).groupSetting),
       body: StreamProvider.value(
         value: DataProvider().singleGroup(grp.id),
         initialData: null,
@@ -42,8 +42,8 @@ class GroupSettings extends StatelessWidget {
                 leading: SvgPicture.asset(icGroupMember),
                 title: Row(
                   children: [
-                    const TextWidget(
-                      text: 'Group members',
+                    TextWidget(
+                      text: appText(context).groupMembers,
                     ),
                     widthBox(5.w),
                     Visibility(
@@ -63,8 +63,8 @@ class GroupSettings extends StatelessWidget {
               ListTile(
                 onTap: () => Get.to(() => BannedUserScreen(groupId: group.id)),
                 leading: SvgPicture.asset(icGroupMember),
-                title: const TextWidget(
-                  text: 'Banned from group users',
+                title: TextWidget(
+                  text: appText(context).btnGrpBan,
                 ),
                 horizontalTitleGap: 0,
                 trailing: const Icon(Icons.navigate_next),
@@ -73,8 +73,8 @@ class GroupSettings extends StatelessWidget {
                 onTap: () =>
                     Get.to(() => BannedFromCmntUsers(groupId: group.id)),
                 leading: SvgPicture.asset(icGroupMember),
-                title: const TextWidget(
-                  text: 'Banned from comments members',
+                title: TextWidget(
+                  text: appText(context).btnGrpCommentBan,
                 ),
                 horizontalTitleGap: 0,
                 trailing: const Icon(Icons.navigate_next),
@@ -83,8 +83,8 @@ class GroupSettings extends StatelessWidget {
                 onTap: () =>
                     Get.to(() => BannedFromPostsUsers(groupId: group.id)),
                 leading: SvgPicture.asset(icGroupMember),
-                title: const TextWidget(
-                  text: 'Banned from Posts members',
+                title: TextWidget(
+                  text: appText(context).btnGrpPostBan,
                 ),
                 horizontalTitleGap: 0,
                 trailing: const Icon(Icons.navigate_next),
@@ -92,16 +92,16 @@ class GroupSettings extends StatelessWidget {
               ListTile(
                 onTap: () => Get.to(() => GroupAdmins(groupId: group.id)),
                 leading: SvgPicture.asset(icGroupMember),
-                title: const TextWidget(
-                  text: 'Group Admins',
+                title: TextWidget(
+                  text: appText(context).btnGrpAdmins,
                 ),
                 horizontalTitleGap: 0,
                 trailing: const Icon(Icons.navigate_next),
               ),
               ListTile(
                 leading: const Icon(Icons.public),
-                title: const TextWidget(
-                  text: 'Make group private',
+                title: TextWidget(
+                  text: appText(context).makePrivate,
                 ),
                 horizontalTitleGap: 0,
                 trailing: Switch(

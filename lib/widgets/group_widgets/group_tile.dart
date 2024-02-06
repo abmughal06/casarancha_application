@@ -1,6 +1,8 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/groups/group_post_screen.dart';
+import 'package:casarancha/utils/app_constants.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -31,7 +33,10 @@ class GroupTile extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(15.h),
         child: InkWell(
-          onTap: () => Get.to(() => GroupPostScreen(group: group)),
+          onTap: group.isPublic || group.memberIds.contains(currentUserUID)
+              ? () => Get.to(() => GroupPostScreen(group: group))
+              : () => GlobalSnackBar.show(
+                  message: "You can't visit private groups"),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

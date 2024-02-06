@@ -44,7 +44,7 @@ class _SharePostScreenState extends State<SharePostScreen> {
     return Scaffold(
       appBar: AppBar(
         title: TextWidget(
-          text: "Share Post",
+          text: appText(context).strSharePost,
           fontSize: 18.sp,
           color: Colors.black,
           fontWeight: FontWeight.w600,
@@ -148,9 +148,9 @@ class _SharePostScreenState extends State<SharePostScreen> {
                   }
 
                   if (users.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: TextWidget(
-                        text: 'No user to share the app',
+                        text: appText(context).noShares,
                       ),
                     );
                   }
@@ -160,7 +160,7 @@ class _SharePostScreenState extends State<SharePostScreen> {
             ),
           ),
           CommonButton(
-            text: 'Done',
+            text: appText(context).strDone,
             height: 58.w,
             verticalOutMargin: 20.w,
             horizontalOutMargin: 20.w,
@@ -258,7 +258,9 @@ class SharePostTile extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 17, vertical: 9),
                   child: TextWidget(
-                    text: isSent ? "Sent" : "Send",
+                    text: isSent
+                        ? appText(context).sent
+                        : appText(context).strSend,
                     letterSpacing: 0.7,
                     color: isSent ? colorPrimaryA05 : colorFF3,
                     fontWeight: FontWeight.w600,

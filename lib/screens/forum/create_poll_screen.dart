@@ -145,7 +145,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
         ],
       ),
       floatingActionButton: CommonButton(
-        text: 'Create Poll',
+        text: appText(context).createPoll,
         height: 52.h,
         horizontalOutMargin: 20.w,
         onTap: () {

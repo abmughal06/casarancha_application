@@ -40,7 +40,9 @@ class BlockAccountsScreen extends StatelessWidget {
               return FollowFollowingTile(
                   user: filterList[index],
                   ontapToggleFollow: () => postProvider.blockUnblockUser(
-                      currentUser: currentUser, appUser: filterList[index].id),
+                      context: context,
+                      currentUser: currentUser,
+                      appUser: filterList[index].id),
                   btnName: appText(context).strRemove);
             });
       }),

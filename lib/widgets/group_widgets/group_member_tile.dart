@@ -90,7 +90,7 @@ class GroupMemberTile extends StatelessWidget {
                                 color: colorPrimaryA05,
                                 borderRadius: BorderRadius.circular(5)),
                             child: TextWidget(
-                              text: 'Banned',
+                              text: appText(context).banned,
                               color: colorWhite,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,

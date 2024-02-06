@@ -454,11 +454,54 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Stream<List<UserModel>?>? nonChatUsers(List chatUsers) {
+  Stream<List<UserModel>?>? nonChatUsers(List friends, Set msgIds) {
     try {
+      // List<String> msgIds = [];
+      // FirebaseFirestore.instance
+      //     .collection(cUsers)
+      //     .doc(FirebaseAuth.instance.currentUser!.uid)
+      //     .collection(cMessageList)
+      //     .get()
+      //     .then((value) =>
+      //         value.docs.where((element) => element.data().isNotEmpty).map((e) {
+      //           var msg = MessageDetails.fromMap(e.data());
+      //           msgIds.add(msg.id);
+      //         }).toList());
+      // print(msgIds);
+
       return FirebaseFirestore.instance.collection('users').snapshots().map(
             (event) => event.docs
-                .where((element) => !chatUsers.contains(element.id))
+                .where((element) =>
+                    friends.contains(element.id) &&
+                    !msgIds.contains(element.id))
+                .map((e) => UserModel.fromMap(e.data()))
+                .toList(),
+          );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Stream<List<UserModel>?>? ghostNonChatUsers(List friends) {
+    try {
+      List<String> msgIds = [];
+      FirebaseFirestore.instance
+          .collection(cUsers)
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection(cGhostMessageList)
+          .get()
+          .then((value) =>
+              value.docs.where((element) => element.data().isNotEmpty).map((e) {
+                var msg = MessageDetails.fromMap(e.data());
+                msgIds.add(msg.id);
+              }).toList());
+
+      print(msgIds);
+
+      return FirebaseFirestore.instance.collection('users').snapshots().map(
+            (event) => event.docs
+                .where((element) => friends.contains(element.id))
+                .where((element) => msgIds.contains(element.id))
                 .map((e) => UserModel.fromMap(e.data()))
                 .toList(),
           );

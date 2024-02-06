@@ -119,7 +119,7 @@ class AuthenticationProvider extends ChangeNotifier {
           const CircularProgressIndicator.adaptive(),
           widthBox(15.w),
           TextWidget(
-            text: 'Verifying number...',
+            text: appText(context).verifyingNumber,
             color: color55F,
             fontSize: 15.sp,
             fontWeight: FontWeight.w400,
@@ -177,7 +177,7 @@ class AuthenticationProvider extends ChangeNotifier {
           const CircularProgressIndicator.adaptive(),
           widthBox(15.w),
           TextWidget(
-            text: 'Verifying OTP ...',
+            text: appText(context).verifyingOTP,
             color: color55F,
             fontSize: 15.sp,
             fontWeight: FontWeight.w400,
@@ -234,6 +234,34 @@ class AuthenticationProvider extends ChangeNotifier {
         isSigningIn = false;
         notifyListeners();
       }
+    }
+  }
+
+  Future<void> updateEmail(
+      {required String oldEmail,
+      required String password,
+      required String newEmail}) async {
+    try {
+      isSigningIn = true;
+      notifyListeners();
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: oldEmail.trim(), password: password.trim());
+      if (userCredential.user != null) {
+        await userCredential.user?.updateEmail(newEmail.trim());
+      }
+    } on FirebaseAuthException catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+
+      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+    } catch (e) {
+      isSigningIn = false;
+      notifyListeners();
+      print(e);
+    } finally {
+      isSigningIn = false;
+      notifyListeners();
     }
   }
 

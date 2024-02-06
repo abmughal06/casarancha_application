@@ -25,17 +25,11 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late EditProfileProvider edit;
-
-  // @override
-  // void dispose() {
-  //   edit.clearAll();
-  //   super.dispose();
-  // }
+  // late EditProfileProvider edit;
 
   @override
   Widget build(BuildContext context) {
-    edit = Provider.of<EditProfileProvider>(context);
+    final edit = Provider.of<EditProfileProvider>(context);
     // final currentUser = context.watch<UserModel?>();
     return Scaffold(
       appBar: primaryAppbar(
@@ -223,7 +217,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextWidget(
-                      text: 'Birthday',
+                      text: appText(context).strBirthday,
                       color: const Color(0xFF3B3B3B).withOpacity(0.8),
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,

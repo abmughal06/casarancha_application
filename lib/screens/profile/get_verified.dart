@@ -43,7 +43,7 @@ class GetVerifiedScreen extends StatelessWidget {
           const Divider(),
           ListTile(
             contentPadding: EdgeInsets.symmetric(horizontal: 15.w),
-            title: const TextWidget(text: 'Get Education Verify'),
+            title: TextWidget(text: appText(context).getVerifyEd),
             trailing: const Icon(Icons.navigate_next),
             onTap: () => Get.to(() => const VerifyScreen(
                   isEducation: true,
@@ -52,7 +52,7 @@ class GetVerifiedScreen extends StatelessWidget {
           const Divider(),
           ListTile(
             contentPadding: EdgeInsets.symmetric(horizontal: 15.w),
-            title: const TextWidget(text: 'Get Work Verify'),
+            title: TextWidget(text: appText(context).getVerifyWk),
             trailing: const Icon(Icons.navigate_next),
             onTap: () => Get.to(() => const VerifyScreen(isWork: true)),
           ),

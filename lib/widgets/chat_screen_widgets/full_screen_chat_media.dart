@@ -58,9 +58,9 @@ class CheckMediaAndShow extends StatelessWidget {
         );
 
       default:
-        return const Center(
+        return Center(
           child: TextWidget(
-            text: 'Error Loading media',
+            text: appText(context).alertErrorLoading,
             color: colorWhite,
           ),
         );
