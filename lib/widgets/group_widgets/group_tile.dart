@@ -25,18 +25,19 @@ class GroupTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 1.5,
-      margin: EdgeInsets.only(bottom: 10.h, left: 20.w, right: 20.w),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.sp)),
-      color: colorWhite,
-      child: Container(
-        padding: EdgeInsets.all(15.h),
-        child: InkWell(
-          onTap: group.isPublic || group.memberIds.contains(currentUserUID)
-              ? () => Get.to(() => GroupPostScreen(group: group))
-              : () => GlobalSnackBar.show(
-                  message: "You can't visit private groups"),
+    return InkWell(
+      onTap: group.isPublic || group.memberIds.contains(currentUserUID)
+          ? () => Get.to(() => GroupPostScreen(group: group))
+          : () => GlobalSnackBar.show(
+              message: appText(context).strCantPrivateGroup),
+      child: Card(
+        elevation: 1.5,
+        margin: EdgeInsets.only(bottom: 10.h, left: 20.w, right: 20.w),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.sp)),
+        color: colorWhite,
+        child: Container(
+          padding: EdgeInsets.all(15.h),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -187,7 +188,9 @@ class GroupTilePrivate extends StatelessWidget {
                                 color: colorF03,
                                 borderRadius: BorderRadius.circular(6)),
                             child: TextWidget(
-                              text: group.isPublic ? 'Public' : 'Private',
+                              text: group.isPublic
+                                  ? appText(context).strPublic
+                                  : appText(context).strPrivate,
                               fontSize: 10.sp,
                               color: color221,
                               fontWeight: FontWeight.w500,

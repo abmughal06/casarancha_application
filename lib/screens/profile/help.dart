@@ -26,8 +26,8 @@ class _HelpCenterState extends State<HelpCenter> {
     showDialog(
       context: context,
       builder: (_) => CustomAdaptiveAlertDialog(
-        alertMsg: 'Your message is sent to admin, he will contact you soon.',
-        actiionBtnName: 'Ok',
+        alertMsg: appText(context).strAdminContact,
+        actiionBtnName: appText(context).strOk,
         onAction: () {
           Get.back();
         },

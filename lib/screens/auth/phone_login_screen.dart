@@ -163,6 +163,13 @@ class PhoneCountryCodeList extends StatelessWidget {
   final searchController = TextEditingController();
   final Function(String) onSelect;
 
+  List<CountryCodeModel> get cntryCodes {
+    return CountryCodes()
+        .countryCodes
+        .map((event) => CountryCodeModel.fromJson(event!))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final search = Provider.of<SearchProvider>(context, listen: false);
@@ -259,10 +266,4 @@ class PhoneCountryCodeList extends StatelessWidget {
       ),
     );
   }
-}
-
-List<CountryCodeModel> get cntryCodes {
-  return countryCodes
-      .map((event) => CountryCodeModel.fromJson(event!))
-      .toList();
 }

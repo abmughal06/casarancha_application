@@ -84,7 +84,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                             return FollowFollowingTile(
                               user: user,
                               ontapToggleFollow: () =>
-                                  profileProvider.toggleFollowBtn(
+                                  profileProvider.toggleFollowBtn(context,
                                       userModel: currentUser,
                                       appUserId: user.id),
                               btnName: isFriend
@@ -122,7 +122,7 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                           return FollowFollowingTile(
                             user: user,
                             ontapToggleFollow: () =>
-                                profileProvider.toggleFollowBtn(
+                                profileProvider.toggleFollowBtn(context,
                                     userModel: currentUser, appUserId: user.id),
                             btnName: appText(context).strRemove,
                           );
@@ -201,6 +201,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                             user: user,
                             ontapToggleFollow: () =>
                                 profileProvider.toggleFollowBtn(
+                              context,
                               userModel: currentUser,
                               appUserId: user.id,
                             ),
@@ -242,6 +243,7 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                 user: user,
                                 ontapToggleFollow: () =>
                                     profileProvider.toggleFollowBtn(
+                                  context,
                                   userModel: currentUser,
                                   appUserId: user.id,
                                 ),

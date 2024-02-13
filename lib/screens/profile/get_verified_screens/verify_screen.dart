@@ -42,65 +42,65 @@ class VerifyScreen extends StatefulWidget {
 class _VerifyScreenState extends State<VerifyScreen> {
   String get title {
     if (widget.isEducation) {
-      return 'Education';
+      return appText(context).strEducation;
     } else if (widget.isUsername) {
-      return 'Username';
+      return appText(context).strUserName;
     } else if (widget.isForum) {
-      return 'Forum';
+      return appText(context).strForum;
     } else if (widget.isGroup) {
-      return 'Group';
+      return appText(context).strSrcGroup;
     } else if (widget.isOrganization) {
-      return 'Organization';
+      return appText(context).strOrganization;
     } else {
-      return 'Work';
+      return appText(context).strWork;
     }
   }
 
   String get discription {
     if (widget.isEducation) {
-      return 'Please fill in the information below in order to verify your education status';
+      return '';
     } else if (widget.isUsername) {
-      return 'Please fill in the information below in order to verify your username status';
+      return appText(context).strUsernameStatus;
     } else if (widget.isForum) {
-      return 'Please fill in the information below in order to verify your forum name status';
+      return appText(context).strForumStatus;
     } else if (widget.isGroup) {
-      return 'Please fill in the information below in order to verify your group name status';
+      return appText(context).strGroupStatus;
     } else if (widget.isOrganization) {
-      return 'Please fill in the information below in order to verify your organization status';
+      return appText(context).strOrganizationStatus;
     } else {
-      return 'Please fill in the information below in order to verify your work status';
+      return appText(context).strWorkStatus;
     }
   }
 
   String get textFieldHint {
     if (widget.isEducation) {
-      return 'School Name';
+      return appText(context).strSchoolName;
     } else if (widget.isUsername) {
-      return 'Username';
+      return appText(context).strUserName;
     } else if (widget.isForum) {
-      return 'Forum Name';
+      return appText(context).strForumName;
     } else if (widget.isGroup) {
-      return 'Group Name';
+      return appText(context).strGroupName;
     } else if (widget.isOrganization) {
-      return 'Organization Name';
+      return appText(context).strOrganizationName;
     } else {
-      return 'Name of place of work';
+      return appText(context).strWorkPlaceName;
     }
   }
 
   String get idName {
     if (widget.isEducation) {
-      return 'School ID';
+      return appText(context).strSchoolID;
     } else if (widget.isUsername) {
-      return 'ID';
+      return appText(context).strID;
     } else if (widget.isForum) {
-      return 'ID';
+      return appText(context).strID;
     } else if (widget.isGroup) {
-      return 'ID';
+      return appText(context).strID;
     } else if (widget.isOrganization) {
-      return 'ID';
+      return appText(context).strID;
     } else {
-      return 'Work ID';
+      return appText(context).strWorkID;
     }
   }
 
@@ -108,7 +108,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   File? otherDocFile;
   final controller = TextEditingController();
 
-  void pickIDPhoto() async {
+  void pickIDPhoto(context) async {
     try {
       final pickedPhoto =
           await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -122,11 +122,11 @@ class _VerifyScreenState extends State<VerifyScreen> {
         setState(() {});
       }
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
   }
 
-  void pickDocPhoto() async {
+  void pickDocPhoto(context) async {
     try {
       final pickedPhoto =
           await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -140,7 +140,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
         setState(() {});
       }
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
   }
 
@@ -164,7 +164,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           ),
           heightBox(12.h),
           GestureDetector(
-            onTap: () => pickIDPhoto(),
+            onTap: () => pickIDPhoto(context),
             child: idFile == null
                 ? DottedBorder(
                     borderType: BorderType.RRect,
@@ -200,7 +200,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           ),
           heightBox(12.h),
           GestureDetector(
-            onTap: () => pickDocPhoto(),
+            onTap: () => pickDocPhoto(context),
             child: otherDocFile == null
                 ? DottedBorder(
                     borderType: BorderType.RRect,
@@ -217,8 +217,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
                           children: [
                             Icon(Icons.upload_file_sharp, size: 50.h),
                             heightBox(10.h),
-                            const TextWidget(
-                              text: 'Upload Other Documents\n(Optional)',
+                            TextWidget(
+                              text: appText(context).strUploadDocuments,
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -239,7 +239,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           ),
           heightBox(12.h),
           CommonButton(
-            text: 'Send for verification',
+            text: appText(context).strSendVerify,
             fontSize: 13.sp,
             height: 52.h,
             onTap: () {
@@ -264,8 +264,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                         SvgPicture.asset(icReportPostDone),
                         heightBox(15.h),
                         TextWidget(
-                          text:
-                              "Your application is submitted for\n$title verification",
+                          text: appText(context).strApplicationSubmitted(title),
                           fontWeight: FontWeight.w600,
                           textAlign: TextAlign.center,
                           fontSize: 18.sp,
@@ -273,7 +272,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                         ),
                         heightBox(12.h),
                         TextWidget(
-                          text: "We will contact you shortly",
+                          text: appText(context).strContact,
                           fontWeight: FontWeight.w400,
                           fontSize: 14.sp,
                           color: const Color(0xff5f5f5f),
@@ -284,8 +283,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                   ),
                 );
               } else {
-                GlobalSnackBar.show(
-                    message: 'Please fill the required information first');
+                GlobalSnackBar.show(message: appText(context).strFillInfo);
               }
             },
           )

@@ -272,8 +272,8 @@ class TagUserListDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final search = Provider.of<SearchProvider>(context);
     return Scaffold(
-      appBar:
-          primaryAppbar(title: 'Select users to tag in post', elevation: 0.2),
+      appBar: primaryAppbar(
+          title: appText(context).strSelectUsersTag, elevation: 0.2),
       body: Consumer<CreatePostMethods>(builder: (context, prov, b) {
         return Padding(
           padding: EdgeInsets.all(15.w),
@@ -298,10 +298,10 @@ class TagUserListDialog extends StatelessWidget {
                       return Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: const Center(
+                          child: Center(
                             child: TextWidget(
                               textAlign: TextAlign.center,
-                              text: 'Search the users to tag them.',
+                              text: appText(context).strSearchUsers,
                             ),
                           ),
                         ),
@@ -366,7 +366,7 @@ class TagUserListDialog extends StatelessWidget {
 
                       Get.back(); // Close the dialog
                     },
-                    child: const Text('Cancel'),
+                    child: Text(appText(context).strCancel),
                   ),
                   TextButton(
                     onPressed: () {
@@ -374,7 +374,7 @@ class TagUserListDialog extends StatelessWidget {
                       // updateTextFieldWithSelectedUsers(prov.selectedUsers);
                       Get.back(); // Close the dialog
                     },
-                    child: const Text('OK'),
+                    child: Text(appText(context).strOk),
                   ),
                 ],
               )

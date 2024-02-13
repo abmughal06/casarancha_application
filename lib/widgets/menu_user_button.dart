@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -127,15 +128,14 @@ thanksForUserReportDialog(context, String user) async {
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
-          title: const Text("Thanks for report!"),
-          content: Text(
-              "Support team will take action as soon as possible on this $user."),
+          title: Text(appText(context).strThanksReport),
+          content: Text(appText(context).alertSupportTeamAction(user)),
           actions: [
             TextButton(
                 onPressed: () {
                   Get.back();
                 },
-                child: const Text("Back"))
+                child: Text(appText(context).strBack))
           ],
         );
       });
@@ -146,15 +146,14 @@ alreadyUserReportDialog(context, String user) async {
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
-          title: const Text("Report already submitted"),
-          content: Text(
-              "Report already submitted! Support team will take action as soon as possible on this $user."),
+          title: Text(appText(context).alertReportSubmitted),
+          content: Text(appText(context).alertReportSubmittedTeamAction(user)),
           actions: [
             TextButton(
                 onPressed: () {
                   Get.back();
                 },
-                child: const Text("Back"))
+                child: Text(appText(context).strBack))
           ],
         );
       });
@@ -173,9 +172,8 @@ reportUserDialog(context,
                 ? const Center(
                     child: CircularProgressIndicator(color: colorPrimaryA05))
                 : CupertinoAlertDialog(
-                    title: const Text("Report user!"),
-                    content:
-                        Text("Are you sure you want to report this $user?"),
+                    title: Text(appText(context).strReportUser),
+                    content: Text(appText(context).strReportConfirmation(user)),
                     actions: [
                       TextButton(
                           onPressed: () async {
@@ -197,17 +195,17 @@ reportUserDialog(context,
                               alreadyUserReportDialog(context, user);
                             }
                           },
-                          child: const Text(
-                            "Report",
-                            style: TextStyle(color: colorPrimaryA05),
+                          child: Text(
+                            appText(context).strReport,
+                            style: const TextStyle(color: colorPrimaryA05),
                           )),
                       TextButton(
                           onPressed: () {
                             Get.back();
                           },
-                          child: const Text(
-                            "Cancel",
-                            style: TextStyle(color: colorBlack),
+                          child: Text(
+                            appText(context).strCancel,
+                            style: const TextStyle(color: colorBlack),
                           ))
                     ],
                   );

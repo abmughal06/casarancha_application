@@ -42,7 +42,7 @@ class GroupMembersScreen extends StatelessWidget {
                         return CustomAdaptiveAlertDialog(
                           actiionBtnName: appText(context).strLeave,
                           actionBtnColor: colorPrimaryA05,
-                          alertMsg: 'Are you sure you want to leave the group?',
+                          alertMsg: appText(context).alertLeaveGroup,
                           onAction: () {
                             grpProv.leaveGroup(
                               groupId: grp.id,

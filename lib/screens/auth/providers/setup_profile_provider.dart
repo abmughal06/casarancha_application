@@ -36,7 +36,7 @@ class SetupProfileProvider extends ChangeNotifier {
 
   bool isLoading = false;
 
-  getFromGallery() async {
+  getFromGallery(context) async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 50,
@@ -47,7 +47,7 @@ class SetupProfileProvider extends ChangeNotifier {
       imageFilePicked = await cropImage(pickedFile.path);
       notifyListeners();
     } else {
-      GlobalSnackBar.show(message: 'Process Cancelled');
+      GlobalSnackBar.show(message: appText(context).strProcessCancelled);
     }
   }
 
@@ -88,15 +88,15 @@ class SetupProfileProvider extends ChangeNotifier {
 
       return false;
     } else if (lname!.isEmpty) {
-      GlobalSnackBar.show(message: "Please enter the last name");
+      GlobalSnackBar.show(message: appText(context).strEnterLastName);
 
       return false;
     } else if (username!.isEmpty) {
-      GlobalSnackBar.show(message: "Please enter the username");
+      GlobalSnackBar.show(message: appText(context).strEnterUserName);
 
       return false;
     } else if (selectedDob == null || selectedDob == "") {
-      GlobalSnackBar.show(message: "Please enter the date of birth");
+      GlobalSnackBar.show(message: appText(context).strEnterDOB);
 
       return false;
     }
@@ -178,7 +178,7 @@ class SetupProfileProvider extends ChangeNotifier {
     } on FirebaseException catch (e) {
       GlobalSnackBar.show(message: e.message.toString());
     } catch (e) {
-      GlobalSnackBar.show(message: "Something is wrong please try again.");
+      GlobalSnackBar.show(message: appText(context).strSomethingWrong);
     } finally {
       isLoading = false;
       notifyListeners();

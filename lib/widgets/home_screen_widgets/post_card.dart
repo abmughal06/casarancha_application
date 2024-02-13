@@ -90,8 +90,8 @@ class PostCard extends StatelessWidget {
                         context: context,
                         builder: (c) => CustomAdaptiveAlertDialog(
                           alertMsg: isGroupAdmin
-                              ? 'Are you sure you want to ban this user from group posting'
-                              : 'Are you sure you want to delete this user post',
+                              ? appText(context).strConfirmBanUserPost
+                              : appText(context).strConfirmDeleteUserPost,
                           actiionBtnName: appText(context).strBan,
                           onAction: () {
                             if (isGroupAdmin) {
@@ -156,7 +156,8 @@ class PostCard extends StatelessWidget {
           isLike: post.likesIds.contains(curruentUser!.id),
           ontapLike: () {
             ghostProvider.checkGhostMode
-                ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                ? GlobalSnackBar.show(
+                    message: appText(context).strGhostModeEnabled)
                 : postPorvider.toggleLikeDislike(
                     postModel: post,
                     groupId: groupId,
@@ -164,7 +165,8 @@ class PostCard extends StatelessWidget {
           },
           ontapSave: () {
             ghostProvider.checkGhostMode
-                ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                ? GlobalSnackBar.show(
+                    message: appText(context).strGhostModeEnabled)
                 : postPorvider.onTapSave(
                     userModel: curruentUser, postId: post.id);
           },

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class EditProfileProvider extends ChangeNotifier {
     imageFilePicked = null;
   }
 
-  getFromGallery() async {
+  getFromGallery(context) async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 50,
@@ -59,23 +60,23 @@ class EditProfileProvider extends ChangeNotifier {
       imageFilePicked = await cropImage(pickedFile.path);
       notifyListeners();
     } else {
-      GlobalSnackBar.show(message: 'Process Cancelled');
+      GlobalSnackBar.show(message: appText(context).strProcessCancelled);
     }
     notifyListeners();
   }
 
-  bool checkValidData() {
+  bool checkValidData(context) {
     if (firstNameController.text.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter first name');
+      GlobalSnackBar.show(message: appText(context).strEnterFirstName);
       return false;
     } else if (lastNameController.text.isEmpty) {
-      GlobalSnackBar.show(message: 'Please enter last name ');
+      GlobalSnackBar.show(message: appText(context).strEnterLastName);
       return false;
     } else if (userNameController.text.isEmpty) {
-      GlobalSnackBar.show(message: "Please Enter username");
+      GlobalSnackBar.show(message: appText(context).strEnterUserName);
       return false;
     } else if (selectedDob == null || selectedDob == "") {
-      GlobalSnackBar.show(message: 'Please enter date of birth');
+      GlobalSnackBar.show(message: appText(context).strEnterDOB);
       return false;
     }
     //  else if (imageFilePicked == null && profileImage == null) {
@@ -85,9 +86,9 @@ class EditProfileProvider extends ChangeNotifier {
     return true;
   }
 
-  void updateData({UserModel? currentUser}) async {
+  void updateData(context, {UserModel? currentUser}) async {
     try {
-      if (checkValidData()) {
+      if (checkValidData(context)) {
         isLoading = true;
         notifyListeners();
 
@@ -119,7 +120,7 @@ class EditProfileProvider extends ChangeNotifier {
     } on FirebaseException catch (e) {
       GlobalSnackBar.show(message: e.message.toString());
     } catch (e) {
-      GlobalSnackBar.show(message: "Something is wrong please try again.");
+      GlobalSnackBar.show(message: appText(context).strSomethingWrong);
     } finally {
       isLoading = false;
       notifyListeners();

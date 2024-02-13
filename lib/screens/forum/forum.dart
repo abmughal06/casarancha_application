@@ -16,21 +16,12 @@ import 'package:provider/provider.dart';
 import '../../models/post_model.dart';
 import '../../widgets/primary_appbar.dart';
 
-class ForumsScreen extends StatefulWidget {
+class ForumsScreen extends StatelessWidget {
   const ForumsScreen({super.key});
 
   @override
-  State<ForumsScreen> createState() => _ForumsScreenState();
-}
-
-class _ForumsScreenState extends State<ForumsScreen>
-    with AutomaticKeepAliveClientMixin<ForumsScreen> {
-  @override
   Widget build(BuildContext context) {
     final ghostProvider = context.watch<DashboardProvider>();
-    // final users = context.watch<List<UserModel>?>();
-
-    super.build(context);
 
     return GhostScaffold(
       appBar: primaryAppbar(
@@ -96,7 +87,4 @@ class _ForumsScreenState extends State<ForumsScreen>
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

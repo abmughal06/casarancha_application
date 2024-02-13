@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
@@ -33,7 +34,7 @@ class AddStoryProvider extends ChangeNotifier {
 
   Future<void> shareStory({UserModel? user}) async {
     if (mediaFile == null) {
-      GlobalSnackBar.show(message: 'Please add a Photo or Video');
+      GlobalSnackBar.show(message: appText(context).strAddVideoorPhoto);
       return;
     }
     isSharingStory = true;
@@ -131,7 +132,7 @@ class AddStoryProvider extends ChangeNotifier {
         mediaFile = File(pickedmedia!.path);
       }
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
     notifyListeners();
   }

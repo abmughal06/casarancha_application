@@ -324,8 +324,8 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                 context: context,
                                                 builder: (_) =>
                                                     CustomAdaptiveAlertDialog(
-                                                  alertMsg:
-                                                      "Are you sure you want to delete this comment?",
+                                                  alertMsg: appText(context)
+                                                      .strConfirmDeleteComment,
                                                   actiionBtnName:
                                                       appText(context)
                                                           .strDelete,
@@ -348,7 +348,8 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                   .contains(currentUserUID) ||
                                               group.creatorId == currentUserUID,
                                           child: TextWidget(
-                                            text: "Ban user from Comments",
+                                            text: appText(context)
+                                                .strBanUserComment,
                                             color: colorPrimaryA05,
                                             fontWeight: FontWeight.w600,
                                             onTap: () async {
@@ -357,8 +358,8 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                 context: context,
                                                 builder: (_) =>
                                                     CustomAdaptiveAlertDialog(
-                                                  alertMsg:
-                                                      "Are you sure you want to ban this users from post comments?",
+                                                  alertMsg: appText(context)
+                                                      .strConfirmBanUserComment,
                                                   actiionBtnName:
                                                       appText(context).strBan,
                                                   onAction: () {
@@ -427,8 +428,9 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                         ),
                                         heightBox(10.h),
                                         widget.cmnt.creatorId != currentUserUID
-                                            ? const ReportPostorComment(
-                                                btnName: 'Report Comment')
+                                            ? ReportPostorComment(
+                                                btnName: appText(context)
+                                                    .strReportComment)
                                             : heightBox(0),
                                         heightBox(10.h),
                                         widget.cmnt.creatorId == currentUserUID
@@ -443,8 +445,8 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                     context: context,
                                                     builder: (_) =>
                                                         CustomAdaptiveAlertDialog(
-                                                      alertMsg:
-                                                          "Are you sure you want to delete your comment?",
+                                                      alertMsg: appText(context)
+                                                          .strConfirmDeleteComment,
                                                       actiionBtnName:
                                                           appText(context)
                                                               .strDelete,
@@ -496,7 +498,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                       child: Padding(
                         padding: EdgeInsets.only(left: 50.w),
                         child: TextWidget(
-                          text: 'hide reply',
+                          text: appText(context).strHideReply,
                           color: Colors.blue,
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w500,
@@ -924,7 +926,8 @@ class PostCommentReplyTile extends StatelessWidget {
                                             child: Row(
                                               children: [
                                                 TextWidget(
-                                                  text: 'reply',
+                                                  text:
+                                                      appText(context).strReply,
                                                   fontSize: 11.sp,
                                                   color: color221,
                                                 ),
@@ -961,18 +964,20 @@ class PostCommentReplyTile extends StatelessWidget {
                                             onTap: () => Get.to(() =>
                                                 SharePostScreen(
                                                     postModel: postModel)),
-                                            text: "Share",
+                                            text: appText(context).strShare,
                                             fontWeight: FontWeight.w600,
                                           ),
                                           heightBox(10.h),
                                           comment.creatorId != currentUserUID
-                                              ? const ReportPostorComment(
-                                                  btnName: 'Report Comment')
+                                              ? ReportPostorComment(
+                                                  btnName: appText(context)
+                                                      .strReportComment)
                                               : heightBox(0),
                                           heightBox(10.h),
                                           comment.creatorId == currentUserUID
                                               ? TextWidget(
-                                                  text: "Delete",
+                                                  text: appText(context)
+                                                      .strDelete,
                                                   color: colorPrimaryA05,
                                                   fontWeight: FontWeight.w600,
                                                   onTap: () async {
@@ -981,10 +986,12 @@ class PostCommentReplyTile extends StatelessWidget {
                                                         context: context,
                                                         builder: (_) =>
                                                             CustomAdaptiveAlertDialog(
-                                                                alertMsg:
-                                                                    "Are you sure you want to delete your comment?",
+                                                                alertMsg: appText(
+                                                                        context)
+                                                                    .strConfirmDeleteComment,
                                                                 actiionBtnName:
-                                                                    'Delete',
+                                                                    appText(context)
+                                                                        .strDelete,
                                                                 onAction: () {
                                                                   postProvider
                                                                       .deleteComment(

@@ -1,6 +1,7 @@
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/profile/block_account_screen.dart';
+import 'package:casarancha/utils/providers/locale_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class ProfileSettings extends StatelessWidget {
   const ProfileSettings({super.key});
@@ -33,6 +35,19 @@ class ProfileSettings extends StatelessWidget {
             ontap: () {},
             trailing: widthBox(0),
           ),
+          Consumer<LocaleProvider>(builder: (context, locale, b) {
+            return settingTile(
+              leadIcon: SvgPicture.asset(icBlockAccount, height: 26.h),
+              title: 'Language',
+              subtitle: locale.currentLang ?? 'en',
+              ontap: () {},
+              trailing: PopupMenuButton(itemBuilder: (_) {
+                return locale.allLocales
+                    .map((e) => PopupMenuItem(child: Text(e.toUpperCase())))
+                    .toList();
+              }),
+            );
+          }),
         ],
       ),
     );

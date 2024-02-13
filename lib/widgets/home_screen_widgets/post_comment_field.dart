@@ -81,6 +81,7 @@ class PostCommentField extends StatelessWidget {
 
                         if (postProvider.repCommentId == null) {
                           postProvider.postComment(
+                            context,
                             postModel: postModel,
                             groupId: groupId,
                             user: user,
@@ -88,6 +89,7 @@ class PostCommentField extends StatelessWidget {
                           );
                         } else {
                           postProvider.postCommentReply(
+                            context,
                             postModel: postModel,
                             groupId: groupId,
                             user: user,

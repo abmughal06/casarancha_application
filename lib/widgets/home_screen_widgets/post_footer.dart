@@ -104,7 +104,7 @@ class CustomPostFooter extends StatelessWidget {
                                 groupId: groupId,
                               ))
                           : GlobalSnackBar.show(
-                              message: "only Admins can share"),
+                              message: appText(context).strAdminShare),
                   child: const Icon(
                     Icons.share,
                     color: color887,

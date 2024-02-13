@@ -259,6 +259,234 @@
     "btnDeleteMsg": "Delete Message",
     "alertErrorLoading": "Error Loading Media",
     "banned": "Banned",
+    "all": "All",
+    "strAlert": "Alert",
+    "strLive": "Live",
+    "strProfileGhostMessage": "you can't see sender profile in ghost messages",
+    "strGlobalBannedGroup": "You can't post anymore in this group, you're banned by group admin for violating group policies.",
+    "strQuoteNPost": "Quote\nPost",
+    "strFilenotSupported": "File not supported",
+    "strSearchUsers": "Search the users to tag them.",
+    "strOk": "OK",
+    "strWait": "Wait",
+    "strShareStory": "Share Story",
+    "strAdminContact": "Your message is sent to admin, he will contact you soon.",
+    "strUploadDocuments": "Upload Other Documents\n(Optional)",
+    "strSendVerify": "Send for verification",
+    "strContact": "We will contact you shortly",
+    "strFillInfo": "Please fill the required information first",
+    "strRemoveUserFromGroup": "''Are you sure you want to remove this user from group?.''",
+    "strRemoveUser": "Remove User?",
+    "alertBanUserTitle": "Ban User?",
+    "alertBanUserMsg": "''Are you sure you want to ban this user from group?.''",
+    "alertBanPostingTitle": "Ban user from posting?",
+    "alertBanPostinMsg": "Are you sure you want to ban this user from posting in group?.",
+    "strbanPosting": "Ban from posting?",
+    "strunbanPosting": "Unban from posting",
+    "alertBanCommentsTile": "Ban from Comments?",
+    "alertBanCommentsMsg": "''Are you sure you want to bann this user from comments in group post?.''",
+    "strUnBanComment": "Unban from Comments",
+    "strBanFromComment": "Ban from Comments",
+    "strMakeAdmin": "Make Admin?",
+    "strConfirmationAdmin": "Are you sure you want to make this user admin of group?.",
+    "strMakeAdminn": "Make Admin",
+    "strConfirmationRequest": "Are you sure you want to accept this user request?",
+    "strDeclineRequest": "Are you sure you want to decline this user request?",
+    "strRemoveAdmin": "Remove Admin?",
+    "strConfirmationRemoveAdmin": "Are you sure you want to remove this user from admins?.",
+    "strConfirmDeleteUserPost": "Are you sure you want to delete this user post",
+    "strConfirmBanUserPost": "Are you sure you want to ban this user from group posting",
+    "strGhostModeEnabled": "Ghost Mode is enabled",
+    "strConfirmDeleteComment": "Are you sure you want to delete this comment?",
+    "strBanUserComment": "Ban user from Comments",
+    "strConfirmBanUserComment": "Are you sure you want to ban this users from post comments?",
+    "strReportComment": "Report Comment",
+    "strHideReply": "hide reply",
+    "strReply": "reply",
+    "strCantVisit": "You can't visit a ghost profile",
+    "strAdminShare": "only Admins can share",
+    "strDownloadFile": "Download File",
+    "strConfirmDownload": "Do you want to download this file?",
+    "strConfirmReportReason": "Are you sure you wanted to report this post if yes then choose the reason for the report which is the related to the post",
+    "strNoViews": "No Views",
+    "strUserNotMatched": "User is Not Matched",
+    "strConfirmLogout": "Are you sure you want to logout to the application?",
+    "strDeleteAccount": "Delete your Account?",
+    "strConfirmationDeleteAccount": "If you select Delete we will delete your account on our server.Your app data will also be deleted and you won't be able to retrieve it.",
+    "strPostDeleted": "Post is deleted",
+    "gsbMoreText": "Please add one more option to continue",
+    "alertLeaveGroup": "Are you sure you want to leave the group?",
+    "strSelectUsersTag": "Select users to tag in post",
+    "strOrganization": "Organization",
+    "strEducationStatus": "Please fill in the information below in order to verify your education status",
+    "strUsernameStatus": "Please fill in the information below in order to verify your username status",
+    "strForumStatus": "Please fill in the information below in order to verify your forum name status",
+    "strGroupStatus": "Please fill in the information below in order to verify your group name status",
+    "strOrganizationStatus": "Please fill in the information below in order to verify your organization status",
+    "strWorkStatus": "Please fill in the information below in order to verify your work status",
+    "strSchoolName": "School Name",
+    "strForumName": "Forum Name",
+    "strOrganizationName": "Organization Name",
+    "strWorkPlaceName": "Name of place of work",
+    "strSchoolID": "School ID",
+    "strID": "ID",
+    "strWorkID": "Work ID",
+    "gsbOperationCancelled": "Operation Cancelled",
+    "strApplicationSubmitted": "Your application is submitted for\n{title} verification",
+
+    "strText": "text",
+    "strThanksReport": "Thanks for report!",
+    "alertSupportTeamAction": "Support team will take action as soon as possible on this {user}.",
+
+    "strBack": "Back",
+    "alertReportSubmitted": "Report already submitted",
+    "alertReportSubmittedTeamAction": "Report already submitted! Support team will take action as soon as possible on this {user}.",
+
+    "strReportConfirmation": "Are you sure you want to report this {user}?",
+
+    "strcannotDownloadText": "Text message cannot be downloaded you can copy them",
+    "strPhoneLoginCancelled": "Phone login cancelled",
+    "strGoogleLoginCancelled": "Google login cancelled",
+    "strAppleLoginCancelled": "Apple login cancelled",
+    "strAccountLinkedSuccess": "Account Linked Successfully",
+    "strProviderAlreadyLinked": "The provider has already been linked to the user.",
+    "strProvidercredNotValid": "The provider's credential is not valid.",
+    "strProcessCancelled": "Process Cancelled",
+    "strEnterFirstName": "Please enter first name",
+    "strEnterLastName": "Please enter the last name",
+    "strEnterUserName": "Please enter the username",
+    "strEnterDOB": "Please enter the date of birth",
+    "strComingSoon": "Comming Soon",
+    "strEnterSomething": "Please enter something to add option",
+    "strWriteGroupName": "Please write group name",
+    "strWriteGroupDesc": "Please write group description",
+    "strProvideGroupImg": "Please provide group image",
+    "strSomethingWrong": "Something is wrong please try again.",
+    "strEnableGhModeAudio": "Please enable ghost mode first to send audio",
+    "strCantPrivateGroup": "You can't visit private groups",
+    "strEnableGhModeAttachment": "Please enable ghost mode in order to send attachment",
+    "strEnableGhModeMessage": "Please enable ghost message first to send the message",
+    "strAddVideoorPhoto": "Please add a Photo or Video",
+    "strUnkownError": "unknown error occured, please try later",
+    "strVideoNotSupported": "video format not supported, please try another one.",
+    "strRecordingRestriction": "You cannot send a recording greater than 60 minutes",
+    "strCreddAlreadyExists": "The account corresponding to the credential already exists,or is already linked to a Firebase User. ",
+    "strAuthErrorMessage": "Please enter {message}",
+    "strDownloading": "Downloading file {download}%",
+    "strFriendFollow": "Your friend is on casarancha, follow now",
+    "strFollowCasaRancha": "is now on casarancha, follow now",
+    "strConfirmDeleteMedia": "Are you sure you want to delete the media?",
+    "strDeleteMedia": "Delete Meia",
+    "strFollowYou": "follow you",
+    "strSentPost": "has sent you a post",
+    "strTaggedPost": "has tagged you in a post",
+    "strCommentStory": "has commented on your story",
+    "strUnReadMessagesInGhost": "has sent you a {unreadMessage} message in ghost",
+
+    "strUnReadAttachment": "has sent you a {unreadMessage} attachment",
+
+    "strUnReadMessages": "has sent you a {unreadMessage}  message",
+
+    "strUnReadVoiceMessages": "has sent you a {unreadMessage} voice message",
+
+    "pushnotPost": "post",
+    "pushnotGroupPost": "group post",
+    "strNotificationComment": "has commented on your {post}.",
+
+    "strNotificationMentioned": "has mentioned you in {post}.",
+
+    "strNotificationReplyComment": "has replied on your comment on {post}.",
+    "@strNotificationReplyComment": {
+        "placeholders": {
+            "post": {
+                "type": "String"
+            }
+        }
+    },
+    "@alertSupportTeamAction": {
+        "placeholders": {
+            "user": {
+                "type": "String"
+            }
+        }
+    },
+    "@strAuthErrorMessage": {
+        "placeholders": {
+            "message": {
+                "type": "String"
+            }
+        }
+    },
+    "@alertReportSubmittedTeamAction": {
+        "placeholders": {
+            "user": {
+                "type": "String"
+            }
+        }
+    },
+    "@strApplicationSubmitted": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
+    "@strDownloading": {
+        "placeholders": {
+            "download": {
+                "type": "int"
+            }
+        }
+    },
+    "@strUnReadMessagesInGhost": {
+        "placeholders": {
+            "unreadMessage": {
+                "type": "int"
+            }
+        }
+    },
+    "@strUnReadAttachment": {
+        "placeholders": {
+            "unreadMessage": {
+                "type": "int"
+            }
+        }
+    },
+    "@strUnReadMessages": {
+        "placeholders": {
+            "unreadMessage": {
+                "type": "int"
+            }
+        }
+    },
+    "@strUnReadVoiceMessages": {
+        "placeholders": {
+            "unreadMessage": {
+                "type": "int"
+            }
+        }
+    },
+    "@strNotificationComment": {
+        "placeholders": {
+            "post": {
+                "type": "String"
+            }
+        }
+    },
+    "@strNotificationMentioned": {
+        "placeholders": {
+            "post": {
+                "type": "String"
+            }
+        }
+    },
+    "@strReportConfirmation": {
+        "placeholders": {
+            "user": {
+                "type": "String"
+            }
+        }
+    },
     "@strStartChat": {
         "placeholders": {
             "username": {
@@ -266,4 +494,5 @@
             }
         }
     }
+
 }

@@ -36,7 +36,7 @@ class Poll extends StatelessWidget {
     return FlutterPolls(
       pollId: postModel.id,
       onVoted: (v, i) async {
-        prov.updatePollData(postId: postModel.id, option: v.id!);
+        prov.updatePollData(context, postId: postModel.id, option: v.id!);
         return true;
       },
       hasVoted: pollVotedUsers == null ? false : true,

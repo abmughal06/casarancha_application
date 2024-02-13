@@ -30,10 +30,15 @@ class MusicGrid extends StatelessWidget {
               // final data = musicList[index].mediaData[0];
 
               return GestureDetector(
-                onTap: () => Get.to(() => PostFullScreenView(
-                      post: musicList[index],
-                      isPostDetail: false,
-                    )),
+                onTap: () => Get.to(
+                  () => ProfilePostFullScreenView(
+                    postsList: musicList,
+                    index: index,
+                    groupId: null,
+                    isPostDetail: false,
+                    postType: appText(context).strMusic,
+                  ),
+                ),
                 child: Container(
                     color: colorF03.withOpacity(0.6),
                     child: Icon(Icons.music_note, size: 35.sp)),

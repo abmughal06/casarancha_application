@@ -133,9 +133,9 @@ class GroupMemberTile extends StatelessWidget {
                                   context: context,
                                   builder: (_) {
                                     return CustomAdaptiveAlertDialog(
-                                      title: 'Remove User?',
-                                      alertMsg:
-                                          '''Are you sure you want to remove this user from group?.''',
+                                      title: appText(context).strRemoveUser,
+                                      alertMsg: appText(context)
+                                          .strRemoveUserFromGroup,
                                       actiionBtnName:
                                           appText(context).strRemove,
                                       onAction: () {
@@ -160,9 +160,10 @@ class GroupMemberTile extends StatelessWidget {
                                     context: context,
                                     builder: (_) {
                                       return CustomAdaptiveAlertDialog(
-                                          title: 'Unban User?',
+                                          title:
+                                              appText(context).alertTitileUnban,
                                           alertMsg:
-                                              '''Are you sure you want to unban this user?.''',
+                                              appText(context).alertMsgUnban,
                                           actiionBtnName:
                                               appText(context).strUnban,
                                           onAction: () {
@@ -177,9 +178,10 @@ class GroupMemberTile extends StatelessWidget {
                                     context: context,
                                     builder: (_) {
                                       return CustomAdaptiveAlertDialog(
-                                        title: 'Ban User?',
+                                        title:
+                                            appText(context).alertBanUserTitle,
                                         alertMsg:
-                                            '''Are you sure you want to ban this user from group?.''',
+                                            appText(context).alertBanUserMsg,
                                         actiionBtnName: appText(context).strBan,
                                         onAction: () {
                                           prov.banUserFromGroup(
@@ -205,9 +207,10 @@ class GroupMemberTile extends StatelessWidget {
                                 context: context,
                                 builder: (_) {
                                   return CustomAdaptiveAlertDialog(
-                                    title: 'Ban user from posting?',
+                                    title:
+                                        appText(context).alertBanPostingTitle,
                                     alertMsg:
-                                        '''Are you sure you want to ban this user from posting in group?.''',
+                                        appText(context).alertBanPostinMsg,
                                     actiionBtnName: appText(context).strYes,
                                     actionBtnColor: colorPrimaryA05,
                                     onAction: () {
@@ -228,8 +231,8 @@ class GroupMemberTile extends StatelessWidget {
                             enabled: !group.banUsersIds.contains(user.id),
                             child: TextWidget(
                               text: !group.banFromPostUsersIds.contains(user.id)
-                                  ? 'Ban from posting'
-                                  : 'Unban from posting',
+                                  ? appText(context).strbanPosting
+                                  : appText(context).strunbanPosting,
                               fontWeight: FontWeight.w500,
                               fontSize: 14.sp,
                               color: colorPrimaryA05,
@@ -241,9 +244,10 @@ class GroupMemberTile extends StatelessWidget {
                                 context: context,
                                 builder: (_) {
                                   return CustomAdaptiveAlertDialog(
-                                    title: 'Ban from Comments?',
+                                    title:
+                                        appText(context).alertBanCommentsTile,
                                     alertMsg:
-                                        '''Are you sure you want to bann this user from comments in group post?.''',
+                                        appText(context).alertBanCommentsMsg,
                                     actiionBtnName: appText(context).strYes,
                                     actionBtnColor: colorPrimaryA05,
                                     onAction: () {
@@ -264,8 +268,8 @@ class GroupMemberTile extends StatelessWidget {
                             enabled: !group.banUsersIds.contains(user.id),
                             child: TextWidget(
                               text: group.banFromCmntUsersIds.contains(user.id)
-                                  ? "Unban from Comments"
-                                  : 'Ban from Comments',
+                                  ? appText(context).strUnBanComment
+                                  : appText(context).strBanFromComment,
                               fontWeight: FontWeight.w500,
                               fontSize: 14.sp,
                               color: colorPrimaryA05,
@@ -277,9 +281,9 @@ class GroupMemberTile extends StatelessWidget {
                                 context: context,
                                 builder: (_) {
                                   return CustomAdaptiveAlertDialog(
-                                    title: 'Make admin?',
+                                    title: appText(context).strMakeAdmin,
                                     alertMsg:
-                                        '''Are you sure you want to make this user admin of group?.''',
+                                        appText(context).strConfirmationAdmin,
                                     actiionBtnName: appText(context).strYes,
                                     actionBtnColor: Colors.black,
                                     onAction: () {
@@ -293,7 +297,7 @@ class GroupMemberTile extends StatelessWidget {
                             },
                             enabled: !group.banUsersIds.contains(user.id),
                             child: TextWidget(
-                              text: 'Make Admin',
+                              text: appText(context).strMakeAdminn,
                               fontWeight: FontWeight.w500,
                               fontSize: 14.sp,
                               color: color221,
@@ -301,38 +305,7 @@ class GroupMemberTile extends StatelessWidget {
                           ),
                         ],
                       )
-                    : PopupMenuButton(
-                        icon: const Icon(Icons.more_vert),
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (_) => [
-                          PopupMenuItem(
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (_) {
-                                    return CustomAdaptiveAlertDialog(
-                                      title: 'Remove User?',
-                                      alertMsg:
-                                          '''Are you sure you want to remove this user from group?.''',
-                                      actiionBtnName:
-                                          appText(context).strRemove,
-                                      onAction: () {
-                                        prov.removeGroupMembers(
-                                            id: user.id, groupId: group.id);
-                                        Get.back();
-                                      },
-                                    );
-                                  });
-                            },
-                            child: TextWidget(
-                              text: appText(context).strRemove,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14.sp,
-                              color: colorPrimaryA05,
-                            ),
-                          ),
-                        ],
-                      ),
+                    : Container()
           ],
         ),
       ),
@@ -410,8 +383,8 @@ class GroupJoinRequestCard extends StatelessWidget {
                               context: context,
                               builder: (_) => CustomAdaptiveAlertDialog(
                                 alertMsg:
-                                    'Are you sure you want to accept this user request?',
-                                actiionBtnName: 'Yes',
+                                    appText(context).strConfirmationRequest,
+                                actiionBtnName: appText(context).strYes,
                                 onAction: () {
                                   Get.back();
                                   prov.acceptMembers(
@@ -429,7 +402,7 @@ class GroupJoinRequestCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(7.sp),
                             ),
                             child: TextWidget(
-                              text: "Accept",
+                              text: appText(context).strAccept,
                               fontSize: 12.sp,
                               color: color13F,
                               fontWeight: FontWeight.w600,
@@ -443,9 +416,8 @@ class GroupJoinRequestCard extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (_) => CustomAdaptiveAlertDialog(
-                                alertMsg:
-                                    'Are you sure you want to decline this user request?',
-                                actiionBtnName: 'Yes',
+                                alertMsg: appText(context).strDeclineRequest,
+                                actiionBtnName: appText(context).strYes,
                                 onAction: () {
                                   prov.removeRequestPrivateGroup(
                                       id: user.id, groupId: group.id);
@@ -462,7 +434,7 @@ class GroupJoinRequestCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(7.sp),
                             ),
                             child: TextWidget(
-                              text: "Decline",
+                              text: appText(context).strDecline,
                               fontSize: 12.sp,
                               color: colorWhite,
                               fontWeight: FontWeight.w600,
@@ -654,9 +626,9 @@ class GroupAdminMemberTile extends StatelessWidget {
                           context: context,
                           builder: (_) {
                             return CustomAdaptiveAlertDialog(
-                              title: 'Remove Admin?',
+                              title: appText(context).strRemoveAdmin,
                               alertMsg:
-                                  '''Are you sure you want to remove this user from admins?.''',
+                                  appText(context).strConfirmationRemoveAdmin,
                               actiionBtnName: appText(context).strRemove,
                               onAction: onTapAction,
                             );

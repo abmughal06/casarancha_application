@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:casarancha/utils/app_utils.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -16,7 +17,7 @@ class NewGroupProvider extends ChangeNotifier {
   File? imageFilePicked;
   bool isCreating = false;
 
-  getFromGallery() async {
+  getFromGallery(context) async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 50,
@@ -27,11 +28,11 @@ class NewGroupProvider extends ChangeNotifier {
       imageFilePicked = File(pickedFile.path);
       notifyListeners();
     } else {
-      GlobalSnackBar.show(message: 'Process Cancelled');
+      GlobalSnackBar.show(message: appText(context).strProcessCancelled);
     }
   }
 
-  createGroup(
+  createGroup(context,
       {required String gName,
       required String bio,
       required bool isPublic,
@@ -43,15 +44,15 @@ class NewGroupProvider extends ChangeNotifier {
       var groupName = gName;
       var groupDescription = bio;
       if (groupName.isEmpty) {
-        GlobalSnackBar.show(message: 'Please write group name');
+        GlobalSnackBar.show(message: appText(context).strWriteGroupName);
         return;
       }
       if (groupDescription.isEmpty) {
-        GlobalSnackBar.show(message: 'Please write group description');
+        GlobalSnackBar.show(message: appText(context).strWriteGroupDesc);
         return;
       }
       if (imageFilePicked == null) {
-        GlobalSnackBar.show(message: 'Please provide group image');
+        GlobalSnackBar.show(message: appText(context).strProvideGroupImg);
         return;
       }
 

@@ -44,8 +44,10 @@ class VideoGridView extends StatelessWidget {
               final data = videoList![index].mediaData[0];
 
               return GestureDetector(
-                onTap: () => Get.to(() => PostFullScreenView(
-                      post: videoList![index],
+                onTap: () => Get.to(() => ProfilePostFullScreenView(
+                      postsList: videoList!,
+                      index: index,
+                      postType: appText(context).strVideo,
                       isPostDetail: true,
                     )),
                 child: FutureBuilder<String?>(

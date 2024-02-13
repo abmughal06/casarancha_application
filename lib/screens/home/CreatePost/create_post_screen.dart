@@ -414,8 +414,7 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
           isLoadingVideo = false;
         });
       }).catchError((e) {
-        GlobalSnackBar.show(
-            message: "video format not supported, please try another one.");
+        GlobalSnackBar.show(message: appText(context).strVideoNotSupported);
         isLoadingVideo = false;
         isPlayingVideo = false;
         isError = true;
@@ -437,8 +436,8 @@ class _VideoPlayerWithFileState extends State<VideoPlayerWithFile> {
   @override
   Widget build(BuildContext context) {
     return isError
-        ? const Center(
-            child: TextWidget(text: 'File not supported'),
+        ? Center(
+            child: TextWidget(text: appText(context).strFilenotSupported),
           )
         : Stack(
             children: [

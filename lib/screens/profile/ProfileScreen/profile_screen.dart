@@ -18,14 +18,9 @@ import '../../../widgets/profle_screen_widgets/qoutes_grid.dart';
 
 import '../../../widgets/profle_screen_widgets/video_grid.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserModel?>();

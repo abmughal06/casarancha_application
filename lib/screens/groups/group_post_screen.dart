@@ -140,8 +140,7 @@ class _GroupPostScreenState extends State<GroupPostScreen> {
                         if (widget.group.banFromPostUsersIds
                             .contains(currentUserUID)) {
                           GlobalSnackBar.show(
-                              message:
-                                  "You can't post anymore in this group, you're banned by group admin for violating group policies.");
+                              message: appText(context).strGlobalBannedGroup);
                         } else {
                           Get.to(() => CreatePostScreen(
                                 groupId: widget.group.id,

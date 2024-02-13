@@ -66,7 +66,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
               ),
               widthBox(12.h),
               CommonButton(
-                text: 'Add',
+                text: appText(context).strAdd,
                 height: 45.h,
                 width: 70.w,
                 backgroundColor: colorF03.withOpacity(0.6),
@@ -84,7 +84,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                     }
                   } else {
                     GlobalSnackBar.show(
-                        message: 'Please enter something to add option');
+                        message: appText(context).strEnterSomething);
                   }
                 },
               ),
@@ -157,8 +157,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                   isForum: true,
                 ));
           } else {
-            GlobalSnackBar.show(
-                message: 'Please add one more option to continue');
+            GlobalSnackBar.show(message: appText(context).gsbMoreText);
           }
         },
       ),

@@ -127,8 +127,8 @@ class ChatInputFieldGhost extends StatelessWidget {
                                         isRecordingDelete = false;
                                       } else {
                                         GlobalSnackBar.show(
-                                            message:
-                                                'Please enable ghost mode first to send audio');
+                                            message: appText(context)
+                                                .strEnableGhModeAudio);
                                       }
                                     },
                                     onLongPressMoveUpdate: (details) {
@@ -148,8 +148,8 @@ class ChatInputFieldGhost extends StatelessWidget {
                                         }
                                       } else {
                                         GlobalSnackBar.show(
-                                            message:
-                                                'Please enable ghost mode first to send audio');
+                                            message: appText(context)
+                                                .strEnableGhModeAudio);
                                       }
                                     },
                                     onLongPressEnd: (details) {
@@ -165,8 +165,8 @@ class ChatInputFieldGhost extends StatelessWidget {
                                         }
                                       } else {
                                         GlobalSnackBar.show(
-                                            message:
-                                                'Please enable ghost mode first to send audio');
+                                            message: appText(context)
+                                                .strEnableGhModeAudio);
                                       }
                                     },
                                     child: Container(
@@ -196,8 +196,8 @@ class ChatInputFieldGhost extends StatelessWidget {
                                         appUser: appUser,
                                         firstMessageByMe: firstMessage)
                                     : GlobalSnackBar.show(
-                                        message:
-                                            'Please enable ghost message first to send the message');
+                                        message: appText(context)
+                                            .strEnableGhModeMessage);
                               },
                               child: Image.asset(
                                 imgSendComment,

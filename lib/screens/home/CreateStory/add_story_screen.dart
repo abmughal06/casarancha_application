@@ -3,6 +3,7 @@ import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/screens/home/CreateStory/add_story_controller.dart';
 
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -88,7 +89,9 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         builder: (context, prov, b) {
           return CommonButton(
             showLoading: prov.isSharingStory,
-            text: prov.isSharingStory ? 'Wait' : 'Share Story',
+            text: prov.isSharingStory
+                ? appText(context).strWait
+                : appText(context).strShareStory,
             height: 58.w,
             verticalOutMargin: 10.w,
             horizontalOutMargin: 10.w,

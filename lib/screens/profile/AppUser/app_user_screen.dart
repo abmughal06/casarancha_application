@@ -271,8 +271,8 @@ class _AppUserScreenState extends State<AppUserScreen> {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () =>
-                                          profileProvider.toggleFollowBtn(
+                                      onTap: () => profileProvider
+                                          .toggleFollowBtn(context,
                                               userModel: currentUser,
                                               appUserId: user.id),
                                       child: Container(

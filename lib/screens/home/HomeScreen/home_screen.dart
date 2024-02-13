@@ -22,28 +22,14 @@ import '../CreatePost/create_post_screen.dart';
 import '../CreateStory/add_story_screen.dart';
 import '../notification_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  DataProvider dataProvider = DataProvider();
-  @override
-  void dispose() {
-    // dataProvider.chatListUsers.drain()
-    super.dispose();
-  }
-
-  var isScrolled = false.obs;
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
+  final isScrolled = false.obs;
 
   @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
     final ghostProvider = context.watch<DashboardProvider>();
-    // super.build(context);
     return SafeArea(
       bottom: false,
       child: GhostScaffold(
@@ -54,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               )
             : NestedScrollView(
+                key: const PageStorageKey(10),
                 controller: ghostProvider.scrollController,
                 floatHeaderSlivers: true,
                 headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -88,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           StreamProvider.value(
-                            value: dataProvider.notficationLength(),
+                            value: DataProvider.notficationLength(),
                             initialData: null,
                             catchError: (context, error) => null,
                             child: Consumer<List<Notification>?>(
@@ -121,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                         backgroundColor: Colors.grey.shade50,
-                        // bottom:
                       ),
                     )
                   ];
@@ -265,7 +251,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // @override
-  // bool get wantKeepAlive => true;
 }

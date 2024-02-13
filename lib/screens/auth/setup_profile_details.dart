@@ -98,7 +98,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                       child: Stack(
                         children: [
                           GestureDetector(
-                            onTap: provider.getFromGallery,
+                            onTap: provider.getFromGallery(context),
                             child: Container(
                                 height: 120.h,
                                 width: 120.h,
@@ -126,7 +126,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
                             bottom: 2.h,
                             right: 3.h,
                             child: GestureDetector(
-                              onTap: provider.getFromGallery,
+                              onTap: provider.getFromGallery(context),
                               child: SvgPicture.asset(
                                 icProfileAdd,
                               ),
