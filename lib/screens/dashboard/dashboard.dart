@@ -43,14 +43,14 @@ class _DashBoardState extends State<DashBoard> {
           onPageChanged: (value) {
             dashboardProvider.changePage(value);
           },
-          children: const [
+          children: [
             HomeScreen(),
-            GhostPosts(),
+            const GhostPosts(),
             SearchScreen(),
-            GroupScreen(),
-            ForumsScreen(),
-            ChatListScreen(),
-            ProfileScreen(),
+            const GroupScreen(),
+            const ForumsScreen(),
+            const ChatListScreen(),
+            const ProfileScreen(),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

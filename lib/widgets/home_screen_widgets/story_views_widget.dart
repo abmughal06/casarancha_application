@@ -22,9 +22,9 @@ Widget storyViews({required List viwersIds}) {
             return centerLoader();
           } else {
             if (users.isEmpty) {
-              return const Center(
+              return Center(
                 child: TextWidget(
-                  text: 'No Views',
+                  text: appText(context).strNoViews,
                 ),
               );
             }

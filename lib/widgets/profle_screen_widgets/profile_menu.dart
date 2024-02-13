@@ -140,9 +140,9 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
       showDialog(
           context: context,
           builder: (_) => CustomAdaptiveAlertDialog(
-              title: 'Logout',
-              alertMsg: 'Are you sure you want to logout to the application?',
-              actiionBtnName: 'Logout',
+              title: appText(context).strLogout,
+              alertMsg: appText(context).strConfirmLogout,
+              actiionBtnName: appText(context).strLogout,
               onAction: () => AuthenticationProvider(FirebaseAuth.instance)
                       .signOut()
                       .whenComplete(() {
@@ -157,14 +157,9 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
         context: context,
         builder: (BuildContext context) {
           return CustomAdaptiveAlertDialog(
-            title: 'Delete your Account?',
-            alertMsg:
-                '''If you select Delete we will delete your account on our server.
-
-Your app data will also be deleted and you won't be able to retrieve it.
-
-''',
-            actiionBtnName: 'Delete',
+            title: appText(context).strDeleteAccount,
+            alertMsg: appText(context).strConfirmationDeleteAccount,
+            actiionBtnName: appText(context).strDelete,
             onAction: () => ProfileProvider().deleteUserAccount(),
           );
         },

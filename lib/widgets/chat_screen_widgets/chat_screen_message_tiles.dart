@@ -28,8 +28,7 @@ Future showMessageMennu({context, url, path, friendId, docId}) async {
               Get.back();
 
               GlobalSnackBar.show(
-                  message:
-                      'Text message cannot be downloaded you can copy them');
+                  message: appText(context).strcannotDownloadText);
             } else {
               Get.back();
               showDialog(

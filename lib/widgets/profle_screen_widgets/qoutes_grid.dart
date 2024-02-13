@@ -31,8 +31,10 @@ class QoutesGridView extends StatelessWidget {
                 margin: EdgeInsets.zero,
                 color: Colors.transparent,
                 child: GestureDetector(
-                  onTap: () => Get.to(() => PostFullScreenView(
-                        post: data,
+                  onTap: () => Get.to(() => ProfilePostFullScreenView(
+                        postsList: qoutesList!,
+                        index: index,
+                        postType: appText(context).strPhoto,
                         isPostDetail: true,
                       )),
                   child: Container(

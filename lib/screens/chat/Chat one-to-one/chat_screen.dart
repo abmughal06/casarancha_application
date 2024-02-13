@@ -4,6 +4,7 @@ import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -66,7 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: svgImgButton(
                 svgIcon: icChatVideo,
                 onTap: () {
-                  GlobalSnackBar.show(message: "Comming Soon");
+                  GlobalSnackBar.show(message: appText(context).strComingSoon);
                 }),
           ),
           Padding(
@@ -74,7 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: svgImgButton(
                 svgIcon: icChatCall,
                 onTap: () {
-                  GlobalSnackBar.show(message: "Comming Soon");
+                  GlobalSnackBar.show(message: appText(context).strComingSoon);
                 }),
           ),
         ],

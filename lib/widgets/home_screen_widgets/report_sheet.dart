@@ -155,8 +155,7 @@ class ReportPostorComment extends StatelessWidget {
               ),
               heightBox(12.h),
               TextWidget(
-                  text:
-                      """Are you sure you wanted to report this post if yes then choose the reason for the report which is the related to the post""",
+                  text: appText(context).strConfirmReportReason,
                   textAlign: TextAlign.center,
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -191,14 +190,14 @@ class ReportPostorComment extends StatelessWidget {
                                   SvgPicture.asset(icReportPostDone),
                                   heightBox(15.h),
                                   TextWidget(
-                                    text: "Thank you for the Report Us",
+                                    text: appText(context).strThanksForReport,
                                     fontWeight: FontWeight.w600,
                                     fontSize: 18.sp,
                                     color: const Color(0xff212121),
                                   ),
                                   heightBox(12.h),
                                   TextWidget(
-                                    text: "We have sparm the report",
+                                    text: appText(context).strSparmReport,
                                     fontWeight: FontWeight.w400,
                                     fontSize: 14.sp,
                                     color: const Color(0xff5f5f5f),

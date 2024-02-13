@@ -99,7 +99,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               children: [
                 heightBox(20.h),
                 GestureDetector(
-                  onTap: () => prov.getFromGallery(),
+                  onTap: () => prov.getFromGallery(context),
                   child: Center(
                     child: SizedBox(
                       height: 127.h,
@@ -334,7 +334,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           height: 56.h,
           text: appText(context).strCreateGroup,
           width: double.infinity,
-          onTap: () async => prov.createGroup(
+          onTap: () async => prov.createGroup(context,
               gName: _groupNameController.text,
               bio: _groupDescriptionController.text,
               isPublic: isPublic,

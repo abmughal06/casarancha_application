@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -130,7 +131,7 @@ class CreatePostMethods extends ChangeNotifier {
       if (tagIds.isNotEmpty) {
         FirebaseMessagingService().sendNotificationToMutipleUsers(
           isMessage: false,
-          msg: 'has tagged you in a post',
+          msg: appText(context).strTaggedPost,
           notificationType: "feed_post_cmnt",
           content: post.toMap(),
           users:
@@ -314,7 +315,7 @@ class CreatePostMethods extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
   }
 
@@ -332,7 +333,7 @@ class CreatePostMethods extends ChangeNotifier {
       videoFileHelper = File(pickedVideo!.path);
       videosList.add(videoFileHelper);
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
     notifyListeners();
   }
@@ -355,7 +356,7 @@ class CreatePostMethods extends ChangeNotifier {
 
       musicList.assignAll(musiciFilesHelper);
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
     notifyListeners();
   }

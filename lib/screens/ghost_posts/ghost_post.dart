@@ -13,21 +13,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class GhostPosts extends StatefulWidget {
+class GhostPosts extends StatelessWidget {
   const GhostPosts({super.key});
 
   @override
-  State<GhostPosts> createState() => _GhostPostsState();
-}
-
-class _GhostPostsState extends State<GhostPosts>
-    with AutomaticKeepAliveClientMixin<GhostPosts> {
-  @override
   Widget build(BuildContext context) {
     final dashboardProvider = Provider.of<DashboardProvider>(context);
-    // final users = context.watch<List<UserModel>?>();
-
-    super.build(context);
     return GhostScaffold(
       appBar:
           primaryAppbar(title: 'Ghost Posts', leading: const GhostModeBtn()),
@@ -81,7 +72,4 @@ class _GhostPostsState extends State<GhostPosts>
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

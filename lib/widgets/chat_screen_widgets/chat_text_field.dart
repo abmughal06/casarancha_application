@@ -327,7 +327,7 @@ class ChatTextFieldGhost extends StatelessWidget {
                           )
                         : GlobalSnackBar.show(
                             message:
-                                'Please enable ghost mode in order to send attachment');
+                                appText(context).strEnableGhModeAttachment);
                   },
                   child: SvgPicture.asset(icChatPaperClip),
                 ),

@@ -2,9 +2,13 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
+import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/custom_dialog.dart';
+import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
+import 'package:casarancha/widgets/primary_Appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +17,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../models/media_details.dart';
 import '../../models/post_model.dart';
@@ -153,13 +158,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
                   )),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            // padding: EdgeInsets.only(
-            //   left: widget.isPostDetail ? 20 : 15,
-            //   right: widget.isPostDetail ? 20 : 15,
-            //   top: widget.isPostDetail ? 130 : 0,
-            //   bottom: 0,
-            // ),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
             child: Align(
               alignment:
                   isPostDetail ? Alignment.bottomCenter : Alignment.topLeft,
@@ -197,11 +196,11 @@ class PostMediaWidgetForQuoteAndPoll extends StatelessWidget {
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
     if (post.mediaData.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         width: double.infinity,
         height: 500,
         child: Center(
-          child: Text('Post is deleted'),
+          child: Text(appText(context).strPostDeleted),
         ),
       );
     }
@@ -341,7 +340,7 @@ class PostFullScreenView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               TextWidget(
-                                text: "Delete Post",
+                                text: appText(context).strDeletePost,
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
@@ -378,6 +377,66 @@ class PostFullScreenView extends StatelessWidget {
               ),
             )
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProfilePostFullScreenView extends StatefulWidget {
+  const ProfilePostFullScreenView({
+    super.key,
+    required this.postsList,
+    required this.isPostDetail,
+    this.groupId,
+    required this.index,
+    required this.postType,
+  });
+  final List<PostModel> postsList;
+  final bool isPostDetail;
+  final String? groupId;
+  final int index;
+  final String postType;
+
+  @override
+  State<ProfilePostFullScreenView> createState() =>
+      _ProfilePostFullScreenViewState();
+}
+
+class _ProfilePostFullScreenViewState extends State<ProfilePostFullScreenView> {
+  final ItemScrollController itemScrollController = ItemScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: primaryAppbar(title: '${widget.postType} Posts'),
+      body: StreamProvider.value(
+        value: DataProvider().profilePostsAccordingToType(
+            widget.postsList.map((e) => e.id).toList()),
+        initialData: null,
+        catchError: (context, error) => null,
+        child: Consumer<List<PostModel>?>(
+          builder: (context, posts, child) {
+            if (posts == null) {
+              return centerLoader();
+            }
+            return ScrollablePositionedList.builder(
+              itemCount: posts.length,
+              itemScrollController: itemScrollController,
+              initialScrollIndex: widget.index,
+              itemBuilder: (context, index) {
+                return PostCard(
+                  post: posts[index],
+                  postCreatorId: posts[index].creatorId,
+                );
+              },
+            );
+          },
         ),
       ),
     );

@@ -78,7 +78,8 @@ class PostCreatorProfileTile extends StatelessWidget {
                 ),
                 ontapSave: () {
                   ghostProvider.checkGhostMode
-                      ? GlobalSnackBar.show(message: "Ghost Mode is enabled")
+                      ? GlobalSnackBar.show(
+                          message: appText(context).strGhostModeEnabled)
                       : postProvider.onTapSave(
                           userModel: curruentUser, postId: post.id);
                 },

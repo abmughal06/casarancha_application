@@ -201,7 +201,8 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void postComment({
+  void postComment(
+    context, {
     PostModel? postModel,
     UserModel? user,
     // String? comment,
@@ -255,15 +256,17 @@ class PostProvider extends ChangeNotifier {
 
           var recieverFCMToken = recieverRef.data()!['fcmToken'];
           FirebaseMessagingService().sendNotificationToUser(
-            appUserId: recieverRef.id,
-            notificationType: 'feed_post_cmnt',
-            content: postModel.toMap(),
-            groupId: groupId,
-            isMessage: false,
-            devRegToken: recieverFCMToken,
-            msg:
-                "has commented on your ${groupId == null ? "post" : "group post"}.",
-          );
+              appUserId: recieverRef.id,
+              notificationType: 'feed_post_cmnt',
+              content: postModel.toMap(),
+              groupId: groupId,
+              isMessage: false,
+              devRegToken: recieverFCMToken,
+              msg: appText(context).strNotificationComment(groupId == null
+                  ? appText(context).pushnotPost
+                  : appText(context).pushnotGroupPost)
+              // "has commented on your ${groupId == null ? "post" : "group post"}.",
+              );
           // } else {
           if (commentTagsId.isNotEmpty) {
             FirebaseMessagingService().sendNotificationToMutipleUsers(
@@ -272,8 +275,11 @@ class PostProvider extends ChangeNotifier {
               users: allUsers!
                   .where((element) => commentTagsId.contains(element.id))
                   .toList(),
-              msg:
-                  "has mentioned you in ${groupId == null ? "post" : "group post"}.",
+              msg: appText(context).strNotificationMentioned(groupId == null
+                  ? appText(context).pushnotPost
+                  : appText(context).pushnotGroupPost),
+
+              // "has mentioned you in ${groupId == null ? "post" : "group post"}.",
               groupId: groupId,
               content: postModel.toMap(),
             );
@@ -290,7 +296,8 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void postCommentReply({
+  void postCommentReply(
+    context, {
     PostModel? postModel,
     String? recieverId,
     UserModel? user,
@@ -351,15 +358,18 @@ class PostProvider extends ChangeNotifier {
 
           var recieverFCMToken = recieverRef.data()!['fcmToken'];
           FirebaseMessagingService().sendNotificationToUser(
-            appUserId: recieverRef.id,
-            notificationType: 'feed_post_cmnt',
-            content: postModel.toMap(),
-            groupId: groupId,
-            isMessage: false,
-            devRegToken: recieverFCMToken,
-            msg:
-                "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
-          );
+              appUserId: recieverRef.id,
+              notificationType: 'feed_post_cmnt',
+              content: postModel.toMap(),
+              groupId: groupId,
+              isMessage: false,
+              devRegToken: recieverFCMToken,
+              msg: appText(context).strNotificationReplyComment(groupId == null
+                  ? appText(context).pushnotPost
+                  : appText(context).pushnotGroupPost)
+
+              // "has reply on your comment on ${groupId == null ? "post" : "group post"}.",
+              );
           // } else {
           if (commentTagsId.isNotEmpty) {
             FirebaseMessagingService().sendNotificationToMutipleUsers(
@@ -368,8 +378,10 @@ class PostProvider extends ChangeNotifier {
               users: allUsers!
                   .where((element) => commentTagsId.contains(element.id))
                   .toList(),
-              msg:
-                  'has mentioned you in ${groupId == null ? "post" : "group post"}.',
+              msg: appText(context).strNotificationMentioned(groupId == null
+                  ? appText(context).pushnotPost
+                  : appText(context).pushnotGroupPost),
+              // 'has mentioned you in ${groupId == null ? "post" : "group post"}.',
               groupId: groupId,
               content: postModel.toMap(),
             );
@@ -756,7 +768,8 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
-  void updatePollData({
+  void updatePollData(
+    context, {
     required String postId,
     required String option,
   }) async {
@@ -788,7 +801,7 @@ class PostProvider extends ChangeNotifier {
         "mediaData": [newMedia],
       });
     } catch (e) {
-      GlobalSnackBar.show(message: 'unknown error occured, please try later');
+      GlobalSnackBar.show(message: appText(context).strUnkownError);
     }
   }
 
@@ -800,7 +813,7 @@ class PostProvider extends ChangeNotifier {
     recieverIds.clear();
   }
 
-  void sharePostData(
+  void sharePostData(context,
       {UserModel? currentUser,
       UserModel? appUser,
       PostModel? postModel,
@@ -906,7 +919,7 @@ class PostProvider extends ChangeNotifier {
       appUserId: appUser.id,
       devRegToken: recieverFCMToken,
       notificationType: "msg",
-      msg: "has sent you a post",
+      msg: appText(context).strSentPost,
       isMessage: false,
       content: postModel.mediaData[0].type == 'Photo'
           ? postModel.mediaData[0].link

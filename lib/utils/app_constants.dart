@@ -66,27 +66,27 @@ int homePageIndex = 0,
     chatPageIndex = 3,
     profilePageIndex = 4;
 
-String storyProfileImg =
-    "https://media.istockphoto.com/photos/millennial-male-team-leader-or"
-    "ganize-virtual-workshop-with-employees-picture-id1300972574?b=1&k=20&m=1300972574&s=1"
-    "70667a&w=0&h=2nBGC7tr0kWIU8zRQ3dMg-C5JLo9H2sNUuDjQ5mlYfo=";
+// String storyProfileImg =
+//     "https://media.istockphoto.com/photos/millennial-male-team-leader-or"
+//     "ganize-virtual-workshop-with-employees-picture-id1300972574?b=1&k=20&m=1300972574&s=1"
+//     "70667a&w=0&h=2nBGC7tr0kWIU8zRQ3dMg-C5JLo9H2sNUuDjQ5mlYfo=";
 
-String postProfileImg =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeGC2zO9XphU0L4bmk9_Htveabe0LkIuQSgWpb5G_P&s";
+// String postProfileImg =
+//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeGC2zO9XphU0L4bmk9_Htveabe0LkIuQSgWpb5G_P&s";
 
-String postImgTemp =
-    "https://thumbs.dreamstime.com/b/beautiful-rain-forest-ang-ka-nature-trail-doi-"
-    "inthanon-national-park-thailand-36703721.jpg";
-String imgNavBarUser =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe"
-    "GC2zO9XphU0L4bmk9_Htveabe0LkIuQSgWpb5G_P&s";
-String imgUrlStoryView =
-    "https://files.oyebesmartest.com/public/img-subcategory/cb-background-qoRpk.webp";
+// String postImgTemp =
+//     "https://thumbs.dreamstime.com/b/beautiful-rain-forest-ang-ka-nature-trail-doi-"
+//     "inthanon-national-park-thailand-36703721.jpg";
+// String imgNavBarUser =
+//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe"
+//     "GC2zO9XphU0L4bmk9_Htveabe0LkIuQSgWpb5G_P&s";
+// String imgUrlStoryView =
+//     "https://files.oyebesmartest.com/public/img-subcategory/cb-background-qoRpk.webp";
 
 String musicImgUrl = "assets/images/musicSplash.jpg";
 
-String musicMp3 =
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
+// String musicMp3 =
+//     'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
 
-String videoCallBack =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIV99IJOGUBMQBy9kccOQsAyq36yzt0BRYUw&usqp=CAU";
+// String videoCallBack =
+//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIV99IJOGUBMQBy9kccOQsAyq36yzt0BRYUw&usqp=CAU";

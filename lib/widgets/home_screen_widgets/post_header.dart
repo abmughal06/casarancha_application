@@ -51,7 +51,7 @@ class CustomPostHeader extends StatelessWidget {
             return GestureDetector(
               onTap: isGhostPost
                   ? () => GlobalSnackBar.show(
-                      message: "You can't visit a ghost profile")
+                      message: appText(context).strCantVisit)
                   : headerOnTap,
               child: Padding(
                 padding:
@@ -90,7 +90,7 @@ class CustomPostHeader extends StatelessWidget {
                                     onTap: isGhostPost
                                         ? () => GlobalSnackBar.show(
                                             message:
-                                                "You can't visit a ghost profile")
+                                                appText(context).strCantVisit)
                                         : headerOnTap,
                                     text: isGhostPost
                                         ? postCreator.ghostName

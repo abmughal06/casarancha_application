@@ -82,6 +82,58 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Stream<List<UserModel>?>? searchUser(String search) {
+    try {
+      if (FirebaseAuth.instance.currentUser != null) {
+        if (search.isEmpty) {
+          return FirebaseFirestore.instance
+              .collection(cUsers)
+              .snapshots()
+              .map((event) => event.docs
+                  .where(
+                    (element) =>
+                        element.id != FirebaseAuth.instance.currentUser!.uid &&
+                        element.data().isNotEmpty &&
+                        element.data().containsKey('name') &&
+                        element.data().containsKey('username') &&
+                        element.data().containsKey('bio') &&
+                        element.data().containsKey('dob') &&
+                        element.data()['isVerified'],
+                  )
+                  .map((e) => UserModel.fromMap(e.data()))
+                  .toList());
+        }
+        return FirebaseFirestore.instance
+            .collection(cUsers)
+            .snapshots()
+            .map((event) => event.docs
+                .where(
+                  (element) =>
+                      element.data().isNotEmpty &&
+                          element.data().containsKey('name') &&
+                          element.data().containsKey('username') &&
+                          element.data().containsKey('bio') &&
+                          element.data().containsKey('dob') &&
+                          element.id !=
+                              FirebaseAuth.instance.currentUser!.uid &&
+                          element
+                              .data()['username']
+                              .toString()
+                              .toLowerCase()
+                              .contains(search.toLowerCase()) ||
+                      element.data()['name'].toString().toLowerCase().contains(
+                            search.toLowerCase(),
+                          ),
+                )
+                .map((e) => UserModel.fromMap(e.data()))
+                .toList());
+      }
+      return null;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<UserModel?>? getSingleUser(id) {
     try {
       return FirebaseFirestore.instance
@@ -146,6 +198,22 @@ class DataProvider extends ChangeNotifier {
               .where((element) =>
                   element.data().isNotEmpty &&
                   element.data()['mediaData'].isNotEmpty)
+              .map((e) => PostModel.fromMap(e.data()))
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<List<PostModel>?> profilePostsAccordingToType(List<String> postsIds) {
+    try {
+      final ref = FirebaseFirestore.instance.collection('posts');
+      return ref.orderBy("createdAt", descending: true).snapshots().map(
+          (event) => event.docs
+              .where((element) =>
+                  element.data().isNotEmpty &&
+                  element.data()['mediaData'].isNotEmpty &&
+                  postsIds.contains(element.id))
               .map((e) => PostModel.fromMap(e.data()))
               .toList());
     } catch (e) {
@@ -296,7 +364,7 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Stream<List<NotificationModel>?>? notficationLength() {
+  static Stream<List<NotificationModel>?>? notficationLength() {
     try {
       if (FirebaseAuth.instance.currentUser?.uid == null) {
         return null;
@@ -606,6 +674,39 @@ class DataProvider extends ChangeNotifier {
           .collection(cGroups)
           .snapshots()
           .map((event) => event.docs
+              .map(
+                (e) => GroupModel.fromMap(e.data()),
+              )
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<List<GroupModel>?>? searchGroups(String search) {
+    try {
+      if (FirebaseAuth.instance.currentUser == null) {
+        return null;
+      }
+      if (search.isEmpty) {
+        return FirebaseFirestore.instance.collection(cGroups).snapshots().map(
+            (event) => event.docs
+                .where((element) =>
+                    element.data()['isVerified'] &&
+                    element.data()['creatorId'] !=
+                        FirebaseAuth.instance.currentUser!.uid)
+                .map(
+                  (e) => GroupModel.fromMap(e.data()),
+                )
+                .toList());
+      }
+      return FirebaseFirestore.instance.collection(cGroups).snapshots().map(
+          (event) => event.docs
+              .where((element) => element
+                  .data()['name']
+                  .toString()
+                  .toLowerCase()
+                  .contains(search.toLowerCase()))
               .map(
                 (e) => GroupModel.fromMap(e.data()),
               )

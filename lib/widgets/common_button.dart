@@ -135,7 +135,7 @@ class CommonButton extends StatelessWidget {
                             children: [
                               // Spacer(),
                               TextWidget(
-                                text: "text",
+                                text: appText(context).strText,
                                 fontSize: fontSize ?? 14.sp,
                                 fontWeight: FontWeight.w600,
                                 fontFamily: strFontName,

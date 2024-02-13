@@ -232,7 +232,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     child: TextWidget(
                                       text: contentImage.contains('http')
                                           ? ''
-                                          : 'Quote\nPost',
+                                          : appText(context).strQuoteNPost,
                                       textAlign: TextAlign.center,
                                       fontSize: 10.sp,
                                       textOverflow: TextOverflow.ellipsis,

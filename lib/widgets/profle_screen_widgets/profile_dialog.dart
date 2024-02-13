@@ -1,3 +1,4 @@
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,36 +39,42 @@ deleteAccountDialog(context) {
           ))
         : Center(
             child: Container(
-                height: 200,
-                width: 300,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
-                padding: const EdgeInsets.all(10),
-                child: Card(
-                    elevation: 0,
-                    color: Colors.transparent,
-                    child: dialog(title: title, content: desc, actions: [
-                      TextButton(
-                          onPressed: () async {
-                            if (FirebaseAuth.instance.currentUser != null) {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              // await deleteAccountFromId(
-                              //     FirebaseAuth.instance.currentUser!);
-                              // Get.back();
-                              // Get.back();
-                              // Get.off(() => const LoginScreen());
-                              // setState(() {
-                              //   isLoading = false;
-                              // });
-                            }
-                          },
-                          child: const Text("Ok",
-                              style: TextStyle(color: colorPrimaryA05))),
-                      cancelBtn
-                    ]))));
+              height: 200,
+              width: 300,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.all(10),
+              child: Card(
+                elevation: 0,
+                color: Colors.transparent,
+                child: dialog(
+                  title: title,
+                  content: desc,
+                  actions: [
+                    TextButton(
+                        onPressed: () async {
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            // await deleteAccountFromId(
+                            //     FirebaseAuth.instance.currentUser!);
+                            // Get.back();
+                            // Get.back();
+                            // Get.off(() => const LoginScreen());
+                            // setState(() {
+                            //   isLoading = false;
+                            // });
+                          }
+                        },
+                        child: Text(appText(context).strOk,
+                            style: const TextStyle(color: colorPrimaryA05))),
+                    cancelBtn
+                  ],
+                ),
+              ),
+            ),
+          );
   });
 }
 
@@ -117,9 +124,11 @@ void showDialogUserIsNotMatched(context) {
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
-          title: const Text("User is Not Matched"),
+          title: Text(appText(context).strUserNotMatched),
           actions: [
-            TextButton(onPressed: () => Get.back(), child: const Text("Ok"))
+            TextButton(
+                onPressed: () => Get.back(),
+                child: Text(appText(context).strOk))
           ],
         );
       });

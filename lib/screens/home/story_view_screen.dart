@@ -3,6 +3,7 @@ import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/story_model.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -414,7 +415,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                     // creatorDetails: creatorDetails,
                     devRegToken: recieverFCMToken,
 
-                    msg: "has commented on your story",
+                    msg: appText(context).strCommentStory,
                   );
                   _commentFocus.unfocus();
                   commentController.text = "";

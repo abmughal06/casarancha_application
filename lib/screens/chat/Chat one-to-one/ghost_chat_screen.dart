@@ -77,14 +77,13 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                   : ListTile(
                       onTap: () {
                         GlobalSnackBar.show(
-                          message:
-                              "you can't see sender profile in ghost messages",
+                          message: appText(context).strProfileGhostMessage,
                         );
                       },
                       horizontalTitleGap: 10,
                       contentPadding: EdgeInsets.zero,
                       title: TextWidget(text: user.ghostName),
-                      subtitle: const Text('Live'),
+                      subtitle: Text(appText(context).strLive),
                       leading: CircleAvatar(
                         backgroundColor: colorF03,
                         child: Image.asset(
@@ -101,7 +100,7 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
             child: svgImgButton(
                 svgIcon: icChatVideo,
                 onTap: () {
-                  GlobalSnackBar.show(message: "Comming Soon");
+                  GlobalSnackBar.show(message: appText(context).strComingSoon);
                 }),
           ),
           Padding(
@@ -109,7 +108,7 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
             child: svgImgButton(
               svgIcon: icChatCall,
               onTap: () {
-                GlobalSnackBar.show(message: "Comming Soon");
+                GlobalSnackBar.show(message: appText(context).strComingSoon);
               },
             ),
           ),

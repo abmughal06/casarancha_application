@@ -5,6 +5,7 @@ import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/app_utils.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share_plus/share_plus.dart';
@@ -30,7 +31,7 @@ class DynamicLinkHelper {
           isMessage: false,
           notificationType: 'dynamicLink',
           appUserId: link!,
-          msg: 'Your friend is on casarancha, follow now',
+          msg: appText(context).strFriendFollow,
           content: null,
           devRegToken: senderUser!.fcmToken,
           groupId: null,
@@ -52,7 +53,7 @@ class DynamicLinkHelper {
           isMessage: false,
           notificationType: 'dynamicLink',
           appUserId: link,
-          msg: 'is now on casarancha, follow now',
+          msg: appText(context).strFollowCasaRancha,
           content: null,
           devRegToken: senderUser!.fcmToken,
           groupId: null,

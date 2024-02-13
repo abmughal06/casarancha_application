@@ -153,10 +153,11 @@ class AuthenticationProvider extends ChangeNotifier {
         },
       );
     } on FirebaseAuthException catch (e) {
-      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      GlobalSnackBar.show(
+          message: appText(context).strAuthErrorMessage(e.message!));
       Get.back();
     } catch (e) {
-      GlobalSnackBar.show(message: 'Phone login cancelled');
+      GlobalSnackBar.show(message: appText(context).strPhoneLoginCancelled);
       Get.back();
     } finally {
       isSigningIn = false;
@@ -194,10 +195,11 @@ class AuthenticationProvider extends ChangeNotifier {
       saveTokenAndNavigateToNext();
     } on FirebaseAuthException catch (e) {
       Get.back();
-      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      GlobalSnackBar.show(
+          message: appText(context).strAuthErrorMessage(e.message!));
     } catch (e) {
       Get.back();
-      GlobalSnackBar.show(message: 'Phone login cancelled');
+      GlobalSnackBar.show(message: appText(context).strPhoneLoginCancelled);
     } finally {
       isSigningIn = false;
       notifyListeners();
@@ -224,12 +226,13 @@ class AuthenticationProvider extends ChangeNotifier {
         isSigningIn = false;
         notifyListeners();
 
-        GlobalSnackBar.show(message: 'Please enter ${e.message}');
+        GlobalSnackBar.show(
+            message: appText(context).strAuthErrorMessage(e.message!));
       } catch (e) {
         isSigningIn = false;
         notifyListeners();
 
-        GlobalSnackBar.show(message: 'Google login cancelled');
+        GlobalSnackBar.show(message: appText(context).strGoogleLoginCancelled);
       } finally {
         isSigningIn = false;
         notifyListeners();
@@ -254,7 +257,8 @@ class AuthenticationProvider extends ChangeNotifier {
       isSigningIn = false;
       notifyListeners();
 
-      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      GlobalSnackBar.show(
+          message: appText(context).strAuthErrorMessage(e.message!));
     } catch (e) {
       isSigningIn = false;
       notifyListeners();
@@ -318,12 +322,13 @@ class AuthenticationProvider extends ChangeNotifier {
       isSigningIn = false;
       notifyListeners();
 
-      GlobalSnackBar.show(message: 'Please enter ${e.message}');
+      GlobalSnackBar.show(
+          message: appText(context).strAuthErrorMessage(e.message!));
     } catch (e) {
       isSigningIn = false;
       notifyListeners();
 
-      GlobalSnackBar.show(message: 'Apple login cancelled');
+      GlobalSnackBar.show(message: appText(context).strAppleLoginCancelled);
     } finally {
       isSigningIn = false;
       notifyListeners();
@@ -385,7 +390,7 @@ class AuthenticationProvider extends ChangeNotifier {
           ?.linkWithCredential(credential);
 
       if (userCredential != null) {
-        GlobalSnackBar.show(message: "Account Linked Successfully");
+        GlobalSnackBar.show(message: appText(context).strAccountLinkedSuccess);
         await FirebaseFirestore.instance
             .collection("users")
             .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -397,17 +402,14 @@ class AuthenticationProvider extends ChangeNotifier {
       switch (e.code) {
         case "provider-already-linked":
           GlobalSnackBar.show(
-              message: "The provider has already been linked to the user.");
+              message: appText(context).strProviderAlreadyLinked);
           break;
         case "invalid-credential":
           GlobalSnackBar.show(
-              message: "The provider's credential is not valid.");
+              message: appText(context).strProvidercredNotValid);
           break;
         case "credential-already-in-use":
-          GlobalSnackBar.show(
-              message:
-                  "The account corresponding to the credential already exists, "
-                  "or is already linked to a Firebase User.");
+          GlobalSnackBar.show(message: appText(context).strCreddAlreadyExists);
           break;
         default:
         // GlobalSnackBar.show(message: "Unknown error.");

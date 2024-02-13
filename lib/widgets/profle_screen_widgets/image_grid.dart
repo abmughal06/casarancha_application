@@ -8,7 +8,10 @@ import '../../models/post_model.dart';
 import '../shared/alert_text.dart';
 
 class ImageGridView extends StatelessWidget {
-  const ImageGridView({super.key, required this.imageList});
+  const ImageGridView({
+    super.key,
+    required this.imageList,
+  });
 
   final List<PostModel>? imageList;
 
@@ -34,8 +37,10 @@ class ImageGridView extends StatelessWidget {
                 margin: EdgeInsets.zero,
                 color: Colors.transparent,
                 child: GestureDetector(
-                  onTap: () => Get.to(() => PostFullScreenView(
-                        post: data,
+                  onTap: () => Get.to(() => ProfilePostFullScreenView(
+                        postsList: imageList!,
+                        index: index,
+                        postType: appText(context).strPhoto,
                         isPostDetail: true,
                       )),
                   child: CachedNetworkImage(

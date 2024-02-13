@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:casarancha/utils/app_utils.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
@@ -145,7 +146,7 @@ class ChatProvider extends ChangeNotifier {
         appUserId: recieverRef.data()!['id'],
         notificationType: "msg",
         devRegToken: recieverFCMToken,
-        msg: "has sent you a $unreadMessages message",
+        msg: appText(context).strUnReadMessages(unreadMessages),
         isMessage: true,
       );
     } catch (e) {
@@ -260,7 +261,7 @@ class ChatProvider extends ChangeNotifier {
         devRegToken: recieverFCMToken,
         isMessage: true,
         notificationType: "msg",
-        msg: "has sent you a $unreadMessages message in ghost",
+        msg: appText(context).strUnReadMessagesInGhost(unreadMessages),
       );
 
       messageController.clear();
@@ -451,7 +452,7 @@ class ChatProvider extends ChangeNotifier {
         notificationType: "msg",
         appUserId: recieverRef.id,
         devRegToken: recieverFCMToken,
-        msg: "has sent you a $unreadMessages attachment",
+        msg: appText(context).strUnReadAttachment(unreadMessages),
         isMessage: true,
       );
       clearLists();
@@ -589,7 +590,7 @@ class ChatProvider extends ChangeNotifier {
         isMessage: true,
         devRegToken: recieverFCMToken,
         notificationType: "msg",
-        msg: "has sent you a $unreadMessages attachment",
+        msg: appText(context).strUnReadAttachment(unreadMessages),
       );
       clearLists();
 
@@ -766,7 +767,7 @@ class ChatProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
   }
 
@@ -785,7 +786,7 @@ class ChatProvider extends ChangeNotifier {
       videosList.add(videoFileHelper);
       // log(videosList.toString());
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
     notifyListeners();
   }
@@ -808,7 +809,7 @@ class ChatProvider extends ChangeNotifier {
 
       musicList.assignAll(musiciFilesHelper);
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
     notifyListeners();
   }
@@ -838,7 +839,7 @@ class ChatProvider extends ChangeNotifier {
       mediaList.assignAll(mediaFilesHelper);
       log(mediaList.toString());
     } catch (e) {
-      GlobalSnackBar.show(message: 'Operation Cancelled');
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
     }
     notifyListeners();
   }
@@ -939,8 +940,7 @@ class ChatProvider extends ChangeNotifier {
             : await sendVoiceMessage(
                 currentUser: currentUser, appUser: appUser);
       } else {
-        GlobalSnackBar.show(
-            message: 'You cannot send a recording greater than 60 minutes');
+        GlobalSnackBar.show(message: appText(context).strRecordingRestriction);
         deleteRecording();
       }
       notifyListeners();
@@ -1053,7 +1053,7 @@ class ChatProvider extends ChangeNotifier {
         devRegToken: recieverFCMToken,
         isMessage: true,
         notificationType: "msg",
-        msg: "has sent you a $unreadMessages voice message",
+        msg: appText(context).strUnReadVoiceMessages(unreadMessages),
       );
 
       clearLists();
@@ -1177,7 +1177,7 @@ class ChatProvider extends ChangeNotifier {
         isMessage: true,
         notificationType: "msg",
         devRegToken: recieverFCMToken,
-        msg: "has sent you a $unreadMessages voice message",
+        msg: appText(context).strUnReadVoiceMessages(unreadMessages),
       );
 
       clearLists();

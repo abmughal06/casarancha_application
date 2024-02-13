@@ -121,7 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             bottom: 0.h,
                             right: 0.w,
                             child: GestureDetector(
-                              onTap: () => edit.getFromGallery(),
+                              onTap: () => edit.getFromGallery(context),
                               child: Container(
                                 decoration: const BoxDecoration(
                                   color: colorWhite,
@@ -244,7 +244,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 height: 56.h,
                 text: appText(context).strSave,
                 showLoading: edit.isLoading,
-                onTap: () => edit.updateData(currentUser: user),
+                onTap: () => edit.updateData(context, currentUser: user),
                 width: double.infinity,
               ),
             ),

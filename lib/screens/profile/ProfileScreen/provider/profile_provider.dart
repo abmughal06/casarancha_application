@@ -3,6 +3,7 @@ import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/menu_user_button.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,8 @@ class ProfileProvider extends ChangeNotifier {
         .whenComplete(() => Get.back());
   }
 
-  void toggleFollowBtn({UserModel? userModel, String? appUserId}) async {
+  void toggleFollowBtn(context,
+      {UserModel? userModel, String? appUserId}) async {
     final currentUserRef = FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid);
@@ -54,7 +56,7 @@ class ProfileProvider extends ChangeNotifier {
             content: null,
             notificationType: "user_follow",
             devRegToken: appUserDevToken.data()!['fcmToken'],
-            msg: "follow you");
+            msg: appText(context).strFollowYou);
       }
     } catch (e) {
       log('$e');
