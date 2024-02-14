@@ -118,7 +118,7 @@ class SetupProfileProvider extends ChangeNotifier {
       String? bio,
       String? education,
       String? work,
-      required BuildContext context}) async {
+      context}) async {
     try {
       if (checkValidData(
           fname: fname, lname: lname, username: username, context: context)) {

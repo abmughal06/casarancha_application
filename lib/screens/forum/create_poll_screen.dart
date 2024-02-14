@@ -41,7 +41,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
     prov = Provider.of<CreatePostMethods>(context, listen: false);
     return Scaffold(
       appBar: primaryAppbar(
-        title: 'Create Poll',
+        title: appText(context).createPoll,
         elevation: 0.2,
       ),
       body: ListView(
@@ -51,7 +51,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
             controller: questionController,
             color: color887.withOpacity(0.1),
             isBorderEnable: true,
-            hint: 'Enter Question',
+            hint: appText(context).strPollQuestion,
           ),
           heightBox(12.h),
           Row(
@@ -61,7 +61,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                   controller: optionController,
                   color: color887.withOpacity(0.1),
                   isBorderEnable: true,
-                  hint: 'Enter Option',
+                  hint: appText(context).strPollOption,
                 ),
               ),
               widthBox(12.h),

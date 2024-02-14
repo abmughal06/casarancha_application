@@ -6,6 +6,7 @@ import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/group_widgets/group_member_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/shared/shimmer_list.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,7 @@ class GroupAdmins extends StatelessWidget {
   Widget build(BuildContext context) {
     final prov = Provider.of<NewGroupProvider>(context);
     return Scaffold(
-      appBar: primaryAppbar(title: 'Group Admins'),
+      appBar: primaryAppbar(title: appText(context).btnGrpAdmins),
       body: StreamProvider.value(
         value: DataProvider().singleGroup(groupId),
         initialData: null,

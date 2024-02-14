@@ -12,7 +12,6 @@ import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/edit_profile_provider.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
-import 'package:casarancha/utils/providers/locale_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +44,6 @@ class ProviderApp extends StatelessWidget {
         ChangeNotifierProvider<ProfileProvider>(
             create: (_) => ProfileProvider()),
         ChangeNotifierProvider<PostProvider>(create: (_) => PostProvider()),
-        ChangeNotifierProvider<LocaleProvider>(create: (_) => LocaleProvider()),
         ChangeNotifierProvider<NewGroupProvider>(
             create: (_) => NewGroupProvider()),
         ChangeNotifierProvider<CreatePostMethods>(

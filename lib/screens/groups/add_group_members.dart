@@ -26,7 +26,8 @@ class AddGroupMembers extends StatelessWidget {
 
     return Scaffold(
       appBar: primaryAppbar(
-          title: 'Add Memmbers in ${group.name}', elevation: 0.2.w),
+          title: appText(context).strFieldHintAddGroup(group.name),
+          elevation: 0.2.w),
       body: Column(
         children: [
           Padding(

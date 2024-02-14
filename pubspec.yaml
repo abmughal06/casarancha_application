@@ -39,6 +39,7 @@ dependencies:
   firebase_dynamic_links:
   share_plus: ^7.2.1
   flutter_linkify: ^6.0.0
+  restart_app: ^1.2.1
   # recaptcha_enterprise_flutter: ^18.4.0 //only for android
 
   cloud_firestore: ^4.13.4
