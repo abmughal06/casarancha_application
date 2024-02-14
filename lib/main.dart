@@ -1,5 +1,6 @@
 import 'package:casarancha/firebase_options.dart';
 import 'package:casarancha/provider_app.dart';
+import 'package:casarancha/screens/profile/settings/settings.dart';
 import 'package:casarancha/utils/providers/locale_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
 import 'authenticator.dart';
 import 'utils/app_constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -17,12 +17,28 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       name: 'Casarancha', options: DefaultFirebaseOptions.currentPlatform);
-
-  runApp(const MyApp());
+  runApp(const HotRestartController(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale? locale;
+
+  @override
+  void initState() {
+    super.initState();
+    setlocale();
+  }
+
+  setlocale() async {
+    locale = await LocalizationService.getLocale();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,30 +51,27 @@ class MyApp extends StatelessWidget {
           initialData: null,
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
+            // getLocale();
             return ProviderApp(
               app: Portal(
-                child: Consumer<LocaleProvider>(
-                  builder: (context, locale, b) {
-                    locale.getLang();
-                    return GetMaterialApp(
-                      navigatorKey: rootNavigatorKey,
-                      localizationsDelegates: const [
-                        AppLocalizations.delegate, // Add this line
-                        GlobalMaterialLocalizations.delegate,
-                        GlobalWidgetsLocalizations.delegate,
-                        GlobalCupertinoLocalizations.delegate,
-                      ],
-                      locale: Locale(locale.currentLang ?? 'en'),
-                      supportedLocales:
-                          locale.allLocales.map((e) => Locale(e)).toList(),
-                      debugShowCheckedModeBanner: false,
-                      theme: ThemeData(
-                        primarySwatch: Colors.red,
-                        useMaterial3: false,
-                      ),
-                      home: const Authenticate(),
-                    );
-                  },
+                child: GetMaterialApp(
+                  navigatorKey: rootNavigatorKey,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate, // Add this line
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  locale: locale,
+                  supportedLocales: LocalizationService.supportedLanguages
+                      .map((e) => Locale(e))
+                      .toList(),
+                  debugShowCheckedModeBanner: false,
+                  theme: ThemeData(
+                    primarySwatch: Colors.red,
+                    useMaterial3: false,
+                  ),
+                  home: const Authenticate(),
                 ),
               ),
             );

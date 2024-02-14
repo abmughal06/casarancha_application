@@ -932,6 +932,8 @@ PODS:
   - RecaptchaInterop (100.0.0)
   - record (0.0.1):
     - Flutter
+  - restart_app (0.0.1):
+    - Flutter
   - SDWebImage (5.18.8):
     - SDWebImage/Core (= 5.18.8)
   - SDWebImage/Core (5.18.8)
@@ -978,6 +980,7 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - record (from `.symlinks/plugins/record/ios`)
+  - restart_app (from `.symlinks/plugins/restart_app/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
@@ -1069,6 +1072,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   record:
     :path: ".symlinks/plugins/record/ios"
+  restart_app:
+    :path: ".symlinks/plugins/restart_app/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
@@ -1140,6 +1145,7 @@ SPEC CHECKSUMS:
   PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   record: cae05d8dd3cdb1dea3511b20e5a5811a1ae00d0d
+  restart_app: 806659942bf932f6ce51c5372f91ce5e81c8c14a
   SDWebImage: a81bbb3ba4ea5f810f4069c68727cb118467a04a
   share_plus: c3fef564749587fc939ef86ffb283ceac0baf9f5
   shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695

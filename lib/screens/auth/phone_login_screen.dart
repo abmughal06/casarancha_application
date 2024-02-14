@@ -185,7 +185,7 @@ class PhoneCountryCodeList extends StatelessWidget {
           TextEditingWidget(
             controller: searchController,
             isShadowEnable: false,
-            hint: 'Write here to search country code',
+            hint: appText(context).strPhoneFieldHint,
             color: colorFF3,
             onChanged: (v) {
               search.searchText(v);

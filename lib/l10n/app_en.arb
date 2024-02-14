@@ -333,17 +333,13 @@
     "strWorkID": "Work ID",
     "gsbOperationCancelled": "Operation Cancelled",
     "strApplicationSubmitted": "Your application is submitted for\n{title} verification",
-
     "strText": "text",
     "strThanksReport": "Thanks for report!",
     "alertSupportTeamAction": "Support team will take action as soon as possible on this {user}.",
-
     "strBack": "Back",
     "alertReportSubmitted": "Report already submitted",
     "alertReportSubmittedTeamAction": "Report already submitted! Support team will take action as soon as possible on this {user}.",
-
     "strReportConfirmation": "Are you sure you want to report this {user}?",
-
     "strcannotDownloadText": "Text message cannot be downloaded you can copy them",
     "strPhoneLoginCancelled": "Phone login cancelled",
     "strGoogleLoginCancelled": "Google login cancelled",
@@ -382,20 +378,34 @@
     "strTaggedPost": "has tagged you in a post",
     "strCommentStory": "has commented on your story",
     "strUnReadMessagesInGhost": "has sent you a {unreadMessage} message in ghost",
-
     "strUnReadAttachment": "has sent you a {unreadMessage} attachment",
-
     "strUnReadMessages": "has sent you a {unreadMessage}  message",
-
     "strUnReadVoiceMessages": "has sent you a {unreadMessage} voice message",
-
     "pushnotPost": "post",
     "pushnotGroupPost": "group post",
     "strNotificationComment": "has commented on your {post}.",
-
     "strNotificationMentioned": "has mentioned you in {post}.",
-
     "strNotificationReplyComment": "has replied on your comment on {post}.",
+    "strProfileSetting": "Profile Settings",
+    "strBlockAccount": "Block Account",
+    "strBlockUnblock": "Block/Unblock Account",
+    "strReportAccount": "Report Account",
+    "strReported": "Reported Accounts",
+    "strGhostPost": "Ghost Posts",
+    "strForumPost": "Forum Posts",
+    "strPhoneFieldHint": "Write here to search country code",
+    "strSetupProfile": "Setup Profile",
+    "strPollQuestion": "Enter Question",
+    "strPollOption": "Enter Option",
+    "strFieldHintAddGroup": "Add Memmbers in ${groupname}",
+    "strAddStory": "Add Story",
+    "@strFieldHintAddGroup": {
+        "placeholders": {
+            "groupname": {
+                "type": "String"
+            }
+        }
+    },
     "@strNotificationReplyComment": {
         "placeholders": {
             "post": {

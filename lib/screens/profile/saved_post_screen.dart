@@ -1,6 +1,7 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,10 +13,9 @@ class SavedPostScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final currentUser = context.watch<UserModel?>();
-    // final users = context.watch<List<UserModel>?>();
     return Scaffold(
-      appBar: primaryAppbar(title: 'Saved Posts', elevation: 0.1),
+      appBar:
+          primaryAppbar(title: appText(context).strSavedPosts, elevation: 0.1),
       body: StreamProvider.value(
         value: DataProvider().savedPostsScreen(),
         initialData: null,
@@ -25,19 +25,7 @@ class SavedPostScreen extends StatelessWidget {
             if (posts == null) {
               return const PostSkeleton();
             }
-            // var filterPost = posts
-            //     .where(
-            //         (element) => currentUser.savedPostsIds.contains(element.id))
-            //     .toList();
 
-            // List<UserModel> postCreator = [];
-            // for (var p in filterPost) {
-            //   for (var u in users) {
-            //     if (p.creatorId == u.id) {
-            //       postCreator.add(u);
-            //     }
-            //   }
-            // }
             return ListView.builder(
               padding: const EdgeInsets.only(bottom: 30),
               shrinkWrap: true,

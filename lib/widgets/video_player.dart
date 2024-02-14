@@ -89,12 +89,18 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   void dispose() {
-    videoPlayerController.removeListener(() {});
-    duration = Duration.zero;
-    position = Duration.zero;
-    isVideoPlaying = false;
-    videoPlayerController.dispose();
+    disposeAll();
     super.dispose();
+  }
+
+  disposeAll() {
+    if (!isVisible) {
+      videoPlayerController.removeListener(() {});
+      duration = Duration.zero;
+      position = Duration.zero;
+      isVideoPlaying = false;
+      videoPlayerController.dispose();
+    }
   }
 
   @override

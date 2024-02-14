@@ -8,6 +8,7 @@ import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/shared/skeleton.dart';
+import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -20,8 +21,8 @@ class GhostPosts extends StatelessWidget {
   Widget build(BuildContext context) {
     final dashboardProvider = Provider.of<DashboardProvider>(context);
     return GhostScaffold(
-      appBar:
-          primaryAppbar(title: 'Ghost Posts', leading: const GhostModeBtn()),
+      appBar: primaryAppbar(
+          title: appText(context).strGhostPost, leading: const GhostModeBtn()),
       body: Stack(
         children: [
           StreamProvider.value(

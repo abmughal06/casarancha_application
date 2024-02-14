@@ -8,7 +8,7 @@ import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/custom_dialog.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_card.dart';
-import 'package:casarancha/widgets/primary_Appbar.dart';
+import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -414,7 +414,8 @@ class _ProfilePostFullScreenViewState extends State<ProfilePostFullScreenView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: primaryAppbar(title: '${widget.postType} Posts'),
+      appBar: primaryAppbar(
+          title: '${widget.postType} ${appText(context).strSrcPost}'),
       body: StreamProvider.value(
         value: DataProvider().profilePostsAccordingToType(
             widget.postsList.map((e) => e.id).toList()),

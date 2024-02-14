@@ -73,7 +73,7 @@ class _SetupProfileScreenState extends State<SetupProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: primaryAppbar(
-        title: 'Setup Profile',
+        title: appText(context).strSetupProfile,
         showBackButton: false,
         actions: [
           IconButton(

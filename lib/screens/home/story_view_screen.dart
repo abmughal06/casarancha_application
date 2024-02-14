@@ -124,6 +124,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
     final ghost = Provider.of<DashboardProvider>(context);
 
     final currentUser = context.watch<UserModel>();
+    final cmntMsg = appText(context).strCommentStory;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -415,7 +416,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                     // creatorDetails: creatorDetails,
                     devRegToken: recieverFCMToken,
 
-                    msg: appText(context).strCommentStory,
+                    msg: cmntMsg,
                   );
                   _commentFocus.unfocus();
                   commentController.text = "";

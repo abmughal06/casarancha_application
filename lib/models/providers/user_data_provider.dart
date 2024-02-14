@@ -4,7 +4,6 @@ import 'package:casarancha/models/notification_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import '../../utils/firebase_collection.dart';
 import '../comment_model.dart';
@@ -564,7 +563,9 @@ class DataProvider extends ChangeNotifier {
                 msgIds.add(msg.id);
               }).toList());
 
-      print(msgIds);
+      if (kDebugMode) {
+        print(msgIds);
+      }
 
       return FirebaseFirestore.instance.collection('users').snapshots().map(
             (event) => event.docs

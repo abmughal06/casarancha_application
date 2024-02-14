@@ -39,7 +39,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     final user = context.watch<UserModel?>();
     return Scaffold(
       appBar: primaryAppbar(
-        title: 'Add Story',
+        title: appText(context).strAddStory,
         actions: [
           IconButton(
             onPressed: () {
@@ -71,8 +71,8 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                     onPressed: () {
                       Get.back();
                     },
-                    child: const Text(
-                      'Cancel',
+                    child: Text(
+                      appText(context).strCancel,
                     ),
                   ),
                 ),

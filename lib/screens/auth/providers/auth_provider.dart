@@ -262,7 +262,7 @@ class AuthenticationProvider extends ChangeNotifier {
     } catch (e) {
       isSigningIn = false;
       notifyListeners();
-      print(e);
+      // print(e);
     } finally {
       isSigningIn = false;
       notifyListeners();

@@ -33,7 +33,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // final currentUser = context.watch<UserModel?>();
     return Scaffold(
       appBar: primaryAppbar(
-        title: 'Setup Profile',
+        title: appText(context).strEditProfile,
         showBackButton: true,
         elevation: 0,
       ),

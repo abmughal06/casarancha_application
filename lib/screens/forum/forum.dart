@@ -25,7 +25,7 @@ class ForumsScreen extends StatelessWidget {
 
     return GhostScaffold(
       appBar: primaryAppbar(
-        title: appText(context).strForum,
+        title: appText(context).strForumPost,
         elevation: 0.1,
         leading: const GhostModeBtn(),
         actions: [
