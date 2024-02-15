@@ -78,7 +78,7 @@ Future<bool?> reportUser(String userId, String reporterUserId) async {
         "objId": reportDocRef.id,
         "reporterUserId": reporterUserId,
         "userId": userId,
-        "createAt": DateTime.now().toIso8601String()
+        "createAt": DateTime.now().toUtc().toLocal()
       });
       return true;
     } else {

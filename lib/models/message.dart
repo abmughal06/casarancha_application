@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class Message {
@@ -8,6 +7,7 @@ class Message {
   dynamic content;
   String caption;
   String type;
+  bool isReply;
   String createdAt;
   bool isSeen;
   Message({
@@ -18,6 +18,7 @@ class Message {
     required this.caption,
     required this.type,
     required this.createdAt,
+    required this.isReply,
     required this.isSeen,
   });
 
@@ -30,6 +31,7 @@ class Message {
     String? type,
     String? createdAt,
     bool? isSeen,
+    bool? isReply,
   }) {
     return Message(
       id: id ?? this.id,
@@ -38,6 +40,7 @@ class Message {
       content: content ?? this.content,
       caption: caption ?? this.caption,
       type: type ?? this.type,
+      isReply: isReply ?? this.isReply,
       createdAt: createdAt ?? this.createdAt,
       isSeen: isSeen ?? this.isSeen,
     );
@@ -51,6 +54,7 @@ class Message {
       'content': content,
       'caption': caption,
       'type': type,
+      'isReply': isReply,
       'createdAt': createdAt,
       'isSeen': isSeen,
     };
@@ -59,6 +63,7 @@ class Message {
   factory Message.fromMap(Map<String, dynamic> map) {
     return Message(
       id: map['id'] as String,
+      isReply: map['isReply'] ?? false,
       sentToId: map['sentToId'] as String,
       sentById: map['sentById'] as String,
       content: map['content'] as dynamic,

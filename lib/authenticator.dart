@@ -46,23 +46,27 @@ class CheckLocale extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: LocalizationService.getLocale(),
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return Scaffold(
-              body: centerLoader(),
-            );
-          } else if (snap.data == null) {
-            return const LannguageSelectionPage();
-          } else {
-            return const Authenticate();
-          }
-        });
+      future: LocalizationService.getLocale(),
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: centerLoader(),
+          );
+        } else if (snap.data == null) {
+          return LannguageSelectionPage(
+            locale: snap.data!.countryCode,
+          );
+        } else {
+          return const Authenticate();
+        }
+      },
+    );
   }
 }
 
 class LannguageSelectionPage extends StatelessWidget {
-  const LannguageSelectionPage({super.key});
+  const LannguageSelectionPage({super.key, this.locale});
+  final String? locale;
 
   @override
   Widget build(BuildContext context) {
@@ -87,8 +91,9 @@ class LannguageSelectionPage extends StatelessWidget {
               title: TextWidget(
                   text: LocalizationService.supportedLanguagesName[index]),
               trailing: TextWidget(
-                  text: LocalizationService.supportedLanguages[index]
-                      .toLowerCase()),
+                  text: locale ??
+                      LocalizationService.supportedLanguages[index]
+                          .toUpperCase()),
             );
           }),
     );

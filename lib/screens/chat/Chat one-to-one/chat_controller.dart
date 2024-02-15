@@ -43,9 +43,17 @@ class ChatProvider extends ChangeNotifier {
 
   bool isExpanded = false;
 
-//Observablaes
   var isChatExits = false;
   var isChecking = false;
+
+  var photosList = <File>[];
+  var videosList = <File>[];
+  var musicList = <File>[];
+  var mediaList = <File>[];
+  var voiceList = <File>[];
+  var mediaUploadTasks = <UploadTask>[];
+  var mediaData = <MediaDetails>[];
+  var allMediaFiles = <File>[];
 
   int unreadMessages = 0;
 
@@ -123,6 +131,7 @@ class ChatProvider extends ChangeNotifier {
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
         sentById: currentUser.id,
+        isReply: false,
         content: textMessage,
         caption: '',
         type: 'Text',
@@ -228,6 +237,7 @@ class ChatProvider extends ChangeNotifier {
       final Message message = Message(
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
+        isReply: false,
         sentById: currentUser.id,
         content: messageController.text,
         caption: '',
@@ -320,15 +330,6 @@ class ChatProvider extends ChangeNotifier {
     unreadMessages = 0;
   }
 
-  var photosList = <File>[];
-  var videosList = <File>[];
-  var musicList = <File>[];
-  var mediaList = <File>[];
-  var voiceList = <File>[];
-  var mediaUploadTasks = <UploadTask>[];
-  var mediaData = <MediaDetails>[];
-  var allMediaFiles = <File>[];
-
   pickImageAndSentViaMessage(
       {UserModel? currentUser, UserModel? appUser, String? mediaType}) async {
     allMediaFiles = [
@@ -404,6 +405,7 @@ class ChatProvider extends ChangeNotifier {
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
         sentById: currentUser.id,
+        isReply: false,
         content: 'upload',
         caption: 'uploading',
         type: '$mediaType',
@@ -550,6 +552,7 @@ class ChatProvider extends ChangeNotifier {
       final Message tempMessage = Message(
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
+        isReply: false,
         sentById: currentUser.id,
         content: 'uploading',
         caption: 'uploading',
@@ -1006,6 +1009,7 @@ class ChatProvider extends ChangeNotifier {
       final Message tempMessage = Message(
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
+        isReply: false,
         sentById: currentUser.id,
         content: 'voice uploading',
         caption: 'uploading',
@@ -1129,6 +1133,7 @@ class ChatProvider extends ChangeNotifier {
         id: messageRefForCurrentUser.id,
         sentToId: appUser.id,
         sentById: currentUser.id,
+        isReply: false,
         content: 'uploaddign',
         caption: 'uploading',
         type: 'voice',
