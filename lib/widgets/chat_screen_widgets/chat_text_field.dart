@@ -19,6 +19,31 @@ class ChatTextField extends StatelessWidget {
   final VoidCallback ontapSend;
   final TextEditingController chatController;
 
+  void _onTextChanged() {
+    final text = chatController.text;
+    if (text.isNotEmpty) {
+      // Capitalize the first letter
+      String newText = text.substring(0, 1).toUpperCase() + text.substring(1);
+
+      // Capitalize letter after a period (.)
+      for (int i = 1; i < text.length - 1; i++) {
+        if (text[i - 1] == '.' && text[i] == ' ') {
+          newText = newText.substring(0, i + 1) +
+              text[i + 1].toUpperCase() +
+              newText.substring(i + 2);
+          i++; // Skip the next character since it has already been capitalized
+        }
+      }
+
+      if (text != newText) {
+        chatController.value = chatController.value.copyWith(
+          text: newText,
+          selection: TextSelection.collapsed(offset: newText.length),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
@@ -41,6 +66,7 @@ class ChatTextField extends StatelessWidget {
             ),
             onChanged: (v) {
               chat.notifyUI();
+              _onTextChanged();
             },
             focusNode: chat.textFieldFocus,
             maxLength: 1500,

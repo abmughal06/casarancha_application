@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -6,9 +5,8 @@ import 'package:casarancha/widgets/music_player_url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../models/media_details.dart';
 import '../../models/message.dart';
@@ -40,32 +38,45 @@ class ChatVideoTile extends StatefulWidget {
 }
 
 class _ChatVideoTileState extends State<ChatVideoTile> {
-  Future<String?> initThumbnail() async {
-    return await VideoThumbnail.thumbnailFile(
-      video: widget.link!,
-      thumbnailPath: (await getTemporaryDirectory()).path,
-      imageFormat: ImageFormat.PNG,
-      maxHeight: 1024,
-      maxWidth: 1024,
-      quality: 10,
-      // timeMs: (_controller.value.duration.inMilliseconds / 2).toInt(),
-    );
-  }
+  late VideoPlayerController videoPlayerController;
+  // Future<String?> initThumbnail() async {
+  //   return await VideoThumbnail.thumbnailFile(
+  //     video: widget.link!,
+  //     thumbnailPath: (await getTemporaryDirectory()).path,
+  //     imageFormat: ImageFormat.PNG,
+  //     maxHeight: 1024,
+  //     maxWidth: 1024,
+  //     quality: 10,
+  //     // timeMs: (_controller.value.duration.inMilliseconds / 2).toInt(),
+  //   );
+  // }
 
-  String? image;
+  // String? image;
 
-  initImage() async {
-    image = await initThumbnail();
-    if (mounted) {
-      setState(() {});
-    }
-  }
+  // initImage() async {
+  //   image = await initThumbnail();
+  //   if (mounted) {
+  //     setState(() {});
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
+    videoPlayerController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.link!))
+          ..initialize().then((value) {
+            if (mounted) {
+              setState(() {});
+            }
+          });
+    // initImage();
+  }
 
-    initImage();
+  @override
+  void dispose() {
+    videoPlayerController.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,23 +93,15 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
             child: Align(
               alignment: widget.isMe ? Alignment.topRight : Alignment.topLeft,
               child: AspectRatio(
-                aspectRatio: 9 / 13,
+                aspectRatio: videoPlayerController.value.aspectRatio,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      image: image == null
-                          ? null
-                          : DecorationImage(
-                              image: FileImage(
-                                File(image!),
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Container(
+                  child: Stack(
+                    children: [
+                      VideoPlayer(videoPlayerController),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
                           height: double.infinity,
                           width: double.infinity,
                           color: Colors.black.withOpacity(0.2),
@@ -108,81 +111,28 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                             color: colorWhite,
                           ),
                         ),
-                        Positioned(
-                          right: 12,
-                          top: 12,
-                          child: widget.mediaLength != null
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w, vertical: 4.h),
-                                  child: TextWidget(
-                                    text: '1/${widget.mediaLength}',
-                                    fontSize: 9.sp,
-                                    color: colorWhite,
-                                  ),
-                                )
-                              : widthBox(0),
-                        )
-                      ],
-                    ),
+                      ),
+                      Positioned(
+                        right: 12,
+                        top: 12,
+                        child: widget.mediaLength != null
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w, vertical: 4.h),
+                                child: TextWidget(
+                                  text: '1/${widget.mediaLength}',
+                                  fontSize: 9.sp,
+                                  color: colorWhite,
+                                ),
+                              )
+                            : widthBox(0),
+                      )
+                    ],
                   ),
-                  // FutureBuilder<String?>(
-                  //   future: initThumbnail(),
-                  //   builder: (context, snapshot) {
-                  //     if (snapshot.data == null) {
-                  //       return const Center(
-                  //         child: CircularProgressIndicator.adaptive(),
-                  //       );
-                  //     }
-                  //     return Container(
-                  //       decoration: BoxDecoration(
-                  //         image: DecorationImage(
-                  //           image: FileImage(
-                  //             File(snapshot.data!),
-                  //           ),
-                  //           fit: BoxFit.cover,
-                  //         ),
-                  //       ),
-                  //       child: Stack(
-                  //         children: [
-                  //           Container(
-                  //             height: double.infinity,
-                  //             width: double.infinity,
-                  //             color: Colors.black.withOpacity(0.2),
-                  //             child: const Icon(
-                  //               Icons.play_arrow_rounded,
-                  //               size: 40,
-                  //               color: colorWhite,
-                  //             ),
-                  //           ),
-                  //           Positioned(
-                  //             right: 12,
-                  //             top: 12,
-                  //             child: widget.mediaLength != null
-                  //                 ? Container(
-                  //                     decoration: BoxDecoration(
-                  //                       color: Colors.black.withOpacity(0.6),
-                  //                       borderRadius: BorderRadius.circular(20),
-                  //                     ),
-                  //                     padding: EdgeInsets.symmetric(
-                  //                         horizontal: 8.w, vertical: 4.h),
-                  //                     child: TextWidget(
-                  //                       text: '1/${widget.mediaLength}',
-                  //                       fontSize: 9.sp,
-                  //                       color: colorWhite,
-                  //                     ),
-                  //                   )
-                  //                 : widthBox(0),
-                  //           )
-                  //         ],
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
                 ),
               ),
             ),

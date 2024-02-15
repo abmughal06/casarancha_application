@@ -167,8 +167,10 @@ class HomeScreen extends StatelessWidget {
                                     itemBuilder: (context, index) {
                                       var storyList = [];
                                       final twentyFourHoursAgo = DateTime.now()
+                                          .toUtc()
                                           .subtract(const Duration(hours: 24));
-                                      DateTime givenDate = DateTime.now();
+                                      DateTime givenDate =
+                                          DateTime.now().toUtc();
 
                                       for (int i = 0;
                                           i <

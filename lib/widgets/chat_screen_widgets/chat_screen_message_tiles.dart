@@ -1,4 +1,5 @@
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../widgets/chat_screen_widgets/chat_post_tile.dart';
 import '../../../widgets/chat_screen_widgets/chat_story_tile.dart';
@@ -19,34 +21,54 @@ import '../../screens/home/post_detail_screen.dart';
 import '../../screens/home/story_view_screen.dart';
 import '../custom_dialog.dart';
 
-Future showMessageMennu({context, url, path, friendId, docId}) async {
+Future showMessageMennu({context, url, path, friendId, docId, text}) async {
   await Get.bottomSheet(CupertinoActionSheet(
     actions: [
       CupertinoActionSheetAction(
-          onPressed: () {
-            if (url == null || path == null) {
-              Get.back();
+        onPressed: () {
+          if (url == null || path == null) {
+            Get.back();
 
-              GlobalSnackBar.show(
-                  message: appText(context).strcannotDownloadText);
-            } else {
-              Get.back();
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return CustomDownloadDialog(
-                      url: url,
-                      path: path,
-                    );
-                  });
-            }
-          },
-          child: TextWidget(
-            text: appText(context).btnDownloadMedia,
-            fontSize: 16.sp,
-            color: color221,
-            fontWeight: FontWeight.w400,
-          )),
+            GlobalSnackBar.show(
+                message: appText(context).strcannotDownloadText);
+          } else {
+            Get.back();
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomDownloadDialog(
+                    url: url,
+                    path: path,
+                  );
+                });
+          }
+        },
+        child: TextWidget(
+          text: appText(context).btnDownloadMedia,
+          fontSize: 16.sp,
+          color: color221,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      CupertinoActionSheetAction(
+        onPressed: () async {
+          if (url == null || path == null) {
+            Get.back();
+            Share.share('$text');
+          } else {
+            Get.back();
+            final path = await DownloadProvider()
+                .downloadForShare(url, 'filename', context);
+            Share.shareXFiles([XFile(path!)]);
+          }
+        },
+        child: TextWidget(
+          text: appText(context).strShare,
+          fontSize: 16.sp,
+          color: color221,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
       CupertinoActionSheetAction(
           onPressed: () {
             Get.back();
@@ -394,6 +416,7 @@ class MessageTiles extends StatelessWidget {
               path: null,
               friendId: isMe ? message.sentToId : message.sentById,
               docId: message.id,
+              text: message.content,
             );
           },
           child: ChatTile(

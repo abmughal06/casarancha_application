@@ -230,7 +230,7 @@ class PostProvider extends ChangeNotifier {
               name: user!.name,
               imageUrl: user.imageStr,
               isVerified: user.isVerified),
-          createdAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toUtc().toString(),
           message: mentionKey.currentState!.controller!.text,
           postId: postModel.id,
           dislikeIds: [],
@@ -332,7 +332,7 @@ class PostProvider extends ChangeNotifier {
               name: user!.name,
               imageUrl: user.imageStr,
               isVerified: user.isVerified),
-          createdAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toUtc().toString(),
           message: mentionKey.currentState!.controller!.text,
           postId: postModel.id,
           dislikeIds: [],
@@ -848,7 +848,7 @@ class PostProvider extends ChangeNotifier {
         imageUrl: appUser.imageStr,
         isVerified: appUser.isVerified,
       ),
-      createdAt: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now().toUtc().toString(),
     );
 
     final MessageDetails currentUserMessageDetails = MessageDetails(
@@ -861,7 +861,7 @@ class PostProvider extends ChangeNotifier {
         imageUrl: currentUser.imageStr,
         isVerified: currentUser.isVerified,
       ),
-      createdAt: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now().toUtc().toString(),
     );
 
     await FirebaseFirestore.instance
@@ -885,11 +885,12 @@ class PostProvider extends ChangeNotifier {
     final Message message = Message(
       id: messageRefForCurrentUser.id,
       sentToId: appUser.id,
+      isReply: false,
       sentById: FirebaseAuth.instance.currentUser!.uid,
       content: post,
       caption: '',
       type: postModel.mediaData[0].type,
-      createdAt: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now().toUtc().toString(),
       isSeen: false,
     );
     final appUserMessage = message.copyWith(id: messageRefForAppUser.id);

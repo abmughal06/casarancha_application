@@ -1,7 +1,11 @@
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:emoji_regex/emoji_regex.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
@@ -48,12 +52,20 @@ class ChatTile extends StatelessWidget {
                   color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                child: SelectableTextWidget(
-                  text: message,
-                  fontSize: calculateFontSize(message),
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                child: SelectableText.rich(
+                  TextSpan(
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: calculateFontSize(message)),
+                    children: linkifyMessage(message),
+                  ),
                 ),
+                // SelectableTextWidget(
+                //   text: message,
+                //   fontSize: calculateFontSize(message),
+                //   fontWeight: FontWeight.w500,
+                //   color: Colors.black,
+                // ),
               ),
             ),
           ),
@@ -89,6 +101,58 @@ class ChatTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+List<TextSpan> linkifyMessage(String message) {
+  List<TextSpan> spans = [];
+
+  final pattern = RegExp(r'(https?://)?(?:www\.)?\S+\.\S+(?:[^\s.,](?=\s|$))?');
+
+  Iterable<RegExpMatch> matches = pattern.allMatches(message);
+
+  int lastMatchEnd = 0;
+
+  for (RegExpMatch match in matches) {
+    if (match.start > lastMatchEnd) {
+      spans.add(TextSpan(text: message.substring(lastMatchEnd, match.start)));
+    }
+    spans.add(
+      TextSpan(
+        text: match.group(0),
+        style: const TextStyle(color: Colors.blue),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => _onOpen(LinkableElement(
+                match.group(0)!,
+                match.group(0)!,
+              )),
+      ),
+    );
+    lastMatchEnd = match.end;
+  }
+
+  if (lastMatchEnd < message.length) {
+    spans.add(TextSpan(text: message.substring(lastMatchEnd)));
+  }
+
+  return spans;
+}
+
+void _onOpen(LinkableElement link) async {
+  String url = link.url;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'http://$url';
+  }
+  Uri? uri = Uri.tryParse(url);
+
+  if (uri != null) {
+    if (await canLaunchUrl(uri)) {
+      launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      GlobalSnackBar.show(message: "Can't launch url => $url");
+    }
+  } else {
+    GlobalSnackBar.show(message: "$url is not valid");
   }
 }
 

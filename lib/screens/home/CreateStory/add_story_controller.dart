@@ -72,7 +72,7 @@ class AddStoryProvider extends ChangeNotifier {
           storyViews: [],
           creatorId: creatorId,
           creatorDetails: creatorDetails,
-          createdAt: DateTime.now().toIso8601String(),
+          createdAt: DateTime.now().toUtc().toString(),
           mediaDetailsList: [],
         );
 
@@ -104,7 +104,7 @@ class AddStoryProvider extends ChangeNotifier {
       final mediaRef = await uploadTask.whenComplete(() {});
       final fileUrl = await mediaRef.ref.getDownloadURL();
       final mediaDetails = MediaDetails(
-        id: DateTime.now().toIso8601String(),
+        id: DateTime.now().toUtc().toString(),
         name: fileName,
         type: fileType,
         link: fileUrl,

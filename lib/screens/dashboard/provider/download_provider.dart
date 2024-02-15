@@ -98,6 +98,34 @@ class DownloadProvider extends ChangeNotifier {
     }
   }
 
+  Future<String?> downloadForShare(String url, String filename, context) async {
+    try {
+      String path = await _getPath(filename);
+
+      Platform.isAndroid
+          ? await FileDownloader.downloadFile(
+              name: filename,
+              url: url,
+              onProgress: (fileName, p) {
+                progress = p;
+                notifyListeners();
+              },
+            )
+          : await dio.download(
+              url,
+              path,
+              onReceiveProgress: (count, total) {
+                progress = count / total;
+                notifyListeners();
+              },
+              deleteOnError: true,
+            );
+      return path;
+    } catch (e) {
+      return null;
+    }
+  }
+
   bool isDocOpening = false;
 
   Future<void> openDocument(String fileUrl, String fileName) async {

@@ -383,6 +383,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
 
                   final Message message = Message(
                     id: messageRefForCurrentUser.id,
+                    isReply: false,
                     sentToId: widget.stories.creatorId,
                     sentById: FirebaseAuth.instance.currentUser!.uid,
                     content: mediaDetail,

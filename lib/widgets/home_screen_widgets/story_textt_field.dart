@@ -86,11 +86,6 @@ class StoryTextField extends StatelessWidget {
             textInputAction: TextInputAction.done,
             onFieldSubmitted: onFieldSubmitted,
             onEditingComplete: onEditCompleted,
-            // () {
-            //   FocusScope.of(context).unfocus();
-            //   commentController.text = "";
-            //   controller!.play();
-            // },
           ),
         ),
       ),
