@@ -195,41 +195,62 @@ class MessageTiles extends StatelessWidget {
             ? null
             : List.generate(message.content.length,
                 (index) => MediaDetails.fromMap(message.content[index]));
+        final isUploading = media == null && !isMe;
 
-        return InkWell(
-          onLongPress: () {
-            showMessageMennu(
-              context: context,
-              url: videos!.link,
-              path: message.type,
-              friendId: isMe ? message.sentToId : message.sentById,
-              docId: message.id,
-            );
-          },
-          onTap: message.caption.isNotEmpty
-              ? () {}
-              : () => Get.to(() => FullScreenVideoPlayer(
-                    videoLink: media!.first.link,
-                  )),
-          child: media == null
-              ? AspectRatio(
-                  aspectRatio: 9 / 13,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: colorBlack.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(15)),
-                    child: centerLoader(),
-                  ))
-              : ChatVideoTile(
-                  key: videos == null ? null : ValueKey(videos.link),
-                  mediaLength: media.length > 1 ? media.length : null,
-                  link: videos?.link,
-                  appUserId: message.sentToId,
-                  isSeen: message.isSeen,
-                  isMe: isMe,
-                  date: message.createdAt,
-                ),
-        );
+        return !isUploading
+            ? InkWell(
+                onLongPress: () {
+                  showMessageMennu(
+                    context: context,
+                    url: videos!.link,
+                    path: message.type,
+                    friendId: isMe ? message.sentToId : message.sentById,
+                    docId: message.id,
+                  );
+                },
+                onTap: message.caption.isNotEmpty
+                    ? () {}
+                    : () => Get.to(() => FullScreenVideoPlayer(
+                          videoLink: media!.first.link,
+                        )),
+                child: media == null
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: isMe
+                                  ? MediaQuery.of(context).size.width * .5
+                                  : 0,
+                              right: isMe
+                                  ? 0
+                                  : MediaQuery.of(context).size.width * .5,
+                              bottom: 10),
+                          child: Align(
+                            alignment:
+                                isMe ? Alignment.topRight : Alignment.topLeft,
+                            child: AspectRatio(
+                              aspectRatio: 9 / 13,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: colorBlack.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(15)),
+                                child: centerLoader(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : ChatVideoTile(
+                        key: videos == null ? null : ValueKey(videos.link),
+                        mediaLength: media.length > 1 ? media.length : null,
+                        link: videos?.link,
+                        appUserId: message.sentToId,
+                        isSeen: message.isSeen,
+                        isMe: isMe,
+                        date: message.createdAt,
+                      ),
+              )
+            : widthBox(0);
       case 'Video':
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
@@ -259,27 +280,31 @@ class MessageTiles extends StatelessWidget {
         final music = message.caption.isEmpty
             ? MediaDetails.fromMap(message.content[0])
             : null;
-        return InkWell(
-          onLongPress: () {
-            if (music != null) {
-              showMessageMennu(
-                context: context,
-                url: music.link,
-                path: message.type,
-                friendId: isMe ? message.sentToId : message.sentById,
-                docId: message.id,
-              );
-            }
-          },
-          child: ChatMusicTile(
-            key: music == null ? null : ValueKey(music.link),
-            appUserId: message.sentToId,
-            isSeen: message.isSeen,
-            isMe: isMe,
-            date: message.createdAt,
-            media: music,
-          ),
-        );
+        final isUploading = music == null && !isMe;
+
+        return !isUploading
+            ? InkWell(
+                onLongPress: () {
+                  if (music != null) {
+                    showMessageMennu(
+                      context: context,
+                      url: music.link,
+                      path: message.type,
+                      friendId: isMe ? message.sentToId : message.sentById,
+                      docId: message.id,
+                    );
+                  }
+                },
+                child: ChatMusicTile(
+                  key: music == null ? null : ValueKey(music.link),
+                  appUserId: message.sentToId,
+                  isSeen: message.isSeen,
+                  isMe: isMe,
+                  date: message.createdAt,
+                  media: music,
+                ),
+              )
+            : widthBox(0);
       case 'Music':
         final prePost = message.content;
         final postModel = PostModel.fromMap(prePost);
@@ -307,56 +332,64 @@ class MessageTiles extends StatelessWidget {
           ),
         );
 
-      case 'InChatDoc':
+      case 'Doc':
         final doc = message.caption.isNotEmpty
             ? null
             : MediaDetails.fromMap(message.content[0]);
-        return InkWell(
-          onLongPress: () {
-            if (doc != null) {
-              showMessageMennu(
-                context: context,
-                url: doc.link,
-                path: message.type,
-                friendId: isMe ? message.sentToId : message.sentById,
-                docId: message.id,
-              );
-            }
-          },
-          child: ChatDocumentTile(
-            key: doc == null ? null : ValueKey(doc.link),
-            appUserId: message.sentToId,
-            isSeen: message.isSeen,
-            isMe: isMe,
-            date: message.createdAt,
-            media: doc,
-          ),
-        );
+        final isUploading = doc == null && !isMe;
 
-      case 'voice':
+        return isUploading
+            ? widthBox(0)
+            : InkWell(
+                onLongPress: () {
+                  if (doc != null) {
+                    showMessageMennu(
+                      context: context,
+                      url: doc.link,
+                      path: message.type,
+                      friendId: isMe ? message.sentToId : message.sentById,
+                      docId: message.id,
+                    );
+                  }
+                },
+                child: ChatDocumentTile(
+                  key: doc == null ? null : ValueKey(doc.link),
+                  appUserId: message.sentToId,
+                  isSeen: message.isSeen,
+                  isMe: isMe,
+                  date: message.createdAt,
+                  media: doc,
+                ),
+              );
+
+      case 'Voice':
         final voice = message.caption.isEmpty
             ? MediaDetails.fromMap(message.content[0])
             : null;
-        return InkWell(
-          onLongPress: () {
-            showMessageMennu(
-              context: context,
-              url: voice!.link,
-              path: message.type,
-              friendId: isMe ? message.sentToId : message.sentById,
-              docId: message.id,
-            );
-          },
-          child: ChatVoiceTile(
-            key: voice != null ? ValueKey(voice.link) : null,
-            appUserId: message.sentToId,
-            isSeen: message.isSeen,
-            isMe: isMe,
-            date: message.createdAt,
-            media: voice,
-          ),
-        );
-      case 'story-Video':
+        final isUploading = voice == null && !isMe;
+
+        return isUploading
+            ? widthBox(0)
+            : InkWell(
+                onLongPress: () {
+                  showMessageMennu(
+                    context: context,
+                    url: voice!.link,
+                    path: message.type,
+                    friendId: isMe ? message.sentToId : message.sentById,
+                    docId: message.id,
+                  );
+                },
+                child: ChatVoiceTile(
+                  key: voice != null ? ValueKey(voice.link) : null,
+                  appUserId: message.sentToId,
+                  isSeen: message.isSeen,
+                  isMe: isMe,
+                  date: message.createdAt,
+                  media: voice,
+                ),
+              );
+      case 'StoryVideo':
         final story = MediaDetails.fromMap(message.content);
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
             ? InkWell(
@@ -383,7 +416,7 @@ class MessageTiles extends StatelessWidget {
                 ),
               )
             : Container();
-      case 'story-Photo':
+      case 'StoryPic':
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
             ? InkWell(
                 onLongPress: () {
@@ -421,11 +454,9 @@ class MessageTiles extends StatelessWidget {
           },
           child: ChatTile(
             key: ValueKey(message.content),
-            message: message.content,
+            message: message,
             appUserId: message.sentToId,
-            isSeen: message.isSeen,
             isMe: isMe,
-            date: message.createdAt,
           ),
         );
       default:

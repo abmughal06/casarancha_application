@@ -34,18 +34,25 @@ class _AccountRecoveryState extends State<AccountRecovery> {
               ? const RegisterAndLinkEmail()
               : const ShowRegisteredEmail(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: CommonButton(
-        height: 52.h,
-        text: appText(context).updateEmail,
-        verticalOutMargin: 10.h,
-        horizontalOutMargin: 20.w,
-        onTap: () {
-          // setState(() {
-          //   isEmailUpdate = true;
-          // });
-          showDialog(context: context, builder: (_) => const UpdateEmail());
-        },
-      ),
+      floatingActionButton: FirebaseAuth
+                      .instance.currentUser!.providerData[0].providerId ==
+                  GoogleAuthProvider.PROVIDER_ID ||
+              FirebaseAuth.instance.currentUser!.providerData[0].providerId ==
+                  GoogleAuthProvider.PROVIDER_ID
+          ? widthBox(0)
+          : CommonButton(
+              height: 52.h,
+              text: appText(context).updateEmail,
+              verticalOutMargin: 10.h,
+              horizontalOutMargin: 20.w,
+              onTap: () {
+                // setState(() {
+                //   isEmailUpdate = true;
+                // });
+                showDialog(
+                    context: context, builder: (_) => const UpdateEmail());
+              },
+            ),
     );
   }
 }

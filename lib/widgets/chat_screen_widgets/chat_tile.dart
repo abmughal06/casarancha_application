@@ -1,3 +1,4 @@
+import 'package:casarancha/models/message.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/gestures.dart';
@@ -18,15 +19,10 @@ class ChatTile extends StatelessWidget {
     required this.message,
     required this.appUserId,
     required this.isMe,
-    required this.isSeen,
-    required this.date,
   });
-
-  final String message;
   final bool isMe;
-  final bool isSeen;
   final String appUserId;
-  final String date;
+  final Message message;
 
   @override
   Widget build(BuildContext context) {
@@ -35,38 +31,88 @@ class ChatTile extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(left: isMe ? 70 : 0, right: isMe ? 0 : 70),
+            padding: EdgeInsets.only(
+              left: isMe ? MediaQuery.of(context).size.width * .2 : 0,
+              right: isMe ? 0 : MediaQuery.of(context).size.width * .2,
+            ),
             child: Align(
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16.r),
-                      topRight: Radius.circular(16.r),
-                      bottomLeft: Radius.circular(
-                        isMe ? 16.r : 0,
+              child: message.isReply
+                  ? Container(
+                      width: MediaQuery.of(context).size.width * .8,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(isMe ? 10.r : 16.r),
+                            topRight: Radius.circular(isMe ? 16.r : 10.r),
+                            bottomLeft: Radius.circular(isMe ? 10.r : 0),
+                            bottomRight: Radius.circular(isMe ? 0 : 10.r)),
+                        color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
                       ),
-                      bottomRight: Radius.circular(
-                        isMe ? 0 : 16.r,
-                      )),
-                  color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                child: SelectableText.rich(
-                  TextSpan(
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: calculateFontSize(message)),
-                    children: linkifyMessage(message),
-                  ),
-                ),
-                // SelectableTextWidget(
-                //   text: message,
-                //   fontSize: calculateFontSize(message),
-                //   fontWeight: FontWeight.w500,
-                //   color: Colors.black,
-                // ),
-              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * .8,
+                            padding: const EdgeInsets.only(
+                                left: 5, right: 5, top: 10, bottom: 12),
+                            margin: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: color080.withOpacity(0.2),
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(isMe ? 10.r : 16.r),
+                                  topRight: Radius.circular(isMe ? 16.r : 10.r),
+                                  bottomLeft: Radius.circular(isMe ? 10.r : 0),
+                                  bottomRight:
+                                      Radius.circular(isMe ? 0 : 10.r)),
+                            ),
+                            child: SelectableText.rich(
+                              TextSpan(
+                                style: TextStyle(
+                                    color: color221,
+                                    fontSize: calculateFontSize(
+                                        message.caption.toString())),
+                                children:
+                                    linkifyMessage(message.caption.toString()),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 8),
+                            child: SelectableText.rich(
+                              TextSpan(
+                                style: TextStyle(
+                                    color: color221,
+                                    fontSize: calculateFontSize(
+                                        message.content.toString())),
+                                children:
+                                    linkifyMessage(message.content.toString()),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(isMe ? 10.r : 16.r),
+                            topRight: Radius.circular(isMe ? 16.r : 10.r),
+                            bottomLeft: Radius.circular(isMe ? 10.r : 0),
+                            bottomRight: Radius.circular(isMe ? 0 : 10.r)),
+                        color: (isMe ? colorF03.withOpacity(0.6) : colorFF4),
+                      ),
+                      padding: EdgeInsets.all(8.h),
+                      child: SelectableText.rich(
+                        TextSpan(
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: calculateFontSize(
+                                  message.content.toString())),
+                          children: linkifyMessage(message.content.toString()),
+                        ),
+                      ),
+                    ),
             ),
           ),
           Align(
@@ -77,7 +123,7 @@ class ChatTile extends StatelessWidget {
                 isMe
                     ? Padding(
                         padding: EdgeInsets.symmetric(horizontal: 3.w),
-                        child: isSeen
+                        child: message.isSeen
                             ? SvgPicture.asset(
                                 icChatMsgSend,
                               )
@@ -88,7 +134,7 @@ class ChatTile extends StatelessWidget {
                       )
                     : Container(),
                 TextWidget(
-                  text: convertDateIntoTime(date),
+                  text: convertDateIntoTime(message.createdAt),
                   color: colorAA3,
                   fontSize: 11.sp,
                 ),

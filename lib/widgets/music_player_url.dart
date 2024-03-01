@@ -300,8 +300,8 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
   Widget build(BuildContext context) {
     return Container(
       key: Key(widget.musicDetails.link),
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      // height: 70,
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: widget.isMe ? colorPrimaryA05 : colorFF3,
         borderRadius: BorderRadius.only(
@@ -318,9 +318,7 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          widthBox(
-            5.w,
-          ),
+          widthBox(5.w),
           GestureDetector(
             onTap: () {
               isPlaying ? audioPlayer.pause() : audioPlayer.resume();
@@ -333,7 +331,7 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
               color: widget.isMe ? colorWhite : color221,
             ),
           ),
-          widthBox(10.w),
+          widthBox(5.w),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -358,9 +356,9 @@ class _MusicPlayerTileState extends State<MusicPlayerTile> {
                     },
                   ),
                 ),
-                heightBox(5.h),
+                heightBox(4.h),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                  padding: EdgeInsets.only(right: 10.w, left: 3.w),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

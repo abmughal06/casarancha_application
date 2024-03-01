@@ -1,18 +1,20 @@
 import 'dart:io';
 
 import 'package:casarancha/models/message.dart';
+import 'package:casarancha/models/message_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/snackbar.dart';
+import 'package:casarancha/widgets/chat_screen_widgets/show_media_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 import '../../../resources/color_resources.dart';
 import '../../../resources/image_resources.dart';
@@ -23,10 +25,12 @@ import '../../../widgets/common_widgets.dart';
 
 class ChatScreen extends StatefulWidget {
   final String appUserId;
+  final MessageDetails? messageDetails;
 
   const ChatScreen({
     super.key,
     required this.appUserId,
+    this.messageDetails,
   });
 
   @override
@@ -107,48 +111,106 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ],
             ),
-            body: StreamProvider.value(
-              value: DataProvider().messages(widget.appUserId, false),
-              initialData: null,
-              catchError: (context, error) => null,
-              child: Consumer<List<Message>?>(
-                builder: (context, messages, b) {
-                  if (messages == null) {
-                    return const Center(
-                        child: CircularProgressIndicator.adaptive());
-                  }
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: messages.length,
-                          reverse: true,
-                          padding: const EdgeInsets.only(top: 12),
-                          itemBuilder: (context, index) {
-                            final message = messages[index];
+            body: SafeArea(
+              bottom: true,
+              top: false,
+              child: StreamProvider.value(
+                value: DataProvider().messages(
+                    widget.messageDetails != null
+                        ? widget.messageDetails!.id
+                        : "${currentUserUID}_${widget.appUserId}",
+                    false),
+                initialData: null,
+                catchError: (context, error) => null,
+                child: Consumer<List<Message>?>(
+                  builder: (context, messages, b) {
+                    if (messages == null) {
+                      return const Center(
+                          child: CircularProgressIndicator.adaptive());
+                    }
+                    if (widget.messageDetails != null) {
+                      chatProvider.conversationId = widget.messageDetails!.id;
+                    } else {
+                      chatProvider.conversationId = getConversationDocId(
+                          currentUserUID!, widget.appUserId);
+                    }
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: messages.length,
+                            reverse: true,
+                            padding: const EdgeInsets.only(top: 12),
+                            itemBuilder: (context, index) {
+                              final message = messages[index];
 
-                            final isMe = message.sentToId == widget.appUserId;
-                            if (messages.isNotEmpty) {
-                              chatProvider.resetMessageCount(
-                                currentUserId:
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                appUserId: widget.appUserId,
-                                messageid: message.id,
+                              final isMe = message.sentToId == widget.appUserId;
+                              if (messages.isNotEmpty &&
+                                  message.sentById != currentUserUID) {
+                                chatProvider.resetMessageCount(
+                                  messageid: message.id,
+                                );
+                              }
+                              return SwipeTo(
+                                key: UniqueKey(),
+                                iconOnLeftSwipe: Icons.arrow_forward,
+                                iconOnRightSwipe: Icons.arrow_back,
+                                onRightSwipe: (details) {
+                                  chatProvider.enableReply(message);
+                                },
+                                onLeftSwipe: (details) {
+                                  chatProvider.enableReply(message);
+                                },
+                                // swipeSensitivity: 20,
+                                child: MessageTiles(
+                                  isMe: isMe,
+                                  message: message,
+                                ),
                               );
-                            }
-                            return MessageTiles(
-                              isMe: isMe,
-                              message: message,
-                            );
-                          },
+                            },
+                          ),
                         ),
-                      ),
-                      ChatInputField(
-                        appUserId: widget.appUserId,
-                      ),
-                    ],
-                  );
-                },
+                        Column(
+                          children: [
+                            if (chatProvider.isReply)
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: colorFF4,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      margin: const EdgeInsets.only(
+                                        left: 15,
+                                        top: 5,
+                                      ),
+                                      padding: const EdgeInsets.all(
+                                        10,
+                                      ),
+                                      child: Text(chatProvider
+                                          .replyingMessage!.content
+                                          .toString()),
+                                    ),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        chatProvider.disableReply();
+                                      },
+                                      icon: const Icon(Icons.close)),
+                                ],
+                              ),
+                            ChatInputField(
+                              messageDetails: widget.messageDetails!,
+                              appUserId: widget.appUserId,
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
             floatingActionButton:

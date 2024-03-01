@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -381,7 +382,6 @@ class PostProvider extends ChangeNotifier {
               msg: appText(context).strNotificationMentioned(groupId == null
                   ? appText(context).pushnotPost
                   : appText(context).pushnotGroupPost),
-              // 'has mentioned you in ${groupId == null ? "post" : "group post"}.',
               groupId: groupId,
               content: postModel.toMap(),
             );
@@ -813,33 +813,25 @@ class PostProvider extends ChangeNotifier {
     recieverIds.clear();
   }
 
-  void sharePostData(context,
+  void sharePostData(
       {UserModel? currentUser,
       UserModel? appUser,
       PostModel? postModel,
-      String? groupId}) async {
-    final messageRefForCurrentUser = FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('messageList')
-        .doc(appUser!.id)
-        .collection('messages')
-        .doc();
+      String? groupId,
+      required String notimsg}) async {
+    final messageRef = FirebaseFirestore.instance
+        .collection("messages")
+        .doc(getConversationDocId(currentUser!.id, appUser!.id));
 
-    final messageRefForAppUser = FirebaseFirestore.instance
-        .collection("users")
-        .doc(appUser.id)
-        .collection('messageList')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('messages')
-        .doc(messageRefForCurrentUser.id);
+    final chatRef = messageRef.collection('chats').doc();
 
     var p = postModel!.copyWith(groupId: groupId);
 
     var post = p.toMap();
 
-    final MessageDetails appUserMessageDetails = MessageDetails(
-      id: appUser.id,
+    final MessageDetails messageDetails = MessageDetails(
+      id: messageRef.id,
+      creatorId: '',
       lastMessage: "Post",
       unreadMessageCount: 0,
       searchCharacters: [...appUser.name.toLowerCase().split('')],
@@ -851,39 +843,8 @@ class PostProvider extends ChangeNotifier {
       createdAt: DateTime.now().toUtc().toString(),
     );
 
-    final MessageDetails currentUserMessageDetails = MessageDetails(
-      id: currentUser!.id,
-      lastMessage: "Post",
-      unreadMessageCount: unreadMessages + 1,
-      searchCharacters: [...currentUser.name.toLowerCase().split('')],
-      creatorDetails: CreatorDetails(
-        name: currentUser.name,
-        imageUrl: currentUser.imageStr,
-        isVerified: currentUser.isVerified,
-      ),
-      createdAt: DateTime.now().toUtc().toString(),
-    );
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser.id)
-        .collection('messageList')
-        .doc(appUser.id)
-        .set(
-          appUserMessageDetails.toMap(),
-        );
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(appUser.id)
-        .collection('messageList')
-        .doc(currentUser.id)
-        .set(
-          currentUserMessageDetails.toMap(),
-        );
-
     final Message message = Message(
-      id: messageRefForCurrentUser.id,
+      id: chatRef.id,
       sentToId: appUser.id,
       isReply: false,
       sentById: FirebaseAuth.instance.currentUser!.uid,
@@ -893,10 +854,9 @@ class PostProvider extends ChangeNotifier {
       createdAt: DateTime.now().toUtc().toString(),
       isSeen: false,
     );
-    final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-    messageRefForCurrentUser.set(message.toMap());
-    messageRefForAppUser.set(appUserMessage.toMap());
+    messageRef.set(messageDetails.toMap());
+    chatRef.set(message.toMap());
 
     recieverIds.add(appUser.id);
 
@@ -920,7 +880,7 @@ class PostProvider extends ChangeNotifier {
       appUserId: appUser.id,
       devRegToken: recieverFCMToken,
       notificationType: "msg",
-      msg: appText(context).strSentPost,
+      msg: notimsg,
       isMessage: false,
       content: postModel.mediaData[0].type == 'Photo'
           ? postModel.mediaData[0].link

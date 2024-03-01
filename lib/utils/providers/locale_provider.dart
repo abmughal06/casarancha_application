@@ -26,6 +26,7 @@
 
 import 'dart:ui';
 
+import 'package:casarancha/resources/image_resources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalizationService {
@@ -52,12 +53,29 @@ class LocalizationService {
     'Portuguese'
   ]; // Add more as needed
   static final List<String> supportedLanguagesFlags = [
-    'https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg',
-    'https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg',
-    'https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg',
-    'https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg',
-    'https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg'
+    icFlagUs,
+    icFlagEquatorial,
+    icFlagGabon,
+    icFlagSaudia,
+    icFlagCaboVerde
   ]; // Add more as needed
+
+  static String getCurrentLanguageFlag(String locale) {
+    switch (locale) {
+      case 'en':
+        return icFlagUs;
+      case 'es':
+        return icFlagEquatorial;
+      case 'fr':
+        return icFlagGabon;
+      case 'ar':
+        return icFlagSaudia;
+      case 'pt':
+        return icFlagCaboVerde;
+      default:
+        return icFlagUs;
+    }
+  }
 
   static Future<Locale> getLocale() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

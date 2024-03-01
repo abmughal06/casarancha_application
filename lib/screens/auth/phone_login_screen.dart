@@ -130,7 +130,8 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                               showLoading: auth.isSigningIn,
                               onTap: () async {
                                 auth.verifyPhoneNumber(
-                                    '$phoneDialCode ${phoneController.text.trim()}');
+                                    '$phoneDialCode ${phoneController.text.trim()}',
+                                    context);
                               },
                               text: appText(context).strSendNow,
                               width: double.infinity,

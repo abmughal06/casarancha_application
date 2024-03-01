@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
@@ -68,7 +66,7 @@ class GhostChatList extends StatelessWidget {
                     if (messages == null) {
                       return Container();
                     } else {
-                      log(messages.length);
+                      // print(messages.length);
 
                       // messageUserIds = messages.map((e) => e.id).toList();
                       // print(messageUserIds);
@@ -85,6 +83,7 @@ class GhostChatList extends StatelessWidget {
                                     messageDetails: messages[index],
                                     ontapTile: () => Get.to(
                                       () => GhostChatScreen2(
+                                        ghostMessageDetails: messages[index],
                                         firstMessagebyMe:
                                             messages[index].firstMessage ==
                                                 FirebaseAuth
@@ -99,6 +98,7 @@ class GhostChatList extends StatelessWidget {
                                     messageDetails: messages[index],
                                     ontapTile: () => Get.to(
                                       () => GhostChatScreen2(
+                                        ghostMessageDetails: messages[index],
                                         firstMessagebyMe:
                                             messages[index].firstMessage ==
                                                 FirebaseAuth
@@ -131,6 +131,7 @@ class GhostChatList extends StatelessWidget {
                                   messageDetails: filterList[index],
                                   ontapTile: () => Get.to(
                                     () => GhostChatScreen2(
+                                      ghostMessageDetails: filterList[index],
                                       firstMessagebyMe:
                                           filterList[index].firstMessage ==
                                               FirebaseAuth
@@ -145,6 +146,7 @@ class GhostChatList extends StatelessWidget {
                                   messageDetails: filterList[index],
                                   ontapTile: () => Get.to(
                                     () => GhostChatScreen2(
+                                      ghostMessageDetails: filterList[index],
                                       firstMessagebyMe:
                                           filterList[index].firstMessage ==
                                               FirebaseAuth

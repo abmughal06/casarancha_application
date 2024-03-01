@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:casarancha/authenticator.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/profile/account_recovery.dart';
 import 'package:casarancha/screens/profile/get_verified.dart';
@@ -37,6 +38,7 @@ bottomSheetProfile(context) {
         appText(context).strAccountRecovery,
         appText(context).strGetVerified,
         appText(context).strSettings,
+        appText(context).language,
         appText(context).strInviteFrnds,
         appText(context).strAbout,
         appText(context).strTermsCondition,
@@ -74,7 +76,11 @@ bottomSheetProfile(context) {
                     padding: const EdgeInsets.symmetric(vertical: 14.0),
                     child: textMenuItem(
                       text: profileBottomSheetList[index],
-                      color: index > 9 ? Colors.red : null,
+                      color: index > 10
+                          ? Colors.red
+                          : index == 5
+                              ? Colors.blue.shade700
+                              : null,
                       onTap: () {
                         Get.back();
                         _onTapSheetItem(index: index, context: context);
@@ -109,33 +115,36 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
     case 4:
       Get.to(() => const ProfileSettings());
       break;
-
     case 5:
+      Get.to(() => const LannguageSelectionPage());
+      break;
+
+    case 6:
       //invite freinds
       inviteFriends();
       break;
 
-    case 6:
+    case 7:
       //about
       launchUrls("https://casarancha.com/about/");
       break;
 
-    case 7:
+    case 8:
       //terms
 
       launchUrls("https://casarancha.com/terms-conditions/");
       break;
-    case 8:
+    case 9:
       //privacy
 
       launchUrls("https://casarancha.com/privacy-policy/");
       break;
-    case 9:
+    case 10:
       //privacy
 
       Get.to(() => const HelpCenter());
       break;
-    case 10:
+    case 11:
       //logout
       showDialog(
           context: context,
@@ -151,7 +160,7 @@ _onTapSheetItem({required int index, required BuildContext context}) async {
                   })));
 
       break;
-    case 11:
+    case 12:
       //logout
       showDialog(
         context: context,

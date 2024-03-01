@@ -11,10 +11,12 @@ class MessageDetails {
   int unreadMessageCount;
   CreatorDetails creatorDetails;
   String createdAt;
+  String creatorId;
   List<String> searchCharacters;
   MessageDetails({
     required this.id,
     required this.lastMessage,
+    required this.creatorId,
     required this.unreadMessageCount,
     required this.creatorDetails,
     required this.createdAt,
@@ -27,10 +29,12 @@ class MessageDetails {
     int? unreadMessageCount,
     CreatorDetails? creatorDetails,
     String? createdAt,
+    String? creatorId,
     List<String>? searchCharacters,
   }) {
     return MessageDetails(
       id: id ?? this.id,
+      creatorId: creatorId ?? this.creatorId,
       lastMessage: lastMessage ?? this.lastMessage,
       unreadMessageCount: unreadMessageCount ?? this.unreadMessageCount,
       creatorDetails: creatorDetails ?? this.creatorDetails,
@@ -42,6 +46,7 @@ class MessageDetails {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
+      'creatorId': creatorId,
       'lastMessage': lastMessage,
       'unreadMessageCount': unreadMessageCount,
       'creatorDetails': creatorDetails.toMap(),
@@ -53,6 +58,7 @@ class MessageDetails {
   factory MessageDetails.fromMap(map) {
     return MessageDetails(
       id: map['id'] as String,
+      creatorId: map['creatorId'] ?? '',
       lastMessage: map['lastMessage'] as String,
       unreadMessageCount: map['unreadMessageCount'] as int,
       creatorDetails:
