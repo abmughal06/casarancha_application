@@ -1,3 +1,4 @@
+import 'package:casarancha/models/ghost_message_details.dart';
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
@@ -22,12 +23,14 @@ class GhostChatScreen2 extends StatefulWidget {
   final String appUserId;
   final CreatorDetails creatorDetails;
   final bool? firstMessagebyMe;
+  final GhostMessageDetails? ghostMessageDetails;
 
   const GhostChatScreen2({
     super.key,
     required this.appUserId,
     required this.creatorDetails,
     this.firstMessagebyMe,
+    this.ghostMessageDetails,
   });
 
   @override
@@ -115,7 +118,11 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
         ],
       ),
       body: StreamProvider.value(
-        value: DataProvider().messages(widget.appUserId, true),
+        value: DataProvider().messages(
+            widget.ghostMessageDetails != null
+                ? widget.ghostMessageDetails!.id
+                : "${currentUserUID}_${widget.appUserId}",
+            true),
         initialData: null,
         catchError: (context, error) => null,
         child: Consumer<List<Message>?>(
@@ -124,6 +131,13 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
               return const Center(
                 child: CircularProgressIndicator.adaptive(),
               );
+            }
+
+            if (widget.ghostMessageDetails != null) {
+              chatProvider.conversationId = widget.ghostMessageDetails!.id;
+            } else {
+              chatProvider.conversationId =
+                  "${currentUserUID}_${widget.appUserId}";
             }
 
             return Column(
@@ -135,8 +149,6 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                     itemBuilder: (context, index) {
                       if (messages.isNotEmpty) {
                         chatProvider.resetMessageCountGhost(
-                          currentUserId: currentUserUID,
-                          appUserId: widget.appUserId,
                           messageid: messages[index].id,
                         );
                       }
@@ -149,11 +161,6 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                 ChatInputFieldGhost(
                   firstMessage: widget.firstMessagebyMe!,
                   appUserId: widget.appUserId,
-                  // currentUser: currentUser,
-                  // appUser: appUser,
-                  // onTapSentMessage: () {
-                  //
-                  // },
                 )
               ],
             );

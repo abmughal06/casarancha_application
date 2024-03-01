@@ -312,6 +312,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                     final MessageDetails appUserMessageDetails = MessageDetails(
                       id: widget.stories.creatorId,
                       lastMessage: "Story",
+                      creatorId: '',
                       unreadMessageCount: 0,
                       searchCharacters: [
                         ...widget.stories.creatorDetails.name
@@ -325,6 +326,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                     final MessageDetails currentUserMessageDetails =
                         MessageDetails(
                       id: currentUser.id,
+                      creatorId: '',
                       lastMessage: "Story",
                       unreadMessageCount: unreadMessageCount + 1,
                       searchCharacters: [

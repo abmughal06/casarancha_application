@@ -68,6 +68,13 @@ const icAddGroupDp = "assets/images/img_group_page/ic_add_group_dp.svg";
 const icGroupTypeSel = "assets/images/img_group_page/ic_group_type_sel.svg";
 const icGroupTypeDeSel = "assets/images/img_group_page/ic_group_type_desel.svg";
 
+//flags
+const icFlagUs = "assets/images/f-us.svg";
+const icFlagSaudia = "assets/images/f-saudia.svg";
+const icFlagGabon = "assets/images/f-gabon.svg";
+const icFlagEquatorial = "assets/images/f-equatorial.svg";
+const icFlagCaboVerde = "assets/images/f-cape-verde.svg";
+
 //Chat page
 const icChatCall = "assets/images/img_chat_page/ic_chat_call.svg";
 const icChatVideo = "assets/images/img_chat_page/ic_chat_video.svg";

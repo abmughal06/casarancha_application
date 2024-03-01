@@ -36,7 +36,7 @@ class SetupProfileProvider extends ChangeNotifier {
 
   bool isLoading = false;
 
-  getFromGallery(context) async {
+  getFromGallery() async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 50,
@@ -47,7 +47,7 @@ class SetupProfileProvider extends ChangeNotifier {
       imageFilePicked = await cropImage(pickedFile.path);
       notifyListeners();
     } else {
-      GlobalSnackBar.show(message: appText(context).strProcessCancelled);
+      // GlobalSnackBar.show(message: );
     }
   }
 

@@ -1,6 +1,4 @@
 // ignore_for_file: library_private_types_in_public_api
-
-import 'package:casarancha/authenticator.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/profile/block_account_screen.dart';
@@ -42,15 +40,15 @@ class _ProfileSettingsState extends State<ProfileSettings> {
             ontap: () {},
             trailing: widthBox(0),
           ),
-          settingTile(
-            leadIcon: Icon(
-              Icons.language,
-              size: 26.h,
-            ),
-            title: appText(context).language,
-            ontap: () => Get.to(() => const LannguageSelectionPage()),
-            trailing: const Icon(Icons.navigate_next),
-          ),
+          // settingTile(
+          //   leadIcon: Icon(
+          //     Icons.language,
+          //     size: 26.h,
+          //   ),
+          //   title: appText(context).language,
+          //   ontap: () => Get.to(() => const LannguageSelectionPage()),
+          //   trailing: const Icon(Icons.navigate_next),
+          // ),
         ],
       ),
     );

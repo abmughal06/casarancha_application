@@ -269,7 +269,7 @@ class ChatVoiceTile extends StatelessWidget {
               alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: media == null
                   ? Container(
-                      height: 70,
+                      // height: 70,
                       decoration: BoxDecoration(
                           color: colorPrimaryA05,
                           borderRadius: BorderRadius.only(
@@ -344,13 +344,14 @@ class ChatDocumentTile extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(
-                  left: isMe ? MediaQuery.of(context).size.width * .4 : 0,
-                  right: isMe ? 0 : MediaQuery.of(context).size.width * .4),
+                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .5,
+              ),
               child: Align(
                 alignment: isMe ? Alignment.topRight : Alignment.topLeft,
                 child: media == null
                     ? Container(
-                        height: 70,
+                        // height: 70,
                         decoration: BoxDecoration(
                             color: colorPrimaryA05,
                             borderRadius: BorderRadius.only(
@@ -381,7 +382,7 @@ class ChatDocumentTile extends StatelessWidget {
                           );
                         },
                         child: Container(
-                            height: 70,
+                            // height: 70,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(16.r),
@@ -393,7 +394,7 @@ class ChatDocumentTile extends StatelessWidget {
                                   isMe ? 0 : 16.r,
                                 ),
                               ),
-                              color: colorPrimaryA05,
+                              color: isMe ? colorPrimaryA05 : colorFF4,
                             ),
                             padding: EdgeInsets.symmetric(
                                 horizontal: 12.w, vertical: 10),
@@ -405,13 +406,13 @@ class ChatDocumentTile extends StatelessWidget {
                                       )
                                     : Icon(
                                         Icons.file_copy,
-                                        color: colorWhite,
-                                        size: 28.sp,
+                                        color: isMe ? colorWhite : color221,
+                                        size: 25.sp,
                                       ),
                                 widthBox(12.w),
                                 Expanded(
                                   child: TextWidget(
-                                    color: colorWhite,
+                                    color: isMe ? colorWhite : color221,
                                     text: media!.name.split('/').last,
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w500,
@@ -516,75 +517,84 @@ class ChatImageTile extends StatelessWidget {
     final media = message.caption.isEmpty
         ? message.content.map((e) => MediaDetails.fromMap(e)).toList()
         : null;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
-                right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
-            child: Align(
-              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
-              child: AspectRatio(
-                aspectRatio: 9 / 13,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: colorBlack.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(15),
-                    image: media != null
-                        ? DecorationImage(
-                            fit: BoxFit.cover,
-                            image: CachedNetworkImageProvider(
-                              media.first.link,
-                            ),
-                          )
-                        : null,
+
+    final isUploading = media == null && !isMe;
+    return !isUploading
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                      right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
+                  child: Align(
+                    alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+                    child: AspectRatio(
+                      aspectRatio: 9 / 13,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: colorBlack.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(15),
+                          image: media != null
+                              ? DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: CachedNetworkImageProvider(
+                                    media.first.link,
+                                  ),
+                                )
+                              : null,
+                        ),
+                        child: media == null
+                            ? centerLoader()
+                            : media.length > 1
+                                ? Align(
+                                    alignment: isMe
+                                        ? Alignment.topRight
+                                        : Alignment.topLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.6),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w, vertical: 4.h),
+                                        child: TextWidget(
+                                          text: '1/${media.length}',
+                                          fontSize: 9.sp,
+                                          color: colorWhite,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : widthBox(0),
+                      ),
+                    ),
                   ),
-                  child: media == null
-                      ? centerLoader()
-                      : media.length > 1
-                          ? Align(
-                              alignment:
-                                  isMe ? Alignment.topRight : Alignment.topLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w, vertical: 4.h),
-                                  child: TextWidget(
-                                    text: '1/${media.length}',
-                                    fontSize: 9.sp,
-                                    color: colorWhite,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : widthBox(0),
                 ),
-              ),
+                media == null
+                    ? Align(
+                        alignment:
+                            isMe ? Alignment.bottomRight : Alignment.bottomLeft,
+                        child: Icon(
+                          Icons.update_outlined,
+                          color: color55F,
+                          size: 12.sp,
+                        ),
+                      )
+                    : DateAndSeenTile(
+                        isMe: isMe, isSeen: isSeen, date: message.createdAt),
+                heightBox(8)
+              ],
             ),
-          ),
-          media == null
-              ? Align(
-                  alignment:
-                      isMe ? Alignment.bottomRight : Alignment.bottomLeft,
-                  child: Icon(
-                    Icons.update_outlined,
-                    color: color55F,
-                    size: 12.sp,
-                  ),
-                )
-              : DateAndSeenTile(
-                  isMe: isMe, isSeen: isSeen, date: message.createdAt),
-          heightBox(8)
-        ],
-      ),
-    );
+          )
+        : const SizedBox(
+            width: 0,
+            height: 0,
+          );
   }
 }
 

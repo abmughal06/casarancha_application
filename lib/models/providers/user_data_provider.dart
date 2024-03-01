@@ -1,6 +1,7 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/notification_model.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -488,7 +489,32 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Stream<List<MessageDetails>?>? chatListUsers() {
+  Stream<List<MessageDetails>?>? getchatListUsers() {
+    try {
+      if (FirebaseAuth.instance.currentUser?.uid == null) {
+        return null;
+      }
+      return FirebaseFirestore.instance
+          .collection('messages')
+          // .doc(FirebaseAuth.instance.currentUser!.uid)
+          // .collection(cMessageList)
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .map(
+            (event) => event.docs
+                .where((element) => element
+                    .data()['id']
+                    .toString()
+                    .contains(FirebaseAuth.instance.currentUser!.uid))
+                .map((e) => MessageDetails.fromMap(e.data()))
+                .toList(),
+          );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Stream<Message?>? lastChatUser(id) {
     try {
       if (FirebaseAuth.instance.currentUser?.uid == null) {
         return null;
@@ -497,16 +523,106 @@ class DataProvider extends ChangeNotifier {
           .collection(cUsers)
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .collection(cMessageList)
-          .orderBy("createdAt", descending: true)
+          .doc(id)
+          .collection('messages')
+          .orderBy('createdAt', descending: true)
+          .limit(1)
           .snapshots()
-          .map((event) => event.docs
-              .where((element) => element.data().isNotEmpty)
-              .map((e) => MessageDetails.fromMap(e.data()))
-              .toList());
+          .map(
+            (event) => event.docs.map((e) => Message.fromMap(e.data())).first,
+          );
     } catch (e) {
       return null;
     }
   }
+
+  Stream<int>? unSeenMessagesLength(id) {
+    try {
+      if (FirebaseAuth.instance.currentUser?.uid == null) {
+        return null;
+      }
+      return FirebaseFirestore.instance
+          .collection('messages')
+          .doc(id)
+          .collection('chats')
+          .snapshots()
+          .map(
+            (event) => event.docs
+                .where((element) =>
+                    element.data()['sentById'] !=
+                        FirebaseAuth.instance.currentUser!.uid &&
+                    !element.data()['isSeen'])
+                .map((e) => e.data())
+                .length,
+          );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Stream<int> getTotalUnseenMessageCount() {
+    return FirebaseFirestore.instance
+        .collection('messages')
+        .snapshots()
+        .asyncMap((snapshot) async {
+      List<QuerySnapshot> querySnapshots = await Future.wait(
+          snapshot.docs.map((doc) => doc.reference.collection('chats').get()));
+      int totalCount = 0;
+      for (var querySnapshot in querySnapshots) {
+        totalCount += querySnapshot.docs.where(
+          (chatDoc) {
+            var data = chatDoc.data() as Map<String,
+                dynamic>?; // Explicit cast to Map<String, dynamic>
+            return data != null &&
+                data['sentToId'] == currentUserUID &&
+                data['isSeen'] == false;
+          },
+        ).length;
+      }
+      return totalCount;
+    });
+  }
+
+  Stream<int> getTotalUnseenMessageCountGhost() {
+    return FirebaseFirestore.instance
+        .collection('ghost_message')
+        .snapshots()
+        .asyncMap((snapshot) async {
+      List<QuerySnapshot> querySnapshots = await Future.wait(
+          snapshot.docs.map((doc) => doc.reference.collection('chats').get()));
+      int totalCount = 0;
+      for (var querySnapshot in querySnapshots) {
+        totalCount += querySnapshot.docs.where(
+          (chatDoc) {
+            var data = chatDoc.data() as Map<String,
+                dynamic>?; // Explicit cast to Map<String, dynamic>
+            return data != null &&
+                data['sentToId'] == currentUserUID &&
+                data['isSeen'] == false;
+          },
+        ).length;
+      }
+      return totalCount;
+    });
+  }
+
+  Stream<int> combineStreams(Stream<int> stream1, Stream<int> stream2) async* {
+    await for (var value in stream1) {
+      yield value;
+    }
+    await for (var value in stream2) {
+      yield value;
+    }
+  }
+
+  Stream<int> get totalUnReadMessages => combineStreams(
+        getTotalUnseenMessageCount(),
+        getTotalUnseenMessageCountGhost(),
+      );
+
+  // Stream<int> get totalUnReadMessages =>
+  //     getTotalUnseenMessageCount().listen((event) => event) +
+  //     getTotalUnseenMessageCountGhost().listen((event) => event);
 
   Stream<List<UserModel>?>? filterUserList(List chatUsers) {
     try {
@@ -585,17 +701,20 @@ class DataProvider extends ChangeNotifier {
         return null;
       }
       return FirebaseFirestore.instance
-          .collection(cUsers)
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection(cGhostMessageList)
-          .orderBy("createdAt", descending: true)
+          .collection('ghost_messages')
+          // .doc(FirebaseAuth.instance.currentUser!.uid)
+          // .collection(cMessageList)
+          .orderBy('createdAt', descending: true)
           .snapshots()
-          .map((event) => event.docs
-              .where((element) =>
-                  element.data().containsKey('firstMessage') &&
-                  element.data().isNotEmpty)
-              .map((e) => GhostMessageDetails.fromMap(e.data()))
-              .toList());
+          .map(
+            (event) => event.docs
+                .where((element) => element
+                    .data()['id']
+                    .toString()
+                    .contains(FirebaseAuth.instance.currentUser!.uid))
+                .map((e) => GhostMessageDetails.fromMap(e.data()))
+                .toList(),
+          );
     } catch (e) {
       rethrow;
     }
@@ -607,11 +726,9 @@ class DataProvider extends ChangeNotifier {
         return null;
       }
       return FirebaseFirestore.instance
-          .collection(cUsers)
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection(isGhost ? cGhostMessageList : cMessageList)
-          .doc(userId)
-          .collection(cMessage)
+          .collection(isGhost ? 'ghost_messages' : "messages")
+          .doc("$userId")
+          .collection('chats')
           .orderBy("createdAt", descending: true)
           .snapshots()
           .map((event) => event.docs

@@ -28,11 +28,65 @@ import '../../../models/user_model.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
 import '../../home/CreatePost/create_post_controller.dart';
 
+enum MessageType {
+  text,
+  inChatPic,
+  photo,
+  qoute,
+  video,
+  inChatVideo,
+  storyPic,
+  storyVideo,
+  doc,
+  music,
+  inChatMusic,
+  voice
+}
+
+String getConversationDocId(String userId1, String userId2) {
+  List<String> sortedIds = [userId1, userId2]..sort();
+  return sortedIds.join('_');
+}
+
+extension MyColorExtension on MessageType {
+  String get name {
+    switch (this) {
+      case MessageType.text:
+        return 'Text';
+      case MessageType.inChatPic:
+        return 'InChatPic';
+      case MessageType.photo:
+        return 'Photo';
+      case MessageType.video:
+        return 'Video';
+      case MessageType.inChatVideo:
+        return 'InChatVideo';
+      case MessageType.music:
+        return 'Music';
+      case MessageType.inChatMusic:
+        return 'InChatMusic';
+      case MessageType.voice:
+        return 'Voice';
+      case MessageType.doc:
+        return 'Doc';
+      case MessageType.qoute:
+        return 'Qoute';
+      case MessageType.storyPic:
+        return 'StoryPic';
+      case MessageType.storyVideo:
+        return 'StoryVideo';
+    }
+  }
+}
+
 class ChatProvider extends ChangeNotifier {
 //variables
 
   late TextEditingController messageController;
   late Record audioRecorder;
+
+  String? conversationId;
+
   ChatProvider() {
     messageController = TextEditingController();
     audioRecorder = Record();
@@ -42,6 +96,8 @@ class ChatProvider extends ChangeNotifier {
   final textFieldFocus = FocusNode();
 
   bool isExpanded = false;
+  bool isReply = false;
+  Message? replyingMessage;
 
   var isChatExits = false;
   var isChecking = false;
@@ -59,46 +115,42 @@ class ChatProvider extends ChangeNotifier {
 
   final userRef = FirebaseFirestore.instance.collection("users");
 
-  Future<void> sentMessage({UserModel? currentUser, UserModel? appUser}) async {
-    if (messageController.text.isEmpty) {
-      return;
+  MessageType checkMessageType() {
+    if (photosList.isNotEmpty) {
+      return MessageType.inChatPic;
+    } else if (videosList.isNotEmpty) {
+      return MessageType.inChatVideo;
+    } else if (musicList.isNotEmpty) {
+      return MessageType.inChatMusic;
+    } else if (voiceList.isNotEmpty) {
+      return MessageType.voice;
+    } else if (mediaList.isNotEmpty) {
+      return MessageType.doc;
+    } else {
+      return MessageType.text;
     }
+  }
+
+  Future<void> sentTextMessage({
+    UserModel? currentUser,
+    UserModel? appUser,
+  }) async {
     try {
       var textMessage = messageController.text;
       messageController.clear();
       notifyListeners();
+      var docId = getConversationDocId(currentUser!.id, appUser!.id);
 
-      final messageRefForCurrentUser = userRef
-          .doc(currentUser!.id)
-          .collection('messageList')
-          .doc(appUser!.id)
-          .collection('messages')
-          .doc();
+      conversationId = docId;
 
-      final messageRefForAppUser = userRef
-          .doc(appUser.id)
-          .collection('messageList')
-          .doc(currentUser.id)
-          .collection('messages')
-          .doc(
-            messageRefForCurrentUser.id,
-          );
+      final messageRef =
+          FirebaseFirestore.instance.collection('messages').doc(conversationId);
 
-      final MessageDetails appUserMessageDetails = MessageDetails(
-        id: appUser.id,
-        lastMessage: textMessage,
-        unreadMessageCount: 0,
-        searchCharacters: [...appUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: appUser.name,
-          imageUrl: appUser.imageStr,
-          isVerified: appUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
+      final chatRef = messageRef.collection('chats').doc();
 
-      final MessageDetails currentUserMessageDetails = MessageDetails(
-        id: currentUser.id,
+      final lastMessageDetails = MessageDetails(
+        id: messageRef.id,
+        creatorId: currentUser.id,
         lastMessage: textMessage,
         unreadMessageCount: unreadMessages + 1,
         searchCharacters: [...currentUser.name.toLowerCase().split('')],
@@ -110,52 +162,27 @@ class ChatProvider extends ChangeNotifier {
         createdAt: DateTime.now().toUtc().toString(),
       );
 
-      // if (!isChatExits.value) {
-      await userRef
-          .doc(currentUser.id)
-          .collection('messageList')
-          .doc(appUser.id)
-          .set(
-            appUserMessageDetails.toMap(),
-          );
-
-      await userRef
-          .doc(appUser.id)
-          .collection('messageList')
-          .doc(currentUser.id)
-          .set(
-            currentUserMessageDetails.toMap(),
-          );
-
       final Message message = Message(
-        id: messageRefForCurrentUser.id,
+        id: chatRef.id,
         sentToId: appUser.id,
         sentById: currentUser.id,
         isReply: false,
         content: textMessage,
         caption: '',
-        type: 'Text',
+        type: MessageType.text.name,
         createdAt: DateTime.now().toUtc().toString(),
         isSeen: false,
       );
 
-      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
+      messageRef.set(lastMessageDetails.toMap());
 
-      messageRefForCurrentUser.set(message.toMap());
-      messageRefForAppUser.set(appUserMessage.toMap());
+      chatRef.set(message.toMap());
 
-      unreadMessages += 1;
-      var recieverRef = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(appUser.id)
-          .get();
-      var recieverFCMToken = recieverRef.data()!['fcmToken'];
-      // printLog(recieverRef.data()!['id']);
       FirebaseMessagingService().sendNotificationToUser(
-        appUserId: recieverRef.data()!['id'],
+        appUserId: appUser.id,
         notificationType: "msg",
-        devRegToken: recieverFCMToken,
-        msg: appText(context).strUnReadMessages(unreadMessages),
+        devRegToken: appUser.fcmToken,
+        msg: textMessage,
         isMessage: true,
       );
     } catch (e) {
@@ -163,50 +190,105 @@ class ChatProvider extends ChangeNotifier {
     } finally {}
   }
 
-  Future<void> sentMessageGhost(
-      {UserModel? currentUser,
-      UserModel? appUser,
-      bool? firstMessageByMe}) async {
+  enableReply(Message message) {
+    isReply = true;
+    replyingMessage = message;
+    notifyListeners();
+  }
+
+  disableReply() {
+    isReply = false;
+    replyingMessage = null;
+    notifyListeners();
+  }
+
+  Future<void> replyMessage({
+    required MessageDetails messageDetails,
+    required UserModel appUser,
+    required UserModel currentUser,
+  }) async {
+    try {
+      if (isReply && replyingMessage != null) {
+        var textMessage = messageController.text;
+        messageController.clear();
+        notifyListeners();
+
+        final messageRef = FirebaseFirestore.instance
+            .collection('messages')
+            .doc(messageDetails.id);
+
+        final chatRef = messageRef.collection('chats').doc();
+
+        final newMessageDetails = messageDetails.copyWith(
+          creatorId: currentUser.id,
+          lastMessage: textMessage,
+          unreadMessageCount: unreadMessages + 1,
+          searchCharacters: [...currentUser.name.toLowerCase().split('')],
+          creatorDetails: CreatorDetails(
+            name: currentUser.name,
+            imageUrl: currentUser.imageStr,
+            isVerified: currentUser.isVerified,
+          ),
+          createdAt: DateTime.now().toUtc().toString(),
+        );
+
+        final newMessage = Message(
+          sentById: FirebaseAuth.instance.currentUser!.uid,
+          sentToId: appUser.id,
+          isSeen: false,
+          type: checkMessageType().name,
+          id: chatRef.id,
+          content: textMessage,
+          caption: replyingMessage!.content,
+          isReply: isReply,
+          createdAt: DateTime.now().toUtc().toString(),
+        );
+
+        messageRef.set(newMessageDetails.toMap());
+
+        chatRef.set(newMessage.toMap());
+
+        FirebaseMessagingService().sendNotificationToUser(
+          appUserId: appUser.id,
+          notificationType: "msg",
+          devRegToken: appUser.fcmToken,
+          msg: textMessage,
+          isMessage: true,
+        );
+      }
+    } catch (e) {
+      GlobalSnackBar(message: e.toString());
+    } finally {
+      disableReply();
+    }
+  }
+
+  Future<void> sentMessageGhost({
+    UserModel? currentUser,
+    UserModel? appUser,
+    bool? firstMessageByMe,
+    String? notificationText,
+  }) async {
     if (messageController.text.isEmpty) {
       return;
     }
     try {
-      final messageRefForCurrentUser = userRef
-          .doc(currentUser!.id)
-          .collection('ghostMessageList')
-          .doc(appUser!.id)
-          .collection('messages')
-          .doc();
+      var docId = conversationId ?? "${currentUser!.id}_${appUser!.id}";
 
-      final messageRefForAppUser = userRef
-          .doc(appUser.id)
-          .collection('ghostMessageList')
-          .doc(currentUser.id)
-          .collection('messages')
-          .doc(
-            messageRefForCurrentUser.id,
-          );
+      conversationId = docId;
 
-      final GhostMessageDetails appUserMessageDetails = GhostMessageDetails(
-        id: appUser.id,
+      final messageRef = FirebaseFirestore.instance
+          .collection('ghost_messages')
+          .doc(conversationId);
+
+      final chatRef = messageRef.collection('chats').doc();
+
+      final GhostMessageDetails lastMessageDetails = GhostMessageDetails(
+        id: messageRef.id,
         lastMessage: messageController.text,
-        firstMessage: firstMessageByMe! ? currentUser.id : appUser.id,
-        unreadMessageCount: 0,
-        searchCharacters: [...appUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: appUser.name,
-          imageUrl: appUser.imageStr,
-          isVerified: appUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
-
-      final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
-        id: currentUser.id,
-        lastMessage: messageController.text,
-        firstMessage: firstMessageByMe ? currentUser.id : appUser.id,
+        firstMessage: firstMessageByMe! ? currentUser!.id : appUser!.id,
         unreadMessageCount: unreadMessages + 1,
-        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        searchCharacters: [...currentUser!.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
           name: currentUser.name,
           imageUrl: currentUser.imageStr,
@@ -215,28 +297,9 @@ class ChatProvider extends ChangeNotifier {
         createdAt: DateTime.now().toUtc().toString(),
       );
 
-      // if (!isChatExits.value) {
-      await userRef
-          .doc(currentUser.id)
-          .collection('ghostMessageList')
-          .doc(appUser.id)
-          .set(
-            appUserMessageDetails.toMap(),
-          );
-
-      await userRef
-          .doc(appUser.id)
-          .collection('ghostMessageList')
-          .doc(currentUser.id)
-          .set(
-            currentUserMessageDetails.toMap(),
-          );
-
-      // }
-
       final Message message = Message(
-        id: messageRefForCurrentUser.id,
-        sentToId: appUser.id,
+        id: chatRef.id,
+        sentToId: appUser!.id,
         isReply: false,
         sentById: currentUser.id,
         content: messageController.text,
@@ -246,32 +309,17 @@ class ChatProvider extends ChangeNotifier {
         isSeen: false,
       );
 
-      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
+      // final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
-      messageRefForCurrentUser.set(message.toMap());
-      messageRefForAppUser.set(appUserMessage.toMap());
+      messageRef.set(lastMessageDetails.toMap());
+      chatRef.set(message.toMap());
 
-      // if (isChatExits.value) {
-      userRef
-          .doc(appUser.id)
-          .collection('ghostMessageList')
-          .doc(currentUser.id)
-          .update(
-            currentUserMessageDetails.toMap(),
-          );
-      unreadMessages += 1;
-      // }
-      var recieverRef = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(appUser.id)
-          .get();
-      var recieverFCMToken = recieverRef.data()!['fcmToken'];
       FirebaseMessagingService().sendNotificationToUser(
-        appUserId: recieverRef.id,
-        devRegToken: recieverFCMToken,
+        appUserId: appUser.id,
+        devRegToken: appUser.fcmToken,
         isMessage: true,
         notificationType: "msg",
-        msg: appText(context).strUnReadMessagesInGhost(unreadMessages),
+        msg: messageController.text,
       );
 
       messageController.clear();
@@ -280,19 +328,20 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> resetMessageCount({currentUserId, appUserId, messageid}) async {
-    await userRef
-        .doc(currentUserId)
-        .collection('messageList')
-        .doc(appUserId)
+  Future<void> resetMessageCount({
+    messageid,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection('messages')
+        .doc("$conversationId")
         .update({
       'unreadMessageCount': 0,
     });
-    final ref = userRef
-        .doc(appUserId)
-        .collection('messageList')
-        .doc(currentUserId)
-        .collection("messages")
+
+    final ref = FirebaseFirestore.instance
+        .collection('messages')
+        .doc("$conversationId")
+        .collection("chats")
         .doc(messageid);
     final doc = await ref.get();
     if (doc.exists) {
@@ -302,20 +351,20 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> resetMessageCountGhost(
-      {currentUserId, appUserId, messageid}) async {
-    userRef
-        .doc(currentUserId)
-        .collection("ghostMessageList")
-        .doc(appUserId)
+  Future<void> resetMessageCountGhost({
+    messageid,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection('ghost_messages')
+        .doc("$conversationId")
         .update({
       'unreadMessageCount': 0,
     });
-    final ref = userRef
-        .doc(appUserId)
-        .collection('ghostMessageList')
-        .doc(currentUserId)
-        .collection("messages")
+
+    final ref = FirebaseFirestore.instance
+        .collection('ghost_messages')
+        .doc("$conversationId")
+        .collection("chats")
         .doc(messageid);
     final doc = await ref.get();
     if (doc.exists) {
@@ -330,8 +379,12 @@ class ChatProvider extends ChangeNotifier {
     unreadMessages = 0;
   }
 
-  pickImageAndSentViaMessage(
-      {UserModel? currentUser, UserModel? appUser, String? mediaType}) async {
+  sendMediaMessage({
+    UserModel? currentUser,
+    UserModel? appUser,
+    // String? mediaType,
+    String? notificationText,
+  }) async {
     allMediaFiles = [
       ...photosList,
       ...videosList,
@@ -340,6 +393,8 @@ class ChatProvider extends ChangeNotifier {
       ...voiceList,
     ];
 
+    var mediaType = checkMessageType().name;
+
     photosList.clear();
     videosList.clear();
     musicList.clear();
@@ -347,50 +402,17 @@ class ChatProvider extends ChangeNotifier {
     voiceList.clear();
 
     try {
-      final messageRefForCurrentUser = userRef
-          .doc(currentUser!.id)
-          .collection('messageList')
-          .doc(appUser!.id)
-          .collection('messages')
-          .doc();
+      final docId = getConversationDocId(currentUser!.id, appUser!.id);
+      conversationId = docId;
+      final messageRef =
+          FirebaseFirestore.instance.collection('messages').doc(conversationId);
 
-      final messageRefForAppUser = userRef
-          .doc(appUser.id)
-          .collection('messageList')
-          .doc(currentUser.id)
-          .collection('messages')
-          .doc(
-            messageRefForCurrentUser.id,
-          );
+      final chatRef = messageRef.collection('chats').doc();
 
-      final MessageDetails appUserMessageDetails = MessageDetails(
-        id: appUser.id,
-        lastMessage: mediaType == 'InChatVideo'
-            ? "Video"
-            : mediaType == 'InChatPic'
-                ? "Photo"
-                : mediaType == 'InChatDoc'
-                    ? "Doc"
-                    : 'Music',
-        unreadMessageCount: 0,
-        searchCharacters: [...appUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: appUser.name,
-          imageUrl: appUser.imageStr,
-          isVerified: appUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
-
-      final MessageDetails currentUserMessageDetails = MessageDetails(
-        id: currentUser.id,
-        lastMessage: mediaType == 'InChatVideo'
-            ? "Video"
-            : mediaType == 'InChatPic'
-                ? "Photo"
-                : mediaType == 'InChatDoc'
-                    ? "Doc"
-                    : 'Music',
+      final MessageDetails messageDetails = MessageDetails(
+        id: messageRef.id,
+        creatorId: currentUser.id,
+        lastMessage: mediaType,
         unreadMessageCount: unreadMessages + 1,
         searchCharacters: [...currentUser.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
@@ -402,74 +424,52 @@ class ChatProvider extends ChangeNotifier {
       );
 
       final Message tempMessage = Message(
-        id: messageRefForCurrentUser.id,
+        id: chatRef.id,
         sentToId: appUser.id,
         sentById: currentUser.id,
         isReply: false,
         content: 'upload',
         caption: 'uploading',
-        type: '$mediaType',
+        type: mediaType,
         createdAt: DateTime.now().toUtc().toString(),
         isSeen: false,
       );
 
-      await userRef
-          .doc(currentUser.id)
-          .collection('messageList')
-          .doc(appUser.id)
-          .set(
-            appUserMessageDetails.toMap(),
-          );
-      messageRefForCurrentUser.set(tempMessage.toMap());
+      chatRef.set(tempMessage.toMap());
 
-      await uploadMediaFiles(recieverId: currentUser.id, fileType: mediaType!);
+      await uploadMediaFiles(recieverId: currentUser.id, fileType: mediaType)
+          .whenComplete(() => null);
 
       var message = tempMessage.copyWith(
         caption: '',
         content: mediaData.map((e) => e.toMap()).toList(),
       );
-
-      await userRef
-          .doc(appUser.id)
-          .collection('messageList')
-          .doc(currentUser.id)
-          .set(
-            currentUserMessageDetails.toMap(),
-          );
-
-      // log(message.toString());
-
-      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
-
-      messageRefForCurrentUser.update(message.toMap());
-      messageRefForAppUser.set(appUserMessage.toMap());
-
-      unreadMessages += 1;
-      var recieverRef = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(appUser.id)
-          .get();
-      var recieverFCMToken = recieverRef.data()!['fcmToken'];
-      FirebaseMessagingService().sendNotificationToUser(
-        notificationType: "msg",
-        appUserId: recieverRef.id,
-        devRegToken: recieverFCMToken,
-        msg: appText(context).strUnReadAttachment(unreadMessages),
-        isMessage: true,
-      );
+      messageRef.set(messageDetails.toMap());
+      chatRef.update(message.toMap());
       clearLists();
 
-      // messageController.clear();
+      unreadMessages += 1;
+      notifyListeners();
+
+      await FirebaseMessagingService().sendNotificationToUser(
+        notificationType: "msg",
+        appUserId: appUser.id,
+        devRegToken: appUser.fcmToken,
+        msg: notificationText,
+        isMessage: true,
+      );
     } catch (e) {
       log(e.toString());
     }
   }
 
-  pickImageAndSentViaMessageGhost(
-      {UserModel? currentUser,
-      UserModel? appUser,
-      String? mediaType,
-      bool? firstMessage}) async {
+  sendMediaMessageGhost({
+    UserModel? currentUser,
+    UserModel? appUser,
+    String? mediaType,
+    bool? firstMessage,
+    String? notificationText,
+  }) async {
     allMediaFiles = [
       ...photosList,
       ...videosList,
@@ -581,23 +581,15 @@ class ChatProvider extends ChangeNotifier {
 
       messageRefForCurrentUser.set(message.toMap());
       messageRefForAppUser.set(appUserMessage.toMap());
-
-      unreadMessages += 1;
-      var recieverRef = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(appUser.id)
-          .get();
-      var recieverFCMToken = recieverRef.data()!['fcmToken'];
-      FirebaseMessagingService().sendNotificationToUser(
-        appUserId: recieverRef.id,
-        isMessage: true,
-        devRegToken: recieverFCMToken,
-        notificationType: "msg",
-        msg: appText(context).strUnReadAttachment(unreadMessages),
-      );
       clearLists();
 
-      // messageController.clear();
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: appUser.id,
+        isMessage: true,
+        devRegToken: appUser.fcmToken,
+        notificationType: "msg",
+        msg: notificationText,
+      );
     } catch (e) {
       log(e.toString());
     }
@@ -648,34 +640,11 @@ class ChatProvider extends ChangeNotifier {
     final storageRef = FirebaseStorage.instance.ref();
     try {
       for (var element in allMediaFiles) {
-        // final String fileType;
         final String fileName = basename(element.path);
         Size? imageSize;
-        // double? videoAspectRatio;
-
-        // log('===> 1 $photosList');
-        // log('===> 2 $voiceList');
-        // log('===> 3 $videosList');
-        // log('===> 4 $musicList');
-        // log('===> 5 $mediaList');
-
-        // if (photosList.contains(element)) {
-        //   fileType = 'Photo';
-        // } else if (videosList.contains(element)) {
-        //   fileType = 'Video';
-        // } else if (mediaList.contains(element)) {
-        //   fileType = 'Media';
-        // } else if (musicList.contains(element)) {
-        //   fileType = 'Music';
-        // } else {
-        //   fileType = 'voice';
-        // }
 
         if (fileType == 'InChatPic') {
           imageSize = await getImageSize(element);
-        }
-        if (fileType == 'InChatVideo') {
-          // videoAspectRatio = await getVideoAspectRatio(element);
         }
 
         final storageFileRef =
@@ -687,17 +656,6 @@ class ChatProvider extends ChangeNotifier {
 
         notifyListeners();
 
-        // mediaUploadTasks.map(
-        //   (e) => e.asStream().listen((event) {
-        //     tasksProgress =
-        //         e.snapshot.bytesTransferred / mediaUploadTasks.length;
-        //     printLog('${(tasksProgress * 100).toStringAsFixed(1)}%');
-        //     notifyListeners();
-        //   }),
-        // );
-
-        // tasksProgress = tasksProgress / mediaUploadTasks.length;
-        // printLog(tasksProgress.toString());
         notifyListeners();
 
         final mediaRef = await uploadTask.whenComplete(() {});
@@ -751,22 +709,32 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getPhoto() async {
+  Future<void> getPhoto(context) async {
     try {
       final pickedPhoto = await ImagePicker().pickMultiImage();
-      // .pickImage(source: ImageSource.gallery);
 
       if (pickedPhoto.isNotEmpty) {
-        // CroppedFile? croppedImage = await ImageCropper().cropImage(
-        //     sourcePath: pickedPhoto.path,
-        //     aspectRatio: const CropAspectRatio(ratioX: 2.0, ratioY: 3.0));
-        // var image = File(croppedImage!.path);
         for (var i in pickedPhoto) {
           var image = File(i.path);
           photosList.add(image);
         }
 
-        // printLog(photosList.toString());
+        printLog(allMediaFiles.toString());
+        notifyListeners();
+      }
+    } catch (e) {
+      GlobalSnackBar.show(message: appText(context).gsbOperationCancelled);
+    }
+  }
+
+  Future<void> takeCameraPic(context) async {
+    try {
+      final pickedPhoto =
+          await ImagePicker().pickImage(source: ImageSource.camera);
+
+      if (pickedPhoto != null) {
+        var image = File(pickedPhoto.path);
+        photosList.add(image);
         notifyListeners();
       }
     } catch (e) {
@@ -779,7 +747,7 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getVideo() async {
+  Future<void> getVideo(context) async {
     final File videoFileHelper;
     try {
       final pickedVideo = await ImagePicker().pickVideo(
@@ -822,17 +790,11 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getMedia() async {
+  Future<void> getMedia(context) async {
     final List<File> mediaFilesHelper = [];
     try {
       final result = await FilePicker.platform.pickFiles(
-        // allowMultiple: true,
         type: FileType.any,
-        // allowedExtensions: [
-        //   'pdf',
-        //   'doc',
-        //   'docx',
-        // ],
       );
       for (var element in result!.files) {
         log('========>>>>>');
@@ -877,7 +839,6 @@ class ChatProvider extends ChangeNotifier {
     final String filename =
         '${DateTime.now().millisecondsSinceEpoch}_${const Uuid().v4()}';
 
-    log(filename);
     if (!await audioRecorder.hasPermission()) {
       return;
     }
@@ -902,8 +863,6 @@ class ChatProvider extends ChangeNotifier {
   cancelTimer() {
     timer.cancel();
     durationInSeconds = Duration.zero;
-    log(timer.isActive.toString());
-    log(durationInSeconds.toString());
     notifyListeners();
   }
 
@@ -912,6 +871,7 @@ class ChatProvider extends ChangeNotifier {
     UserModel? appUser,
     bool? isGhostMessage,
     bool? firstMessageByWho,
+    String? notificationText,
   }) async {
     cancelTimer();
 
@@ -928,20 +888,21 @@ class ChatProvider extends ChangeNotifier {
 
         voiceList.add(recordedFilePath!);
 
-        log(voiceList.toString());
-
         if (voiceList.isEmpty) {
           return;
         }
 
         isGhostMessage!
-            ? await sendVoiceMessageGhost(
+            ? await sendMediaMessageGhost(
                 currentUser: currentUser,
                 appUser: appUser,
-                firstMessageByMe: firstMessageByWho,
+                firstMessage: firstMessageByWho,
               )
-            : await sendVoiceMessage(
-                currentUser: currentUser, appUser: appUser);
+            : await sendMediaMessage(
+                currentUser: currentUser,
+                appUser: appUser,
+                notificationText: notificationText,
+              );
       } else {
         GlobalSnackBar.show(message: appText(context).strRecordingRestriction);
         deleteRecording();
@@ -951,247 +912,6 @@ class ChatProvider extends ChangeNotifier {
       log('Error: $e');
     } finally {
       isRecorderLock = false;
-      notifyListeners();
-    }
-  }
-
-  sendVoiceMessage({UserModel? currentUser, UserModel? appUser}) async {
-    isRecordingSend = true;
-    notifyListeners();
-
-    allMediaFiles = [...voiceList];
-
-    try {
-      log('done');
-
-      final messageRefForCurrentUser = userRef
-          .doc(currentUser!.id)
-          .collection('messageList')
-          .doc(appUser!.id)
-          .collection('messages')
-          .doc();
-
-      final messageRefForAppUser = userRef
-          .doc(appUser.id)
-          .collection('messageList')
-          .doc(currentUser.id)
-          .collection('messages')
-          .doc(
-            messageRefForCurrentUser.id,
-          );
-
-      final MessageDetails appUserMessageDetails = MessageDetails(
-        id: appUser.id,
-        lastMessage: 'voice message',
-        unreadMessageCount: 0,
-        searchCharacters: [...appUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: appUser.name,
-          imageUrl: appUser.imageStr,
-          isVerified: appUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
-
-      final MessageDetails currentUserMessageDetails = MessageDetails(
-        id: currentUser.id,
-        lastMessage: 'voice message',
-        unreadMessageCount: unreadMessages + 1,
-        searchCharacters: [...currentUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: currentUser.name,
-          imageUrl: currentUser.imageStr,
-          isVerified: currentUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
-
-      final Message tempMessage = Message(
-        id: messageRefForCurrentUser.id,
-        sentToId: appUser.id,
-        isReply: false,
-        sentById: currentUser.id,
-        content: 'voice uploading',
-        caption: 'uploading',
-        type: 'voice',
-        createdAt: DateTime.now().toUtc().toString(),
-        isSeen: false,
-      );
-
-      // if (!isChatExits.value) {
-      await userRef
-          .doc(currentUser.id)
-          .collection('messageList')
-          .doc(appUser.id)
-          .set(
-            appUserMessageDetails.toMap(),
-          );
-      await messageRefForCurrentUser.set(tempMessage.toMap());
-
-      await uploadMediaFiles(recieverId: appUser.id, fileType: 'voice');
-
-      var message = tempMessage.copyWith(
-          caption: '', content: mediaData.map((e) => e.toMap()).toList());
-
-      await userRef
-          .doc(appUser.id)
-          .collection('messageList')
-          .doc(currentUser.id)
-          .set(
-            currentUserMessageDetails.toMap(),
-          );
-
-      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
-
-      messageRefForCurrentUser.update(message.toMap());
-      messageRefForAppUser.set(appUserMessage.toMap());
-
-      unreadMessages += 1;
-      var recieverRef = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(appUser.id)
-          .get();
-      var recieverFCMToken = recieverRef.data()!['fcmToken'];
-      FirebaseMessagingService().sendNotificationToUser(
-        appUserId: recieverRef.id,
-        devRegToken: recieverFCMToken,
-        isMessage: true,
-        notificationType: "msg",
-        msg: appText(context).strUnReadVoiceMessages(unreadMessages),
-      );
-
-      clearLists();
-
-      // messageController.clear();
-    } catch (e) {
-      log(e.toString());
-    } finally {
-      isRecordingSend = false;
-      notifyListeners();
-    }
-  }
-
-  sendVoiceMessageGhost(
-      {UserModel? currentUser,
-      UserModel? appUser,
-      bool? firstMessageByMe}) async {
-    isRecordingSend = true;
-    notifyListeners();
-
-    allMediaFiles = [...voiceList];
-
-    try {
-      log('done');
-
-      final messageRefForCurrentUser = userRef
-          .doc(currentUser!.id)
-          .collection('ghostMessageList')
-          .doc(appUser!.id)
-          .collection('messages')
-          .doc();
-
-      final messageRefForAppUser = userRef
-          .doc(appUser.id)
-          .collection('ghostMessageList')
-          .doc(currentUser.id)
-          .collection('messages')
-          .doc(
-            messageRefForCurrentUser.id,
-          );
-
-      final GhostMessageDetails appUserMessageDetails = GhostMessageDetails(
-        id: appUser.id,
-        lastMessage: 'voice message',
-        firstMessage: firstMessageByMe! ? currentUser.id : appUser.id,
-        unreadMessageCount: 0,
-        searchCharacters: [...appUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: appUser.name,
-          imageUrl: appUser.imageStr,
-          isVerified: appUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
-
-      final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
-        id: currentUser.id,
-        firstMessage: firstMessageByMe ? currentUser.id : appUser.id,
-        lastMessage: 'voice message',
-        unreadMessageCount: unreadMessages + 1,
-        searchCharacters: [...currentUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: currentUser.name,
-          imageUrl: currentUser.imageStr,
-          isVerified: currentUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
-
-      // if (!isChatExits.value) {
-
-      final Message tempMessage = Message(
-        id: messageRefForCurrentUser.id,
-        sentToId: appUser.id,
-        sentById: currentUser.id,
-        isReply: false,
-        content: 'uploaddign',
-        caption: 'uploading',
-        type: 'voice',
-        createdAt: DateTime.now().toUtc().toString(),
-        isSeen: false,
-      );
-      await userRef
-          .doc(currentUser.id)
-          .collection('ghostMessageList')
-          .doc(appUser.id)
-          .set(
-            appUserMessageDetails.toMap(),
-          );
-      messageRefForCurrentUser.set(tempMessage.toMap());
-
-      await uploadMediaFiles(recieverId: appUser.id, fileType: 'voice');
-
-      await userRef
-          .doc(appUser.id)
-          .collection('ghostMessageList')
-          .doc(currentUser.id)
-          .set(
-            currentUserMessageDetails.toMap(),
-          );
-
-      // log(mediaData.toString());
-
-      // log(message.toString());
-
-      final message = tempMessage.copyWith(
-          caption: '', content: mediaData.map((e) => e.toMap()).toList());
-
-      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
-
-      messageRefForCurrentUser.set(message.toMap());
-      messageRefForAppUser.set(appUserMessage.toMap());
-
-      unreadMessages += 1;
-      var recieverRef = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(appUser.id)
-          .get();
-      var recieverFCMToken = recieverRef.data()!['fcmToken'];
-      FirebaseMessagingService().sendNotificationToUser(
-        appUserId: recieverRef.id,
-        isMessage: true,
-        notificationType: "msg",
-        devRegToken: recieverFCMToken,
-        msg: appText(context).strUnReadVoiceMessages(unreadMessages),
-      );
-
-      clearLists();
-
-      // messageController.clear();
-    } catch (e) {
-      log(e.toString());
-    } finally {
-      isRecordingSend = false;
       notifyListeners();
     }
   }

@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:casarancha/authenticator.dart';
 import 'package:casarancha/screens/auth/phone_login_screen.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/screens/auth/sign_up_screen.dart';
+import 'package:casarancha/utils/providers/locale_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -31,6 +33,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
 
+  Locale? locale;
+
+  @override
+  void initState() {
+    super.initState();
+    initLocale();
+  }
+
+  initLocale() async {
+    locale = await LocalizationService.getLocale();
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -58,15 +73,42 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: EdgeInsets.only(
                       top: 5, left: 20.w, bottom: 20.w, right: 20.w),
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextWidget(
-                        text: appText(context).strWelcome,
-                        fontSize: 20.sp,
-                        color: color13F,
-                        textHeight: 1.5,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextWidget(
+                          text: appText(context).strWelcome,
+                          fontSize: 20.sp,
+                          color: color13F,
+                          textHeight: 1.5,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        if (locale != null)
+                          SizedBox(
+                            height: 80,
+                            width: 100,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => Get.to(
+                                      () => const LannguageSelectionPage()),
+                                  child: SvgPicture.asset(
+                                    LocalizationService.getCurrentLanguageFlag(
+                                        locale!.languageCode),
+                                  ),
+                                ),
+                                TextWidget(
+                                  text: appText(context).language,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12.sp,
+                                )
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                     heightBox(8.h),
                     Align(
@@ -176,10 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: color080,
                           fontWeight: FontWeight.w500,
                         ),
-                        horizonLine(
-                          width: 80.w,
-                          horizontalMargin: 18.w,
-                        ),
+                        horizonLine(width: 80.w, horizontalMargin: 18.w),
                       ],
                     ),
                     heightBox(24.h),

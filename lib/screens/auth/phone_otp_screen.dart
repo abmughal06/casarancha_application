@@ -69,6 +69,7 @@ class PhoneOTPScreen extends StatelessWidget {
                           auth.checkOtpVerification(
                             otpController.text,
                             verificationId,
+                            context,
                           );
                         },
                         text: appText(context).strContinue,

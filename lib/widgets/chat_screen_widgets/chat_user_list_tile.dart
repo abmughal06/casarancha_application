@@ -15,10 +15,10 @@ import '../text_widget.dart';
 class ChatUserListTile extends StatelessWidget {
   const ChatUserListTile(
       {super.key,
-      required this.messageDetails,
+      required this.message,
       required this.ontapTile,
       required this.personId});
-  final MessageDetails messageDetails;
+  final MessageDetails message;
   final String personId;
 
   final VoidCallback ontapTile;
@@ -26,78 +26,87 @@ class ChatUserListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider.value(
-      value: DataProvider().getSingleUser(personId),
-      initialData: null,
-      catchError: (context, error) => null,
-      child: Consumer<UserModel?>(builder: (context, personDetail, b) {
-        if (personDetail == null) {
-          return Container();
-        }
-        return ListTile(
-          onTap: ontapTile,
-          title: Row(
-            children: [
-              TextWidget(
-                onTap: ontapTile,
-                text: personDetail.name,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff222939),
-              ),
-              widthBox(5.w),
-              verifyBadge(personDetail.isVerified)
-            ],
-          ),
-          subtitle: TextWidget(
-            onTap: ontapTile,
-            text: messageDetails.lastMessage,
-            textOverflow: TextOverflow.ellipsis,
-            fontWeight: messageDetails.unreadMessageCount == 0
-                ? FontWeight.w400
-                : FontWeight.w700,
-            fontSize: 14.sp,
-            color: messageDetails.unreadMessageCount == 0
-                ? const Color(0xff8a8a8a)
-                : const Color(0xff000000),
-          ),
-          leading: ProfilePic(
-            pic: personDetail.imageStr,
-            heightAndWidth: 45.h,
-          ),
-          trailing: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextWidget(
-                onTap: ontapTile,
-                text: convertDateIntoTime(messageDetails.createdAt),
-                fontWeight: FontWeight.w400,
-                fontSize: 12.sp,
-                color: const Color(0xff878787),
-              ),
-              SizedBox(height: 5.h),
-              messageDetails.unreadMessageCount == 0
-                  ? const Icon(Icons.navigate_next)
-                  : Container(
-                      height: 19.h,
-                      width: 19.w,
-                      decoration: const BoxDecoration(
-                          color: Color(0xff7BC246), shape: BoxShape.circle),
-                      child: Center(
-                        child: TextWidget(
-                          text: messageDetails.unreadMessageCount.toString(),
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400,
-                          onTap: ontapTile,
-                        ),
+        value: DataProvider().getSingleUser(personId),
+        initialData: null,
+        catchError: (context, error) => null,
+        child: Consumer<UserModel?>(builder: (context, personDetail, b) {
+          if (personDetail == null) {
+            return Container();
+          }
+          return StreamProvider.value(
+            value: DataProvider().unSeenMessagesLength(message.id),
+            initialData: null,
+            catchError: (context, error) => null,
+            child: Consumer<int?>(builder: (context, length, b) {
+              // print(length);
+              return length == null
+                  ? Container()
+                  : ListTile(
+                      onTap: ontapTile,
+                      title: Row(
+                        children: [
+                          TextWidget(
+                            onTap: ontapTile,
+                            text: personDetail.name,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xff222939),
+                          ),
+                          widthBox(5.w),
+                          verifyBadge(personDetail.isVerified)
+                        ],
                       ),
-                    ),
-            ],
-          ),
-        );
-      }),
-    );
+                      subtitle: TextWidget(
+                        onTap: ontapTile,
+                        text: message.lastMessage,
+                        textOverflow: TextOverflow.ellipsis,
+                        fontWeight:
+                            length > 0 ? FontWeight.w700 : FontWeight.w400,
+                        fontSize: 14.sp,
+                        color: length > 0
+                            ? const Color(0xff000000)
+                            : const Color(0xff8a8a8a),
+                      ),
+                      leading: ProfilePic(
+                        pic: personDetail.imageStr,
+                        heightAndWidth: 45.h,
+                      ),
+                      trailing: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextWidget(
+                            onTap: ontapTile,
+                            text: convertDateIntoTime(message.createdAt),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12.sp,
+                            color: const Color(0xff878787),
+                          ),
+                          SizedBox(height: 5.h),
+                          length == 0
+                              ? const Icon(Icons.navigate_next)
+                              : Container(
+                                  height: 19.h,
+                                  width: 19.w,
+                                  decoration: const BoxDecoration(
+                                      color: Color(0xff7BC246),
+                                      shape: BoxShape.circle),
+                                  child: Center(
+                                    child: TextWidget(
+                                      text: length.toString(),
+                                      color: Colors.white,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w400,
+                                      onTap: ontapTile,
+                                    ),
+                                  ),
+                                )
+                        ],
+                      ),
+                    );
+            }),
+          );
+        }));
   }
 }
 

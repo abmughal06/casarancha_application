@@ -102,7 +102,7 @@ class _SharePostScreenState extends State<SharePostScreen> {
                                 .contains(users[index].id),
                             ontapSend: () {
                               postProvider.sharePostData(
-                                context,
+                                notimsg: appText(context).strSentPost,
                                 currentUser: currentUser,
                                 groupId: widget.groupId,
                                 appUser: users[index],
@@ -136,7 +136,7 @@ class _SharePostScreenState extends State<SharePostScreen> {
                                 .contains(searchList[index].id),
                             ontapSend: () {
                               postProvider.sharePostData(
-                                context,
+                                notimsg: appText(context).strSentPost,
                                 currentUser: currentUser,
                                 groupId: widget.groupId,
                                 appUser: searchList[index],

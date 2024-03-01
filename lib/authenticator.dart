@@ -18,51 +18,50 @@ class Authenticate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User?>();
+    // final firebaseUser = context.watch<User?>();
 
-    if (firebaseUser == null) {
-      return const LoginScreen();
-    } else {
-      return Consumer<UserModel?>(
-        builder: (context, user, child) {
-          if (user == null) {
-            return Scaffold(
-              body: centerLoader(),
-            );
-          } else if (user.name.isEmpty || user.username.isEmpty) {
-            return const SetupProfileScreen();
-          } else {
-            return const DashBoard();
-          }
-        },
-      );
-    }
+    // if (firebaseUser == null) {
+    //   return const LoginScreen();
+    // } else {
+
+    return FirebaseAuth.instance.currentUser == null
+        ? const LoginScreen()
+        : Consumer<UserModel?>(
+            builder: (context, user, child) {
+              if (user == null) {
+                return Scaffold(body: centerLoader());
+              } else if (user.name.isEmpty || user.username.isEmpty) {
+                return const SetupProfileScreen();
+              } else {
+                return const DashBoard();
+              }
+            },
+          );
+    // }
   }
 }
 
-class CheckLocale extends StatelessWidget {
-  const CheckLocale({super.key});
+// class CheckLocale extends StatelessWidget {
+//   const CheckLocale({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: LocalizationService.getLocale(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            body: centerLoader(),
-          );
-        } else if (snap.data == null) {
-          return LannguageSelectionPage(
-            locale: snap.data!.countryCode,
-          );
-        } else {
-          return const Authenticate();
-        }
-      },
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder(
+//       future: LocalizationService.getLocale(),
+//       builder: (context, snap) {
+//         if (snap.data != null) {
+//           return const Authenticate();
+//         } else if (snap.data == null) {
+//           return LannguageSelectionPage(
+//             locale: snap.data!.countryCode,
+//           );
+//         } else {
+//           return Scaffold(body: centerLoader());
+//         }
+//       },
+//     );
+//   }
+// }
 
 class LannguageSelectionPage extends StatelessWidget {
   const LannguageSelectionPage({super.key, this.locale});
@@ -85,7 +84,7 @@ class LannguageSelectionPage extends StatelessWidget {
               leading: SizedBox(
                 height: 30.h,
                 width: 50.w,
-                child: SvgPicture.network(
+                child: SvgPicture.asset(
                     LocalizationService.supportedLanguagesFlags[index]),
               ),
               title: TextWidget(

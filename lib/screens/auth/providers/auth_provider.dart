@@ -86,8 +86,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signIn(
-      {String? email, String? password, required BuildContext context}) async {
+  Future<void> signIn({String? email, String? password, context}) async {
     if (checkValidDataLogin(
         email: email, password: password, context: context)) {
       try {
@@ -108,7 +107,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> verifyPhoneNumber(number) async {
+  Future<void> verifyPhoneNumber(number, context) async {
     Get.defaultDialog(
       title: '',
       titlePadding: EdgeInsets.zero,
@@ -165,7 +164,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> checkOtpVerification(smsCode, verifyId) async {
+  Future<void> checkOtpVerification(smsCode, verifyId, context) async {
     isSigningIn = true;
     notifyListeners();
     Get.defaultDialog(
@@ -335,8 +334,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  bool checkValidDataLogin(
-      {String? email, String? password, required BuildContext context}) {
+  bool checkValidDataLogin({String? email, String? password, context}) {
     if (email!.isEmpty) {
       GlobalSnackBar.show(message: appText(context).strErrorEmail);
       return false;
@@ -420,6 +418,12 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 }
+
+
+
+
+
+
 
 // Future<void> callTwitterSignIn() async {
   //   try {

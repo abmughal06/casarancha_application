@@ -155,9 +155,14 @@ class ChatInputFieldGhost extends StatelessWidget {
                                     onLongPressEnd: (details) {
                                       if (ghostProvider.checkGhostMode) {
                                         if (!isRecordingDelete) {
+                                          chatProvider.unreadMessages += 1;
                                           chatProvider.stopRecording(
                                             currentUser: currentUser,
                                             appUser: appUser,
+                                            notificationText: appText(context)
+                                                .strUnReadVoiceMessages(
+                                                    chatProvider
+                                                        .unreadMessages),
                                             firstMessageByWho: firstMessage,
                                             isGhostMessage: true,
                                           );
@@ -190,11 +195,15 @@ class ChatInputFieldGhost extends StatelessWidget {
                             widthBox(12.w),
                             GestureDetector(
                               onTap: () {
+                                chatProvider.unreadMessages += 1;
                                 ghostProvider.checkGhostMode
                                     ? chatProvider.sentMessageGhost(
                                         currentUser: currentUser,
                                         appUser: appUser,
-                                        firstMessageByMe: firstMessage)
+                                        firstMessageByMe: firstMessage,
+                                        notificationText: appText(context)
+                                            .strUnReadMessagesInGhost(
+                                                chatProvider.unreadMessages))
                                     : GlobalSnackBar.show(
                                         message: appText(context)
                                             .strEnableGhModeMessage);
@@ -414,10 +423,10 @@ class ShowMediaToSendInChatGhost extends StatelessWidget {
                         media.mediaList.isNotEmpty
                     ? GestureDetector(
                         onTap: () => media.photosList.isNotEmpty
-                            ? media.getPhoto()
+                            ? media.getPhoto(context)
                             : media.mediaList.isNotEmpty
-                                ? media.getMedia()
-                                : media.getVideo(),
+                                ? media.getMedia(context)
+                                : media.getVideo(context),
                         child: Image.asset(
                           imgAddPost,
                           height: 38.h,
@@ -427,10 +436,13 @@ class ShowMediaToSendInChatGhost extends StatelessWidget {
                     : widthBox(0),
                 GestureDetector(
                   onTap: () {
-                    media.pickImageAndSentViaMessageGhost(
+                    media.unreadMessages += 1;
+                    media.sendMediaMessageGhost(
                       firstMessage: firstMessage,
                       currentUser: currentUser,
                       appUser: appUser,
+                      notificationText: appText(context)
+                          .strUnReadAttachment(media.unreadMessages),
                       mediaType: media.photosList.isNotEmpty
                           ? 'InChatPic'
                           : media.videosList.isNotEmpty

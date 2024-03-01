@@ -3,6 +3,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_user_list_tile.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/shared/shimmer_list.dart';
@@ -64,7 +65,7 @@ class _FriendChatListState extends State<FriendChatList> {
         : ListView(
             children: [
               StreamProvider.value(
-                value: DataProvider().chatListUsers(),
+                value: DataProvider().getchatListUsers(),
                 initialData: null,
                 catchError: (context, error) => null,
                 child: Consumer<List<MessageDetails>?>(
@@ -72,27 +73,33 @@ class _FriendChatListState extends State<FriendChatList> {
                     if (messages == null) {
                       return const ChatShimmerList();
                     } else {
-                      // messageUserIds = messages.map((e) => e.id).toList();
-
-                      if (chatQuery.searchController.text.isEmpty ||
-                          chatQuery.searchController.text == '') {
+                      if (chatQuery.searchController.text.isEmpty) {
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: messages.length,
                           itemBuilder: (context, index) {
                             return ChatUserListTile(
-                              personId: messages[index].id,
-                              messageDetails: messages[index],
+                              personId: messages[index].id.split('_').last ==
+                                      currentUserUID
+                                  ? messages[index].id.split('_').first
+                                  : messages[index].id.split('_').last,
+                              message: messages[index],
                               ontapTile: () => Get.to(
                                 () => ChatScreen(
-                                  appUserId: messages[index].id,
+                                  messageDetails: messages[index],
+                                  appUserId:
+                                      messages[index].id.split('_').last ==
+                                              currentUserUID
+                                          ? messages[index].id.split('_').first
+                                          : messages[index].id.split('_').last,
                                 ),
                               ),
                             );
                           },
                         );
                       }
+
                       var filterList = messages
                           .where((element) => element.creatorDetails.name
                               .toLowerCase()
@@ -105,11 +112,19 @@ class _FriendChatListState extends State<FriendChatList> {
                         itemCount: filterList.length,
                         itemBuilder: (context, index) {
                           return ChatUserListTile(
-                            personId: filterList[index].id,
-                            messageDetails: filterList[index],
+                            personId: filterList[index].id.split('_').last ==
+                                    currentUserUID
+                                ? filterList[index].id.split('_').first
+                                : filterList[index].id.split('_').last,
+                            message: filterList[index],
                             ontapTile: () => Get.to(
                               () => ChatScreen(
-                                appUserId: filterList[index].id,
+                                messageDetails: filterList[index],
+                                appUserId:
+                                    filterList[index].id.split('_').last ==
+                                            currentUserUID
+                                        ? filterList[index].id.split('_').first
+                                        : filterList[index].id.split('_').last,
                               ),
                             ),
                           );
@@ -125,7 +140,7 @@ class _FriendChatListState extends State<FriendChatList> {
                 color: color221.withOpacity(0.1),
               ),
               StreamProvider.value(
-                value: DataProvider().chatListUsers(),
+                value: DataProvider().getchatListUsers(),
                 initialData: null,
                 catchError: (context, error) => null,
                 child: Consumer<List<MessageDetails>?>(
@@ -133,11 +148,15 @@ class _FriendChatListState extends State<FriendChatList> {
                     if (messages == null) {
                       return const ChatShimmerList();
                     } else {
-                      // var msgIds = messages.map((e) => e.id).toList();
+                      var msgIds = messages
+                          .map((e) => e.id.split('_').first == currentUserUID
+                              ? e.id.split('_').last
+                              : e.id.split('_').first)
+                          .toSet();
                       return StreamProvider.value(
                         value: DataProvider().nonChatUsers(
                           currentUser.followersIds + currentUser.followingsIds,
-                          messages.map((e) => e.id).toSet(),
+                          msgIds,
                         ),
                         initialData: null,
                         catchError: (context, error) => null,
