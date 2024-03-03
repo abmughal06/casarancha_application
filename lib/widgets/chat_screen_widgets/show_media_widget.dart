@@ -14,9 +14,15 @@ import 'package:provider/provider.dart';
 
 class ShowMediaToSendInChat extends StatelessWidget {
   const ShowMediaToSendInChat(
-      {super.key, required this.currentUser, required this.appUser});
+      {super.key,
+      required this.currentUser,
+      required this.appUser,
+      this.firstMessage,
+      this.isGhost = false});
   final UserModel currentUser;
   final UserModel appUser;
+  final bool? firstMessage;
+  final bool isGhost;
 
   @override
   Widget build(BuildContext context) {
@@ -230,13 +236,31 @@ class ShowMediaToSendInChat extends StatelessWidget {
                   child: svgImgButton(
                     svgIcon: icStoryCmtSend,
                     onTap: () {
-                      media.unreadMessages += 1;
-                      media.sendMediaMessage(
-                        currentUser: currentUser,
-                        appUser: appUser,
-                        notificationText: appText(context)
-                            .strUnReadAttachment(media.unreadMessages),
-                      );
+                      if (isGhost) {
+                        media.unreadMessages += 1;
+                        media.sendMediaMessageGhost(
+                          firstMessage: firstMessage,
+                          currentUser: currentUser,
+                          appUser: appUser,
+                          notificationText: appText(context)
+                              .strUnReadAttachment(media.unreadMessages),
+                          mediaType: media.photosList.isNotEmpty
+                              ? 'InChatPic'
+                              : media.videosList.isNotEmpty
+                                  ? 'InChatVideo'
+                                  : media.mediaList.isNotEmpty
+                                      ? 'InChatDoc'
+                                      : 'InChatMusic',
+                        );
+                      } else {
+                        media.unreadMessages += 1;
+                        media.sendMediaMessage(
+                          currentUser: currentUser,
+                          appUser: appUser,
+                          notificationText: appText(context)
+                              .strUnReadAttachment(media.unreadMessages),
+                        );
+                      }
                     },
                   ),
                 ),
