@@ -2,6 +2,7 @@ import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/chat_user_list_tile.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -88,7 +89,19 @@ class GhostChatList extends StatelessWidget {
                                             messages[index].firstMessage ==
                                                 FirebaseAuth
                                                     .instance.currentUser!.uid,
-                                        appUserId: messages[index].id,
+                                        appUserId: messages[index]
+                                                    .id
+                                                    .split('_')
+                                                    .last ==
+                                                currentUserUID
+                                            ? messages[index]
+                                                .id
+                                                .split('_')
+                                                .first
+                                            : messages[index]
+                                                .id
+                                                .split('_')
+                                                .last,
                                         creatorDetails:
                                             messages[index].creatorDetails,
                                       ),
@@ -181,7 +194,12 @@ class GhostChatList extends StatelessWidget {
                         value: DataProvider().nonChatUsers(
                             currentUser.followersIds +
                                 currentUser.followingsIds,
-                            messages.map((e) => e.id).toSet()),
+                            messages
+                                .map((e) =>
+                                    e.id.split('_').last == currentUserUID
+                                        ? e.id.split('_').first
+                                        : e.id.split('_').last)
+                                .toSet()),
                         initialData: null,
                         catchError: (context, error) => null,
                         child: Consumer<List<UserModel>?>(

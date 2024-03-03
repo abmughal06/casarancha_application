@@ -1,5 +1,7 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -119,68 +121,98 @@ class GhostChatListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: ListTile(
-        onTap: ontapTile,
-        title: Row(
-          children: [
-            TextWidget(
-              onTap: ontapTile,
-              text: messageDetails.creatorDetails.name,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xff222939),
+    return StreamProvider.value(
+      value: DataProvider().getSingleUser(
+          messageDetails.id.split('_').last == currentUserUID
+              ? messageDetails.id.split('_').first
+              : messageDetails.id.split('_').last),
+      initialData: null,
+      catchError: (context, error) => null,
+      child: Consumer<UserModel?>(
+        builder: (context, user, b) {
+          if (user == null) {
+            return widthBox(0);
+          }
+          return StreamProvider.value(
+            value: DataProvider().unSeenMessagesLengthGhost(
+                getConversationDocId(currentUserUID!, user.id)),
+            initialData: null,
+            catchError: (context, error) => null,
+            child: Consumer<int?>(
+              builder: (context, length, b) {
+                return length == null
+                    ? widthBox(0)
+                    : SizedBox(
+                        child: ListTile(
+                          onTap: ontapTile,
+                          title: Row(
+                            children: [
+                              TextWidget(
+                                onTap: ontapTile,
+                                text: user.name,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff222939),
+                              ),
+                              widthBox(5.w),
+                              verifyBadge(
+                                user.isVerified,
+                              )
+                            ],
+                          ),
+                          subtitle: TextWidget(
+                            onTap: ontapTile,
+                            text: messageDetails.lastMessage,
+                            textOverflow: TextOverflow.ellipsis,
+                            fontWeight: !(length > 0)
+                                ? FontWeight.w400
+                                : FontWeight.w700,
+                            fontSize: 14.sp,
+                            color: !(length > 0)
+                                ? const Color(0xff8a8a8a)
+                                : const Color(0xff000000),
+                          ),
+                          leading: ProfilePic(
+                            pic: user.imageStr,
+                            heightAndWidth: 45.h,
+                          ),
+                          trailing: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextWidget(
+                                onTap: ontapTile,
+                                text: convertDateIntoTime(
+                                    messageDetails.createdAt),
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12.sp,
+                                color: const Color(0xff878787),
+                              ),
+                              SizedBox(height: 5.h),
+                              !(length > 0)
+                                  ? const Icon(Icons.navigate_next)
+                                  : Container(
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: const BoxDecoration(
+                                          color: Color(0xff7BC246),
+                                          shape: BoxShape.circle),
+                                      child: TextWidget(
+                                        text: messageDetails.unreadMessageCount
+                                            .toString(),
+                                        onTap: ontapTile,
+                                        color: Colors.white,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
+                      );
+              },
             ),
-            widthBox(5.w),
-            verifyBadge(
-              messageDetails.creatorDetails.isVerified,
-            )
-          ],
-        ),
-        subtitle: TextWidget(
-          onTap: ontapTile,
-          text: messageDetails.lastMessage,
-          textOverflow: TextOverflow.ellipsis,
-          fontWeight: messageDetails.unreadMessageCount == 0
-              ? FontWeight.w400
-              : FontWeight.w700,
-          fontSize: 14.sp,
-          color: messageDetails.unreadMessageCount == 0
-              ? const Color(0xff8a8a8a)
-              : const Color(0xff000000),
-        ),
-        leading: ProfilePic(
-          pic: messageDetails.creatorDetails.imageUrl,
-          heightAndWidth: 45.h,
-        ),
-        trailing: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextWidget(
-              onTap: ontapTile,
-              text: convertDateIntoTime(messageDetails.createdAt),
-              fontWeight: FontWeight.w400,
-              fontSize: 12.sp,
-              color: const Color(0xff878787),
-            ),
-            SizedBox(height: 5.h),
-            messageDetails.unreadMessageCount == 0
-                ? const Icon(Icons.navigate_next)
-                : Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        color: Color(0xff7BC246), shape: BoxShape.circle),
-                    child: TextWidget(
-                      text: messageDetails.unreadMessageCount.toString(),
-                      onTap: ontapTile,
-                      color: Colors.white,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

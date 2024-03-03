@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:casarancha/models/message.dart';
-import 'package:casarancha/models/message_details.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
@@ -25,13 +24,8 @@ import '../../../widgets/common_widgets.dart';
 
 class ChatScreen extends StatefulWidget {
   final String appUserId;
-  final MessageDetails? messageDetails;
 
-  const ChatScreen({
-    super.key,
-    required this.appUserId,
-    this.messageDetails,
-  });
+  const ChatScreen({super.key, required this.appUserId});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -116,9 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
               top: false,
               child: StreamProvider.value(
                 value: DataProvider().messages(
-                    widget.messageDetails != null
-                        ? widget.messageDetails!.id
-                        : "${currentUserUID}_${widget.appUserId}",
+                    getConversationDocId(currentUserUID!, widget.appUserId),
                     false),
                 initialData: null,
                 catchError: (context, error) => null,
@@ -128,12 +120,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       return const Center(
                           child: CircularProgressIndicator.adaptive());
                     }
-                    if (widget.messageDetails != null) {
-                      chatProvider.conversationId = widget.messageDetails!.id;
-                    } else {
-                      chatProvider.conversationId = getConversationDocId(
-                          currentUserUID!, widget.appUserId);
-                    }
+
+                    chatProvider.conversationId =
+                        getConversationDocId(currentUserUID!, widget.appUserId);
+
                     return Column(
                       children: [
                         Expanded(
@@ -202,7 +192,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ],
                               ),
                             ChatInputField(
-                              messageDetails: widget.messageDetails!,
+                              // messageDetails: widget.messageDetails,
                               appUserId: widget.appUserId,
                             ),
                           ],
@@ -217,11 +207,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 Consumer<ChatProvider>(builder: (context, v, b) {
               if (v.isRecording && !v.isRecorderLock) {
                 return Padding(
-                  padding: EdgeInsets.only(bottom: Platform.isIOS ? 50 : 80),
-                  child: FloatingActionButton(
-                    mini: true,
-                    onPressed: () {},
+                  padding: EdgeInsets.only(bottom: Platform.isIOS ? 20 : 50),
+                  child: CircleAvatar(
                     backgroundColor: colorWhite,
+                    radius: 20,
                     child: SvgPicture.asset(icSelectLock),
                   ),
                 );

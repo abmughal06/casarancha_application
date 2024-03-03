@@ -203,7 +203,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<void> replyMessage({
-    required MessageDetails messageDetails,
+    // required MessageDetails messageDetails,
     required UserModel appUser,
     required UserModel currentUser,
   }) async {
@@ -215,11 +215,12 @@ class ChatProvider extends ChangeNotifier {
 
         final messageRef = FirebaseFirestore.instance
             .collection('messages')
-            .doc(messageDetails.id);
+            .doc(getConversationDocId(currentUser.id, appUser.id));
 
         final chatRef = messageRef.collection('chats').doc();
 
-        final newMessageDetails = messageDetails.copyWith(
+        final newMessageDetails = MessageDetails(
+          id: getConversationDocId(currentUser.id, appUser.id),
           creatorId: currentUser.id,
           lastMessage: textMessage,
           unreadMessageCount: unreadMessages + 1,
@@ -273,7 +274,11 @@ class ChatProvider extends ChangeNotifier {
       return;
     }
     try {
-      var docId = conversationId ?? "${currentUser!.id}_${appUser!.id}";
+      var textMessage = messageController.text;
+      messageController.clear();
+      notifyListeners();
+      var docId =
+          conversationId ?? getConversationDocId(currentUser!.id, appUser!.id);
 
       conversationId = docId;
 
@@ -285,7 +290,7 @@ class ChatProvider extends ChangeNotifier {
 
       final GhostMessageDetails lastMessageDetails = GhostMessageDetails(
         id: messageRef.id,
-        lastMessage: messageController.text,
+        lastMessage: textMessage.trim(),
         firstMessage: firstMessageByMe! ? currentUser!.id : appUser!.id,
         unreadMessageCount: unreadMessages + 1,
         searchCharacters: [...currentUser!.name.toLowerCase().split('')],
@@ -302,14 +307,12 @@ class ChatProvider extends ChangeNotifier {
         sentToId: appUser!.id,
         isReply: false,
         sentById: currentUser.id,
-        content: messageController.text,
+        content: textMessage.trim(),
         caption: '',
         type: 'Text',
         createdAt: DateTime.now().toUtc().toString(),
         isSeen: false,
       );
-
-      // final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
 
       messageRef.set(lastMessageDetails.toMap());
       chatRef.set(message.toMap());

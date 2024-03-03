@@ -1,5 +1,4 @@
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -58,15 +57,7 @@ class VoiceRecordingWidget extends StatelessWidget {
         ),
       );
     }
-    if (isRecordingSend) {
-      return Expanded(
-        child: Container(
-            height: 40.h,
-            decoration: BoxDecoration(
-                color: colorFF4, borderRadius: BorderRadius.circular(30)),
-            child: centerLoader(size: 20.w)),
-      );
-    }
+
     return Container();
   }
 }

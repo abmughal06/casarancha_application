@@ -560,6 +560,30 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Stream<int>? unSeenMessagesLengthGhost(id) {
+    try {
+      if (FirebaseAuth.instance.currentUser?.uid == null) {
+        return null;
+      }
+      return FirebaseFirestore.instance
+          .collection('ghost_messages')
+          .doc(id)
+          .collection('chats')
+          .snapshots()
+          .map(
+            (event) => event.docs
+                .where((element) =>
+                    element.data()['sentById'] !=
+                        FirebaseAuth.instance.currentUser!.uid &&
+                    !element.data()['isSeen'])
+                .map((e) => e.data())
+                .length,
+          );
+    } catch (e) {
+      return null;
+    }
+  }
+
   Stream<int> getTotalUnseenMessageCount() {
     return FirebaseFirestore.instance
         .collection('messages')
@@ -702,8 +726,6 @@ class DataProvider extends ChangeNotifier {
       }
       return FirebaseFirestore.instance
           .collection('ghost_messages')
-          // .doc(FirebaseAuth.instance.currentUser!.uid)
-          // .collection(cMessageList)
           .orderBy('createdAt', descending: true)
           .snapshots()
           .map(
