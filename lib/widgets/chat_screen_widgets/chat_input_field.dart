@@ -147,34 +147,28 @@ class _ChatInputFieldState extends State<ChatInputField> {
                             ),
                     ),
                   if (chatProvider.textFieldFocus.hasFocus)
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 5.w,
-                        horizontal: 12.w,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          if (chatProvider.isReply) {
-                            chatProvider.unreadMessages + 1;
-                            chatProvider.replyMessage(
-                              currentUser: currentUser,
-                              appUser: appUser,
-                            );
-                          } else if (chatProvider.isMessageEditing) {
-                            chatProvider.editMessage(
-                                false, chatProvider.editMessageId);
-                          } else {
-                            chatProvider.unreadMessages + 1;
-                            chatProvider.sentTextMessage(
-                              currentUser: currentUser,
-                              appUser: appUser,
-                            );
-                          }
-                        },
-                        child: const Icon(
-                          CupertinoIcons.arrow_turn_right_up,
-                          color: colorPrimaryA05,
-                        ),
+                    IconButton(
+                      onPressed: () {
+                        if (chatProvider.isReply) {
+                          chatProvider.unreadMessages + 1;
+                          chatProvider.replyMessage(
+                            currentUser: currentUser,
+                            appUser: appUser,
+                          );
+                        } else if (chatProvider.isMessageEditing) {
+                          chatProvider.editMessage(
+                              false, chatProvider.editMessageId);
+                        } else {
+                          chatProvider.unreadMessages + 1;
+                          chatProvider.sentTextMessage(
+                            currentUser: currentUser,
+                            appUser: appUser,
+                          );
+                        }
+                      },
+                      icon: const Icon(
+                        CupertinoIcons.arrow_turn_right_up,
+                        color: colorPrimaryA05,
                       ),
                     ),
                 ],

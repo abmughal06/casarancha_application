@@ -36,7 +36,7 @@ class ChatTextField extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
             textCapitalization: TextCapitalization.sentences,
-            maxLength: 1500,
+            maxLength: 2000,
             decoration: InputDecoration(
               isDense: true,
               counterText: "",

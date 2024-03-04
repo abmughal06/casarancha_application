@@ -168,15 +168,28 @@ class AllSearch extends StatelessWidget {
                     group: groupSnap,
                     ontapTrailing: () {
                       if (!isCurrentUserGroupMember) {
-                        context.read<NewGroupProvider>().addGroupMembers(
-                            id: FirebaseAuth.instance.currentUser!.uid,
-                            groupId: groupSnap.id);
+                        // print(groupSnap.isPublic);
+                        if (groupSnap.isPublic) {
+                          context.read<NewGroupProvider>().addGroupMembers(
+                              id: FirebaseAuth.instance.currentUser!.uid,
+                              groupId: groupSnap.id);
+                        } else {
+                          context.read<NewGroupProvider>().requestPrivateGroup(
+                              id: FirebaseAuth.instance.currentUser!.uid,
+                              groupId: groupSnap.id);
+                        }
                       }
                     },
                     isSearchScreen: true,
-                    btnText: isCurrentUserGroupMember
-                        ? appText(context).strJoined
-                        : appText(context).strSrcJoin,
+                    btnText: groupSnap.isPublic
+                        ? isCurrentUserGroupMember
+                            ? appText(context).strJoined
+                            : appText(context).strSrcJoin
+                        : groupSnap.joinRequestIds.contains(currentUserUID)
+                            ? appText(context).reqSent
+                            : isCurrentUserGroupMember
+                                ? appText(context).strJoined
+                                : appText(context).strSrcJoin,
                   );
                 },
               ),
@@ -282,6 +295,7 @@ class GroupSearch extends StatelessWidget {
                 group: groupSnap,
                 ontapTrailing: () {
                   if (!isCurrentUserGroupMember) {
+                    // print(groupSnap.isPublic);
                     if (groupSnap.isPublic) {
                       context.read<NewGroupProvider>().addGroupMembers(
                           id: FirebaseAuth.instance.currentUser!.uid,

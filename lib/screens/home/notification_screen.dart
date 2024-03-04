@@ -114,7 +114,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     ? PostModel.fromMap(notification.content)
                                     : null;
 
-                            var contentImage = postModel != null
+                            var contentImage = postModel != null &&
+                                    postModel.mediaData.first.type == 'Photo'
                                 ? postModel.mediaData.first.link
                                 : '';
 

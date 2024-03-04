@@ -1,4 +1,5 @@
 import 'package:casarancha/models/message.dart';
+import 'package:casarancha/resources/strings.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/gestures.dart';
@@ -69,6 +70,7 @@ class ChatTile extends StatelessWidget {
                               TextSpan(
                                 style: TextStyle(
                                     color: color221,
+                                    fontFamily: strFontName,
                                     fontSize: calculateFontSize(
                                         message.caption.toString())),
                                 children:
@@ -83,6 +85,7 @@ class ChatTile extends StatelessWidget {
                               TextSpan(
                                 style: TextStyle(
                                     color: color221,
+                                    fontFamily: strFontName,
                                     fontSize: calculateFontSize(
                                         message.content.toString())),
                                 children:
@@ -107,6 +110,7 @@ class ChatTile extends StatelessWidget {
                         TextSpan(
                           style: TextStyle(
                               color: Colors.black,
+                              fontFamily: strFontName,
                               fontSize: calculateFontSize(
                                   message.content.toString())),
                           children: linkifyMessage(message.content.toString()),
@@ -166,7 +170,7 @@ List<TextSpan> linkifyMessage(String message) {
     spans.add(
       TextSpan(
         text: match.group(0),
-        style: const TextStyle(color: Colors.blue),
+        style: const TextStyle(color: Colors.blue, fontFamily: strFontName),
         recognizer: TapGestureRecognizer()
           ..onTap = () => _onOpen(LinkableElement(
                 match.group(0)!,
@@ -178,7 +182,9 @@ List<TextSpan> linkifyMessage(String message) {
   }
 
   if (lastMatchEnd < message.length) {
-    spans.add(TextSpan(text: message.substring(lastMatchEnd)));
+    spans.add(TextSpan(
+        text: message.substring(lastMatchEnd),
+        style: const TextStyle(fontFamily: strFontName)));
   }
 
   return spans;

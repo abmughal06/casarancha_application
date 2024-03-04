@@ -209,10 +209,10 @@ class MessageTiles extends StatelessWidget {
           ),
         );
       case 'InChatVideo':
-        final videos = message.caption.isEmpty
+        final videos = message.content != 'upload'
             ? MediaDetails.fromMap(message.content[0])
             : null;
-        var media = message.caption.isNotEmpty
+        var media = message.content == "upload"
             ? null
             : List.generate(message.content.length,
                 (index) => MediaDetails.fromMap(message.content[index]));
@@ -229,7 +229,7 @@ class MessageTiles extends StatelessWidget {
                     docId: message.id,
                   );
                 },
-                onTap: message.caption.isNotEmpty
+                onTap: message.content != 'upload'
                     ? () {}
                     : () => Get.to(() => FullScreenVideoPlayer(
                           videoLink: media!.first.link,
@@ -264,9 +264,10 @@ class MessageTiles extends StatelessWidget {
                     : ChatVideoTile(
                         key: videos == null ? null : ValueKey(videos.link),
                         mediaLength: media.length > 1 ? media.length : null,
-                        link: videos?.link,
+                        media: videos,
                         appUserId: message.sentToId,
                         isSeen: message.isSeen,
+                        caption: message.caption,
                         isMe: isMe,
                         date: message.createdAt,
                       ),
@@ -290,15 +291,16 @@ class MessageTiles extends StatelessWidget {
               )),
           child: ChatVideoTile(
             key: ValueKey(postModel.mediaData.first.link),
-            link: postModel.mediaData[0].link,
+            media: postModel.mediaData[0],
             appUserId: message.sentToId,
+            caption: null,
             isSeen: message.isSeen,
             isMe: isMe,
             date: message.createdAt,
           ),
         );
       case 'InChatMusic':
-        final music = message.caption.isEmpty
+        final music = message.content != 'upload'
             ? MediaDetails.fromMap(message.content[0])
             : null;
         final isUploading = music == null && !isMe;
@@ -321,6 +323,7 @@ class MessageTiles extends StatelessWidget {
                   appUserId: message.sentToId,
                   isSeen: message.isSeen,
                   isMe: isMe,
+                  caption: message.caption,
                   date: message.createdAt,
                   media: music,
                 ),
@@ -354,7 +357,7 @@ class MessageTiles extends StatelessWidget {
         );
 
       case 'Doc':
-        final doc = message.caption.isNotEmpty
+        final doc = message.content == 'upload'
             ? null
             : MediaDetails.fromMap(message.content[0]);
         final isUploading = doc == null && !isMe;
@@ -377,6 +380,7 @@ class MessageTiles extends StatelessWidget {
                   key: doc == null ? null : ValueKey(doc.link),
                   appUserId: message.sentToId,
                   isSeen: message.isSeen,
+                  caption: message.caption,
                   isMe: isMe,
                   date: message.createdAt,
                   media: doc,
