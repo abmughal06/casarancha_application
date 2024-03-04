@@ -15,7 +15,7 @@ class GhostScaffold extends StatelessWidget {
   final AppBar? appBar;
   final Widget body;
   final FloatingActionButtonAnimator? floatingActionButtonAnimator;
-  final FloatingActionButton? floatingActionButton;
+  final Widget? floatingActionButton;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Color? backgroundColor;
 

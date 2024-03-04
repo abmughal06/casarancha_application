@@ -16,43 +16,18 @@ class ChatTextField extends StatelessWidget {
   final VoidCallback ontapSend;
   final TextEditingController chatController;
 
-  void _onTextChanged() {
-    final text = chatController.text;
-    if (text.isNotEmpty) {
-      // Capitalize the first letter
-      String newText = text.substring(0, 1).toUpperCase() + text.substring(1);
-
-      // Capitalize letter after a period (.)
-      for (int i = 1; i < text.length - 1; i++) {
-        if (text[i - 1] == '.' && text[i] == ' ') {
-          newText = newText.substring(0, i + 1) +
-              text[i + 1].toUpperCase() +
-              newText.substring(i + 2);
-          i++; // Skip the next character since it has already been capitalized
-        }
-      }
-
-      if (text != newText) {
-        chatController.value = chatController.value.copyWith(
-          text: newText,
-          selection: TextSelection.collapsed(offset: newText.length),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
       builder: (context, chat, b) {
-        return Focus(
-          focusNode: chat.textFieldFocus,
+        return FocusScope(
           onFocusChange: (value) {
             chat.notifyUI();
           },
           child: TextField(
             minLines: 1,
             maxLines: 3,
+            focusNode: chat.textFieldFocus,
             controller: chatController,
             style: TextStyle(
               color: color239,
@@ -60,10 +35,7 @@ class ChatTextField extends StatelessWidget {
               fontFamily: strFontName,
               fontWeight: FontWeight.w600,
             ),
-            onChanged: (v) {
-              _onTextChanged();
-            },
-            // focusNode: chat.textFieldFocus,
+            textCapitalization: TextCapitalization.sentences,
             maxLength: 1500,
             decoration: InputDecoration(
               isDense: true,
@@ -92,20 +64,8 @@ class ChatTextField extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16.r),
               ),
             ),
-            // onTap: () {
-            //   chat.textFieldFocus.requestFocus();
-            //   chat.notifyUI();
-            // },
             keyboardType: TextInputType.multiline,
             textInputAction: TextInputAction.newline,
-            // onTapOutside: (v) {
-            //   chat.textFieldFocus.unfocus();
-            //   chat.notifyUI();
-            // },
-            // onSubmitted: (v) {
-            //   chat.textFieldFocus.unfocus();
-            //   chat.notifyUI();
-            // },
           ),
         );
       },

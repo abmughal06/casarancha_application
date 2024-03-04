@@ -42,9 +42,12 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
+  String? appUserName;
+
   @override
   Widget build(BuildContext context) {
     chatProvider = Provider.of<ChatProvider>(context);
+    chatProvider.setUserName(widget.appUserId);
 
     return chatProvider.photosList.isNotEmpty ||
             chatProvider.videosList.isNotEmpty ||
@@ -59,6 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
               if (users == null) {
                 return centerLoader();
               }
+
               return ShowMediaToSendInChat(
                 currentUser: users
                     .where((element) => element.id == currentUserUID)
@@ -142,7 +146,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 );
                               }
                               return SwipeTo(
-                                key: UniqueKey(),
+                                key: ValueKey(message),
                                 iconOnLeftSwipe: Icons.arrow_forward,
                                 iconOnRightSwipe: Icons.arrow_back,
                                 onRightSwipe: (details) {
@@ -171,6 +175,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                       decoration: BoxDecoration(
                                         color: colorFF4,
                                         borderRadius: BorderRadius.circular(12),
+                                        border: const Border(
+                                          left: BorderSide(
+                                              color: colorPrimaryA05, width: 6),
+                                        ),
                                       ),
                                       margin: const EdgeInsets.only(
                                         left: 15,
@@ -179,20 +187,47 @@ class _ChatScreenState extends State<ChatScreen> {
                                       padding: const EdgeInsets.all(
                                         10,
                                       ),
-                                      child: Text(chatProvider
-                                          .replyingMessage!.content
-                                          .toString()),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          TextWidget(
+                                            text: chatProvider.replyingMessage!
+                                                        .sentToId ==
+                                                    widget.appUserId
+                                                ? "You"
+                                                : chatProvider.appUserName,
+                                            fontWeight: FontWeight.w600,
+                                            color: colorPrimaryA05,
+                                          ),
+                                          TextWidget(
+                                            text: chatProvider.replyingMessage!
+                                                        .type ==
+                                                    'Text'
+                                                ? chatProvider
+                                                    .replyingMessage!.content
+                                                    .toString()
+                                                : chatProvider.getMediaType(
+                                                    chatProvider
+                                                        .replyingMessage!.type),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   IconButton(
                                       onPressed: () {
                                         chatProvider.disableReply();
                                       },
-                                      icon: const Icon(Icons.close)),
+                                      icon: const Icon(
+                                        Icons.close,
+                                        color: colorPrimaryA05,
+                                      )),
                                 ],
                               ),
                             ChatInputField(
-                              // messageDetails: widget.messageDetails,
                               appUserId: widget.appUserId,
                             ),
                           ],

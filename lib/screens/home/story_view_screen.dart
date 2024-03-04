@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/story_model.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/ChatList/chat_list_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -258,168 +259,10 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                   pauseAndPlayStory(story);
                 },
                 ontapSend: () async {
-                  if (ghost.checkGhostMode) {
-                    final GhostMessageDetails appUserMessageDetails =
-                        GhostMessageDetails(
-                      id: widget.stories.creatorId,
-                      lastMessage: "Story",
-                      unreadMessageCount: 0,
-                      searchCharacters: [
-                        ...widget.stories.creatorDetails.name
-                            .toLowerCase()
-                            .split('')
-                      ],
-                      creatorDetails: widget.stories.creatorDetails,
-                      createdAt: DateTime.now().toUtc().toString(),
-                      firstMessage: currentUser.id,
-                    );
-
-                    final GhostMessageDetails currentUserMessageDetails =
-                        GhostMessageDetails(
-                      id: currentUser.id,
-                      lastMessage: "Story",
-                      unreadMessageCount: unreadMessageCount + 1,
-                      searchCharacters: [
-                        ...currentUser.name.toLowerCase().split('')
-                      ],
-                      creatorDetails: CreatorDetails(
-                        name: currentUser.name,
-                        imageUrl: currentUser.imageStr,
-                        isVerified: currentUser.isVerified,
-                      ),
-                      createdAt: DateTime.now().toUtc().toString(),
-                      firstMessage: currentUser.id,
-                    );
-
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(currentUser.id)
-                        .collection('ghostMessageList')
-                        .doc(widget.stories.creatorId)
-                        .set(
-                          appUserMessageDetails.toMap(),
-                        );
-
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(widget.stories.creatorId)
-                        .collection('ghostMessageList')
-                        .doc(currentUser.id)
-                        .set(
-                          currentUserMessageDetails.toMap(),
-                        );
-                  } else {
-                    final MessageDetails appUserMessageDetails = MessageDetails(
-                      id: widget.stories.creatorId,
-                      lastMessage: "Story",
-                      creatorId: '',
-                      unreadMessageCount: 0,
-                      searchCharacters: [
-                        ...widget.stories.creatorDetails.name
-                            .toLowerCase()
-                            .split('')
-                      ],
-                      creatorDetails: widget.stories.creatorDetails,
-                      createdAt: DateTime.now().toUtc().toString(),
-                    );
-
-                    final MessageDetails currentUserMessageDetails =
-                        MessageDetails(
-                      id: currentUser.id,
-                      creatorId: '',
-                      lastMessage: "Story",
-                      unreadMessageCount: unreadMessageCount + 1,
-                      searchCharacters: [
-                        ...currentUser.name.toLowerCase().split('')
-                      ],
-                      creatorDetails: CreatorDetails(
-                        name: currentUser.name,
-                        imageUrl: currentUser.imageStr,
-                        isVerified: currentUser.isVerified,
-                      ),
-                      createdAt: DateTime.now().toUtc().toString(),
-                    );
-
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(currentUser.id)
-                        .collection('messageList')
-                        .doc(widget.stories.creatorId)
-                        .set(
-                          appUserMessageDetails.toMap(),
-                        );
-
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(widget.stories.creatorId)
-                        .collection('messageList')
-                        .doc(currentUser.id)
-                        .set(
-                          currentUserMessageDetails.toMap(),
-                        );
-                  }
-                  final messageRefForCurrentUser = FirebaseFirestore.instance
-                      .collection("users")
-                      .doc(FirebaseAuth.instance.currentUser!.uid)
-                      .collection(ghost.checkGhostMode
-                          ? 'ghostMessageList'
-                          : 'messageList')
-                      .doc(widget.stories.creatorId)
-                      .collection('messages')
-                      .doc();
-
-                  final messageRefForAppUser = FirebaseFirestore.instance
-                      .collection("users")
-                      .doc(widget.stories.creatorId)
-                      .collection(ghost.checkGhostMode
-                          ? 'ghostMessageList'
-                          : 'messageList')
-                      .doc(FirebaseAuth.instance.currentUser!.uid)
-                      .collection('messages')
-                      .doc(
-                        messageRefForCurrentUser.id,
-                      );
-
-                  var story = storyItems.toList();
-                  var mediaDetail = story[_currentIndex].toMap();
-
-                  final Message message = Message(
-                    id: messageRefForCurrentUser.id,
-                    isReply: false,
-                    sentToId: widget.stories.creatorId,
-                    sentById: FirebaseAuth.instance.currentUser!.uid,
-                    content: mediaDetail,
-                    caption: commentController.text,
-                    type: "story-${story[_currentIndex].type}",
-                    createdAt: DateTime.now().toUtc().toString(),
-                    isSeen: false,
-                  );
-
-                  final appUserMessage =
-                      message.copyWith(id: messageRefForAppUser.id);
-
-                  messageRefForCurrentUser.set(message.toMap());
-                  messageRefForAppUser.set(appUserMessage.toMap());
-                  var recieverRef = await FirebaseFirestore.instance
-                      .collection("users")
-                      .doc(widget.stories.creatorId)
-                      .get();
-
-                  var recieverFCMToken = recieverRef.data()!['fcmToken'];
-
-                  FirebaseMessagingService().sendNotificationToUser(
-                    appUserId: recieverRef.id,
-                    content: storyItems[_currentIndex].type == 'Photo'
-                        ? storyItems[_currentIndex].link
-                        : '',
-                    groupId: null,
-                    notificationType: "msg",
-
-                    isMessage: true,
-                    // creatorDetails: creatorDetails,
-                    devRegToken: recieverFCMToken,
-
-                    msg: cmntMsg,
+                  sentComment(
+                    checkGhostMode: ghost.checkGhostMode,
+                    currentUser: currentUser,
+                    cmntMsg: cmntMsg,
                   );
                   _commentFocus.unfocus();
                   commentController.text = "";
@@ -430,6 +273,91 @@ class _StoryViewScreenState extends State<StoryViewScreen>
           ),
         ),
       ),
+    );
+  }
+
+  sentComment({checkGhostMode, currentUser, cmntMsg}) async {
+    if (checkGhostMode) {
+      final GhostMessageDetails messageDetails = GhostMessageDetails(
+        id: getConversationDocId(currentUser.id, widget.stories.creatorId),
+        lastMessage: "Story",
+        unreadMessageCount: 0,
+        searchCharacters: [
+          ...widget.stories.creatorDetails.name.toLowerCase().split('')
+        ],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toUtc().toString(),
+        firstMessage: currentUser.id,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('ghost_messages')
+          .doc(getConversationDocId(currentUser.id, widget.stories.creatorId))
+          .set(messageDetails.toMap());
+    } else {
+      final MessageDetails messageDetails = MessageDetails(
+        id: getConversationDocId(currentUser.id, widget.stories.creatorId),
+        creatorId: '',
+        lastMessage: "Story",
+        unreadMessageCount: unreadMessageCount + 1,
+        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toUtc().toString(),
+      );
+
+      await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(getConversationDocId(currentUser.id, widget.stories.creatorId))
+          .set(messageDetails.toMap());
+    }
+    final chatRef = FirebaseFirestore.instance
+        .collection(checkGhostMode ? 'ghost_messages' : 'messages')
+        .doc(getConversationDocId(currentUser.id, widget.stories.creatorId))
+        .collection('chats')
+        .doc();
+
+    var story = storyItems.toList();
+    var mediaDetail = story[_currentIndex].toMap();
+
+    final Message message = Message(
+      id: chatRef.id,
+      isReply: false,
+      sentToId: widget.stories.creatorId,
+      sentById: currentUser.id,
+      content: mediaDetail,
+      caption: commentController.text,
+      type: "story-${story[_currentIndex].type}",
+      createdAt: DateTime.now().toUtc().toString(),
+      isSeen: false,
+    );
+
+    chatRef.set(message.toMap());
+    var recieverRef = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.stories.creatorId)
+        .get();
+
+    var recieverFCMToken = recieverRef.data()!['fcmToken'];
+
+    FirebaseMessagingService().sendNotificationToUser(
+      appUserId: recieverRef.id,
+      content: storyItems[_currentIndex].type == 'Photo'
+          ? storyItems[_currentIndex].link
+          : '',
+      groupId: null,
+      notificationType: "msg",
+      isMessage: true,
+      ghostmode: checkGhostMode,
+      devRegToken: recieverFCMToken,
+      msg: cmntMsg,
     );
   }
 

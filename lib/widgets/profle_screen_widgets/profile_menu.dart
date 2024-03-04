@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:casarancha/authenticator.dart';
+import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/profile/account_recovery.dart';
 import 'package:casarancha/screens/profile/get_verified.dart';
@@ -11,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../resources/color_resources.dart';
 import '../../screens/auth/login_screen.dart';
@@ -100,7 +102,7 @@ bottomSheetProfile(context) {
 _onTapSheetItem({required int index, required BuildContext context}) async {
   switch (index) {
     case 0:
-      Get.to(() => const EditProfileScreen());
+      Get.to(() => EditProfileScreen(user: context.watch<UserModel?>()));
       break;
     case 1:
       Get.to(() => const SavedPostScreen());

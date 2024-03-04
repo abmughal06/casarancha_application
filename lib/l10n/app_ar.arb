@@ -398,5 +398,6 @@
     "strPollQuestion": "أدخل السؤال",
     "strPollOption": "أدخل الخيار",
     "strFieldHintAddGroup": "إضافة أعضاء في ${groupname}",
-    "strAddStory": "إضافة قصة"
+    "strAddStory": "إضافة قصة",
+    "edit": "يحرر"
 }

@@ -62,6 +62,8 @@ class PostProvider extends ChangeNotifier {
       }
     } catch (e) {
       log("$e");
+    } finally {
+      notifyListeners();
     }
   }
 
