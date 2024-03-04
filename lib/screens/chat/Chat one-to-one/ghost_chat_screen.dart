@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:casarancha/models/ghost_message_details.dart';
 import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/post_creator_details.dart';
@@ -12,8 +14,10 @@ import 'package:casarancha/widgets/chat_screen_widgets/chat_screen_message_tiles
 import 'package:casarancha/widgets/chat_screen_widgets/show_media_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:swipe_to/swipe_to.dart';
 import '../../../models/user_model.dart';
 import '../../../resources/image_resources.dart';
 import '../../../widgets/chat_screen_widgets/chat_user_app_bar.dart';
@@ -73,6 +77,7 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                   appUser: users
                       .where((element) => element.id == widget.appUserId)
                       .first,
+                  isGhost: true,
                   firstMessage: widget.firstMessagebyMe!,
                 );
               },
@@ -182,19 +187,109 @@ class _GhostChatScreen2State extends State<GhostChatScreen2> {
                             final isMe =
                                 messages[index].sentToId == widget.appUserId;
                             var message = messages[index];
-                            return MessageTiles(message: message, isMe: isMe);
+                            return SwipeTo(
+                                key: ValueKey(message),
+                                iconOnLeftSwipe: Icons.arrow_forward,
+                                iconOnRightSwipe: Icons.arrow_back,
+                                onRightSwipe: (details) {
+                                  chatProvider.enableReply(message);
+                                },
+                                onLeftSwipe: (details) {
+                                  chatProvider.enableReply(message);
+                                },
+                                child:
+                                    MessageTiles(message: message, isMe: isMe));
                           },
                         ),
                       ),
-                      ChatInputFieldGhost(
-                        firstMessage: widget.firstMessagebyMe!,
-                        appUserId: widget.appUserId,
+                      Column(
+                        children: [
+                          if (chatProvider.isReply)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: colorFF4,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: const Border(
+                                        left: BorderSide(
+                                            color: colorPrimaryA05, width: 6),
+                                      ),
+                                    ),
+                                    margin: const EdgeInsets.only(
+                                      left: 15,
+                                      top: 5,
+                                    ),
+                                    padding: const EdgeInsets.all(
+                                      10,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        TextWidget(
+                                          text: chatProvider.replyingMessage!
+                                                      .sentToId ==
+                                                  widget.appUserId
+                                              ? "You"
+                                              : chatProvider.appUserName,
+                                          fontWeight: FontWeight.w600,
+                                          color: colorPrimaryA05,
+                                        ),
+                                        TextWidget(
+                                          text: chatProvider
+                                                      .replyingMessage!.type ==
+                                                  'Text'
+                                              ? chatProvider
+                                                  .replyingMessage!.content
+                                                  .toString()
+                                              : chatProvider.getMediaType(
+                                                  chatProvider
+                                                      .replyingMessage!.type),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      chatProvider.disableReply();
+                                    },
+                                    icon: const Icon(
+                                      Icons.close,
+                                      color: colorPrimaryA05,
+                                    )),
+                              ],
+                            ),
+                          ChatInputFieldGhost(
+                            firstMessage: widget.firstMessagebyMe!,
+                            appUserId: widget.appUserId,
+                          ),
+                        ],
                       )
                     ],
                   );
                 },
               ),
             ),
+            floatingActionButton:
+                Consumer<ChatProvider>(builder: (context, v, b) {
+              if (v.isRecording && !v.isRecorderLock) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: Platform.isIOS ? 20 : 50),
+                  child: CircleAvatar(
+                    backgroundColor: colorWhite,
+                    radius: 20,
+                    child: SvgPicture.asset(icSelectLock),
+                  ),
+                );
+              }
+              return Container();
+            }),
           );
   }
 }

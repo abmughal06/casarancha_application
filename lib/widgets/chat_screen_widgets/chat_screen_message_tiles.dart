@@ -1,5 +1,6 @@
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_model.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../widgets/chat_screen_widgets/chat_post_tile.dart';
@@ -22,44 +24,49 @@ import '../../screens/home/story_view_screen.dart';
 import '../custom_dialog.dart';
 
 Future showMessageMennu({context, url, path, friendId, docId, text}) async {
+  final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+  final ghost = Provider.of<DashboardProvider>(context, listen: false);
   await Get.bottomSheet(CupertinoActionSheet(
     actions: [
+      if (url != null || path != null)
+        CupertinoActionSheetAction(
+          onPressed: () {
+            if (url == null || path == null) {
+              Get.back();
+
+              GlobalSnackBar.show(
+                  message: appText(context).strcannotDownloadText);
+            } else {
+              Get.back();
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return CustomDownloadDialog(
+                      url: url,
+                      path: path,
+                    );
+                  });
+            }
+          },
+          child: TextWidget(
+            text: appText(context).btnDownloadMedia,
+            fontSize: 16.sp,
+            color: color221,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       CupertinoActionSheetAction(
         onPressed: () {
-          if (url == null || path == null) {
-            Get.back();
-
-            GlobalSnackBar.show(
-                message: appText(context).strcannotDownloadText);
-          } else {
-            Get.back();
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return CustomDownloadDialog(
-                    url: url,
-                    path: path,
-                  );
-                });
-          }
-        },
-        child: TextWidget(
-          text: appText(context).btnDownloadMedia,
-          fontSize: 16.sp,
-          color: color221,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-      CupertinoActionSheetAction(
-        onPressed: () async {
           if (url == null || path == null) {
             Get.back();
             Share.share('$text');
           } else {
             Get.back();
-            final path = await DownloadProvider()
-                .downloadForShare(url, 'filename', context);
-            Share.shareXFiles([XFile(path!)]);
+            // final path = await DownloadProvider()
+            //     .downloadForShare(url, 'filename', context);
+            // if (path != null) {
+            Share.shareUri(Uri.parse(url));
+            // }
           }
         },
         child: TextWidget(
@@ -69,24 +76,38 @@ Future showMessageMennu({context, url, path, friendId, docId, text}) async {
           fontWeight: FontWeight.w400,
         ),
       ),
-      CupertinoActionSheetAction(
-          onPressed: () {
+      if (url == null || path == null)
+        CupertinoActionSheetAction(
+          onPressed: () async {
             Get.back();
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return CustomDeleteDialog(
-                    friendId: friendId,
-                    docId: docId,
-                  );
-                });
+            await chatProvider.enableEditing(docId, ghost.checkGhostMode);
           },
           child: TextWidget(
-            text: appText(context).btnDeleteMsg,
+            text: appText(context).edit,
             fontSize: 16.sp,
-            color: colorPrimaryA05,
+            color: color221,
             fontWeight: FontWeight.w400,
-          )),
+          ),
+        ),
+      CupertinoActionSheetAction(
+        onPressed: () {
+          Get.back();
+          showDialog(
+              context: context,
+              builder: (context) {
+                return CustomDeleteDialog(
+                  friendId: friendId,
+                  docId: docId,
+                );
+              });
+        },
+        child: TextWidget(
+          text: appText(context).btnDeleteMsg,
+          fontSize: 16.sp,
+          color: colorPrimaryA05,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
     ],
     cancelButton: CupertinoActionSheetAction(
       onPressed: () {

@@ -399,6 +399,7 @@
     "strPollOption": "Enter Option",
     "strFieldHintAddGroup": "Add Memmbers in ${groupname}",
     "strAddStory": "Add Story",
+    "edit": "Edit",
     "@strFieldHintAddGroup": {
         "placeholders": {
             "groupname": {

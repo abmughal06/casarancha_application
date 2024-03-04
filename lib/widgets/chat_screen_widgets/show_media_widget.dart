@@ -244,13 +244,6 @@ class ShowMediaToSendInChat extends StatelessWidget {
                           appUser: appUser,
                           notificationText: appText(context)
                               .strUnReadAttachment(media.unreadMessages),
-                          mediaType: media.photosList.isNotEmpty
-                              ? 'InChatPic'
-                              : media.videosList.isNotEmpty
-                                  ? 'InChatVideo'
-                                  : media.mediaList.isNotEmpty
-                                      ? 'InChatDoc'
-                                      : 'InChatMusic',
                         );
                       } else {
                         media.unreadMessages += 1;

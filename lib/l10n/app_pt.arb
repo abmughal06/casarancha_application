@@ -398,5 +398,6 @@
     "strPollQuestion": "Inserir pergunta",
     "strPollOption": "Inserir opção",
     "strFieldHintAddGroup": "Adicionar membros em ${groupname}",
-    "strAddStory": "Adicionar história"
+    "strAddStory": "Adicionar história",
+    "edit": "editar"
 }

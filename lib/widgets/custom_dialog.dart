@@ -58,8 +58,7 @@ class CustomDeleteDialog extends StatelessWidget {
         alertMsg: appText(context).strConfirmDeleteMedia,
         onAction: () {
           chat.deleteChat(
-            friendId: friendId,
-            docId: docId,
+            messageId: docId,
           );
           Get.back();
         },

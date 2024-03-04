@@ -76,18 +76,19 @@ class FirebaseMessagingService {
       String? groupId,
       required bool isMessage,
       required String notificationType,
-      required String appUserId}) async {
+      required String appUserId,
+      bool ghostmode = false}) async {
     Map<String, String> header = {
       "Content-Type": "application/json",
       "Authorization": serverKey,
     };
 
     var model = await getCurrentUserDetails();
-    var ghostmode = await ghostModeOn();
+    // var ghostmode = await ghostModeOn();
 
     Map officialBodyFormat = {
       "notification": {
-        "title": ghostmode ? "Ghost----" : model.name,
+        "title": ghostmode ? model.ghostName : model.name,
         "body": msg,
         "sound": "default"
       },
@@ -127,7 +128,7 @@ class FirebaseMessagingService {
         notificationType: notificationType,
         isRead: false,
         createdDetails: CreatorDetails(
-            name: ghostmode ? "Ghost----" : model.name,
+            name: ghostmode ? model.ghostName : model.name,
             imageUrl: ghostmode ? "" : model.imageStr,
             isVerified: model.isVerified),
         createdAt: DateTime.now().toUtc().toString(),

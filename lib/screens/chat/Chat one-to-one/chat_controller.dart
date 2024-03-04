@@ -95,6 +95,17 @@ class ChatProvider extends ChangeNotifier {
 
   final textFieldFocus = FocusNode();
 
+  String? appUserName;
+
+  setUserName(id) async {
+    var ref = FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .get()
+        .then((value) => value['name']);
+    appUserName = await ref;
+  }
+
   bool isExpanded = false;
   bool isReply = false;
   Message? replyingMessage;
@@ -128,6 +139,31 @@ class ChatProvider extends ChangeNotifier {
       return MessageType.doc;
     } else {
       return MessageType.text;
+    }
+  }
+
+  String getMediaType(String name) {
+    switch (name) {
+      case 'InChatPic':
+        return 'Photo';
+      case 'InChatVideo':
+        return 'Photo';
+      case 'InChatMusic':
+        return 'Music';
+      case 'Voice':
+        return 'Voice';
+      case 'Photo' || 'Video' || 'Quote' || 'Music':
+        return 'Post';
+      case 'Text':
+        return 'Text';
+      case 'Doc':
+        return 'Doc';
+      case 'StoryVideo':
+        return 'Story Video';
+      case 'StoryPic':
+        return 'Story Pic';
+      default:
+        return '';
     }
   }
 
@@ -183,6 +219,7 @@ class ChatProvider extends ChangeNotifier {
         notificationType: "msg",
         devRegToken: appUser.fcmToken,
         msg: textMessage,
+        ghostmode: false,
         isMessage: true,
       );
     } catch (e) {
@@ -193,12 +230,14 @@ class ChatProvider extends ChangeNotifier {
   enableReply(Message message) {
     isReply = true;
     replyingMessage = message;
+    textFieldFocus.requestFocus();
     notifyListeners();
   }
 
   disableReply() {
     isReply = false;
     replyingMessage = null;
+    textFieldFocus.unfocus();
     notifyListeners();
   }
 
@@ -240,7 +279,9 @@ class ChatProvider extends ChangeNotifier {
           type: checkMessageType().name,
           id: chatRef.id,
           content: textMessage,
-          caption: replyingMessage!.content,
+          caption: replyingMessage!.type == 'Text'
+              ? replyingMessage!.content
+              : getMediaType(replyingMessage!.type),
           isReply: isReply,
           createdAt: DateTime.now().toUtc().toString(),
         );
@@ -252,6 +293,71 @@ class ChatProvider extends ChangeNotifier {
         FirebaseMessagingService().sendNotificationToUser(
           appUserId: appUser.id,
           notificationType: "msg",
+          ghostmode: false,
+          devRegToken: appUser.fcmToken,
+          msg: textMessage,
+          isMessage: true,
+        );
+      }
+    } catch (e) {
+      GlobalSnackBar(message: e.toString());
+    } finally {
+      disableReply();
+    }
+  }
+
+  Future<void> replyMessageGhost(
+      {required UserModel appUser,
+      required UserModel currentUser,
+      bool? firstMessageByMe}) async {
+    try {
+      if (isReply && replyingMessage != null) {
+        var textMessage = messageController.text;
+        messageController.clear();
+        notifyListeners();
+
+        final messageRef = FirebaseFirestore.instance
+            .collection('ghost_messages')
+            .doc(getConversationDocId(currentUser.id, appUser.id));
+
+        final chatRef = messageRef.collection('chats').doc();
+
+        final newMessageDetails = GhostMessageDetails(
+          id: getConversationDocId(currentUser.id, appUser.id),
+          lastMessage: textMessage,
+          unreadMessageCount: unreadMessages + 1,
+          searchCharacters: [...currentUser.name.toLowerCase().split('')],
+          creatorDetails: CreatorDetails(
+            name: currentUser.name,
+            imageUrl: currentUser.imageStr,
+            isVerified: currentUser.isVerified,
+          ),
+          createdAt: DateTime.now().toUtc().toString(),
+          firstMessage: firstMessageByMe! ? currentUser.id : appUser.id,
+        );
+
+        final newMessage = Message(
+          sentById: FirebaseAuth.instance.currentUser!.uid,
+          sentToId: appUser.id,
+          isSeen: false,
+          type: checkMessageType().name,
+          id: chatRef.id,
+          content: textMessage,
+          caption: replyingMessage!.type == 'Text'
+              ? replyingMessage!.content
+              : getMediaType(replyingMessage!.type),
+          isReply: isReply,
+          createdAt: DateTime.now().toUtc().toString(),
+        );
+
+        messageRef.set(newMessageDetails.toMap());
+
+        chatRef.set(newMessage.toMap());
+
+        FirebaseMessagingService().sendNotificationToUser(
+          appUserId: appUser.id,
+          notificationType: "msg",
+          ghostmode: false,
           devRegToken: appUser.fcmToken,
           msg: textMessage,
           isMessage: true,
@@ -322,6 +428,7 @@ class ChatProvider extends ChangeNotifier {
         devRegToken: appUser.fcmToken,
         isMessage: true,
         notificationType: "msg",
+        ghostmode: true,
         msg: messageController.text,
       );
 
@@ -385,7 +492,6 @@ class ChatProvider extends ChangeNotifier {
   sendMediaMessage({
     UserModel? currentUser,
     UserModel? appUser,
-    // String? mediaType,
     String? notificationText,
   }) async {
     allMediaFiles = [
@@ -459,6 +565,7 @@ class ChatProvider extends ChangeNotifier {
         appUserId: appUser.id,
         devRegToken: appUser.fcmToken,
         msg: notificationText,
+        ghostmode: false,
         isMessage: true,
       );
     } catch (e) {
@@ -469,7 +576,6 @@ class ChatProvider extends ChangeNotifier {
   sendMediaMessageGhost({
     UserModel? currentUser,
     UserModel? appUser,
-    String? mediaType,
     bool? firstMessage,
     String? notificationText,
   }) async {
@@ -481,40 +587,26 @@ class ChatProvider extends ChangeNotifier {
       ...voiceList,
     ];
 
+    var mediaType = checkMessageType().name;
+
     photosList.clear();
     videosList.clear();
     musicList.clear();
     mediaList.clear();
     voiceList.clear();
     try {
-      final messageRefForCurrentUser = userRef
-          .doc(currentUser!.id)
-          .collection('ghostMessageList')
-          .doc(appUser!.id)
-          .collection('messages')
-          .doc();
+      conversationId =
+          conversationId ?? getConversationDocId(currentUser!.id, appUser!.id);
+      final messageRef = FirebaseFirestore.instance
+          .collection('ghost_messages')
+          .doc(conversationId);
 
-      final messageRefForAppUser = userRef
-          .doc(appUser.id)
-          .collection('ghostMessageList')
-          .doc(currentUser.id)
-          .collection('messages')
-          .doc(
-            messageRefForCurrentUser.id,
-          );
-
-      final GhostMessageDetails appUserMessageDetails = GhostMessageDetails(
-        id: appUser.id,
-        lastMessage: mediaType == 'InChatVideo'
-            ? "Video"
-            : mediaType == 'InChatPic'
-                ? "Photo"
-                : mediaType == 'InChatDoc'
-                    ? "Doc"
-                    : 'Music',
+      final GhostMessageDetails messageDetails = GhostMessageDetails(
+        id: messageRef.id,
+        lastMessage: mediaType,
         unreadMessageCount: 0,
-        firstMessage: firstMessage! ? currentUser.id : appUser.id,
-        searchCharacters: [...appUser.name.toLowerCase().split('')],
+        firstMessage: firstMessage! ? currentUser!.id : appUser!.id,
+        searchCharacters: [...appUser!.name.toLowerCase().split('')],
         creatorDetails: CreatorDetails(
           name: appUser.name,
           imageUrl: appUser.imageStr,
@@ -523,76 +615,39 @@ class ChatProvider extends ChangeNotifier {
         createdAt: DateTime.now().toUtc().toString(),
       );
 
-      final GhostMessageDetails currentUserMessageDetails = GhostMessageDetails(
-        id: currentUser.id,
-        lastMessage: mediaType == 'InChatVideo'
-            ? "Video"
-            : mediaType == 'InChatPic'
-                ? "Photo"
-                : mediaType == 'InChatDoc'
-                    ? "Doc"
-                    : 'Music',
-        unreadMessageCount: unreadMessages + 1,
-        firstMessage: firstMessage ? currentUser.id : appUser.id,
-        searchCharacters: [...currentUser.name.toLowerCase().split('')],
-        creatorDetails: CreatorDetails(
-          name: currentUser.name,
-          imageUrl: currentUser.imageStr,
-          isVerified: currentUser.isVerified,
-        ),
-        createdAt: DateTime.now().toUtc().toString(),
-      );
-
-      // if (!isChatExits.value) {
-      await userRef
-          .doc(currentUser.id)
-          .collection('ghostMessageList')
-          .doc(appUser.id)
-          .set(
-            appUserMessageDetails.toMap(),
-          );
+      final chatRef = messageRef.collection('chats').doc();
 
       final Message tempMessage = Message(
-        id: messageRefForCurrentUser.id,
+        id: chatRef.id,
         sentToId: appUser.id,
         isReply: false,
-        sentById: currentUser.id,
+        sentById: currentUser!.id,
         content: 'uploading',
         caption: 'uploading',
-        type: '$mediaType',
+        type: mediaType,
         createdAt: DateTime.now().toUtc().toString(),
         isSeen: false,
       );
-      messageRefForCurrentUser.set(tempMessage.toMap());
+      await chatRef.set(tempMessage.toMap());
 
-      await uploadMediaFiles(recieverId: currentUser.id, fileType: mediaType!);
+      await uploadMediaFiles(recieverId: currentUser.id, fileType: mediaType);
 
-      await userRef
-          .doc(appUser.id)
-          .collection('ghostMessageList')
-          .doc(currentUser.id)
-          .set(
-            currentUserMessageDetails.toMap(),
-          );
+      var message = tempMessage.copyWith(
+        caption: '',
+        content: mediaData.map((e) => e.toMap()).toList(),
+      );
+      messageRef.set(messageDetails.toMap());
+      chatRef.update(message.toMap());
 
-      // log(message.toString());
-
-      final message = tempMessage.copyWith(
-          caption: '', content: mediaData.map((e) => e.toMap()).toList());
-
-      final appUserMessage = message.copyWith(id: messageRefForAppUser.id);
-
-      messageRefForCurrentUser.set(message.toMap());
-      messageRefForAppUser.set(appUserMessage.toMap());
       clearLists();
 
       FirebaseMessagingService().sendNotificationToUser(
-        appUserId: appUser.id,
-        isMessage: true,
-        devRegToken: appUser.fcmToken,
-        notificationType: "msg",
-        msg: notificationText,
-      );
+          appUserId: appUser.id,
+          isMessage: true,
+          devRegToken: appUser.fcmToken,
+          notificationType: "msg",
+          msg: notificationText,
+          ghostmode: true);
     } catch (e) {
       log(e.toString());
     }
@@ -637,8 +692,6 @@ class ChatProvider extends ChangeNotifier {
     //   ...mediaList,
     //   ...voiceList,
     // ];
-
-    log(allMediaFiles.toString());
 
     final storageRef = FirebaseStorage.instance.ref();
     try {
@@ -845,13 +898,14 @@ class ChatProvider extends ChangeNotifier {
     if (!await audioRecorder.hasPermission()) {
       return;
     }
+    isRecording = true;
+    notifyListeners();
     final dir = await getTemporaryDirectory();
-    Timer(const Duration(seconds: 1), () async {
+    Timer(const Duration(milliseconds: 500), () async {
       await audioRecorder.start(
         path: "${dir.path}/$filename.m4a",
       );
-      isRecording = true;
-      notifyListeners();
+
       startTimer();
     });
   }
@@ -937,19 +991,78 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  deleteChat({friendId, docId}) {
+  deleteChat({messageId}) async {
     try {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection('messageList')
-          .doc(friendId)
-          .collection('messages')
-          .doc(docId)
-          .delete();
+      final messageRef =
+          FirebaseFirestore.instance.collection('messages').doc(conversationId);
+      final chatRef = messageRef.collection('chats').doc(messageId);
+
+      await messageRef.collection('chats').get().then((messages) async {
+        if (messages.docs.length > 1) {
+          chatRef.delete();
+          MessageDetails lastMessage;
+          await messageRef.get().then((value) {
+            lastMessage = MessageDetails.fromMap(value.data());
+            final newMessage =
+                lastMessage.copyWith(lastMessage: 'Last message deleted');
+            messageRef.update(newMessage.toMap());
+          });
+        } else {
+          chatRef.delete();
+          messageRef.delete();
+        }
+      });
     } catch (e) {
       GlobalSnackBar.show(message: e.toString());
       printLog(e.toString());
     } finally {}
+  }
+
+  bool isMessageEditing = false;
+  String? editMessageId;
+
+  enableEditing(messageId, isGhost) async {
+    isMessageEditing = true;
+    final messageRef = FirebaseFirestore.instance
+        .collection(isGhost ? 'ghost_messages' : 'messages')
+        .doc(conversationId);
+    final chatRef = messageRef.collection('chats').doc(messageId);
+    editMessageId = messageId;
+    Message lastMessage;
+    await chatRef.get().then((value) {
+      lastMessage = Message.fromMap(value.data()!);
+      messageController.text = lastMessage.content;
+      editMessageId = messageId;
+      textFieldFocus.requestFocus();
+      // final newMessage =
+      //     lastMessage.copyWith(content: messageController.text.trim());
+      // chatRef.update(newMessage.toMap());
+    });
+    notifyListeners();
+  }
+
+  editMessage(isGhost, messageId) async {
+    try {
+      final messageRef = FirebaseFirestore.instance
+          .collection(isGhost ? 'ghost_messages' : 'messages')
+          .doc(conversationId);
+      final chatRef = messageRef.collection('chats').doc(messageId);
+
+      Message lastMessage;
+      await chatRef.get().then((value) {
+        lastMessage = Message.fromMap(value.data()!);
+        final newMessage =
+            lastMessage.copyWith(content: messageController.text.trim());
+        chatRef.update(newMessage.toMap());
+      });
+    } catch (e) {
+      GlobalSnackBar.show(message: e.toString());
+      printLog(e.toString());
+    } finally {
+      isMessageEditing = false;
+      editMessageId = null;
+      messageController.clear();
+      notifyListeners();
+    }
   }
 }
