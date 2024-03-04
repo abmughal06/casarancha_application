@@ -32,7 +32,7 @@ class _AccountRecoveryState extends State<AccountRecovery> {
           ? centerLoader()
           : currentUser.email.isEmpty
               ? const RegisterAndLinkEmail()
-              : const ShowRegisteredEmail(),
+              : ShowRegisteredEmail(email: currentUser.email),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FirebaseAuth
                       .instance.currentUser!.providerData[0].providerId ==
@@ -183,6 +183,7 @@ class _RegisterAndLinkEmailState extends State<RegisterAndLinkEmail> {
         heightBox(20),
         CommonButton(
           text: appText(context).strSave,
+          showLoading: context.watch<AuthenticationProvider>().isSigningIn,
           horizontalOutMargin: 0,
           onTap: () {
             context.read<AuthenticationProvider>().linkPhoneWithEmailAccount(
@@ -383,7 +384,8 @@ class _UpdateEmailState extends State<UpdateEmail> {
 }
 
 class ShowRegisteredEmail extends StatelessWidget {
-  const ShowRegisteredEmail({super.key});
+  const ShowRegisteredEmail({super.key, required this.email});
+  final String email;
 
   @override
   Widget build(BuildContext context) {
@@ -401,7 +403,7 @@ class ShowRegisteredEmail extends StatelessWidget {
               fontSize: 12,
             ),
             SelectableTextWidget(
-              text: FirebaseAuth.instance.currentUser!.email,
+              text: email,
               color: Colors.blueAccent,
             ),
             heightBox(12.h),

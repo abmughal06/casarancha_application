@@ -251,6 +251,10 @@ class AuthenticationProvider extends ChangeNotifier {
               email: oldEmail.trim(), password: password.trim());
       if (userCredential.user != null) {
         await userCredential.user?.updateEmail(newEmail.trim());
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .update({'email': newEmail.trim()});
       }
     } on FirebaseAuthException catch (e) {
       isSigningIn = false;
@@ -384,18 +388,17 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
       final credential =
           EmailAuthProvider.credential(email: email, password: password);
-      final userCredential = await FirebaseAuth.instance.currentUser
-          ?.linkWithCredential(credential);
-
-      if (userCredential != null) {
-        GlobalSnackBar.show(message: appText(context).strAccountLinkedSuccess);
+      await FirebaseAuth.instance.currentUser
+          ?.linkWithCredential(credential)
+          .whenComplete(() async {
         await FirebaseFirestore.instance
             .collection("users")
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .update({
           "email": email,
         });
-      }
+        // GlobalSnackBar.show(message: appText(context).strAccountLinkedSuccess);
+      });
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "provider-already-linked":

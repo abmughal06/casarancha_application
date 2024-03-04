@@ -81,13 +81,15 @@ class CheckMediaAndShowPost extends StatelessWidget {
                     postModel: postModel,
                     groupId: groupId,
                   )),
-          child: CachedNetworkImage(
-            progressIndicatorBuilder: (context, url, progress) => Container(
-              color: colorBlack.withOpacity(0.04),
-              // width: MediaQuery.of(context).size.width,
-              // height: double.parse(mediaData.imageHeight!),
+          child: AspectRatio(
+            aspectRatio: double.parse(mediaData.imageWidth!) /
+                double.parse(mediaData.imageHeight!),
+            child: CachedNetworkImage(
+              progressIndicatorBuilder: (context, url, progress) => Container(
+                color: colorBlack.withOpacity(0.04),
+              ),
+              imageUrl: mediaData.link,
             ),
-            imageUrl: mediaData.link,
           ),
         );
 
@@ -382,6 +384,47 @@ class PostFullScreenView extends StatelessWidget {
     );
   }
 }
+
+// Widget _buildFeaturedCards(
+//     {required List<MediaDetails> product,
+//     postId,
+//     ondoubleTap,
+//     postModel,
+//     isPostDetail,
+//     groupId}) {
+//   final cards = <Widget>[];
+//   Widget feautredCards;
+
+//   if (product.isNotEmpty) {
+//     for (int i = 0; i < product.length; i++) {
+//       cards.add(
+//         CheckMediaAndShowPost(
+//             mediaData: product[i],
+//             postId: postId,
+//             ondoubleTap: ondoubleTap,
+//             postModel: postModel,
+//             isPostDetail: isPostDetail,
+//             groupId: groupId),
+//       );
+//       // print(product.length);
+//     }
+//     feautredCards = Container(
+//       padding: const EdgeInsets.only(top: 16, bottom: 8),
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: <Widget>[
+//           SingleChildScrollView(
+//             scrollDirection: Axis.horizontal,
+//             child: Row(children: cards),
+//           ),
+//         ],
+//       ),
+//     );
+//   } else {
+//     feautredCards = Container();
+//   }
+//   return feautredCards;
+// }
 
 class ProfilePostFullScreenView extends StatefulWidget {
   const ProfilePostFullScreenView({

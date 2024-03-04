@@ -364,7 +364,7 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  static Stream<List<NotificationModel>?>? notficationLength() {
+  static Stream<int>? notficationLength() {
     try {
       if (FirebaseAuth.instance.currentUser?.uid == null) {
         return null;
@@ -379,13 +379,14 @@ class DataProvider extends ChangeNotifier {
               .where(
                 (element) =>
                     element.data().isNotEmpty &&
-                    element.data()['sentById'] != null &&
-                    element.data()['sentById'] !=
-                        FirebaseAuth.instance.currentUser!.uid &&
+                    // element.data()['sentById'] != null &&
+                    // element.data()['sentById'] !=
+                    //     FirebaseAuth.instance.currentUser!.uid &&
                     element.data()['isRead'] == false,
               )
               .map((e) => NotificationModel.fromMap(e.data()))
-              .toList());
+              .toList()
+              .length);
     } catch (e) {
       rethrow;
     }
@@ -549,6 +550,7 @@ class DataProvider extends ChangeNotifier {
           .map(
             (event) => event.docs
                 .where((element) =>
+                    element.data()['content'].isNotEmpty &&
                     element.data()['sentById'] !=
                         FirebaseAuth.instance.currentUser!.uid &&
                     !element.data()['isSeen'])
@@ -598,6 +600,7 @@ class DataProvider extends ChangeNotifier {
             var data = chatDoc.data() as Map<String,
                 dynamic>?; // Explicit cast to Map<String, dynamic>
             return data != null &&
+                data['content'].isNotEmpty &&
                 data['sentToId'] == currentUserUID &&
                 data['isSeen'] == false;
           },
@@ -858,7 +861,7 @@ class DataProvider extends ChangeNotifier {
 
   Stream<GroupModel>? singleGroup(groupId) {
     try {
-      if (FirebaseAuth.instance.currentUser?.uid == null) {
+      if (FirebaseAuth.instance.currentUser?.uid == null || groupId == null) {
         return null;
       }
       return FirebaseFirestore.instance

@@ -42,6 +42,7 @@ class HomeScreen extends StatelessWidget {
             : NestedScrollView(
                 key: const PageStorageKey(10),
                 controller: ghostProvider.scrollController,
+                physics: const BouncingScrollPhysics(),
                 floatHeaderSlivers: true,
                 headerSliverBuilder: (context, innerBoxIsScrolled) {
                   isScrolled(innerBoxIsScrolled);
@@ -78,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                             value: DataProvider.notficationLength(),
                             initialData: null,
                             catchError: (context, error) => null,
-                            child: Consumer<List<Notification>?>(
+                            child: Consumer<int?>(
                               builder: (context, notification, b) {
                                 if (notification == null) {
                                   return IconButton(
@@ -90,14 +91,15 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                   );
                                 }
-                                var count = notification.length.toString();
+                                var count = notification;
+                                // print(count);
                                 return IconButton(
                                   onPressed: () {
                                     Get.to(() => const NotificationScreen());
                                   },
                                   icon: Badge(
-                                    label: Text(count),
-                                    isLabelVisible: notification.isNotEmpty,
+                                    label: Text(count.toString()),
+                                    isLabelVisible: count > 0,
                                     child: SvgPicture.asset(
                                       icNotifyBell,
                                     ),

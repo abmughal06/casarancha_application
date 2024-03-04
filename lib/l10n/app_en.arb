@@ -270,7 +270,7 @@
     "strOk": "OK",
     "strWait": "Wait",
     "strShareStory": "Share Story",
-    "strAdminContact": "Your message is sent to admin, he will contact you soon.",
+    "strAdminContact": "Your message is sent to admin.\nAdmin will respond in the order the message was received.",
     "strUploadDocuments": "Upload Other Documents\n(Optional)",
     "strSendVerify": "Send for verification",
     "strContact": "We will contact you shortly",

@@ -83,124 +83,116 @@ class _ChatInputFieldGhostState extends State<ChatInputFieldGhost> {
                         isRecordingSend: chatProvider.isRecordingSend,
                         duration: formatTime(chatProvider.durationInSeconds)),
                   if (!chatProvider.textFieldFocus.hasFocus)
-                    Row(
-                      children: [
-                        widthBox(12.w),
-                        chatProvider.isRecorderLock
-                            ? GestureDetector(
-                                onTap: () {
-                                  chatProvider.stopRecording(
-                                      currentUser: currentUser,
-                                      appUser: appUser,
-                                      firstMessageByWho: widget.firstMessage,
-                                      isGhostMessage: true);
+                    Row(children: [
+                      widthBox(12.w),
+                      chatProvider.isRecorderLock
+                          ? GestureDetector(
+                              onTap: () {
+                                chatProvider.stopRecording(
+                                    currentUser: currentUser,
+                                    appUser: appUser,
+                                    firstMessageByWho: widget.firstMessage,
+                                    isGhostMessage: true);
+                              },
+                              child: const Icon(
+                                CupertinoIcons.arrow_turn_right_up,
+                                color: colorPrimaryA05,
+                              ))
+                          : Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: GestureDetector(
+                                onLongPressStart: (c) async {
+                                  if (ghostProvider.checkGhostMode) {
+                                    if (await chatProvider.audioRecorder
+                                        .hasPermission()) {
+                                      chatProvider.startRecording();
+                                    }
+                                    isRecordingDelete = false;
+                                  } else {
+                                    GlobalSnackBar.show(
+                                        message: appText(context)
+                                            .strEnableGhModeAudio);
+                                  }
+                                },
+                                onLongPressMoveUpdate: (details) {
+                                  if (ghostProvider.checkGhostMode) {
+                                    final dragDistanceHor =
+                                        details.localPosition.dx;
+                                    final dragDistanceVer =
+                                        details.localPosition.dy;
+
+                                    if (dragDistanceHor < -50) {
+                                      chatProvider.deleteRecording();
+                                      isRecordingDelete = true;
+                                    }
+                                    if (dragDistanceVer < -20) {
+                                      chatProvider.toggleRecorderLock();
+                                    }
+                                  } else {
+                                    GlobalSnackBar.show(
+                                        message: appText(context)
+                                            .strEnableGhModeAudio);
+                                  }
+                                },
+                                onLongPressEnd: (details) {
+                                  if (ghostProvider.checkGhostMode) {
+                                    if (!isRecordingDelete) {
+                                      chatProvider.unreadMessages += 1;
+                                      chatProvider.stopRecording(
+                                        currentUser: currentUser,
+                                        appUser: appUser,
+                                        notificationText: appText(context)
+                                            .strUnReadVoiceMessages(
+                                                chatProvider.unreadMessages),
+                                        firstMessageByWho: widget.firstMessage,
+                                        isGhostMessage: true,
+                                      );
+                                    }
+                                  } else {
+                                    GlobalSnackBar.show(
+                                        message: appText(context)
+                                            .strEnableGhModeAudio);
+                                  }
                                 },
                                 child: const Icon(
-                                  CupertinoIcons.arrow_turn_right_up,
-                                  color: colorPrimaryA05,
-                                ))
-                            : Padding(
-                                padding: const EdgeInsets.only(right: 5),
-                                child: GestureDetector(
-                                  onLongPressStart: (c) async {
-                                    if (ghostProvider.checkGhostMode) {
-                                      if (await chatProvider.audioRecorder
-                                          .hasPermission()) {
-                                        chatProvider.startRecording();
-                                      }
-                                      isRecordingDelete = false;
-                                    } else {
-                                      GlobalSnackBar.show(
-                                          message: appText(context)
-                                              .strEnableGhModeAudio);
-                                    }
-                                  },
-                                  onLongPressMoveUpdate: (details) {
-                                    if (ghostProvider.checkGhostMode) {
-                                      final dragDistanceHor =
-                                          details.localPosition.dx;
-                                      final dragDistanceVer =
-                                          details.localPosition.dy;
-
-                                      if (dragDistanceHor < -50) {
-                                        chatProvider.deleteRecording();
-                                        isRecordingDelete = true;
-                                      }
-                                      if (dragDistanceVer < -20) {
-                                        chatProvider.toggleRecorderLock();
-                                      }
-                                    } else {
-                                      GlobalSnackBar.show(
-                                          message: appText(context)
-                                              .strEnableGhModeAudio);
-                                    }
-                                  },
-                                  onLongPressEnd: (details) {
-                                    if (ghostProvider.checkGhostMode) {
-                                      if (!isRecordingDelete) {
-                                        chatProvider.unreadMessages += 1;
-                                        chatProvider.stopRecording(
-                                          currentUser: currentUser,
-                                          appUser: appUser,
-                                          notificationText: appText(context)
-                                              .strUnReadVoiceMessages(
-                                                  chatProvider.unreadMessages),
-                                          firstMessageByWho:
-                                              widget.firstMessage,
-                                          isGhostMessage: true,
-                                        );
-                                      }
-                                    } else {
-                                      GlobalSnackBar.show(
-                                          message: appText(context)
-                                              .strEnableGhModeAudio);
-                                    }
-                                  },
-                                  child: const Icon(
-                                    Icons.mic_none_sharp,
-                                    color: color080,
-                                  ),
+                                  Icons.mic_none_sharp,
+                                  color: color080,
                                 ),
-                              )
-                      ],
-                    ),
+                              ),
+                            )
+                    ]),
                   if (chatProvider.textFieldFocus.hasFocus)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                          onTap: () {
-                            chatProvider.unreadMessages += 1;
-                            // print('sent');
-                            ghostProvider.checkGhostMode
-                                ? chatProvider.isReply
-                                    ? chatProvider.replyMessageGhost(
-                                        appUser: appUser,
-                                        currentUser: currentUser,
-                                        firstMessageByMe: widget.firstMessage,
+                    IconButton(
+                      onPressed: () {
+                        chatProvider.unreadMessages += 1;
+                        ghostProvider.checkGhostMode
+                            ? chatProvider.isReply
+                                ? chatProvider.replyMessageGhost(
+                                    appUser: appUser,
+                                    currentUser: currentUser,
+                                    firstMessageByMe: widget.firstMessage,
+                                  )
+                                : chatProvider.isMessageEditing
+                                    ? chatProvider.editMessage(
+                                        true,
+                                        chatProvider.editMessageId,
                                       )
-                                    : chatProvider.isMessageEditing
-                                        ? chatProvider.editMessage(
-                                            true,
-                                            chatProvider.editMessageId,
-                                          )
-                                        : chatProvider.sentMessageGhost(
-                                            currentUser: currentUser,
-                                            appUser: appUser,
-                                            firstMessageByMe:
-                                                widget.firstMessage,
-                                            notificationText: appText(context)
-                                                .strUnReadMessagesInGhost(
-                                                    chatProvider
-                                                        .unreadMessages))
-                                : GlobalSnackBar.show(
-                                    message: appText(context)
-                                        .strEnableGhModeMessage);
-                          },
-                          child: const Icon(
-                            CupertinoIcons.arrow_turn_right_up,
-                            color: colorPrimaryA05,
-                          )),
-                    )
+                                    : chatProvider.sentMessageGhost(
+                                        currentUser: currentUser,
+                                        appUser: appUser,
+                                        firstMessageByMe: widget.firstMessage,
+                                        notificationText: appText(context)
+                                            .strUnReadMessagesInGhost(
+                                                chatProvider.unreadMessages))
+                            : GlobalSnackBar.show(
+                                message:
+                                    appText(context).strEnableGhModeMessage);
+                      },
+                      icon: const Icon(
+                        CupertinoIcons.arrow_turn_right_up,
+                        color: colorPrimaryA05,
+                      ),
+                    ),
                 ],
               ),
             ),

@@ -63,8 +63,8 @@ class ShowMediaToSendInChat extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
+      body: ListView(
+        // mainAxisSize: MainAxisSize.max,
         children: [
           heightBox(15.h),
           SizedBox(
@@ -220,69 +220,77 @@ class ShowMediaToSendInChat extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: appText(context).strWriteCommentHere,
-                hintStyle: TextStyle(
-                  color: colorWhite,
-                  fontSize: 14.sp,
-                  fontFamily: strFontName,
-                  fontWeight: FontWeight.w400,
-                ),
-                suffixIcon: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  child: svgImgButton(
-                    svgIcon: icStoryCmtSend,
-                    onTap: () {
-                      if (isGhost) {
-                        media.unreadMessages += 1;
-                        media.sendMediaMessageGhost(
-                          firstMessage: firstMessage,
-                          currentUser: currentUser,
-                          appUser: appUser,
-                          notificationText: appText(context)
-                              .strUnReadAttachment(media.unreadMessages),
-                        );
-                      } else {
-                        media.unreadMessages += 1;
-                        media.sendMediaMessage(
-                          currentUser: currentUser,
-                          appUser: appUser,
-                          notificationText: appText(context)
-                              .strUnReadAttachment(media.unreadMessages),
-                        );
-                      }
-                    },
-                  ),
-                ),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-                filled: true,
-                fillColor: Colors.transparent,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.0),
-                    borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.r),
-                  borderSide: BorderSide(
-                    color: colorWhite,
-                    width: 1.h,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.r),
-                  borderSide: BorderSide(
-                    color: colorWhite,
-                    width: 1.h,
-                  ),
-                ),
+          heightBox(30.h),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: TextField(
+          controller: media.messageController,
+          style: TextStyle(
+            color: colorWhite,
+            fontSize: 14.sp,
+            fontFamily: strFontName,
+            fontWeight: FontWeight.w400,
+          ),
+          decoration: InputDecoration(
+            hintText: appText(context).strWriteCommentHere,
+            hintStyle: TextStyle(
+              color: colorWhite,
+              fontSize: 14.sp,
+              fontFamily: strFontName,
+              fontWeight: FontWeight.w400,
+            ),
+            suffixIcon: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              child: svgImgButton(
+                svgIcon: icStoryCmtSend,
+                onTap: () {
+                  if (isGhost) {
+                    media.unreadMessages += 1;
+                    media.sendMediaMessageGhost(
+                      firstMessage: firstMessage,
+                      currentUser: currentUser,
+                      appUser: appUser,
+                      notificationText: appText(context)
+                          .strUnReadAttachment(media.unreadMessages),
+                    );
+                  } else {
+                    media.unreadMessages += 1;
+                    media.sendMediaMessage(
+                      currentUser: currentUser,
+                      appUser: appUser,
+                      notificationText: appText(context)
+                          .strUnReadAttachment(media.unreadMessages),
+                    );
+                  }
+                },
+              ),
+            ),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            filled: true,
+            fillColor: Colors.transparent,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30.r),
+              borderSide: BorderSide(
+                color: colorWhite,
+                width: 1.h,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30.r),
+              borderSide: BorderSide(
+                color: colorWhite,
+                width: 1.h,
               ),
             ),
           ),
-          heightBox(30.h),
-        ],
+        ),
       ),
     );
   }

@@ -171,6 +171,9 @@ class ChatProvider extends ChangeNotifier {
     UserModel? currentUser,
     UserModel? appUser,
   }) async {
+    if (messageController.text.isEmpty) {
+      return;
+    }
     try {
       var textMessage = messageController.text;
       messageController.clear();
@@ -538,11 +541,13 @@ class ChatProvider extends ChangeNotifier {
         sentById: currentUser.id,
         isReply: false,
         content: 'upload',
-        caption: 'uploading',
+        caption: messageController.text,
         type: mediaType,
         createdAt: DateTime.now().toUtc().toString(),
         isSeen: false,
       );
+      messageController.clear();
+      notifyListeners();
 
       chatRef.set(tempMessage.toMap());
 
@@ -550,7 +555,6 @@ class ChatProvider extends ChangeNotifier {
           .whenComplete(() => null);
 
       var message = tempMessage.copyWith(
-        caption: '',
         content: mediaData.map((e) => e.toMap()).toList(),
       );
       messageRef.set(messageDetails.toMap());
