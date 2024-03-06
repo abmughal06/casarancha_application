@@ -1,3 +1,4 @@
+import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
@@ -58,16 +59,30 @@ class ChatUserListTile extends StatelessWidget {
                           verifyBadge(personDetail.isVerified)
                         ],
                       ),
-                      subtitle: TextWidget(
-                        onTap: ontapTile,
-                        text: message.lastMessage,
-                        textOverflow: TextOverflow.ellipsis,
-                        fontWeight:
-                            length > 0 ? FontWeight.w700 : FontWeight.w400,
-                        fontSize: 14.sp,
-                        color: length > 0
-                            ? const Color(0xff000000)
-                            : const Color(0xff8a8a8a),
+                      subtitle: StreamProvider.value(
+                        value: DataProvider().messages(message.id, false),
+                        initialData: null,
+                        catchError: (c, b) => null,
+                        child: Consumer<List<Message>?>(
+                            builder: (context, msg, b) {
+                          return msg == null
+                              ? widthBox(0)
+                              : TextWidget(
+                                  onTap: ontapTile,
+                                  text: msg.first.type == 'Text'
+                                      ? msg.first.content
+                                      : ChatProvider()
+                                          .getMediaType(msg.first.type),
+                                  textOverflow: TextOverflow.ellipsis,
+                                  fontWeight: length > 0
+                                      ? FontWeight.w700
+                                      : FontWeight.w400,
+                                  fontSize: 14.sp,
+                                  color: length > 0
+                                      ? const Color(0xff000000)
+                                      : const Color(0xff8a8a8a),
+                                );
+                        }),
                       ),
                       leading: ProfilePic(
                         pic: personDetail.imageStr,
@@ -160,17 +175,30 @@ class GhostChatListTile extends StatelessWidget {
                               )
                             ],
                           ),
-                          subtitle: TextWidget(
-                            onTap: ontapTile,
-                            text: messageDetails.lastMessage,
-                            textOverflow: TextOverflow.ellipsis,
-                            fontWeight: !(length > 0)
-                                ? FontWeight.w400
-                                : FontWeight.w700,
-                            fontSize: 14.sp,
-                            color: !(length > 0)
-                                ? const Color(0xff8a8a8a)
-                                : const Color(0xff000000),
+                          subtitle: StreamProvider.value(
+                            value: DataProvider()
+                                .messages(messageDetails.id, true),
+                            initialData: null,
+                            catchError: (c, b) => null,
+                            child: Consumer<List<Message>?>(
+                                builder: (context, msg, b) {
+                              return msg == null
+                                  ? widthBox(0)
+                                  : TextWidget(
+                                      onTap: ontapTile,
+                                      text: msg.first.type == 'Text'
+                                          ? msg.first.content
+                                          : msg.first.type,
+                                      textOverflow: TextOverflow.ellipsis,
+                                      fontWeight: length > 0
+                                          ? FontWeight.w700
+                                          : FontWeight.w400,
+                                      fontSize: 14.sp,
+                                      color: length > 0
+                                          ? const Color(0xff000000)
+                                          : const Color(0xff8a8a8a),
+                                    );
+                            }),
                           ),
                           leading: ProfilePic(
                             pic: user.imageStr,
@@ -227,10 +255,6 @@ class GhostChatUserListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final users = context.watch<List<UserModel>?>();
-    // final user = users!
-    //     .where((element) => element.id == messageDetails.firstMessage)
-    //     .first;
     return StreamProvider.value(
       value: DataProvider().getSingleUser(messageDetails.id),
       initialData: null,

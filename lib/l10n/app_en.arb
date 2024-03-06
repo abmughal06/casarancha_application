@@ -400,6 +400,7 @@
     "strFieldHintAddGroup": "Add Memmbers in ${groupname}",
     "strAddStory": "Add Story",
     "edit": "Edit",
+    "unSendMessage": "Unsend Message",
     "@strFieldHintAddGroup": {
         "placeholders": {
             "groupname": {

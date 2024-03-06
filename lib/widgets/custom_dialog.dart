@@ -44,10 +44,12 @@ class CustomDeleteDialog extends StatelessWidget {
     super.key,
     required this.friendId,
     required this.docId,
+    this.isUnsend = false,
   });
 
   final String? friendId;
   final String? docId;
+  final bool isUnsend;
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +59,15 @@ class CustomDeleteDialog extends StatelessWidget {
         actiionBtnName: appText(context).strDelete,
         alertMsg: appText(context).strConfirmDeleteMedia,
         onAction: () {
-          chat.deleteChat(
-            messageId: docId,
-          );
+          if (isUnsend) {
+            chat.unsendMessage(
+              messageId: docId,
+            );
+          } else {
+            chat.deleteChat(
+              messageId: docId,
+            );
+          }
           Get.back();
         },
       );

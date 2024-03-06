@@ -62,11 +62,7 @@ Future showMessageMennu({context, url, path, friendId, docId, text}) async {
             Share.share('$text');
           } else {
             Get.back();
-            // final path = await DownloadProvider()
-            //     .downloadForShare(url, 'filename', context);
-            // if (path != null) {
             Share.shareUri(Uri.parse(url));
-            // }
           }
         },
         child: TextWidget(
@@ -89,6 +85,26 @@ Future showMessageMennu({context, url, path, friendId, docId, text}) async {
             fontWeight: FontWeight.w400,
           ),
         ),
+      CupertinoActionSheetAction(
+        onPressed: () {
+          Get.back();
+          showDialog(
+              context: context,
+              builder: (context) {
+                return CustomDeleteDialog(
+                  friendId: friendId,
+                  docId: docId,
+                  isUnsend: true,
+                );
+              });
+        },
+        child: TextWidget(
+          text: appText(context).unSendMessage,
+          fontSize: 16.sp,
+          color: colorPrimaryA05,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
       CupertinoActionSheetAction(
         onPressed: () {
           Get.back();
@@ -130,11 +146,14 @@ class MessageTiles extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (message.type) {
       case "InChatPic":
+        final pic = message.content != 'upload'
+            ? MediaDetails.fromMap(message.content[0])
+            : null;
         return InkWell(
           onLongPress: () {
             showMessageMennu(
               context: context,
-              url: message.content[0]['link'],
+              url: pic == null ? "" : pic.link,
               path: message.type,
               friendId: isMe ? message.sentToId : message.sentById,
               docId: message.id,
@@ -223,7 +242,7 @@ class MessageTiles extends StatelessWidget {
                 onLongPress: () {
                   showMessageMennu(
                     context: context,
-                    url: videos!.link,
+                    url: videos == null ? "" : videos.link,
                     path: message.type,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
@@ -308,15 +327,13 @@ class MessageTiles extends StatelessWidget {
         return !isUploading
             ? InkWell(
                 onLongPress: () {
-                  if (music != null) {
-                    showMessageMennu(
-                      context: context,
-                      url: music.link,
-                      path: message.type,
-                      friendId: isMe ? message.sentToId : message.sentById,
-                      docId: message.id,
-                    );
-                  }
+                  showMessageMennu(
+                    context: context,
+                    url: music == null ? "" : music.link,
+                    path: message.type,
+                    friendId: isMe ? message.sentToId : message.sentById,
+                    docId: message.id,
+                  );
                 },
                 child: ChatMusicTile(
                   key: music == null ? null : ValueKey(music.link),
@@ -366,15 +383,13 @@ class MessageTiles extends StatelessWidget {
             ? widthBox(0)
             : InkWell(
                 onLongPress: () {
-                  if (doc != null) {
-                    showMessageMennu(
-                      context: context,
-                      url: doc.link,
-                      path: message.type,
-                      friendId: isMe ? message.sentToId : message.sentById,
-                      docId: message.id,
-                    );
-                  }
+                  showMessageMennu(
+                    context: context,
+                    url: doc == null ? '' : doc.link,
+                    path: message.type,
+                    friendId: isMe ? message.sentToId : message.sentById,
+                    docId: message.id,
+                  );
                 },
                 child: ChatDocumentTile(
                   key: doc == null ? null : ValueKey(doc.link),
@@ -399,7 +414,7 @@ class MessageTiles extends StatelessWidget {
                 onLongPress: () {
                   showMessageMennu(
                     context: context,
-                    url: voice!.link,
+                    url: voice == null ? '' : voice.link,
                     path: message.type,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
@@ -485,7 +500,7 @@ class MessageTiles extends StatelessWidget {
           ),
         );
       default:
-        return Container();
+        return widthBox(0);
     }
   }
 }

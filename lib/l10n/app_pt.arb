@@ -399,5 +399,7 @@
     "strPollOption": "Inserir opção",
     "strFieldHintAddGroup": "Adicionar membros em ${groupname}",
     "strAddStory": "Adicionar história",
-    "edit": "editar"
+    "edit": "editar",
+    "unSendMessage": "cancelar envio de mensagem"
+
 }

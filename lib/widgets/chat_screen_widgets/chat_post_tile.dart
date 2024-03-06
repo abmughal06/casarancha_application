@@ -144,7 +144,7 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                         ),
                       ),
                     ),
-                    if (widget.caption != null)
+                    if (widget.caption != null && widget.caption!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
@@ -251,7 +251,7 @@ class ChatMusicTile extends StatelessWidget {
                             border: 16,
                             isMe: isMe,
                           ),
-                          if (caption != null)
+                          if (caption != null && caption!.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
@@ -482,7 +482,7 @@ class ChatDocumentTile extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            if (caption != null)
+                            if (caption != null && caption!.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 4),

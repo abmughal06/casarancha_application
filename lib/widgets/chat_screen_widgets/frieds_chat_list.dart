@@ -87,7 +87,6 @@ class _FriendChatListState extends State<FriendChatList> {
                               message: messages[index],
                               ontapTile: () => Get.to(
                                 () => ChatScreen(
-                                  // messageDetails: messages[index],
                                   appUserId:
                                       messages[index].id.split('_').last ==
                                               currentUserUID
