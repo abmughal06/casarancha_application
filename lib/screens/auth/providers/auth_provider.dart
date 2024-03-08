@@ -239,10 +239,11 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateEmail(
-      {required String oldEmail,
-      required String password,
-      required String newEmail}) async {
+  Future<void> updateEmail({
+    required String oldEmail,
+    required String password,
+    required String newEmail,
+  }) async {
     try {
       isSigningIn = true;
       notifyListeners();
@@ -261,7 +262,8 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
 
       GlobalSnackBar.show(
-          message: appText(context).strAuthErrorMessage(e.message!));
+        message: e.message,
+      );
     } catch (e) {
       isSigningIn = false;
       notifyListeners();

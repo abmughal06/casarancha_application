@@ -42,7 +42,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
               allUsers.where((element) => element.id == widget.appUserId).first;
           return TapRegion(
             onTapOutside: (event) {
-              chatProvider.textFieldFocus.unfocus();
+              // chatProvider.textFieldFocus.unfocus();
               // chatProvider.notifyUI();
             },
             child: Container(

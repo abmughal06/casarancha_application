@@ -1,6 +1,6 @@
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/widgets/video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:native_video_view/native_video_view.dart';
 
 class FullScreenVideoPlayer extends StatelessWidget {
   const FullScreenVideoPlayer({super.key, required this.videoLink});
@@ -16,20 +16,12 @@ class FullScreenVideoPlayer extends StatelessWidget {
       ),
       body: SafeArea(
         child: Center(
-          child: NativeVideoView(
-            useExoPlayer: false,
-            showMediaController: true,
-            enableVolumeControl: true,
-            keepAspectRatio: false,
-            onCreated: (controller) {
-              controller.setVideoSource(videoLink,
-                  sourceType: VideoSourceType.network);
-              controller.play();
-            },
-            onPrepared: (con, info) {},
-            onCompletion: (con) {},
-          ),
-        ),
+            child: CustomVideoPlayer(
+          videoUrl: videoLink,
+          videoAspectRatio: 9 / 16,
+          isPostDetail: false,
+          onVisible: () {},
+        )),
       ),
     );
   }

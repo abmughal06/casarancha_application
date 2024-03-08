@@ -121,7 +121,7 @@ class NewGroupProvider extends ChangeNotifier {
     }
   }
 
-  requestPrivateGroup({id, groupId}) async {
+  Future<void> requestPrivateGroup({id, groupId}) async {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
         {
@@ -139,7 +139,7 @@ class NewGroupProvider extends ChangeNotifier {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
         {
-          'joinRequestIds': FieldValue.arrayUnion([id])
+          'joinRequestIds': FieldValue.arrayRemove([id])
         },
       );
     } catch (e) {

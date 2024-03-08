@@ -159,7 +159,7 @@ class MessageTiles extends StatelessWidget {
               docId: message.id,
             );
           },
-          onTap: message.caption.isNotEmpty
+          onTap: message.content == 'upload'
               ? () {}
               : () => Get.to(() => ChatMediaFullScreenView(
                     media: List.generate(
@@ -248,7 +248,7 @@ class MessageTiles extends StatelessWidget {
                     docId: message.id,
                   );
                 },
-                onTap: message.content != 'upload'
+                onTap: message.content == 'upload'
                     ? () {}
                     : () => Get.to(() => FullScreenVideoPlayer(
                           videoLink: media!.first.link,

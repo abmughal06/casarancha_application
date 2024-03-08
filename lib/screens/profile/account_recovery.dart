@@ -14,25 +14,30 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class AccountRecovery extends StatefulWidget {
+class AccountRecovery extends StatelessWidget {
   const AccountRecovery({super.key});
 
   @override
-  State<AccountRecovery> createState() => _AccountRecoveryState();
-}
-
-class _AccountRecoveryState extends State<AccountRecovery> {
-  bool isEmailUpdate = false;
-  @override
   Widget build(BuildContext context) {
     final currentUser = context.watch<UserModel?>();
+    final prov = Provider.of<AuthenticationProvider>(context);
     return Scaffold(
       appBar: primaryAppbar(title: appText(context).accountRecovery),
-      body: currentUser == null
-          ? centerLoader()
-          : currentUser.email.isEmpty
-              ? const RegisterAndLinkEmail()
-              : ShowRegisteredEmail(email: currentUser.email),
+      body: Stack(
+        children: [
+          currentUser == null
+              ? centerLoader()
+              : currentUser.email.isEmpty
+                  ? const RegisterAndLinkEmail()
+                  : ShowRegisteredEmail(email: currentUser.email),
+          Align(
+            alignment: Alignment.center,
+            child: prov.isSigningIn
+                ? const CircularProgressIndicator.adaptive()
+                : widthBox(0),
+          )
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FirebaseAuth
                       .instance.currentUser!.providerData[0].providerId ==
@@ -46,9 +51,6 @@ class _AccountRecoveryState extends State<AccountRecovery> {
               verticalOutMargin: 10.h,
               horizontalOutMargin: 20.w,
               onTap: () {
-                // setState(() {
-                //   isEmailUpdate = true;
-                // });
                 showDialog(
                     context: context, builder: (_) => const UpdateEmail());
               },

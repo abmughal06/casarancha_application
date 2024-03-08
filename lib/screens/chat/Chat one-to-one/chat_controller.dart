@@ -80,7 +80,6 @@ extension MyColorExtension on MessageType {
 }
 
 class ChatProvider extends ChangeNotifier {
-//variables
 
   late TextEditingController messageController;
   late Record audioRecorder;
@@ -240,7 +239,7 @@ class ChatProvider extends ChangeNotifier {
   disableReply() {
     isReply = false;
     replyingMessage = null;
-    textFieldFocus.unfocus();
+    // textFieldFocus.unfocus();
     notifyListeners();
   }
 

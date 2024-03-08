@@ -122,17 +122,18 @@ class StorySkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 50.h,
-      child: ListView.separated(
-        padding: const EdgeInsets.only(left: 12),
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) => shimmerImg(
-          height: 50.h,
-          width: 50.h,
-          borderRadius: 1000,
+      child: Expanded(
+        child: ListView.separated(
+          padding: const EdgeInsets.only(left: 12),
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) => shimmerImg(
+            height: 50.h,
+            width: 50.h,
+            borderRadius: 1000,
+          ),
+          separatorBuilder: (context, index) => widthBox(10),
+          itemCount: 10,
         ),
-        separatorBuilder: (context, index) => widthBox(10),
-        itemCount: 10,
       ),
     );
   }

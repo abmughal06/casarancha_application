@@ -36,11 +36,11 @@ class PostCommentTile extends StatefulWidget {
       {super.key,
       required this.cmnt,
       required this.isFeedTile,
-      this.postModel,
+      required this.postModel,
       this.groupId});
   final Comment cmnt;
   final bool isFeedTile;
-  final PostModel? postModel;
+  final PostModel postModel;
   final String? groupId;
 
   @override
@@ -295,8 +295,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                         TextWidget(
                                           onTap: () => Get.to(() =>
                                               SharePostScreen(
-                                                  postModel:
-                                                      widget.postModel!)),
+                                                  postModel: widget.postModel)),
                                           text: appText(context).strShare,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -309,11 +308,15 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                             : heightBox(0),
                                         heightBox(10.h),
                                         Visibility(
-                                          visible: widget.cmnt.creatorId ==
-                                                  currentUserUID ||
-                                              group.adminIds
-                                                  .contains(currentUserUID) ||
-                                              group.creatorId == currentUserUID,
+                                          visible:
+                                              widget.cmnt.creatorId ==
+                                                      currentUserUID ||
+                                                  widget.postModel.creatorId ==
+                                                      currentUserUID ||
+                                                  group.adminIds.contains(
+                                                      currentUserUID) ||
+                                                  group.creatorId ==
+                                                      currentUserUID,
                                           child: TextWidget(
                                             text: appText(context).strDelete,
                                             color: colorPrimaryA05,
@@ -421,8 +424,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                         TextWidget(
                                           onTap: () => Get.to(() =>
                                               SharePostScreen(
-                                                  postModel:
-                                                      widget.postModel!)),
+                                                  postModel: widget.postModel)),
                                           text: appText(context).strShare,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -433,7 +435,10 @@ class _PostCommentTileState extends State<PostCommentTile> {
                                                     .strReportComment)
                                             : heightBox(0),
                                         heightBox(10.h),
-                                        widget.cmnt.creatorId == currentUserUID
+                                        widget.cmnt.creatorId ==
+                                                    currentUserUID ||
+                                                widget.postModel.creatorId ==
+                                                    currentUserUID
                                             ? TextWidget(
                                                 text:
                                                     appText(context).strDelete,
@@ -490,7 +495,7 @@ class _PostCommentTileState extends State<PostCommentTile> {
                   children: [
                     PostCommentReplyTile(
                       comment: widget.cmnt,
-                      postModel: widget.postModel!,
+                      postModel: widget.postModel,
                       groupId: widget.groupId,
                     ),
                     Visibility(

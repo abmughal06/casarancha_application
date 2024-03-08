@@ -62,6 +62,7 @@ class AddStoryProvider extends ChangeNotifier {
 
       if (storyData.exists) {
         await storyRef.update({
+          // "createdAt": DateTime.now().toUtc().toString(),
           'mediaDetailsList': FieldValue.arrayUnion([
             mediaData.toMap(),
           ])
