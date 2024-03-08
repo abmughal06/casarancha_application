@@ -419,6 +419,7 @@ class GroupJoinRequestCard extends StatelessWidget {
                                 alertMsg: appText(context).strDeclineRequest,
                                 actiionBtnName: appText(context).strYes,
                                 onAction: () {
+                                  Get.back();
                                   prov.removeRequestPrivateGroup(
                                       id: user.id, groupId: group.id);
                                 },

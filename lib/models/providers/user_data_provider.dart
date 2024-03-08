@@ -162,25 +162,36 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Stream<List<PostModel>?> homeFeedPosts() {
+    try {
+      final ref = FirebaseFirestore.instance.collection('posts');
+      return ref.orderBy("createdAt", descending: true).snapshots().map(
+          (event) => event.docs
+              .where((element) =>
+                  element.data().isNotEmpty &&
+                  element.data()['mediaData'].isNotEmpty)
+              .map((e) => PostModel.fromMap(e.data()))
+              .where((element) => !element.isForumPost && !element.isGhostPost)
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<List<PostModel>?> ghostModePosts(
       List followingsIds, List followersIds, String currentUserId) {
     try {
       final ref = FirebaseFirestore.instance.collection('posts');
-      return ref
-          .orderBy("createdAt", descending: true)
-          .snapshots()
-          .map((event) => event.docs
-              .where(
-                (element) =>
-                    (followersIds.contains(element.data()['creatorId']) ||
-                        followingsIds.contains(element.data()['creatorId']) ||
-                        element.data()['creatorId'] == currentUserId) &&
-                    element.data().isNotEmpty &&
-                    element.data()['mediaData'].isNotEmpty &&
-                    element.data()['isForumPost'] == false &&
-                    element.data()['isGhostPost'] == false,
-              )
+      return ref.orderBy("createdAt", descending: true).snapshots().map(
+          (event) => event.docs
+              .where((element) =>
+                  (followersIds.contains(element.data()['creatorId']) ||
+                      followingsIds.contains(element.data()['creatorId']) ||
+                      element.data()['creatorId'] == currentUserId) &&
+                  element.data().isNotEmpty &&
+                  element.data()['mediaData'].isNotEmpty)
               .map((e) => PostModel.fromMap(e.data()))
+              .where((element) => !element.isForumPost && !element.isGhostPost)
               .toList());
     } catch (e) {
       rethrow;
@@ -328,13 +339,25 @@ class DataProvider extends ChangeNotifier {
   }
 
   Stream<List<Story>?> allStories(List a) {
+    final twentyFourHoursAgo =
+        DateTime.now().toUtc().subtract(const Duration(hours: 24));
+    DateTime givenDate = DateTime.now().toUtc();
     try {
       return FirebaseFirestore.instance.collection('stories').snapshots().map(
           (event) => event.docs
-              .where((element) =>
-                  element.data().isNotEmpty && a.contains(element.id))
-              .map((e) => Story.fromMap(e.data()))
-              .toList());
+                  .where((element) =>
+                      element.data().isNotEmpty && a.contains(element.id))
+                  .map((e) => Story.fromMap(e.data()))
+                  .where((element) {
+                for (var i = 0; i < element.mediaDetailsList.length;) {
+                  givenDate = DateTime.parse(element.mediaDetailsList[i].id);
+                  if (givenDate.isAfter(twentyFourHoursAgo)) {
+                    return true;
+                  }
+                  return false;
+                }
+                return false;
+              }).toList());
     } catch (e) {
       rethrow;
     }

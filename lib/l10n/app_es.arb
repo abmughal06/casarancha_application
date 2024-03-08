@@ -399,5 +399,6 @@
     "strPollOption": "Ingresar opción",
     "strFieldHintAddGroup": "Agregar miembros en ${groupname}",
     "strAddStory": "Agregar historia",
-    "edit": "editar"
+    "edit": "editar",
+    "unSendMessage": "anular mensaje"
 }

@@ -121,7 +121,7 @@ class _MyStoryViewScreenState extends State<MyStoryViewScreen>
                     case 'Photo':
                       return CachedNetworkImage(
                         imageUrl: story.link,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fitWidth,
                       );
                     case 'Video':
                       if (_videoController != null &&

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
@@ -251,22 +250,18 @@ class PostMediaWidgetForOtherTypes extends StatelessWidget {
         ),
       );
     }
-    return CarouselSlider.builder(
-      itemCount: post.mediaData.length,
-      options: CarouselOptions(
-        viewportFraction: 1,
-        enableInfiniteScroll: false,
-        aspectRatio: post.mediaData.first.type == 'Photo'
-            ? double.parse(post.mediaData.first.imageWidth!) /
-                double.parse(post.mediaData.first.imageHeight!)
-            : post.mediaData.first.type == 'Video'
-                ? double.parse(post.mediaData.first.videoAspectRatio!)
-                : MediaQuery.of(context).size.width / 200,
-      ),
-      itemBuilder: (context, index, i) {
-        var media = post.mediaData[i];
-        return Center(
-          child: CheckMediaAndShowPost(
+    return AspectRatio(
+      aspectRatio: post.mediaData.first.type == 'Photo'
+          ? double.parse(post.mediaData.first.imageWidth!) /
+              double.parse(post.mediaData.first.imageHeight!)
+          : post.mediaData.first.type == 'Video'
+              ? double.parse(post.mediaData.first.videoAspectRatio!)
+              : MediaQuery.of(context).size.width / 200,
+      child: PageView.builder(
+        itemCount: post.mediaData.length,
+        itemBuilder: (context, i) {
+          var media = post.mediaData[i];
+          return CheckMediaAndShowPost(
             groupId: groupId,
             isPostDetail: isPostDetail,
             postModel: post,
@@ -275,9 +270,9 @@ class PostMediaWidgetForOtherTypes extends StatelessWidget {
             mediaData: media,
             postId: post.id,
             isFullScreen: isFullScreen,
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:casarancha/screens/dashboard/ghost_scaffold.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/utils/app_constants.dart';
+import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/group_widgets/group_tile.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
@@ -186,7 +187,7 @@ class AllSearch extends StatelessWidget {
                             ? appText(context).strJoined
                             : appText(context).strSrcJoin
                         : groupSnap.joinRequestIds.contains(currentUserUID)
-                            ? appText(context).reqSent
+                            ? appText(context).strCancel
                             : isCurrentUserGroupMember
                                 ? appText(context).strJoined
                                 : appText(context).strSrcJoin,
@@ -301,9 +302,27 @@ class GroupSearch extends StatelessWidget {
                           id: FirebaseAuth.instance.currentUser!.uid,
                           groupId: groupSnap.id);
                     } else {
-                      context.read<NewGroupProvider>().requestPrivateGroup(
-                          id: FirebaseAuth.instance.currentUser!.uid,
-                          groupId: groupSnap.id);
+                      if (groupSnap.joinRequestIds.contains(currentUserUID)) {
+                        context
+                            .read<NewGroupProvider>()
+                            .removeRequestPrivateGroup(
+                                id: FirebaseAuth.instance.currentUser!.uid,
+                                groupId: groupSnap.id)
+                            .whenComplete(() {
+                          GlobalSnackBar.show(
+                              message: 'Request removed successfully');
+                        });
+                      } else {
+                        context
+                            .read<NewGroupProvider>()
+                            .requestPrivateGroup(
+                                id: FirebaseAuth.instance.currentUser!.uid,
+                                groupId: groupSnap.id)
+                            .whenComplete(() {
+                          GlobalSnackBar.show(
+                              message: 'Request sent successfully');
+                        });
+                      }
                     }
                   }
                 },
@@ -313,7 +332,7 @@ class GroupSearch extends StatelessWidget {
                         ? appText(context).strJoined
                         : appText(context).strSrcJoin
                     : groupSnap.joinRequestIds.contains(currentUserUID)
-                        ? appText(context).reqSent
+                        ? appText(context).strCancel
                         : isCurrentUserGroupMember
                             ? appText(context).strJoined
                             : appText(context).strSrcJoin,

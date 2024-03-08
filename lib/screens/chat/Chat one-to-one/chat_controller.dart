@@ -80,7 +80,6 @@ extension MyColorExtension on MessageType {
 }
 
 class ChatProvider extends ChangeNotifier {
-//variables
 
   late TextEditingController messageController;
   late Record audioRecorder;
@@ -147,7 +146,7 @@ class ChatProvider extends ChangeNotifier {
       case 'InChatPic':
         return 'Photo';
       case 'InChatVideo':
-        return 'Photo';
+        return 'Video';
       case 'InChatMusic':
         return 'Music';
       case 'Voice':
@@ -240,7 +239,7 @@ class ChatProvider extends ChangeNotifier {
   disableReply() {
     isReply = false;
     replyingMessage = null;
-    textFieldFocus.unfocus();
+    // textFieldFocus.unfocus();
     notifyListeners();
   }
 
@@ -1016,6 +1015,33 @@ class ChatProvider extends ChangeNotifier {
           messageRef.delete();
         }
       });
+    } catch (e) {
+      GlobalSnackBar.show(message: e.toString());
+      printLog(e.toString());
+    } finally {}
+  }
+
+  unsendMessage({messageId}) async {
+    try {
+      final messageRef =
+          FirebaseFirestore.instance.collection('messages').doc(conversationId);
+      final chatRef = messageRef.collection('chats').doc(messageId);
+      chatRef.delete();
+      messageRef.delete();
+      // await messageRef.collection('chats').get().then((messages) async {
+      //   if (messages.docs.length > 1) {
+      //     chatRef.delete();
+      //     MessageDetails lastMessage;
+      //     await messageRef.get().then((value) {
+      //       lastMessage = MessageDetails.fromMap(value.data());
+      //       final newMessage =
+      //           lastMessage.copyWith(lastMessage: 'Last message deleted');
+      //       messageRef.update(newMessage.toMap());
+      //     });
+      //   } else {
+
+      //   }
+      // });
     } catch (e) {
       GlobalSnackBar.show(message: e.toString());
       printLog(e.toString());

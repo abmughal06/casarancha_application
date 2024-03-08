@@ -16,7 +16,7 @@ import '../models/post_model.dart';
 
 bool isVideoMute = true;
 
-class VideoPlayerWidget extends StatefulWidget {
+class VideoPlayerWidget extends StatelessWidget {
   const VideoPlayerWidget(
       {super.key,
       required this.videoUrl,
@@ -28,13 +28,39 @@ class VideoPlayerWidget extends StatefulWidget {
   final PostModel? postModel;
   final bool? isPostDetailScreen;
   final MediaDetails media;
-
   final String? groupId;
+
   @override
-  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+  Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
+    return CustomVideoPlayer(
+      videoUrl: media.link,
+      videoAspectRatio: double.parse(media.videoAspectRatio!),
+      isPostDetail: isPostDetailScreen!,
+      onVisible: () {
+        postProvider.countVideoViews(postModel: postModel, groupId: groupId);
+      },
+    );
+  }
 }
 
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+class CustomVideoPlayer extends StatefulWidget {
+  const CustomVideoPlayer({
+    super.key,
+    required this.videoUrl,
+    required this.videoAspectRatio,
+    required this.isPostDetail,
+    required this.onVisible,
+  });
+  final String videoUrl;
+  final double videoAspectRatio;
+  final bool isPostDetail;
+  final VoidCallback onVisible;
+  @override
+  State<CustomVideoPlayer> createState() => _CustomVideoPlayerState();
+}
+
+class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   late VideoPlayerController videoPlayerController;
   bool isVisible = false;
 
@@ -65,7 +91,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.initState();
 
     videoPlayerController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.media.link),
+      Uri.parse(widget.videoUrl),
     );
 
     videoPlayerController.addListener(() {
@@ -105,9 +131,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final postProvider = Provider.of<PostProvider>(context);
     return VisibilityDetector(
-      key: ValueKey(widget.videoUrl!),
+      key: ValueKey(widget.videoUrl),
       onVisibilityChanged: (visibilityInfo) {
         isVisible = visibilityInfo.visibleFraction > 0.6;
         if (isVisible) {
@@ -116,17 +141,14 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           } else {
             videoPlayerController.setVolume(1.0);
           }
-          postProvider.countVideoViews(
-            postModel: widget.postModel,
-            groupId: widget.groupId,
-          );
+          widget.onVisible;
           videoPlayerController.play();
         } else {
           videoPlayerController.pause();
         }
       },
       child: AspectRatio(
-        aspectRatio: double.parse(widget.media.videoAspectRatio!),
+        aspectRatio: widget.videoAspectRatio,
         child: GestureDetector(
           onTap: () {
             if (isVideoPlaying) {
@@ -181,7 +203,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       ),
                     ),
                     Positioned(
-                      top: widget.isPostDetailScreen! ? 50.h : 15.h,
+                      top: widget.isPostDetail ? 50.h : 15.h,
                       right: 15.w,
                       child: TextWidget(
                         text: formatTime(duration - position),

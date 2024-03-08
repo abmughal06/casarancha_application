@@ -399,5 +399,7 @@
     "strPollOption": "أدخل الخيار",
     "strFieldHintAddGroup": "إضافة أعضاء في ${groupname}",
     "strAddStory": "إضافة قصة",
-    "edit": "يحرر"
+    "edit": "يحرر",
+    "unSendMessage": "إلغاء إرسال الرسالة"
+
 }
