@@ -48,7 +48,7 @@ String getConversationDocId(String userId1, String userId2) {
   return sortedIds.join('_');
 }
 
-extension MyColorExtension on MessageType {
+extension MyMessageTypeExtention on MessageType {
   String get name {
     switch (this) {
       case MessageType.text:
@@ -80,7 +80,6 @@ extension MyColorExtension on MessageType {
 }
 
 class ChatProvider extends ChangeNotifier {
-
   late TextEditingController messageController;
   late Record audioRecorder;
 
@@ -157,10 +156,8 @@ class ChatProvider extends ChangeNotifier {
         return 'Text';
       case 'Doc':
         return 'Doc';
-      case 'StoryVideo':
-        return 'Story Video';
-      case 'StoryPic':
-        return 'Story Pic';
+      case 'story-Video' || 'story-Photo':
+        return 'Story';
       default:
         return '';
     }

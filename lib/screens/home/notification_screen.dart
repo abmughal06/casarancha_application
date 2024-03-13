@@ -179,15 +179,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     fontSize: 14.sp,
                                   ),
                                   children: [
-                                    WidgetSpan(
-                                      child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4.0),
-                                          child: verifyBadge(notification
-                                              .createdDetails!.isVerified)),
-                                    ),
+                                    if (notification.createdDetails!.isVerified)
+                                      WidgetSpan(
+                                        child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4.0),
+                                            child: verifyBadge(notification
+                                                .createdDetails!.isVerified)),
+                                      ),
                                     TextSpan(
-                                        text: " ${notification.msg!}",
+                                        text: notification.msg!,
                                         style: TextStyle(
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w400,

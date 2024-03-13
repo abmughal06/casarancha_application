@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:casarancha/resources/firebase_cloud_messaging.dart';
 import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -121,12 +122,24 @@ class NewGroupProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> requestPrivateGroup({id, groupId}) async {
+  Future<void> requestPrivateGroup({
+    id,
+    groupId,
+    adminId,
+  }) async {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
         {
           'joinRequestIds': FieldValue.arrayUnion([id])
         },
+      );
+
+      // final appUser = await getUser(id);
+      final adminUser = await getUser(adminId);
+      await sendNotificatonToUser(
+        msg: 'wants to join your group',
+        userId: adminUser.id,
+        fcmToken: adminUser.fcmToken,
       );
     } catch (e) {
       printLog(e.toString());
@@ -149,13 +162,42 @@ class NewGroupProvider extends ChangeNotifier {
     }
   }
 
-  acceptMembers({id, groupId}) async {
+  cancelMembers({id, groupId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
+        {
+          'joinRequestIds': FieldValue.arrayRemove([id])
+        },
+      );
+      final appUser = await getUser(id);
+      // final adminUser = await getUser(adminId);
+      await sendNotificatonToUser(
+        msg: 'declined your group join request',
+        userId: appUser.id,
+        fcmToken: appUser.fcmToken,
+      );
+    } catch (e) {
+      printLog(e.toString());
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  acceptMembers({id, groupId, adminId}) async {
     try {
       await FirebaseFirestore.instance.collection('groups').doc(groupId).update(
         {
           'joinRequestIds': FieldValue.arrayRemove([id]),
           'memberIds': FieldValue.arrayUnion([id]),
         },
+      );
+
+      final appUser = await getUser(id);
+      // final adminUser = await getUser(adminId);
+      await sendNotificatonToUser(
+        msg: 'accept your group join request',
+        userId: appUser.id,
+        fcmToken: appUser.fcmToken,
       );
     } catch (e) {
       printLog(e.toString());
@@ -324,5 +366,23 @@ class NewGroupProvider extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  Future<UserModel> getUser(id) async {
+    return FirebaseFirestore.instance.collection('users').doc(id).get().then(
+          (value) => UserModel.fromMap(value.data()!),
+        );
+  }
+
+  sendNotificatonToUser({msg, userId, fcmToken}) async {
+    await FirebaseMessagingService().sendNotificationToUser(
+      isMessage: false,
+      notificationType: 'group',
+      appUserId: userId,
+      msg: msg,
+      devRegToken: fcmToken,
+      groupId: null,
+      content: null,
+    );
   }
 }

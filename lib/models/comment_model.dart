@@ -79,37 +79,4 @@ class Comment {
       tagIds: map['tagIds'] ?? [],
     );
   }
-
-  // String toJson() => json.encode(toMap());
-
-  // factory Comment.fromJson(String source) =>
-  //     Comment.fromMap(json.decode(source));
-
-  // @override
-  // String toString() {
-  //   return 'Comment(id: $id, postId:$postId,creatorId: $creatorId, creatorDetails: $creatorDetails, createdAt: $createdAt, message: $message)';
-  // }
-
-  // @override
-  // bool operator ==(Object other) {
-  //   if (identical(this, other)) return true;
-
-  //   return other is Comment &&
-  //       other.postId == postId &&
-  //       other.id == id &&
-  //       other.creatorId == creatorId &&
-  //       other.creatorDetails == creatorDetails &&
-  //       other.createdAt == createdAt &&
-  //       other.message == message;
-  // }
-
-  // @override
-  // int get hashCode {
-  //   return id.hashCode ^
-  //       postId.hashCode ^
-  //       creatorId.hashCode ^
-  //       creatorDetails.hashCode ^
-  //       createdAt.hashCode ^
-  //       message.hashCode;
-  // }
 }

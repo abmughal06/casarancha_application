@@ -8,6 +8,7 @@ import 'package:casarancha/widgets/full_screen_video_player.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:casarancha/models/media_details.dart';
@@ -23,7 +24,8 @@ import '../../screens/home/post_detail_screen.dart';
 import '../../screens/home/story_view_screen.dart';
 import '../custom_dialog.dart';
 
-Future showMessageMennu({context, url, path, friendId, docId, text}) async {
+Future showMessageMennu(
+    {context, url, path, friendId, docId, text, isMe, message}) async {
   final chatProvider = Provider.of<ChatProvider>(context, listen: false);
   final ghost = Provider.of<DashboardProvider>(context, listen: false);
   await Get.bottomSheet(CupertinoActionSheet(
@@ -55,6 +57,33 @@ Future showMessageMennu({context, url, path, friendId, docId, text}) async {
             fontWeight: FontWeight.w400,
           ),
         ),
+      if (url == null || path == null)
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Get.back();
+            Clipboard.setData(ClipboardData(text: text)).then((_) {
+              GlobalSnackBar.show(message: 'Message copied to clipboard');
+            });
+          },
+          child: TextWidget(
+            text: 'Copy',
+            fontSize: 16.sp,
+            color: color221,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      CupertinoActionSheetAction(
+        onPressed: () {
+          Get.back();
+          chatProvider.enableReply(message);
+        },
+        child: TextWidget(
+          text: appText(context).strReply,
+          fontSize: 16.sp,
+          color: color221,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
       CupertinoActionSheetAction(
         onPressed: () {
           if (url == null || path == null) {
@@ -72,7 +101,7 @@ Future showMessageMennu({context, url, path, friendId, docId, text}) async {
           fontWeight: FontWeight.w400,
         ),
       ),
-      if (url == null || path == null)
+      if ((url == null || path == null) && isMe)
         CupertinoActionSheetAction(
           onPressed: () async {
             Get.back();
@@ -429,7 +458,7 @@ class MessageTiles extends StatelessWidget {
                   media: voice,
                 ),
               );
-      case 'StoryVideo':
+      case 'story-Video':
         final story = MediaDetails.fromMap(message.content);
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
             ? InkWell(
@@ -456,7 +485,7 @@ class MessageTiles extends StatelessWidget {
                 ),
               )
             : Container();
-      case 'StoryPic':
+      case 'story-Photo':
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
             ? InkWell(
                 onLongPress: () {
@@ -488,8 +517,10 @@ class MessageTiles extends StatelessWidget {
               url: null,
               path: null,
               friendId: isMe ? message.sentToId : message.sentById,
+              isMe: isMe,
               docId: message.id,
               text: message.content,
+              message: message,
             );
           },
           child: ChatTile(

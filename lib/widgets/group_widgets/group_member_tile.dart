@@ -388,7 +388,9 @@ class GroupJoinRequestCard extends StatelessWidget {
                                 onAction: () {
                                   Get.back();
                                   prov.acceptMembers(
-                                      id: user.id, groupId: group.id);
+                                      id: user.id,
+                                      groupId: group.id,
+                                      adminId: group.creatorId);
                                 },
                                 actionBtnColor: color221,
                               ),
@@ -420,8 +422,11 @@ class GroupJoinRequestCard extends StatelessWidget {
                                 actiionBtnName: appText(context).strYes,
                                 onAction: () {
                                   Get.back();
-                                  prov.removeRequestPrivateGroup(
-                                      id: user.id, groupId: group.id);
+                                  prov.cancelMembers(
+                                    id: user.id,
+                                    groupId: group.id,
+                                    // adminId: group.creatorId,
+                                  );
                                 },
                                 actionBtnColor: colorPrimaryA05,
                               ),

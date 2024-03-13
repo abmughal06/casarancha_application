@@ -43,6 +43,8 @@ dependencies:
   swipe_to: ^1.0.6
   # recaptcha_enterprise_flutter: ^18.4.0 //only for android
 
+  pinch_zoom: ^1.0.0
+
   cloud_firestore: ^4.13.4
   cupertino_icons: ^1.0.5
   file_picker: ^6.1.1

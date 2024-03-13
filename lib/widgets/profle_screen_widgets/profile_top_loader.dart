@@ -1,4 +1,10 @@
+import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/resources/strings.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/ghost_chat_screen.dart';
+import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/profile_pic.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/profile_menu.dart';
 import 'package:flutter/material.dart';
@@ -163,8 +169,7 @@ class ProfileTop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final appUsers = context.watch<List<UserModel>?>();
-
+    final ghost = Provider.of<DashboardProvider>(context);
     return Column(
       children: [
         Card(
@@ -226,16 +231,23 @@ class ProfileTop extends StatelessWidget {
                 })),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
-                ontap: () =>
-                    Get.to(() => const CurruentUserFollowerFollowingScreen(
-                          follow: true,
-                        )),
+                ontap: () => Get.to(() => user.id != currentUserUID
+                    ? AppUserFollowerFollowingScreen(
+                        appUser: user,
+                        follow: true,
+                      )
+                    : const CurruentUserFollowerFollowingScreen(
+                        follow: true,
+                      )),
                 count: user.followersIds.length.toString(),
                 strText: appText(context).strProfileFollowers),
             verticalLine(height: 24.h, horizontalMargin: 30.w),
             profileCounter(
-                ontap: () =>
-                    Get.to(() => const CurruentUserFollowerFollowingScreen()),
+                ontap: () => Get.to(() => user.id != currentUserUID
+                    ? AppUserFollowerFollowingScreen(
+                        appUser: user,
+                      )
+                    : const CurruentUserFollowerFollowingScreen()),
                 count: user.followingsIds.length.toString(),
                 strText: appText(context).strProfileFollowing),
           ],
@@ -307,8 +319,109 @@ class ProfileTop extends StatelessWidget {
             ],
           ),
         ),
-        heightBox(20.h),
+        if (user.id != currentUserUID)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                FollowProfileButton(id: user.id),
+                widthBox(8.w),
+                GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => ghost.checkGhostMode
+                          ? GhostChatScreen2(
+                              appUserId: user.id,
+                              firstMessagebyMe: true,
+                              creatorDetails: CreatorDetails(
+                                name: user.name,
+                                imageUrl: user.imageStr,
+                                isVerified: user.isVerified,
+                              ),
+                            )
+                          : ChatScreen(
+                              appUserId: user.id,
+                            ),
+                    );
+                  },
+                  child: Image.asset(
+                    imgProMsg,
+                    height: 60.h,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (user.id == currentUserUID) heightBox(20.h),
       ],
+    );
+  }
+}
+
+class FollowProfileButton extends StatelessWidget {
+  const FollowProfileButton({super.key, required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
+    return StreamProvider.value(
+      initialData: null,
+      catchError: (context, error) => null,
+      value: DataProvider().getSingleUser(currentUserUID),
+      child: Consumer<UserModel?>(builder: (context, currentUser, b) {
+        return currentUser == null
+            ? widthBox(0)
+            : Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    profileProvider.toggleFollowBtn(context, appUserId: id);
+                  },
+                  child: Container(
+                    height: 45.h,
+                    decoration: BoxDecoration(
+                      color: currentUser.followingsIds.contains(id)
+                          ? colorWhite
+                          : colorF03,
+                      border: Border.all(
+                        width: 1.w,
+                        color: currentUser.followingsIds.contains(id)
+                            ? color221
+                            : Colors.transparent,
+                      ),
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorBlack.withOpacity(.06),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                        BoxShadow(
+                          color: colorBlack.withOpacity(.04),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    child: Center(
+                      child: TextWidget(
+                        text: currentUser.followingsIds.contains(id)
+                            ? appText(context).strUnFollow
+                            : appText(context).strSrcFollow,
+                        color: color13F,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+      }),
     );
   }
 }

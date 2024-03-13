@@ -1,12 +1,8 @@
-import 'dart:io';
-
-import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/widgets/home_screen_widgets/post_detail_media.dart';
+import 'package:casarancha/widgets/shared/video_thumbnail.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../models/post_model.dart';
 import '../shared/alert_text.dart';
@@ -15,17 +11,6 @@ class VideoGridView extends StatelessWidget {
   const VideoGridView({super.key, required this.videoList});
 
   final List<PostModel>? videoList;
-
-  Future<String?> videoThumbnail(value) async {
-    return await VideoThumbnail.thumbnailFile(
-      video: value,
-      thumbnailPath: (await getTemporaryDirectory()).path,
-      imageFormat: ImageFormat.PNG,
-      maxHeight: 1024,
-      maxWidth: 1024,
-      quality: 10,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,34 +29,15 @@ class VideoGridView extends StatelessWidget {
               final data = videoList![index].mediaData[0];
 
               return GestureDetector(
-                onTap: () => Get.to(() => ProfilePostFullScreenView(
-                      postsList: videoList!,
-                      index: index,
-                      postType: appText(context).strVideo,
-                      isPostDetail: true,
-                    )),
-                child: FutureBuilder<String?>(
-                  future: videoThumbnail(data.link),
-                  builder: (context, snap) {
-                    if (snap.connectionState == ConnectionState.waiting) {
-                      return Container(
-                        color: colorBlack.withOpacity(0.04),
-                      );
-                    }
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: colorWhite,
-                        image: snap.data != null
-                            ? DecorationImage(
-                                image: FileImage(File(snap.data!)),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                      ),
-                    );
-                  },
-                ),
-              );
+                  onTap: () => Get.to(() => ProfilePostFullScreenView(
+                        postsList: videoList!,
+                        index: index,
+                        postType: appText(context).strVideo,
+                        isPostDetail: true,
+                      )),
+                  child: VideoThumbnailWidget(
+                    videoUrl: data.link,
+                  ));
             },
           ),
         ),

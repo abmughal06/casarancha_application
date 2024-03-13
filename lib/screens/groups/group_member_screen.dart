@@ -1,6 +1,7 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/groups/add_group_members.dart';
+import 'package:casarancha/screens/groups/group_notification_badge.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/common_button.dart';
@@ -90,25 +91,11 @@ class GroupMembersScreen extends StatelessWidget {
                     Tab(
                       text: appText(context).strMembers,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Tab(
-                          text: appText(context).strJoinRequest,
-                        ),
-                        if (group.joinRequestIds.isNotEmpty &&
-                            (group.creatorId == currentUserUID ||
-                                group.adminIds.contains(currentUserUID)))
-                          Row(
-                            children: [
-                              widthBox(5.w),
-                              const CircleAvatar(
-                                radius: 4,
-                                backgroundColor: colorPrimaryA05,
-                              ),
-                            ],
-                          ),
-                      ],
+                    GroupNotificationBadge(
+                      groupId: grp.id,
+                      child: Tab(
+                        text: appText(context).strJoinRequest,
+                      ),
                     ),
                   ],
                 ),

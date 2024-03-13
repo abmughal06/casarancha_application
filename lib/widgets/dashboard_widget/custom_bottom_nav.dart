@@ -88,11 +88,39 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   onTap: () {
                     provider.changePage(3);
                   },
-                  child: SvgPicture.asset(
-                    provider.currentIndex == 3
-                        ? icBottomSelGrp
-                        : icBottomDeSelGrp,
-                    color: provider.currentIndex == 3 ? null : Colors.white,
+                  child: StreamProvider.value(
+                    value: DataProvider.grpNotificationLength(),
+                    initialData: null,
+                    catchError: (context, error) => null,
+                    child: Consumer<int?>(
+                      builder: (context, msgs, b) {
+                        if (msgs == null) {
+                          return SvgPicture.asset(
+                            provider.currentIndex == 3
+                                ? icBottomSelGrp
+                                : icBottomDeSelGrp,
+                            color: provider.currentIndex == 3
+                                ? null
+                                : Colors.white,
+                          );
+                        }
+
+                        int count = msgs;
+
+                        return Badge(
+                          label: Text(count.toString()),
+                          isLabelVisible: count > 0,
+                          child: SvgPicture.asset(
+                            provider.currentIndex == 3
+                                ? icBottomSelGrp
+                                : icBottomDeSelGrp,
+                            color: provider.currentIndex == 3
+                                ? null
+                                : Colors.white,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
                 InkWell(
@@ -133,11 +161,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                         );
                       }
 
-                      int count = msgs;
-
                       return Badge(
-                        label: Text(count.toString()),
-                        isLabelVisible: count > 0,
+                        label: Text(msgs.toString()),
+                        isLabelVisible: msgs > 0,
                         child: SvgPicture.asset(
                           provider.currentIndex == 5
                               ? icBottomSelChat

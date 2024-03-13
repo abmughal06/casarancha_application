@@ -264,8 +264,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
                     currentUser: currentUser,
                     cmntMsg: cmntMsg,
                   );
-                  _commentFocus.unfocus();
-                  commentController.text = "";
+
                   pauseAndPlayStory(storyItems[_currentIndex]);
                 },
               )
@@ -276,7 +275,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
     );
   }
 
-  sentComment({checkGhostMode, currentUser, cmntMsg}) async {
+  Future<void> sentComment({checkGhostMode, currentUser, cmntMsg}) async {
     if (checkGhostMode) {
       final GhostMessageDetails messageDetails = GhostMessageDetails(
         id: getConversationDocId(currentUser.id, widget.stories.creatorId),
@@ -318,6 +317,9 @@ class _StoryViewScreenState extends State<StoryViewScreen>
           .doc(getConversationDocId(currentUser.id, widget.stories.creatorId))
           .set(messageDetails.toMap());
     }
+    final storyCaption = commentController.text.trim();
+    _commentFocus.unfocus();
+    commentController.text = "";
     final chatRef = FirebaseFirestore.instance
         .collection(checkGhostMode ? 'ghost_messages' : 'messages')
         .doc(getConversationDocId(currentUser.id, widget.stories.creatorId))
@@ -333,7 +335,7 @@ class _StoryViewScreenState extends State<StoryViewScreen>
       sentToId: widget.stories.creatorId,
       sentById: currentUser.id,
       content: mediaDetail,
-      caption: commentController.text,
+      caption: storyCaption,
       type: "story-${story[_currentIndex].type}",
       createdAt: DateTime.now().toUtc().toString(),
       isSeen: false,

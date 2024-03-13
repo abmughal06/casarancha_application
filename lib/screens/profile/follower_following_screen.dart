@@ -83,10 +83,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                                 currentUser.followingsIds.contains(user.id);
                             return FollowFollowingTile(
                               user: user,
-                              ontapToggleFollow: () =>
-                                  profileProvider.toggleFollowBtn(context,
-                                      userModel: currentUser,
-                                      appUserId: user.id),
+                              ontapToggleFollow: () => profileProvider
+                                  .toggleFollowBtn(context, appUserId: user.id),
                               btnName: isFriend
                                   ? appText(context).strFriends
                                   : appText(context).strSrcFollow,
@@ -121,9 +119,8 @@ class CurruentUserFollowerFollowingScreen extends StatelessWidget {
                           final user = users[index];
                           return FollowFollowingTile(
                             user: user,
-                            ontapToggleFollow: () =>
-                                profileProvider.toggleFollowBtn(context,
-                                    userModel: currentUser, appUserId: user.id),
+                            ontapToggleFollow: () => profileProvider
+                                .toggleFollowBtn(context, appUserId: user.id),
                             btnName: appText(context).strRemove,
                           );
                         },
@@ -202,7 +199,6 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                             ontapToggleFollow: () =>
                                 profileProvider.toggleFollowBtn(
                               context,
-                              userModel: currentUser,
                               appUserId: user.id,
                             ),
                             btnName: user.id == currentUser.id
@@ -244,7 +240,6 @@ class AppUserFollowerFollowingScreen extends StatelessWidget {
                                 ontapToggleFollow: () =>
                                     profileProvider.toggleFollowBtn(
                                   context,
-                                  userModel: currentUser,
                                   appUserId: user.id,
                                 ),
                                 btnName: user.id == currentUser.id

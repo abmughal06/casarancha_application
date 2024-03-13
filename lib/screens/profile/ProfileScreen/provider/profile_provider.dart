@@ -3,7 +3,6 @@ import 'package:casarancha/screens/auth/login_screen.dart';
 import 'package:casarancha/screens/auth/providers/auth_provider.dart';
 import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/widgets/menu_user_button.dart';
-import 'package:casarancha/widgets/text_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,16 +22,19 @@ class ProfileProvider extends ChangeNotifier {
         .whenComplete(() => Get.back());
   }
 
-  void toggleFollowBtn(context,
-      {UserModel? userModel, String? appUserId}) async {
+  void toggleFollowBtn(context, {String? appUserId}) async {
     final currentUserRef = FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid);
 
+    final userModel = await currentUserRef
+        .get()
+        .then((value) => UserModel.fromMap(value.data()!));
+
     final appUserRef =
         FirebaseFirestore.instance.collection("users").doc(appUserId);
     try {
-      if (userModel!.followingsIds.contains(appUserId)) {
+      if (userModel.followingsIds.contains(appUserId)) {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayRemove([appUserId])
         });
@@ -56,7 +58,7 @@ class ProfileProvider extends ChangeNotifier {
             content: null,
             notificationType: "user_follow",
             devRegToken: appUserDevToken.data()!['fcmToken'],
-            msg: appText(context).strFollowYou);
+            msg: '${appUserDevToken.data()!['name']} follows you');
       }
     } catch (e) {
       log('$e');

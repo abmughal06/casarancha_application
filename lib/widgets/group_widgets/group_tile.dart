@@ -1,5 +1,6 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/resources/color_resources.dart';
+import 'package:casarancha/screens/groups/group_notification_badge.dart';
 import 'package:casarancha/screens/groups/group_post_screen.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/utils/snackbar.dart';
@@ -43,9 +44,12 @@ class GroupTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  ProfilePic(
-                    pic: group.imageUrl,
-                    heightAndWidth: 50.w,
+                  GroupNotificationBadge(
+                    groupId: group.id,
+                    child: ProfilePic(
+                      pic: group.imageUrl,
+                      heightAndWidth: 50.w,
+                    ),
                   ),
                   widthBox(12.w),
                   Column(

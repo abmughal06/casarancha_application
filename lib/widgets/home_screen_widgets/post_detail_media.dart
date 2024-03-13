@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -224,7 +225,7 @@ class PostMediaWidgetForQuoteAndPoll extends StatelessWidget {
   }
 }
 
-class PostMediaWidgetForOtherTypes extends StatelessWidget {
+class PostMediaWidgetForOtherTypes extends StatefulWidget {
   const PostMediaWidgetForOtherTypes({
     super.key,
     required this.post,
@@ -239,9 +240,17 @@ class PostMediaWidgetForOtherTypes extends StatelessWidget {
   final String? groupId;
 
   @override
+  State<PostMediaWidgetForOtherTypes> createState() =>
+      _PostMediaWidgetForOtherTypesState();
+}
+
+class _PostMediaWidgetForOtherTypesState
+    extends State<PostMediaWidgetForOtherTypes> {
+  ScrollPhysics physics = const ScrollPhysics();
+  @override
   Widget build(BuildContext context) {
     final prov = Provider.of<PostProvider>(context);
-    if (post.mediaData.isEmpty) {
+    if (widget.post.mediaData.isEmpty) {
       return const SizedBox(
         width: double.infinity,
         height: 500,
@@ -251,25 +260,40 @@ class PostMediaWidgetForOtherTypes extends StatelessWidget {
       );
     }
     return AspectRatio(
-      aspectRatio: post.mediaData.first.type == 'Photo'
-          ? double.parse(post.mediaData.first.imageWidth!) /
-              double.parse(post.mediaData.first.imageHeight!)
-          : post.mediaData.first.type == 'Video'
-              ? double.parse(post.mediaData.first.videoAspectRatio!)
+      aspectRatio: widget.post.mediaData.first.type == 'Photo'
+          ? double.parse(widget.post.mediaData.first.imageWidth!) /
+              double.parse(widget.post.mediaData.first.imageHeight!)
+          : widget.post.mediaData.first.type == 'Video'
+              ? double.parse(widget.post.mediaData.first.videoAspectRatio!)
               : MediaQuery.of(context).size.width / 200,
       child: PageView.builder(
-        itemCount: post.mediaData.length,
+        itemCount: widget.post.mediaData.length,
+        physics: physics,
         itemBuilder: (context, i) {
-          var media = post.mediaData[i];
-          return CheckMediaAndShowPost(
-            groupId: groupId,
-            isPostDetail: isPostDetail,
-            postModel: post,
-            ondoubleTap: () =>
-                prov.toggleLikeDislike(postModel: post, groupId: groupId),
-            mediaData: media,
-            postId: post.id,
-            isFullScreen: isFullScreen,
+          var media = widget.post.mediaData[i];
+          return PinchZoom(
+            resetDuration: const Duration(milliseconds: 100),
+            maxScale: 5.0,
+            onZoomStart: () {
+              setState(() {
+                physics = const NeverScrollableScrollPhysics();
+              });
+            },
+            onZoomEnd: () {
+              setState(() {
+                physics = const BouncingScrollPhysics();
+              });
+            },
+            child: CheckMediaAndShowPost(
+              groupId: widget.groupId,
+              isPostDetail: widget.isPostDetail,
+              postModel: widget.post,
+              ondoubleTap: () => prov.toggleLikeDislike(
+                  postModel: widget.post, groupId: widget.groupId),
+              mediaData: media,
+              postId: widget.post.id,
+              isFullScreen: widget.isFullScreen,
+            ),
           );
         },
       ),
@@ -379,47 +403,6 @@ class PostFullScreenView extends StatelessWidget {
     );
   }
 }
-
-// Widget _buildFeaturedCards(
-//     {required List<MediaDetails> product,
-//     postId,
-//     ondoubleTap,
-//     postModel,
-//     isPostDetail,
-//     groupId}) {
-//   final cards = <Widget>[];
-//   Widget feautredCards;
-
-//   if (product.isNotEmpty) {
-//     for (int i = 0; i < product.length; i++) {
-//       cards.add(
-//         CheckMediaAndShowPost(
-//             mediaData: product[i],
-//             postId: postId,
-//             ondoubleTap: ondoubleTap,
-//             postModel: postModel,
-//             isPostDetail: isPostDetail,
-//             groupId: groupId),
-//       );
-//       // print(product.length);
-//     }
-//     feautredCards = Container(
-//       padding: const EdgeInsets.only(top: 16, bottom: 8),
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: <Widget>[
-//           SingleChildScrollView(
-//             scrollDirection: Axis.horizontal,
-//             child: Row(children: cards),
-//           ),
-//         ],
-//       ),
-//     );
-//   } else {
-//     feautredCards = Container();
-//   }
-//   return feautredCards;
-// }
 
 class ProfilePostFullScreenView extends StatefulWidget {
   const ProfilePostFullScreenView({

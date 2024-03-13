@@ -1,19 +1,17 @@
 import 'package:casarancha/models/group_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
-import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/groups/banned_cmnt_users.dart';
 import 'package:casarancha/screens/groups/banned_posts_users.dart';
 import 'package:casarancha/screens/groups/banned_user_screen.dart';
 import 'package:casarancha/screens/groups/group_admins.dart';
 import 'package:casarancha/screens/groups/group_member_screen.dart';
+import 'package:casarancha/screens/groups/group_notification_badge.dart';
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
-import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/primary_appbar.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -39,23 +37,10 @@ class GroupSettings extends StatelessWidget {
             children: [
               ListTile(
                 onTap: () => Get.to(() => GroupMembersScreen(grp: group)),
-                leading: SvgPicture.asset(icGroupMember),
-                title: Row(
-                  children: [
-                    TextWidget(
-                      text: appText(context).groupMembers,
-                    ),
-                    widthBox(5.w),
-                    Visibility(
-                      visible: group.joinRequestIds.isNotEmpty &&
-                          (group.creatorId == currentUserUID ||
-                              group.adminIds.contains(currentUserUID)),
-                      child: const CircleAvatar(
-                        radius: 4,
-                        backgroundColor: colorPrimaryA05,
-                      ),
-                    ),
-                  ],
+                leading: GroupNotificationBadge(
+                    groupId: grp.id, child: SvgPicture.asset(icGroupMember)),
+                title: TextWidget(
+                  text: appText(context).groupMembers,
                 ),
                 horizontalTitleGap: 0,
                 trailing: const Icon(Icons.navigate_next),

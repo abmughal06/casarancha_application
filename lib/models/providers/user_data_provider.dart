@@ -162,6 +162,22 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Stream<List<PostModel>?> getUserPosts(id) {
+    try {
+      final ref = FirebaseFirestore.instance.collection('posts');
+      return ref.orderBy("createdAt", descending: true).snapshots().map(
+          (event) => event.docs
+              .where((element) =>
+                  element.data().isNotEmpty &&
+                  element.data()['mediaData'].isNotEmpty)
+              .map((e) => PostModel.fromMap(e.data()))
+              .where((element) => element.creatorId == id)
+              .toList());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Stream<List<PostModel>?> homeFeedPosts() {
     try {
       final ref = FirebaseFirestore.instance.collection('posts');
@@ -341,7 +357,6 @@ class DataProvider extends ChangeNotifier {
   Stream<List<Story>?> allStories(List a) {
     final twentyFourHoursAgo =
         DateTime.now().toUtc().subtract(const Duration(hours: 24));
-    DateTime givenDate = DateTime.now().toUtc();
     try {
       return FirebaseFirestore.instance.collection('stories').snapshots().map(
           (event) => event.docs
@@ -349,14 +364,16 @@ class DataProvider extends ChangeNotifier {
                       element.data().isNotEmpty && a.contains(element.id))
                   .map((e) => Story.fromMap(e.data()))
                   .where((element) {
-                for (var i = 0; i < element.mediaDetailsList.length;) {
-                  givenDate = DateTime.parse(element.mediaDetailsList[i].id);
+                var isExist = false;
+                for (var e in element.mediaDetailsList) {
+                  final givenDate = DateTime.parse(e.id);
                   if (givenDate.isAfter(twentyFourHoursAgo)) {
-                    return true;
+                    isExist = true;
+                  } else {
+                    isExist = false;
                   }
-                  return false;
                 }
-                return false;
+                return isExist;
               }).toList());
     } catch (e) {
       rethrow;
@@ -381,6 +398,7 @@ class DataProvider extends ChangeNotifier {
                   element.data()['sentById'] !=
                       FirebaseAuth.instance.currentUser!.uid)
               .map((e) => NotificationModel.fromMap(e.data()))
+              .where((element) => element.msg != null)
               .toList());
     } catch (e) {
       rethrow;
@@ -402,13 +420,34 @@ class DataProvider extends ChangeNotifier {
               .where(
                 (element) =>
                     element.data().isNotEmpty &&
-                    // element.data()['sentById'] != null &&
-                    // element.data()['sentById'] !=
-                    //     FirebaseAuth.instance.currentUser!.uid &&
                     element.data()['isRead'] == false,
               )
               .map((e) => NotificationModel.fromMap(e.data()))
               .toList()
+              .length);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Stream<int>? grpNotificationLength() {
+    try {
+      if (FirebaseAuth.instance.currentUser?.uid == null) {
+        return null;
+      }
+      return FirebaseFirestore.instance
+          .collection('groups')
+          .snapshots()
+          .map((event) => event.docs
+              .where((element) => element.data().isNotEmpty)
+              .map((e) => GroupModel.fromMap(e.data()))
+              .toList()
+              .where(
+                (element) =>
+                    (element.adminIds.contains(currentUserUID) ||
+                        element.creatorId == currentUserUID) &&
+                    element.joinRequestIds.isNotEmpty,
+              )
               .length);
     } catch (e) {
       rethrow;

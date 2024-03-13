@@ -27,9 +27,8 @@ class _DashBoardState extends State<DashBoard> {
   @override
   void initState() {
     super.initState();
-
-    _dhelper.initDynamicLinks(context);
     _fcmServices.init(context);
+    _dhelper.initDynamicLinks(context);
   }
 
   @override

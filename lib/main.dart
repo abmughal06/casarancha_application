@@ -31,8 +31,8 @@ class _MyAppState extends State<MyApp> {
   Locale? locale;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     setlocale();
   }
 

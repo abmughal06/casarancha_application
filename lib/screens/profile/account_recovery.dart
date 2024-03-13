@@ -39,22 +39,24 @@ class AccountRecovery extends StatelessWidget {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FirebaseAuth
-                      .instance.currentUser!.providerData[0].providerId ==
-                  GoogleAuthProvider.PROVIDER_ID ||
-              FirebaseAuth.instance.currentUser!.providerData[0].providerId ==
-                  GoogleAuthProvider.PROVIDER_ID
-          ? widthBox(0)
-          : CommonButton(
-              height: 52.h,
-              text: appText(context).updateEmail,
-              verticalOutMargin: 10.h,
-              horizontalOutMargin: 20.w,
-              onTap: () {
-                showDialog(
-                    context: context, builder: (_) => const UpdateEmail());
-              },
-            ),
+      floatingActionButton:
+          (FirebaseAuth.instance.currentUser!.providerData[0].providerId ==
+                          GoogleAuthProvider.PROVIDER_ID ||
+                      FirebaseAuth.instance.currentUser!.providerData[0]
+                              .providerId ==
+                          GoogleAuthProvider.PROVIDER_ID) ||
+                  currentUser!.email.isEmpty
+              ? widthBox(0)
+              : CommonButton(
+                  height: 52.h,
+                  text: appText(context).updateEmail,
+                  verticalOutMargin: 10.h,
+                  horizontalOutMargin: 20.w,
+                  onTap: () {
+                    showDialog(
+                        context: context, builder: (_) => const UpdateEmail());
+                  },
+                ),
     );
   }
 }

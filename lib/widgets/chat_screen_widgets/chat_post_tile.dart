@@ -2,12 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
 import 'package:casarancha/widgets/music_player_url.dart';
+import 'package:casarancha/widgets/shared/video_thumbnail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
-
 import '../../models/media_details.dart';
 import '../../models/message.dart';
 import '../../resources/color_resources.dart';
@@ -15,7 +14,7 @@ import '../../resources/image_resources.dart';
 import '../../screens/chat/ChatList/chat_list_screen.dart';
 import '../text_widget.dart';
 
-class ChatVideoTile extends StatefulWidget {
+class ChatVideoTile extends StatelessWidget {
   const ChatVideoTile({
     super.key,
     required this.appUserId,
@@ -36,52 +35,6 @@ class ChatVideoTile extends StatefulWidget {
   final int? mediaLength;
 
   @override
-  State<ChatVideoTile> createState() => _ChatVideoTileState();
-}
-
-class _ChatVideoTileState extends State<ChatVideoTile> {
-  late VideoPlayerController videoPlayerController;
-  // Future<String?> initThumbnail() async {
-  //   return await VideoThumbnail.thumbnailFile(
-  //     video: widget.link!,
-  //     thumbnailPath: (await getTemporaryDirectory()).path,
-  //     imageFormat: ImageFormat.PNG,
-  //     maxHeight: 1024,
-  //     maxWidth: 1024,
-  //     quality: 10,
-  //     // timeMs: (_controller.value.duration.inMilliseconds / 2).toInt(),
-  //   );
-  // }
-
-  // String? image;
-
-  // initImage() async {
-  //   image = await initThumbnail();
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
-  @override
-  void initState() {
-    super.initState();
-    videoPlayerController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.media!.link))
-          ..initialize().then((value) {
-            if (mounted) {
-              setState(() {});
-            }
-          });
-    // initImage();
-  }
-
-  @override
-  void dispose() {
-    videoPlayerController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -89,14 +42,13 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
         children: [
           Padding(
             padding: EdgeInsets.only(
-                left: widget.isMe ? MediaQuery.of(context).size.width * .5 : 0,
-                right:
-                    widget.isMe ? 0 : MediaQuery.of(context).size.width * .5),
+                left: isMe ? MediaQuery.of(context).size.width * .5 : 0,
+                right: isMe ? 0 : MediaQuery.of(context).size.width * .5),
             child: Align(
-              alignment: widget.isMe ? Alignment.topRight : Alignment.topLeft,
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
               child: Container(
                 decoration: BoxDecoration(
-                  color: widget.isMe ? colorF03.withOpacity(0.6) : colorFF4,
+                  color: isMe ? colorF03.withOpacity(0.6) : colorFF4,
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Column(
@@ -107,7 +59,7 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                         borderRadius: BorderRadius.circular(15),
                         child: Stack(
                           children: [
-                            VideoPlayer(videoPlayerController),
+                            VideoThumbnailWidget(videoUrl: media!.link),
                             Align(
                               alignment: Alignment.center,
                               child: Container(
@@ -124,7 +76,7 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                             Positioned(
                               right: 12,
                               top: 12,
-                              child: widget.mediaLength != null
+                              child: mediaLength != null
                                   ? Container(
                                       decoration: BoxDecoration(
                                         color: Colors.black.withOpacity(0.6),
@@ -133,7 +85,7 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 8.w, vertical: 4.h),
                                       child: TextWidget(
-                                        text: '1/${widget.mediaLength}',
+                                        text: '1/$mediaLength',
                                         fontSize: 9.sp,
                                         color: colorWhite,
                                       ),
@@ -144,14 +96,14 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
                         ),
                       ),
                     ),
-                    if (widget.caption != null && widget.caption!.isNotEmpty)
+                    if (caption != null && caption!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: TextWidget(
-                            text: widget.caption,
+                            text: caption,
                             color: colorBlack,
                           ),
                         ),
@@ -161,19 +113,17 @@ class _ChatVideoTileState extends State<ChatVideoTile> {
               ),
             ),
           ),
-          widget.media == null
+          media == null
               ? Align(
-                  alignment: widget.isMe
-                      ? Alignment.bottomRight
-                      : Alignment.bottomLeft,
+                  alignment:
+                      isMe ? Alignment.bottomRight : Alignment.bottomLeft,
                   child: Icon(
                     Icons.update_outlined,
                     color: color55F,
                     size: 12.sp,
                   ),
                 )
-              : DateAndSeenTile(
-                  isMe: widget.isMe, isSeen: widget.isSeen, date: widget.date),
+              : DateAndSeenTile(isMe: isMe, isSeen: isSeen, date: date),
           const SizedBox(
             height: 8,
           )

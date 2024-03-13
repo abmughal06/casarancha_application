@@ -2,6 +2,7 @@ import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/screens/dashboard/ghost_mode_btn.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserModel?>();
+    // final user = context.watch<UserModel?>();
 
     return SafeArea(
       child: Scaffold(
@@ -91,11 +92,11 @@ class ProfileScreen extends StatelessWidget {
                 heightBox(10.w),
                 StreamProvider.value(
                   initialData: null,
-                  value: DataProvider().posts(),
+                  value: DataProvider().getUserPosts(currentUserUID),
                   catchError: (context, error) => null,
                   child:
                       Consumer<List<PostModel>?>(builder: (context, post, b) {
-                    if (post == null || user == null) {
+                    if (post == null) {
                       return centerLoader();
                     }
 
@@ -106,21 +107,18 @@ class ProfileScreen extends StatelessWidget {
                           QoutesGridView(
                             qoutesList: post
                                 .where((element) =>
-                                    element.creatorId == user.id &&
                                     element.mediaData.first.type == 'Qoute')
                                 .toList(),
                           ),
                           ImageGridView(
                             imageList: post
                                 .where((element) =>
-                                    element.creatorId == user.id &&
                                     element.mediaData.first.type == 'Photo')
                                 .toList(),
                           ),
                           VideoGridView(
                             videoList: post
                                 .where((element) =>
-                                    element.creatorId == user.id &&
                                     element.mediaData.first.type == 'Video')
                                 .toList(),
                           ),
@@ -128,7 +126,6 @@ class ProfileScreen extends StatelessWidget {
                           MusicGrid(
                             musicList: post
                                 .where((element) =>
-                                    element.creatorId == user.id &&
                                     element.mediaData.first.type == 'Music')
                                 .toList(),
                           ),

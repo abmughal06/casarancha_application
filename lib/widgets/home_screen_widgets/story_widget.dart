@@ -13,7 +13,8 @@ import '../../screens/home/story_view_screen.dart';
 class MyStoryWidget extends StatelessWidget {
   MyStoryWidget({super.key, required this.stories});
   final Story? stories;
-  final twentyFourHoursAgo = DateTime.now().subtract(const Duration(hours: 24));
+  final twentyFourHoursAgo =
+      DateTime.now().toUtc().subtract(const Duration(hours: 24));
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +101,12 @@ class AppUserStoryWidget extends StatelessWidget {
             Visibility(
               visible: story.creatorDetails.isVerified,
               child: Positioned(
-                bottom: 0,
+                bottom: 6,
                 right: 0,
                 child: SvgPicture.asset(
                   icVerifyBadge,
-                  height: 17.h,
-                  width: 17.h,
+                  height: 15.h,
+                  width: 15.h,
                 ),
               ),
             )

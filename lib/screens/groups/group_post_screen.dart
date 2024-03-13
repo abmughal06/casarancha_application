@@ -2,6 +2,7 @@ import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/resources/image_resources.dart';
 import 'package:casarancha/screens/groups/group_member_screen.dart';
+import 'package:casarancha/screens/groups/group_notification_badge.dart';
 import 'package:casarancha/screens/groups/group_settings.dart';
 import 'package:casarancha/screens/home/CreatePost/create_post_screen.dart';
 import 'package:casarancha/utils/app_constants.dart';
@@ -68,35 +69,20 @@ class _GroupPostScreenState extends State<GroupPostScreen> {
               actions: [
                 currentUserUID == widget.group.creatorId ||
                         widget.group.adminIds.contains(currentUserUID)
-                    ? Stack(
-                        children: [
-                          InkWell(
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GroupNotificationBadge(
+                          groupId: widget.group.id,
+                          child: GestureDetector(
                             onTap: () => Get.to(() => GroupSettings(
                                   grp: widget.group,
                                 )),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Icon(
-                                Icons.settings,
-                                color: color887,
-                              ),
+                            child: const Icon(
+                              Icons.settings,
+                              color: color887,
                             ),
                           ),
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: Visibility(
-                              visible: widget.group.joinRequestIds.isNotEmpty &&
-                                  (widget.group.creatorId == currentUserUID ||
-                                      widget.group.adminIds
-                                          .contains(currentUserUID)),
-                              child: const CircleAvatar(
-                                radius: 4,
-                                backgroundColor: colorPrimaryA05,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       )
                     : IconButton(
                         onPressed: () => Get.to(() => GroupMembersScreen(

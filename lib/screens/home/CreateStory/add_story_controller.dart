@@ -11,18 +11,12 @@ import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-// import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../models/user_model.dart';
 
 class AddStoryProvider extends ChangeNotifier {
-  // late ProfileScreenController profileScreenController;
-
   final fbinstance = FirebaseFirestore.instance;
-
-  //Obserables
-
   UploadTask? mediaUploadTasks;
   File? mediaFile;
 
@@ -62,7 +56,7 @@ class AddStoryProvider extends ChangeNotifier {
 
       if (storyData.exists) {
         await storyRef.update({
-          // "createdAt": DateTime.now().toUtc().toString(),
+          "creatorDetails": creatorDetails.toMap(),
           'mediaDetailsList': FieldValue.arrayUnion([
             mediaData.toMap(),
           ])

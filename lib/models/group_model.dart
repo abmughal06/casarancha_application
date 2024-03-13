@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-
 import 'package:casarancha/models/post_creator_details.dart';
 
 class GroupModel {

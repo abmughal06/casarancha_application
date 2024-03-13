@@ -176,8 +176,10 @@ class AllSearch extends StatelessWidget {
                               groupId: groupSnap.id);
                         } else {
                           context.read<NewGroupProvider>().requestPrivateGroup(
-                              id: FirebaseAuth.instance.currentUser!.uid,
-                              groupId: groupSnap.id);
+                                adminId: groupSnap.creatorId,
+                                id: FirebaseAuth.instance.currentUser!.uid,
+                                groupId: groupSnap.id,
+                              );
                         }
                       }
                     },
@@ -206,7 +208,6 @@ class AllSearch extends StatelessWidget {
                     user: userSnap,
                     ontapToggleFollow: () => profileProvider.toggleFollowBtn(
                       context,
-                      userModel: cUser,
                       appUserId: userSnap.id,
                     ),
                     btnName: cUser.followingsIds.contains(userSnap.id)
@@ -253,7 +254,6 @@ class PeopleSearch extends StatelessWidget {
                 user: userSnap,
                 ontapToggleFollow: () => profileProvider.toggleFollowBtn(
                   context,
-                  userModel: cUser,
                   appUserId: userSnap.id,
                 ),
                 btnName: cUser.followingsIds.contains(userSnap.id)
