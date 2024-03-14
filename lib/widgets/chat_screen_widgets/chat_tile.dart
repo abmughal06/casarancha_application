@@ -60,11 +60,10 @@ class ChatTile extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: color080.withOpacity(0.2),
                               borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(isMe ? 10.r : 16.r),
-                                  topRight: Radius.circular(isMe ? 16.r : 10.r),
-                                  bottomLeft: Radius.circular(isMe ? 10.r : 0),
-                                  bottomRight:
-                                      Radius.circular(isMe ? 0 : 10.r)),
+                                  topLeft: Radius.circular(isMe ? 5.r : 12.r),
+                                  topRight: Radius.circular(isMe ? 12.r : 5.r),
+                                  bottomLeft: Radius.circular(isMe ? 5.r : 0),
+                                  bottomRight: Radius.circular(isMe ? 0 : 5.r)),
                             ),
                             child: SelectableText.rich(
                               TextSpan(
