@@ -1,8 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:casarancha/models/post_model.dart';
+import 'package:casarancha/models/message.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/resources/color_resources.dart';
-import 'package:casarancha/screens/home/providers/post_provider.dart';
+import 'package:casarancha/resources/image_resources.dart';
+import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,27 +11,25 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
-import '../../resources/image_resources.dart';
 import '../../widgets/common_button.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/text_widget.dart';
 import '../search/search_screen.dart';
 
-class SharePostScreen extends StatefulWidget {
-  const SharePostScreen({super.key, required this.postModel, this.groupId});
-  final PostModel postModel;
-  final String? groupId;
+class ForwardMessageScreen extends StatefulWidget {
+  const ForwardMessageScreen({super.key, required this.message});
+  final Message message;
 
   @override
-  State<SharePostScreen> createState() => _SharePostScreenState();
+  State<ForwardMessageScreen> createState() => _ForwardMessageScreenState();
 }
 
-class _SharePostScreenState extends State<SharePostScreen> {
-  late PostProvider postProvider;
+class _ForwardMessageScreenState extends State<ForwardMessageScreen> {
+  late ChatProvider chatProvider;
 
   @override
   void dispose() {
-    postProvider.restoreReciverList();
+    chatProvider.restoreReciverList();
     super.dispose();
   }
 
@@ -38,7 +37,7 @@ class _SharePostScreenState extends State<SharePostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    postProvider = Provider.of<PostProvider>(context);
+    chatProvider = Provider.of<ChatProvider>(context);
     final search = Provider.of<SearchProvider>(context);
 
     return Scaffold(
@@ -94,22 +93,19 @@ class _SharePostScreenState extends State<SharePostScreen> {
                         padding: EdgeInsets.only(bottom: 120.h),
                         itemCount: users.length,
                         itemBuilder: (context, index) {
-                          return SharePostTile(
-                            appUser: users[index],
-                            postModel: widget.postModel,
-                            currentUser: currentUser,
-                            isSent: postProvider.recieverIds
-                                .contains(users[index].id),
-                            ontapSend: () {
-                              postProvider.sharePostData(
-                                notimsg: appText(context).strSentPost,
-                                currentUser: currentUser,
-                                groupId: widget.groupId,
-                                appUser: users[index],
-                                postModel: widget.postModel,
-                              );
-                            },
-                          );
+                          return ForwardMessageTile(
+                              callAction: () {
+                                chatProvider.forwardMessage(
+                                  message: widget.message,
+                                  currentUser: currentUser,
+                                  appUser: users[index],
+                                );
+                              },
+                              appUser: users[index],
+                              currentUser: currentUser,
+                              isSent: chatProvider.recieverIds
+                                  .contains(users[index].id),
+                              message: widget.message);
                         },
                       ),
                     );
@@ -128,19 +124,17 @@ class _SharePostScreenState extends State<SharePostScreen> {
                         padding: EdgeInsets.only(bottom: 120.h),
                         itemCount: searchList.length,
                         itemBuilder: (context, index) {
-                          return SharePostTile(
+                          return ForwardMessageTile(
                             appUser: searchList[index],
-                            postModel: widget.postModel,
                             currentUser: currentUser,
-                            isSent: postProvider.recieverIds
+                            isSent: chatProvider.recieverIds
                                 .contains(searchList[index].id),
-                            ontapSend: () {
-                              postProvider.sharePostData(
-                                notimsg: appText(context).strSentPost,
+                            message: widget.message,
+                            callAction: () {
+                              chatProvider.forwardMessage(
+                                message: widget.message,
                                 currentUser: currentUser,
-                                groupId: widget.groupId,
                                 appUser: searchList[index],
-                                postModel: widget.postModel,
                               );
                             },
                           );
@@ -174,21 +168,21 @@ class _SharePostScreenState extends State<SharePostScreen> {
   }
 }
 
-class SharePostTile extends StatelessWidget {
-  const SharePostTile({
+class ForwardMessageTile extends StatelessWidget {
+  const ForwardMessageTile({
     super.key,
-    required this.postModel,
     required this.currentUser,
     required this.appUser,
     required this.isSent,
-    required this.ontapSend,
+    required this.message,
+    required this.callAction,
   });
 
-  final PostModel postModel;
+  final Message message;
   final UserModel currentUser;
   final UserModel appUser;
   final bool isSent;
-  final VoidCallback ontapSend;
+  final VoidCallback callAction;
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +247,7 @@ class SharePostTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
               ),
               child: InkWell(
-                onTap: ontapSend,
+                onTap: callAction,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 17, vertical: 9),

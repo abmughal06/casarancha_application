@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../models/user_model.dart';
 import '../../../../utils/snackbar.dart';
-import '../../../home/CreatePost/create_post_controller.dart';
 
 class EditProfileProvider extends ChangeNotifier {
   late TextEditingController firstNameController;
@@ -56,7 +55,7 @@ class EditProfileProvider extends ChangeNotifier {
       maxHeight: 400,
     );
     if (pickedFile != null) {
-      imageFilePicked = await cropImage(pickedFile.path);
+      imageFilePicked = File(pickedFile.path);
       notifyListeners();
     } else {
       GlobalSnackBar.show(message: appText(context).strProcessCancelled);

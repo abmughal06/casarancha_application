@@ -4,7 +4,6 @@ import 'package:casarancha/models/user_model.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:path/path.dart';
 import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/models/post_creator_details.dart';
@@ -16,7 +15,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
-// import 'package:video_player/video_player.dart';
 import '../../../resources/firebase_cloud_messaging.dart';
 
 class CreatePostMethods extends ChangeNotifier {
@@ -396,61 +394,61 @@ Future<double> getVideoAspectRatio(File video) async {
       .then((value) => videoPlayerController.value.aspectRatio);
 }
 
-Future<File?> profileCropImage(String path) async {
-  CroppedFile? croppedFile = await ImageCropper().cropImage(
-    sourcePath: path,
-    aspectRatioPresets: [
-      CropAspectRatioPreset.ratio16x9,
-      CropAspectRatioPreset.ratio3x2,
-      CropAspectRatioPreset.ratio4x3,
-      CropAspectRatioPreset.ratio5x3,
-      CropAspectRatioPreset.ratio5x4,
-      CropAspectRatioPreset.ratio7x5,
-      CropAspectRatioPreset.square,
-      CropAspectRatioPreset.original,
-    ],
-    uiSettings: [
-      AndroidUiSettings(
-        toolbarTitle: 'Cropper',
-        toolbarColor: Colors.red,
-        toolbarWidgetColor: Colors.white,
-      ),
-      IOSUiSettings(
-        title: 'Cropper',
-        resetAspectRatioEnabled: true,
-      ),
-    ],
-  );
-  if (croppedFile != null) {
-    return File(croppedFile.path);
-  } else {
-    return null;
-  }
-}
+// Future<File?> profileCropImage(String path) async {
+//   CroppedFile? croppedFile = await ImageCropper().cropImage(
+//     sourcePath: path,
+//     aspectRatioPresets: [
+//       CropAspectRatioPreset.ratio16x9,
+//       CropAspectRatioPreset.ratio3x2,
+//       CropAspectRatioPreset.ratio4x3,
+//       CropAspectRatioPreset.ratio5x3,
+//       CropAspectRatioPreset.ratio5x4,
+//       CropAspectRatioPreset.ratio7x5,
+//       CropAspectRatioPreset.square,
+//       CropAspectRatioPreset.original,
+//     ],
+//     uiSettings: [
+//       AndroidUiSettings(
+//         toolbarTitle: 'Cropper',
+//         toolbarColor: Colors.red,
+//         toolbarWidgetColor: Colors.white,
+//       ),
+//       IOSUiSettings(
+//         title: 'Cropper',
+//         resetAspectRatioEnabled: true,
+//       ),
+//     ],
+//   );
+//   if (croppedFile != null) {
+//     return File(croppedFile.path);
+//   } else {
+//     return null;
+//   }
+// }
 
-Future<File?> cropImage(String path) async {
-  CroppedFile? croppedFile = await ImageCropper().cropImage(
-    sourcePath: path,
-    aspectRatioPresets: [
-      CropAspectRatioPreset.square,
-      CropAspectRatioPreset.original
-    ],
-    uiSettings: [
-      AndroidUiSettings(
-        toolbarTitle: 'Cropper',
-        toolbarColor: Colors.red,
-        toolbarWidgetColor: Colors.white,
-        initAspectRatio: CropAspectRatioPreset.square,
-      ),
-      IOSUiSettings(
-          title: 'Cropper',
-          resetAspectRatioEnabled: true,
-          aspectRatioLockEnabled: true),
-    ],
-  );
-  if (croppedFile != null) {
-    return File(croppedFile.path);
-  } else {
-    return null;
-  }
-}
+// Future<File?> cropImage(String path) async {
+//   CroppedFile? croppedFile = await ImageCropper().cropImage(
+//     sourcePath: path,
+//     aspectRatioPresets: [
+//       CropAspectRatioPreset.square,
+//       CropAspectRatioPreset.original
+//     ],
+//     uiSettings: [
+//       AndroidUiSettings(
+//         toolbarTitle: 'Cropper',
+//         toolbarColor: Colors.red,
+//         toolbarWidgetColor: Colors.white,
+//         initAspectRatio: CropAspectRatioPreset.square,
+//       ),
+//       IOSUiSettings(
+//           title: 'Cropper',
+//           resetAspectRatioEnabled: true,
+//           aspectRatioLockEnabled: true),
+//     ],
+//   );
+//   if (croppedFile != null) {
+//     return File(croppedFile.path);
+//   } else {
+//     return null;
+//   }
+// }

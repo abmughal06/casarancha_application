@@ -80,4 +80,18 @@ class ProfileProvider extends ChangeNotifier {
       // Handle general exception
     }
   }
+
+  toggleUserOnlineStatus(bool value) async {
+    final currentUserRef = FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+
+    // final userModel = await currentUserRef
+    //     .get()
+    //     .then((value) => UserModel.fromMap(value.data()!));
+
+    currentUserRef.update({
+      "isOnline": value,
+    });
+  }
 }

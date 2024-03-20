@@ -1092,4 +1092,68 @@ class ChatProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  List<String> recieverIds = [];
+
+  restoreReciverList() {
+    recieverIds.clear();
+  }
+
+  forwardMessage({
+    required Message message,
+    required UserModel currentUser,
+    required UserModel appUser,
+  }) {
+    try {
+      var docId = getConversationDocId(currentUser.id, appUser.id);
+
+      conversationId = docId;
+
+      final messageRef =
+          FirebaseFirestore.instance.collection('messages').doc(conversationId);
+
+      final chatRef = messageRef.collection('chats').doc();
+
+      recieverIds.add(appUser.id);
+      notifyListeners();
+
+      final lastMessageDetails = MessageDetails(
+        id: messageRef.id,
+        creatorId: currentUser.id,
+        lastMessage: message.type == 'Text' ? message.content : message.type,
+        unreadMessageCount: unreadMessages + 1,
+        searchCharacters: [...currentUser.name.toLowerCase().split('')],
+        creatorDetails: CreatorDetails(
+          name: currentUser.name,
+          imageUrl: currentUser.imageStr,
+          isVerified: currentUser.isVerified,
+        ),
+        createdAt: DateTime.now().toUtc().toString(),
+      );
+
+      final Message newMessage = message.copyWith(
+        id: chatRef.id,
+        sentToId: appUser.id,
+        sentById: currentUser.id,
+        isReply: false,
+        createdAt: DateTime.now().toUtc().toString(),
+        isSeen: false,
+      );
+
+      messageRef.set(lastMessageDetails.toMap());
+
+      chatRef.set(newMessage.toMap());
+
+      FirebaseMessagingService().sendNotificationToUser(
+        appUserId: appUser.id,
+        notificationType: "msg",
+        devRegToken: appUser.fcmToken,
+        msg: message.type == 'Text' ? message.content : message.type,
+        ghostmode: false,
+        isMessage: true,
+      );
+    } catch (e) {
+      GlobalSnackBar(message: e.toString());
+    } finally {}
+  }
 }

@@ -41,6 +41,7 @@ dependencies:
   flutter_linkify: ^6.0.0
   restart_app: ^1.2.1
   swipe_to: ^1.0.6
+  gallery_saver: ^2.3.2
   # recaptcha_enterprise_flutter: ^18.4.0 //only for android
 
   pinch_zoom: ^1.0.0
@@ -50,7 +51,7 @@ dependencies:
   file_picker: ^6.1.1
   firebase_auth: ^4.2.5
   firebase_storage: ^11.0.10
-  http: ^1.1.2
+  http: ^0.13.3
 
   firebase_core: ^2.24.2
   firebase_messaging: ^14.5.0
@@ -98,7 +99,7 @@ dependencies:
   google_sign_in: ^5.4.3
   # flutter_facebook_auth: ^4.4.1+1
   # twitter_login: ^4.2.3
-  image_cropper: ^5.0.1
+  # image_cropper: ^5.0.1
   readmore: ^2.2.0
   video_thumbnail: ^0.5.3
   # percent_indicator: ^4.2.3

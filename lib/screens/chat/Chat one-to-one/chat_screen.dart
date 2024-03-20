@@ -9,7 +9,6 @@ import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/show_media_widget.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -85,28 +84,33 @@ class _ChatScreenState extends State<ChatScreen> {
               automaticallyImplyLeading: false,
               backgroundColor: colorWhite,
               title: ChatScreenUserAppBar(
-                // creatorDetails: widget.creatorDetails,
                 appUserId: widget.appUserId,
               ),
               actions: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: svgImgButton(
-                      svgIcon: icChatVideo,
-                      onTap: () {
-                        GlobalSnackBar.show(
-                            message: appText(context).strComingSoon);
-                      }),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 8.w, right: 20.w),
-                  child: svgImgButton(
-                      svgIcon: icChatCall,
-                      onTap: () {
-                        GlobalSnackBar.show(
-                            message: appText(context).strComingSoon);
-                      }),
-                ),
+                PopupMenuButton(
+                  icon: const Icon(
+                    Icons.more_vert,
+                    color: color080,
+                  ),
+                  itemBuilder: (_) {
+                    return [
+                      PopupMenuItem(
+                          child: IconButton(
+                              onPressed: () {
+                                GlobalSnackBar.show(
+                                    message: appText(context).strComingSoon);
+                              },
+                              icon: SvgPicture.asset(icChatVideo))),
+                      PopupMenuItem(
+                          child: IconButton(
+                              onPressed: () {
+                                GlobalSnackBar.show(
+                                    message: appText(context).strComingSoon);
+                              },
+                              icon: SvgPicture.asset(icChatCall)))
+                    ];
+                  },
+                )
               ],
             ),
             body: SafeArea(

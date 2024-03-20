@@ -121,6 +121,12 @@ class PostCard extends StatelessWidget {
                       showDialog(
                           context: context,
                           builder: (c) => CustomDownloadDialog(
+                                isImage: post.mediaData.first.type == 'Photo'
+                                    ? true
+                                    : false,
+                                isVideo: post.mediaData.first.type == 'Video'
+                                    ? true
+                                    : false,
                                 path:
                                     '${post.mediaData.first.type}${Random().nextInt(2)}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}',
                                 url: post.mediaData.first.link,

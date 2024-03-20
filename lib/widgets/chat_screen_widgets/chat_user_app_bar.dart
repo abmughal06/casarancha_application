@@ -1,5 +1,6 @@
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -47,10 +48,16 @@ class ChatScreenUserAppBar extends StatelessWidget {
               ),
             ],
           ),
-          subtitle: const Text('Live'),
-          leading: ProfilePic(
-            pic: appUser.imageStr,
-            heightAndWidth: 40.h,
+          leading: Badge(
+            padding: EdgeInsets.zero,
+            smallSize: 12,
+            backgroundColor:
+                appUser.isOnline ? Colors.green.shade600 : color080,
+            alignment: Alignment.bottomRight,
+            child: ProfilePic(
+              pic: appUser.imageStr,
+              heightAndWidth: 40.h,
+            ),
           ),
         );
       }),

@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -44,39 +43,39 @@ class SetupProfileProvider extends ChangeNotifier {
       maxHeight: 400,
     );
     if (pickedFile != null) {
-      imageFilePicked = await cropImage(pickedFile.path);
+      imageFilePicked = File(pickedFile.path);
       notifyListeners();
     } else {
       // GlobalSnackBar.show(message: );
     }
   }
 
-  Future<File?> cropImage(String path) async {
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.square,
-        CropAspectRatioPreset.original
-      ],
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: 'Cropper',
-          toolbarColor: Colors.red,
-          toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.square,
-        ),
-        IOSUiSettings(
-            title: 'Cropper',
-            resetAspectRatioEnabled: true,
-            aspectRatioLockEnabled: true),
-      ],
-    );
-    if (croppedFile != null) {
-      return File(croppedFile.path);
-    } else {
-      return null;
-    }
-  }
+  // Future<File?> cropImage(String path) async {
+  //   CroppedFile? croppedFile = await ImageCropper().cropImage(
+  //     sourcePath: path,
+  //     aspectRatioPresets: [
+  //       CropAspectRatioPreset.square,
+  //       CropAspectRatioPreset.original
+  //     ],
+  //     uiSettings: [
+  //       AndroidUiSettings(
+  //         toolbarTitle: 'Cropper',
+  //         toolbarColor: Colors.red,
+  //         toolbarWidgetColor: Colors.white,
+  //         initAspectRatio: CropAspectRatioPreset.square,
+  //       ),
+  //       IOSUiSettings(
+  //           title: 'Cropper',
+  //           resetAspectRatioEnabled: true,
+  //           aspectRatioLockEnabled: true),
+  //     ],
+  //   );
+  //   if (croppedFile != null) {
+  //     return File(croppedFile.path);
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
   bool checkValidData(
       {String? fname,

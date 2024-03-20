@@ -36,7 +36,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       edit.firstNameController =
           TextEditingController(text: widget.user!.name.split(" ").first);
       edit.lastNameController =
-          TextEditingController(text: widget.user!.name.split(" ")[1]);
+          TextEditingController(text: widget.user!.name.split(" ").last);
       edit.bioController = TextEditingController(text: widget.user!.bio);
       edit.educationController =
           TextEditingController(text: widget.user!.education);

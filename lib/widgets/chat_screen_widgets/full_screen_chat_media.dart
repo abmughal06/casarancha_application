@@ -147,6 +147,14 @@ class ChatMediaFullScreenView extends StatelessWidget {
           showDialog(
             context: context,
             builder: (c) => CustomDownloadDialog(
+              isImage:
+                  media.first.type == 'Photo' || media.first.type == 'InChatPic'
+                      ? true
+                      : false,
+              isVideo: media.first.type == 'Video' ||
+                      media.first.type == 'InChatVideo'
+                  ? true
+                  : false,
               path: name,
               url: link,
             ),

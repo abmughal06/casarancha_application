@@ -207,7 +207,6 @@ class HomeScreen extends StatelessWidget {
                               child: ListView.builder(
                                 padding: EdgeInsets.only(bottom: 80.h),
                                 key: const PageStorageKey(0),
-                                // controller: ghostProvider.scrollController,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: posts.length,
                                 cacheExtent: 100,

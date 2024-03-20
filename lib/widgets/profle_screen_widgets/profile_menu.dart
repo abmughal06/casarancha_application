@@ -71,26 +71,33 @@ bottomSheetProfile(context) {
             ),
             heightBox(10.h),
             Expanded(
-              child: ListView.builder(
-                itemCount: profileBottomSheetList.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    child: textMenuItem(
-                      text: profileBottomSheetList[index],
-                      color: index > 10
-                          ? Colors.red
-                          : index == 5
-                              ? Colors.blue.shade700
-                              : null,
-                      onTap: () {
-                        Get.back();
-                        _onTapSheetItem(index: index, context: context);
-                      },
-                    ),
-                  );
-                },
-              ),
+              child: Consumer<UserModel?>(builder: (context, user, b) {
+                if (user == null) {
+                  return centerLoader();
+                }
+
+                return ListView.builder(
+                  itemCount: profileBottomSheetList.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      child: textMenuItem(
+                        text: profileBottomSheetList[index],
+                        color: index > 10
+                            ? Colors.red
+                            : index == 5
+                                ? Colors.blue.shade700
+                                : null,
+                        onTap: () {
+                          Get.back();
+                          _onTapSheetItem(
+                              index: index, context: context, userModel: user);
+                        },
+                      ),
+                    );
+                  },
+                );
+              }),
             ),
           ],
         ),
@@ -99,10 +106,13 @@ bottomSheetProfile(context) {
   );
 }
 
-_onTapSheetItem({required int index, required BuildContext context}) async {
+_onTapSheetItem(
+    {required int index,
+    required BuildContext context,
+    UserModel? userModel}) async {
   switch (index) {
     case 0:
-      Get.to(() => EditProfileScreen(user: context.watch<UserModel?>()));
+      Get.to(() => EditProfileScreen(user: userModel));
       break;
     case 1:
       Get.to(() => const SavedPostScreen());

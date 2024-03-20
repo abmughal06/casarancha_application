@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../resources/image_resources.dart';
@@ -114,10 +113,10 @@ class _VerifyScreenState extends State<VerifyScreen> {
           await ImagePicker().pickImage(source: ImageSource.gallery);
 
       if (pickedPhoto != null) {
-        CroppedFile? croppedImage = await ImageCropper().cropImage(
-            sourcePath: pickedPhoto.path,
-            aspectRatio: const CropAspectRatio(ratioX: 3.375, ratioY: 2.125));
-        var image = File(croppedImage!.path);
+        // CroppedFile? croppedImage = await ImageCropper().cropImage(
+        //     sourcePath: pickedPhoto.path,
+        //     aspectRatio: const CropAspectRatio(ratioX: 3.375, ratioY: 2.125));
+        var image = File(pickedPhoto.path);
         idFile = image;
         setState(() {});
       }
@@ -132,10 +131,10 @@ class _VerifyScreenState extends State<VerifyScreen> {
           await ImagePicker().pickImage(source: ImageSource.gallery);
 
       if (pickedPhoto != null) {
-        CroppedFile? croppedImage = await ImageCropper().cropImage(
-            sourcePath: pickedPhoto.path,
-            aspectRatio: const CropAspectRatio(ratioX: 3.375, ratioY: 2.125));
-        var image = File(croppedImage!.path);
+        // CroppedFile? croppedImage = await ImageCropper().cropImage(
+        //     sourcePath: pickedPhoto.path,
+        //     aspectRatio: const CropAspectRatio(ratioX: 3.375, ratioY: 2.125));
+        var image = File(pickedPhoto.path);
         otherDocFile = image;
         setState(() {});
       }

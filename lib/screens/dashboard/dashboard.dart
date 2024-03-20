@@ -4,6 +4,7 @@ import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
 import 'package:casarancha/screens/ghost_posts/ghost_post.dart';
 import 'package:casarancha/screens/home/HomeScreen/home_screen.dart';
 import 'package:casarancha/screens/profile/ProfileScreen/profile_screen.dart';
+import 'package:casarancha/screens/profile/ProfileScreen/provider/profile_provider.dart';
 import 'package:casarancha/screens/search/search_screen.dart';
 import 'package:casarancha/widgets/profle_screen_widgets/dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class DashBoard extends StatefulWidget {
   State<DashBoard> createState() => _DashBoardState();
 }
 
-class _DashBoardState extends State<DashBoard> {
+class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
   final _dhelper = DynamicLinkHelper();
   final _fcmServices = FirebaseMessagingService();
 
@@ -29,6 +30,21 @@ class _DashBoardState extends State<DashBoard> {
     super.initState();
     _fcmServices.init(context);
     _dhelper.initDynamicLinks(context);
+    WidgetsBinding.instance.addObserver(this);
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      ProfileProvider().toggleUserOnlineStatus(true);
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        ProfileProvider().toggleUserOnlineStatus(true);
+      });
+    } else {
+      ProfileProvider().toggleUserOnlineStatus(false);
+    }
   }
 
   @override

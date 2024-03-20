@@ -163,130 +163,129 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
           onLongPressEnd: (c) {
             videoPlayerController.play();
           },
-          child: videoPlayerController.value.isInitialized
-              ? Stack(
-                  children: [
-                    VideoPlayer(videoPlayerController),
-                    Container(
-                      color: isVideoPlaying
-                          ? Colors.transparent
-                          : Colors.black.withOpacity(0.3),
+          child: Stack(
+            children: [
+              videoPlayerController.value.isInitialized
+                  ? VideoPlayer(videoPlayerController)
+                  : Container(
+                      color: colorBlack.withOpacity(0.2),
                     ),
-                    AnimatedOpacity(
-                      opacity: isVideoPlaying ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 300),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: GestureDetector(
-                          onTap: () {
-                            if (isVideoPlaying) {
-                              videoPlayerController.pause();
-                            } else {
-                              videoPlayerController.play();
-                            }
-                          },
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 500),
-                            child: isVideoPlaying
-                                ? SvgPicture.asset(
-                                    icVideoPauseBtn,
-                                    height: 45.h,
-                                    width: 45.h,
-                                  )
-                                : SvgPicture.asset(
-                                    icVideoPlayBtn,
-                                    height: 45.h,
-                                    width: 45.h,
-                                  ),
-                          ),
-                        ),
-                      ),
+              Container(
+                color: isVideoPlaying
+                    ? Colors.transparent
+                    : Colors.black.withOpacity(0.3),
+              ),
+              AnimatedOpacity(
+                opacity: isVideoPlaying ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (isVideoPlaying) {
+                        videoPlayerController.pause();
+                      } else {
+                        videoPlayerController.play();
+                      }
+                    },
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      child: isVideoPlaying
+                          ? SvgPicture.asset(
+                              icVideoPauseBtn,
+                              height: 45.h,
+                              width: 45.h,
+                            )
+                          : SvgPicture.asset(
+                              icVideoPlayBtn,
+                              height: 45.h,
+                              width: 45.h,
+                            ),
                     ),
-                    Positioned(
-                      top: widget.isPostDetail ? 50.h : 15.h,
-                      right: 15.w,
-                      child: TextWidget(
-                        text: formatTime(duration - position),
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                        color: colorWhite,
-                        shadow: [
-                          Shadow(
-                            blurRadius: 3.0,
-                            color: colorBlack.withOpacity(0.5),
-                          ),
-                          Shadow(
-                            blurRadius: 8.0,
-                            color: colorBlack.withOpacity(0.5),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 25.h,
-                      right: 15.w,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (isVideoMute) {
-                            videoPlayerController.setVolume(1.0);
-                            isVideoMute = false;
-                          } else {
-                            videoPlayerController.setVolume(0.0);
-                            isVideoMute = true;
-                          }
-                          if (mounted) {
-                            setState(() {});
-                          }
-                        },
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 500),
-                          child: isVideoMute
-                              ? SvgPicture.asset(
-                                  icVideoSoundOff,
-                                  height: 22.h,
-                                  width: 22.h,
-                                )
-                              : SvgPicture.asset(
-                                  icVideoSoundOn,
-                                  height: 22.h,
-                                  width: 22.h,
-                                ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0.h,
-                      left: 15.w,
-                      right: 15.w,
-                      child: SizedBox(
-                        height: 30,
-                        child: SliderTheme(
-                          data: SliderThemeData(
-                            overlayShape: SliderComponentShape.noThumb,
-                            thumbShape: SliderComponentShape.noThumb,
-                            trackHeight: 1.h,
-                          ),
-                          child: Slider(
-                            thumbColor: Colors.transparent,
-                            activeColor: colorWhite,
-                            inactiveColor: color55F,
-                            min: 0.0,
-                            max: duration.inMilliseconds.toDouble(),
-                            value: position.inMilliseconds.toDouble(),
-                            onChanged: (value) async {
-                              final position =
-                                  Duration(milliseconds: value.toInt());
-                              await videoPlayerController.seekTo(position);
-                            },
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              : Container(
-                  color: colorBlack.withOpacity(0.04),
+                  ),
                 ),
+              ),
+              Positioned(
+                top: widget.isPostDetail ? 50.h : 15.h,
+                right: 15.w,
+                child: TextWidget(
+                  text: formatTime(duration - position),
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: colorWhite,
+                  shadow: [
+                    Shadow(
+                      blurRadius: 3.0,
+                      color: colorBlack.withOpacity(0.5),
+                    ),
+                    Shadow(
+                      blurRadius: 8.0,
+                      color: colorBlack.withOpacity(0.5),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 25.h,
+                right: 15.w,
+                child: GestureDetector(
+                  onTap: () {
+                    if (isVideoMute) {
+                      videoPlayerController.setVolume(1.0);
+                      isVideoMute = false;
+                    } else {
+                      videoPlayerController.setVolume(0.0);
+                      isVideoMute = true;
+                    }
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  },
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: isVideoMute
+                        ? SvgPicture.asset(
+                            icVideoSoundOff,
+                            height: 22.h,
+                            width: 22.h,
+                          )
+                        : SvgPicture.asset(
+                            icVideoSoundOn,
+                            height: 22.h,
+                            width: 22.h,
+                          ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0.h,
+                left: 15.w,
+                right: 15.w,
+                child: SizedBox(
+                  height: 30,
+                  child: SliderTheme(
+                    data: SliderThemeData(
+                      overlayShape: SliderComponentShape.noThumb,
+                      thumbShape: SliderComponentShape.noThumb,
+                      trackHeight: 1.h,
+                    ),
+                    child: Slider(
+                      thumbColor: Colors.transparent,
+                      activeColor: colorWhite,
+                      inactiveColor: color55F,
+                      min: 0.0,
+                      max: duration.inMilliseconds.toDouble(),
+                      value: position.inMilliseconds.toDouble(),
+                      onChanged: (value) async {
+                        final position = Duration(milliseconds: value.toInt());
+                        await videoPlayerController.seekTo(position);
+                      },
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

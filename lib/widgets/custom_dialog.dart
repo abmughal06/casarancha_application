@@ -12,9 +12,15 @@ import '../screens/dashboard/provider/download_provider.dart';
 
 class CustomDownloadDialog extends StatelessWidget {
   const CustomDownloadDialog(
-      {super.key, required this.path, required this.url});
+      {super.key,
+      required this.path,
+      required this.url,
+      required this.isVideo,
+      required this.isImage});
 
   final String path;
+  final bool isVideo;
+  final bool isImage;
   final String url;
 
   @override
@@ -24,15 +30,21 @@ class CustomDownloadDialog extends StatelessWidget {
         title: appText(context).strDownloadFile,
         actiionBtnName: appText(context).strYes,
         actionBtnColor: color221,
-        onAction: () => download.startDownloading(url, path, context),
+        onAction: () {
+          if (isVideo) {
+            download.videoDownloading(url, path, context);
+          } else if (isImage) {
+            download.imageDownloading(url, path);
+          } else {
+            download.startDownloading(url, path, context);
+          }
+        },
         alertMsg: download.isDownloading
             ? Platform.isAndroid
                 ? appText(context)
                     .strDownloading((download.progress * 1).toInt())
-                // 'Downloading file (${(download.progress * 1).toInt()}%)'
                 : appText(context)
                     .strDownloading((download.progress * 100).toInt())
-            //  'Downloading file (${(download.progress * 100).toInt()}%)'
             : appText(context).strConfirmDownload,
       );
     });

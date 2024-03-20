@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -384,7 +384,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 78NDCY7T9N;
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 1.0.4;
@@ -395,7 +395,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.6;
+				MARKETING_VERSION = 2.0.7;
 				OTHER_LDFLAGS = (
 					"-l\"c++\"",
 					"-l\"icucore\"",
@@ -484,8 +484,6 @@
 					"-framework",
 					"\"SystemConfiguration\"",
 					"-framework",
-					"\"TOCropViewController\"",
-					"-framework",
 					"\"UIKit\"",
 					"-framework",
 					"\"audioplayers_darwin\"",
@@ -513,8 +511,6 @@
 					"\"flutter_share\"",
 					"-framework",
 					"\"google_sign_in_ios\"",
-					"-framework",
-					"\"image_cropper\"",
 					"-framework",
 					"\"image_picker_ios\"",
 					"-framework",
@@ -676,7 +672,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 78NDCY7T9N;
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 1.0.4;
@@ -687,7 +683,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.6;
+				MARKETING_VERSION = 2.0.7;
 				OTHER_LDFLAGS = (
 					"-l\"c++\"",
 					"-l\"icucore\"",
@@ -776,8 +772,6 @@
 					"-framework",
 					"\"SystemConfiguration\"",
 					"-framework",
-					"\"TOCropViewController\"",
-					"-framework",
 					"\"UIKit\"",
 					"-framework",
 					"\"audioplayers_darwin\"",
@@ -805,8 +799,6 @@
 					"\"flutter_share\"",
 					"-framework",
 					"\"google_sign_in_ios\"",
-					"-framework",
-					"\"image_cropper\"",
 					"-framework",
 					"\"image_picker_ios\"",
 					"-framework",
@@ -862,7 +854,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/RunnerRelease.entitlements;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 78NDCY7T9N;
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 1.0.4;
@@ -873,7 +865,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.6;
+				MARKETING_VERSION = 2.0.7;
 				OTHER_LDFLAGS = (
 					"-l\"c++\"",
 					"-l\"icucore\"",
@@ -962,8 +954,6 @@
 					"-framework",
 					"\"SystemConfiguration\"",
 					"-framework",
-					"\"TOCropViewController\"",
-					"-framework",
 					"\"UIKit\"",
 					"-framework",
 					"\"audioplayers_darwin\"",
@@ -991,8 +981,6 @@
 					"\"flutter_share\"",
 					"-framework",
 					"\"google_sign_in_ios\"",
-					"-framework",
-					"\"image_cropper\"",
 					"-framework",
 					"\"image_picker_ios\"",
 					"-framework",

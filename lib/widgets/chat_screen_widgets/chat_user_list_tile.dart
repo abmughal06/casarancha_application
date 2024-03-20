@@ -41,7 +41,6 @@ class ChatUserListTile extends StatelessWidget {
             initialData: null,
             catchError: (context, error) => null,
             child: Consumer<int?>(builder: (context, length, b) {
-              // print(length);
               return length == null
                   ? Container()
                   : ListTile(
@@ -84,9 +83,17 @@ class ChatUserListTile extends StatelessWidget {
                                 );
                         }),
                       ),
-                      leading: ProfilePic(
-                        pic: personDetail.imageStr,
-                        heightAndWidth: 45.h,
+                      leading: Badge(
+                        padding: EdgeInsets.zero,
+                        smallSize: 12,
+                        backgroundColor: personDetail.isOnline
+                            ? Colors.green.shade600
+                            : color080,
+                        alignment: Alignment.bottomRight,
+                        child: ProfilePic(
+                          pic: personDetail.imageStr,
+                          heightAndWidth: 45.h,
+                        ),
                       ),
                       trailing: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -200,9 +207,17 @@ class GhostChatListTile extends StatelessWidget {
                                     );
                             }),
                           ),
-                          leading: ProfilePic(
-                            pic: user.imageStr,
-                            heightAndWidth: 45.h,
+                          leading: Badge(
+                            padding: EdgeInsets.zero,
+                            smallSize: 12,
+                            backgroundColor: user.isOnline
+                                ? Colors.green.shade600
+                                : color080,
+                            alignment: Alignment.bottomRight,
+                            child: ProfilePic(
+                              pic: user.imageStr,
+                              heightAndWidth: 45.h,
+                            ),
                           ),
                           trailing: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -362,9 +377,16 @@ class ChatUserListTileForNoChat extends StatelessWidget {
           fontSize: 14.sp,
           color: const Color(0xff8a8a8a),
         ),
-        leading: ProfilePic(
-          pic: userModel.imageStr,
-          heightAndWidth: 45.h,
+        leading: Badge(
+          padding: EdgeInsets.zero,
+          smallSize: 12,
+          backgroundColor:
+              userModel.isOnline ? Colors.green.shade600 : color080,
+          alignment: Alignment.bottomRight,
+          child: ProfilePic(
+            pic: userModel.imageStr,
+            heightAndWidth: 45.h,
+          ),
         ),
         trailing: const Icon(Icons.navigate_next),
       ),

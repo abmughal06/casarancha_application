@@ -67,6 +67,8 @@ class CheckMediaAndShowPost extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return CustomDownloadDialog(
+                        isImage: true,
+                        isVideo: false,
                         url: mediaData.link,
                         path:
                             '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
@@ -77,10 +79,12 @@ class CheckMediaAndShowPost extends StatelessWidget {
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(
-                    postModel: postModel,
-                    groupId: groupId,
-                  )),
+              : isFullScreen
+                  ? () {}
+                  : () => Get.to(() => PostDetailScreen(
+                        postModel: postModel,
+                        groupId: groupId,
+                      )),
           child: AspectRatio(
             aspectRatio: double.parse(mediaData.imageWidth!) /
                 double.parse(mediaData.imageHeight!),
@@ -101,6 +105,8 @@ class CheckMediaAndShowPost extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return CustomDownloadDialog(
+                        isImage: false,
+                        isVideo: true,
                         url: mediaData.link,
                         path:
                             '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
@@ -112,10 +118,12 @@ class CheckMediaAndShowPost extends StatelessWidget {
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(
-                    postModel: postModel,
-                    groupId: groupId,
-                  )),
+              : isFullScreen
+                  ? () {}
+                  : () => Get.to(() => PostDetailScreen(
+                        postModel: postModel,
+                        groupId: groupId,
+                      )),
           child: VideoPlayerWidget(
             key: ValueKey(mediaData.link),
             media: mediaData,
@@ -154,10 +162,12 @@ class CheckMediaAndShowPost extends StatelessWidget {
           onTap: isPostDetail
               ? () => Get.to(() => PostFullScreenView(
                   post: postModel, isPostDetail: isPostDetail))
-              : () => Get.to(() => PostDetailScreen(
-                    postModel: postModel,
-                    groupId: groupId,
-                  )),
+              : isFullScreen
+                  ? () {}
+                  : () => Get.to(() => PostDetailScreen(
+                        postModel: postModel,
+                        groupId: groupId,
+                      )),
           child: Container(
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
@@ -266,36 +276,38 @@ class _PostMediaWidgetForOtherTypesState
           : widget.post.mediaData.first.type == 'Video'
               ? double.parse(widget.post.mediaData.first.videoAspectRatio!)
               : MediaQuery.of(context).size.width / 200,
-      child: PageView.builder(
-        itemCount: widget.post.mediaData.length,
-        physics: physics,
-        itemBuilder: (context, i) {
-          var media = widget.post.mediaData[i];
-          return PinchZoom(
-            resetDuration: const Duration(milliseconds: 100),
-            maxScale: 5.0,
-            onZoomStart: () {
-              setState(() {
-                physics = const NeverScrollableScrollPhysics();
-              });
-            },
-            onZoomEnd: () {
-              setState(() {
-                physics = const BouncingScrollPhysics();
-              });
-            },
-            child: CheckMediaAndShowPost(
-              groupId: widget.groupId,
-              isPostDetail: widget.isPostDetail,
-              postModel: widget.post,
-              ondoubleTap: () => prov.toggleLikeDislike(
-                  postModel: widget.post, groupId: widget.groupId),
-              mediaData: media,
-              postId: widget.post.id,
-              isFullScreen: widget.isFullScreen,
-            ),
-          );
-        },
+      child:
+          // PageView.builder(
+          //   itemCount: widget.post.mediaData.length,
+          //   physics: physics,
+          //   itemBuilder: (context, i) {
+          //     var media = widget.post.mediaData[i];
+          //     return
+          PinchZoom(
+        resetDuration: const Duration(milliseconds: 100),
+        maxScale: 5.0,
+        // onZoomStart: () {
+        //   setState(() {
+        //     physics = const NeverScrollableScrollPhysics();
+        //   });
+        // },
+        // onZoomEnd: () {
+        //   setState(() {
+        //     physics = const BouncingScrollPhysics();
+        //   });
+        // },
+        child: CheckMediaAndShowPost(
+          groupId: widget.groupId,
+          isPostDetail: widget.isPostDetail,
+          postModel: widget.post,
+          ondoubleTap: () => prov.toggleLikeDislike(
+              postModel: widget.post, groupId: widget.groupId),
+          mediaData: widget.post.mediaData.first,
+          postId: widget.post.id,
+          isFullScreen: widget.isFullScreen,
+        ),
+        // );
+        // },
       ),
     );
   }
@@ -327,11 +339,13 @@ class PostFullScreenView extends StatelessWidget {
                   ? PostMediaWidgetForQuoteAndPoll(
                       post: post,
                       isPostDetail: false,
+                      isFullScreen: true,
                       groupId: groupId,
                     )
                   : PostMediaWidgetForOtherTypes(
                       post: post,
                       isPostDetail: false,
+                      isFullScreen: true,
                       groupId: groupId,
                     ),
             ),

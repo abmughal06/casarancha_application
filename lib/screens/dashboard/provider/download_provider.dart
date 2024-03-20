@@ -4,6 +4,8 @@ import 'package:casarancha/utils/snackbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+// import 'package:gallery_saver/gallery_saver.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 
@@ -98,6 +100,68 @@ class DownloadProvider extends ChangeNotifier {
     }
   }
 
+  void imageDownloading(String url, String filename) async {
+    isDownloading = true;
+    notifyListeners();
+    try {
+      String path = await _getPath2(filename);
+
+      await dio.download(
+        url,
+        path,
+        onReceiveProgress: (count, total) {
+          progress = count / total;
+          notifyListeners();
+        },
+        deleteOnError: true,
+      );
+
+      await GallerySaver.saveImage(path, albumName: 'Casa Rancha')
+          .whenComplete(() {
+        GlobalSnackBar.show(message: 'Saved in Gallery');
+      });
+    } catch (e) {
+      isDownloading = false;
+      notifyListeners();
+    } finally {
+      isDownloading = false;
+      progress = 0.0;
+      Get.back();
+      notifyListeners();
+    }
+  }
+
+  void videoDownloading(String url, String filename, context) async {
+    isDownloading = true;
+    notifyListeners();
+    try {
+      String path = await _getPath2(filename);
+
+      await dio.download(
+        url,
+        path,
+        onReceiveProgress: (count, total) {
+          progress = count / total;
+          notifyListeners();
+        },
+        deleteOnError: true,
+      );
+
+      await GallerySaver.saveVideo(path, albumName: 'Casa Rancha')
+          .whenComplete(() {
+        GlobalSnackBar.show(message: 'Saved in Gallery');
+      });
+    } catch (e) {
+      isDownloading = false;
+      notifyListeners();
+    } finally {
+      isDownloading = false;
+      progress = 0.0;
+      Get.back();
+      notifyListeners();
+    }
+  }
+
   Future<String?> downloadForShare(String url, String filename, context) async {
     try {
       String path = await _getPath(filename);
@@ -154,6 +218,11 @@ class DownloadProvider extends ChangeNotifier {
 
   Future<String> _getPath(String filename) async {
     final dir = await getApplicationDocumentsDirectory();
+    return '${dir.path}/$filename';
+  }
+
+  Future<String> _getPath2(String filename) async {
+    final dir = await getTemporaryDirectory();
     return '${dir.path}/$filename';
   }
 }
