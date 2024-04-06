@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:casarancha/models/providers/user_data_provider.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
@@ -23,7 +21,6 @@ import '../../models/media_details.dart';
 import '../../models/post_model.dart';
 import '../../resources/color_resources.dart';
 import '../../resources/image_resources.dart';
-import '../../screens/dashboard/provider/download_provider.dart';
 import '../music_player_url.dart';
 import '../poll.dart';
 import '../text_widget.dart';
@@ -67,11 +64,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return CustomDownloadDialog(
-                        isImage: true,
-                        isVideo: false,
-                        url: mediaData.link,
-                        path:
-                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
+                        mediaDetails: postModel.mediaData,
                       );
                     })
                 : null;
@@ -105,11 +98,7 @@ class CheckMediaAndShowPost extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return CustomDownloadDialog(
-                        isImage: false,
-                        isVideo: true,
-                        url: mediaData.link,
-                        path:
-                            '${mediaData.type}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaData.type)}',
+                        mediaDetails: postModel.mediaData,
                       );
                     })
                 : null;

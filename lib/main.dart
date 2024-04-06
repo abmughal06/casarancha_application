@@ -51,7 +51,6 @@ class _MyAppState extends State<MyApp> {
           initialData: null,
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
-            // getLocale();
             return ProviderApp(
               app: Portal(
                 child: GetMaterialApp(

@@ -6,6 +6,7 @@ import 'package:casarancha/screens/profile/account_recovery.dart';
 import 'package:casarancha/screens/profile/get_verified.dart';
 import 'package:casarancha/screens/profile/help.dart';
 import 'package:casarancha/screens/profile/settings/settings.dart';
+import 'package:casarancha/utils/app_constants.dart';
 import 'package:casarancha/widgets/shared/alert_dialog.dart';
 import 'package:casarancha/widgets/text_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -165,7 +166,7 @@ _onTapSheetItem(
               alertMsg: appText(context).strConfirmLogout,
               actiionBtnName: appText(context).strLogout,
               onAction: () => AuthenticationProvider(FirebaseAuth.instance)
-                      .signOut()
+                      .signOut(currentUserUID)
                       .whenComplete(() {
                     // User? user;
                     Get.offAll(() => const LoginScreen());

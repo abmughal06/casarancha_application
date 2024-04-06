@@ -9,6 +9,7 @@ class MediaDetails {
   String? imageWidth;
   String? videoAspectRatio;
   String? videoViews;
+  String? videoThumbnail;
   List? storyViews;
   String? pollQuestion;
   List<dynamic>? pollOptions;
@@ -18,6 +19,7 @@ class MediaDetails {
       required this.name,
       required this.type,
       required this.link,
+      this.videoThumbnail,
       this.pollVotedUsers,
       this.imageHeight,
       this.storyViews,
@@ -34,6 +36,7 @@ class MediaDetails {
     String? link,
     List? storyViews,
     String? pollQuestion,
+    String? videoThumbnail,
     List<dynamic>? pollOptions,
     List<dynamic>? pollVotedUsers,
     String? imageHeight,
@@ -47,6 +50,7 @@ class MediaDetails {
       name: name ?? this.name,
       type: type ?? this.type,
       link: link ?? this.link,
+      videoThumbnail: videoThumbnail ?? this.videoThumbnail,
       pollOptions: pollOptions ?? this.pollOptions,
       pollQuestion: pollQuestion ?? this.pollQuestion,
       imageHeight: imageHeight ?? this.imageHeight,
@@ -76,6 +80,7 @@ class MediaDetails {
                 'type': type,
                 'link': link,
                 'videoAspectRatio': videoAspectRatio,
+                'videoThumbnail': videoThumbnail,
                 'videoViews': videoViews,
               }
             : type.toLowerCase() == 'poll'
@@ -105,6 +110,7 @@ class MediaDetails {
       storyViews: map['storyViews'] ?? [],
       type: map['type'] ?? '',
       link: map['link'] ?? '',
+      videoThumbnail: map['videoThumbnail'] ?? '',
       pollVotedUsers: map['pollVotedUsers'] ?? [],
       pollOptions: map['pollOptions'] ?? [],
       pollQuestion: map['pollQuestion'] ?? '',

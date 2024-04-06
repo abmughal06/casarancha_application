@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:casarancha/models/media_details.dart';
 import 'package:casarancha/utils/app_utils.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:dio/dio.dart';
@@ -65,118 +66,157 @@ class DownloadProvider extends ChangeNotifier {
     }
   }
 
-  void startDownloading(String url, String filename, context) async {
+  void startDownloading(
+      {required List<MediaDetails> mediaDetails,
+      required BuildContext context}) async {
     isDownloading = true;
     notifyListeners();
     try {
-      String path = await _getPath(filename);
+      for (var media in mediaDetails) {
+        if (media.type == 'Video' || media.type == 'InChatVideo') {
+          String path = await _getPath2(media.type);
+
+          await dio.download(
+            media.link,
+            path,
+            onReceiveProgress: (count, total) {
+              progress = count / total;
+              notifyListeners();
+            },
+            deleteOnError: true,
+          );
+
+          await GallerySaver.saveVideo(path, albumName: 'Casa Rancha')
+              .whenComplete(() {});
+        } else if (media.type == 'Photo' || media.type == 'InChatPic') {
+          String path = await _getPath2(media.type);
+
+          await dio.download(
+            media.link,
+            path,
+            onReceiveProgress: (count, total) {
+              progress = count / total;
+              notifyListeners();
+            },
+            deleteOnError: true,
+          );
+
+          await GallerySaver.saveImage(path, albumName: 'Casa Rancha')
+              .whenComplete(() {});
+        } else {
+          String path = await _getPath(media.type);
+
+          Platform.isAndroid
+              ? await FileDownloader.downloadFile(
+                  name: path.split('/').last,
+                  url: media.link,
+                  onProgress: (fileName, p) {
+                    progress = p;
+                    notifyListeners();
+                  },
+                )
+              : await dio.download(
+                  media.link,
+                  path,
+                  onReceiveProgress: (count, total) {
+                    progress = count / total;
+                    notifyListeners();
+                  },
+                  deleteOnError: true,
+                );
+        }
+      }
+    } catch (e) {
+      isDownloading = false;
+      notifyListeners();
+    } finally {
+      isDownloading = false;
+      progress = 0.0;
+      GlobalSnackBar.show(message: 'Media saved successfully');
+      Get.back();
+      notifyListeners();
+    }
+  }
+
+  // void imageDownloading(List<String> urls, String mediaType) async {
+  //   isDownloading = true;
+  //   notifyListeners();
+  //   try {
+  //     for (var url in urls) {
+  //       String path = await _getPath2(mediaType);
+
+  //       await dio.download(
+  //         url,
+  //         path,
+  //         onReceiveProgress: (count, total) {
+  //           progress = count / total;
+  //           notifyListeners();
+  //         },
+  //         deleteOnError: true,
+  //       );
+
+  //       await GallerySaver.saveImage(path, albumName: 'Casa Rancha')
+  //           .whenComplete(() {});
+  //     }
+  //     GlobalSnackBar.show(message: 'Saved in Gallery');
+  //   } catch (e) {
+  //     isDownloading = false;
+  //     notifyListeners();
+  //   } finally {
+  //     isDownloading = false;
+  //     progress = 0.0;
+  //     Get.back();
+  //     notifyListeners();
+  //   }
+  // }
+
+  // void videoDownloading(String url, String filename, context) async {
+  //   isDownloading = true;
+  //   notifyListeners();
+  //   try {
+  //     String path = await _getPath2(filename);
+
+  //     await dio.download(
+  //       url,
+  //       path,
+  //       onReceiveProgress: (count, total) {
+  //         progress = count / total;
+  //         notifyListeners();
+  //       },
+  //       deleteOnError: true,
+  //     );
+
+  //     await GallerySaver.saveVideo(path, albumName: 'Casa Rancha')
+  //         .whenComplete(() {
+  //       GlobalSnackBar.show(message: 'Saved in Gallery');
+  //     });
+  //   } catch (e) {
+  //     isDownloading = false;
+  //     notifyListeners();
+  //   } finally {
+  //     isDownloading = false;
+  //     progress = 0.0;
+  //     Get.back();
+  //     notifyListeners();
+  //   }
+  // }
+
+  Future<String?> downloadForShare(
+      {required MediaDetails media, required BuildContext context}) async {
+    try {
+      String path = await _getPath(media.type);
 
       Platform.isAndroid
           ? await FileDownloader.downloadFile(
-              name: filename,
-              url: url,
+              name: path.split('/').last,
+              url: media.link,
               onProgress: (fileName, p) {
                 progress = p;
                 notifyListeners();
               },
             )
           : await dio.download(
-              url,
-              path,
-              onReceiveProgress: (count, total) {
-                progress = count / total;
-                notifyListeners();
-              },
-              deleteOnError: true,
-            );
-    } catch (e) {
-      isDownloading = false;
-      notifyListeners();
-    } finally {
-      isDownloading = false;
-      progress = 0.0;
-      Get.back();
-      notifyListeners();
-    }
-  }
-
-  void imageDownloading(String url, String filename) async {
-    isDownloading = true;
-    notifyListeners();
-    try {
-      String path = await _getPath2(filename);
-
-      await dio.download(
-        url,
-        path,
-        onReceiveProgress: (count, total) {
-          progress = count / total;
-          notifyListeners();
-        },
-        deleteOnError: true,
-      );
-
-      await GallerySaver.saveImage(path, albumName: 'Casa Rancha')
-          .whenComplete(() {
-        GlobalSnackBar.show(message: 'Saved in Gallery');
-      });
-    } catch (e) {
-      isDownloading = false;
-      notifyListeners();
-    } finally {
-      isDownloading = false;
-      progress = 0.0;
-      Get.back();
-      notifyListeners();
-    }
-  }
-
-  void videoDownloading(String url, String filename, context) async {
-    isDownloading = true;
-    notifyListeners();
-    try {
-      String path = await _getPath2(filename);
-
-      await dio.download(
-        url,
-        path,
-        onReceiveProgress: (count, total) {
-          progress = count / total;
-          notifyListeners();
-        },
-        deleteOnError: true,
-      );
-
-      await GallerySaver.saveVideo(path, albumName: 'Casa Rancha')
-          .whenComplete(() {
-        GlobalSnackBar.show(message: 'Saved in Gallery');
-      });
-    } catch (e) {
-      isDownloading = false;
-      notifyListeners();
-    } finally {
-      isDownloading = false;
-      progress = 0.0;
-      Get.back();
-      notifyListeners();
-    }
-  }
-
-  Future<String?> downloadForShare(String url, String filename, context) async {
-    try {
-      String path = await _getPath(filename);
-
-      Platform.isAndroid
-          ? await FileDownloader.downloadFile(
-              name: filename,
-              url: url,
-              onProgress: (fileName, p) {
-                progress = p;
-                notifyListeners();
-              },
-            )
-          : await dio.download(
-              url,
+              media.link,
               path,
               onReceiveProgress: (count, total) {
                 progress = count / total;
@@ -216,14 +256,14 @@ class DownloadProvider extends ChangeNotifier {
     }
   }
 
-  Future<String> _getPath(String filename) async {
+  Future<String> _getPath(String mediaType) async {
     final dir = await getApplicationDocumentsDirectory();
-    return '${dir.path}/$filename';
+    return '${dir.path}/$mediaType.${checkMediaTypeAndSetExtention(mediaType)}';
   }
 
-  Future<String> _getPath2(String filename) async {
+  Future<String> _getPath2(String mediaType) async {
     final dir = await getTemporaryDirectory();
-    return '${dir.path}/$filename';
+    return '${dir.path}/$mediaType.${checkMediaTypeAndSetExtention(mediaType)}';
   }
 }
 

@@ -84,7 +84,6 @@ class FirebaseMessagingService {
     };
 
     var model = await getCurrentUserDetails();
-    // var ghostmode = await ghostModeOn();
 
     Map officialBodyFormat = {
       "notification": {
@@ -110,13 +109,13 @@ class FirebaseMessagingService {
       "to": devRegToken
     };
 
-    http.post(
-      Uri.parse("https://fcm.googleapis.com/fcm/send"),
-      headers: header,
-      body: jsonEncode(officialBodyFormat),
-    );
-    // final result = await res;
-    // printLog(result.statusCode.toString());
+    if (devRegToken != null) {
+      http.post(
+        Uri.parse("https://fcm.googleapis.com/fcm/send"),
+        headers: header,
+        body: jsonEncode(officialBodyFormat),
+      );
+    }
 
     if (isMessage == false) {
       final NotificationModel notification = NotificationModel(
@@ -187,13 +186,13 @@ class FirebaseMessagingService {
         "to": user.fcmToken,
       };
 
-      await http.post(
-        Uri.parse("https://fcm.googleapis.com/fcm/send"),
-        headers: header,
-        body: jsonEncode(officialBodyFormat),
-      );
-
-      // printLog(res.statusCode.toString());
+      if (user.fcmToken != null) {
+        await http.post(
+          Uri.parse("https://fcm.googleapis.com/fcm/send"),
+          headers: header,
+          body: jsonEncode(officialBodyFormat),
+        );
+      }
 
       if (!isMessage) {
         final NotificationModel notification = NotificationModel(

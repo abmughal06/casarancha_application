@@ -378,7 +378,7 @@ class FollowProfileButton extends StatelessWidget {
             : Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    profileProvider.toggleFollowBtn(context, appUserId: id);
+                    profileProvider.toggleFollowBtn(appUserId: id);
                   },
                   child: Container(
                     height: 45.h,

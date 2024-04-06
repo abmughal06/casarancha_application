@@ -11,6 +11,14 @@ import 'package:get/get.dart';
 import '../../../../models/user_model.dart';
 import '../../../../resources/firebase_cloud_messaging.dart';
 
+Future<UserModel> getUserById(id) async {
+  return await FirebaseFirestore.instance
+      .collection('users')
+      .doc(id)
+      .get()
+      .then((value) => UserModel.fromMap(value.data()!));
+}
+
 class ProfileProvider extends ChangeNotifier {
   final postRef = FirebaseFirestore.instance.collection("posts");
 
@@ -22,19 +30,20 @@ class ProfileProvider extends ChangeNotifier {
         .whenComplete(() => Get.back());
   }
 
-  void toggleFollowBtn(context, {String? appUserId}) async {
+  void toggleFollowBtn({required String appUserId}) async {
     final currentUserRef = FirebaseFirestore.instance
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser!.uid);
 
-    final userModel = await currentUserRef
-        .get()
-        .then((value) => UserModel.fromMap(value.data()!));
-
     final appUserRef =
         FirebaseFirestore.instance.collection("users").doc(appUserId);
+
+    final currentUser =
+        await getUserById(FirebaseAuth.instance.currentUser!.uid);
+    final appUser = await getUserById(appUserId);
+
     try {
-      if (userModel.followingsIds.contains(appUserId)) {
+      if (currentUser.followingsIds.contains(appUserId)) {
         await currentUserRef.update({
           "followingsIds": FieldValue.arrayRemove([appUserId])
         });
@@ -50,15 +59,15 @@ class ProfileProvider extends ChangeNotifier {
           'followersIds':
               FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid])
         });
-        final appUserDevToken = await appUserRef.get();
         FirebaseMessagingService().sendNotificationToUser(
-            isMessage: false,
-            appUserId: appUserId!,
-            groupId: null,
-            content: null,
-            notificationType: "user_follow",
-            devRegToken: appUserDevToken.data()!['fcmToken'],
-            msg: '${appUserDevToken.data()!['name']} follows you');
+          isMessage: false,
+          appUserId: appUserId,
+          groupId: null,
+          content: null,
+          notificationType: "user_follow",
+          devRegToken: appUser.fcmToken,
+          msg: 'follows you',
+        );
       }
     } catch (e) {
       log('$e');
@@ -70,28 +79,25 @@ class ProfileProvider extends ChangeNotifier {
       Get.back();
       var currentUserId = FirebaseAuth.instance.currentUser!.uid;
       AuthenticationProvider(FirebaseAuth.instance)
-          .signOut()
+          .signOut(currentUserId)
           .then((value) => Get.offAll(() => const LoginScreen()));
       await firestore.collection('users').doc(currentUserId).delete();
     } on FirebaseAuthException catch (e) {
       printLog(e.toString());
     } catch (e) {
       printLog(e.toString());
-      // Handle general exception
     }
   }
 
   toggleUserOnlineStatus(bool value) async {
-    final currentUserRef = FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid);
+    if (FirebaseAuth.instance.currentUser != null) {
+      final currentUserRef = FirebaseFirestore.instance
+          .collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid);
 
-    // final userModel = await currentUserRef
-    //     .get()
-    //     .then((value) => UserModel.fromMap(value.data()!));
-
-    currentUserRef.update({
-      "isOnline": value,
-    });
+      currentUserRef.update({
+        "isOnline": value,
+      });
+    }
   }
 }

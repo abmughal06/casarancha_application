@@ -207,7 +207,6 @@ class AllSearch extends StatelessWidget {
                   return FollowFollowingTile(
                     user: userSnap,
                     ontapToggleFollow: () => profileProvider.toggleFollowBtn(
-                      context,
                       appUserId: userSnap.id,
                     ),
                     btnName: cUser.followingsIds.contains(userSnap.id)
@@ -253,7 +252,6 @@ class PeopleSearch extends StatelessWidget {
               return FollowFollowingTile(
                 user: userSnap,
                 ontapToggleFollow: () => profileProvider.toggleFollowBtn(
-                  context,
                   appUserId: userSnap.id,
                 ),
                 btnName: cUser.followingsIds.contains(userSnap.id)

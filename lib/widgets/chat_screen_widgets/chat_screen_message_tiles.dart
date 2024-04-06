@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:casarancha/resources/color_resources.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_controller.dart';
 import 'package:casarancha/screens/chat/forward_msg_screen.dart';
 import 'package:casarancha/screens/dashboard/provider/dashboard_provider.dart';
-import 'package:casarancha/screens/dashboard/provider/download_provider.dart';
 import 'package:casarancha/utils/snackbar.dart';
 import 'package:casarancha/widgets/chat_screen_widgets/full_screen_chat_media.dart';
 import 'package:casarancha/widgets/common_widgets.dart';
@@ -28,48 +25,30 @@ import '../../screens/home/post_detail_screen.dart';
 import '../../screens/home/story_view_screen.dart';
 import '../custom_dialog.dart';
 
-Future showMessageMennu(
-    {context,
-    url,
-    path,
-    friendId,
-    docId,
-    text,
-    isMe,
-    message,
-    mediaType}) async {
+Future showMessageMennu({
+  required BuildContext context,
+  required String friendId,
+  required String docId,
+  bool isMe = false,
+  required Message message,
+  List<MediaDetails>? mediaDetails,
+}) async {
   final chatProvider = Provider.of<ChatProvider>(context, listen: false);
   final ghost = Provider.of<DashboardProvider>(context, listen: false);
   await Get.bottomSheet(CupertinoActionSheet(
     actions: [
-      if (url != null || path != null)
+      if (mediaDetails != null)
         CupertinoActionSheetAction(
           onPressed: () {
-            if (url == null || path == null) {
-              Get.back();
-
-              GlobalSnackBar.show(
-                  message: appText(context).strcannotDownloadText);
-            } else {
-              Get.back();
-              // print(url, path);
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return CustomDownloadDialog(
-                    isImage: mediaType == 'Photo' || mediaType == 'InChatPic'
-                        ? true
-                        : false,
-                    isVideo: mediaType == 'Video' || mediaType == 'InChatVideo'
-                        ? true
-                        : false,
-                    url: url,
-                    path:
-                        "${mediaType}_${Random().nextInt(2)}${checkMediaTypeAndSetExtention(mediaType)}",
-                  );
-                },
-              );
-            }
+            Get.back();
+            showDialog(
+              context: context,
+              builder: (context) {
+                return CustomDownloadDialog(
+                  mediaDetails: mediaDetails,
+                );
+              },
+            );
           },
           child: TextWidget(
             text: appText(context).btnDownloadMedia,
@@ -78,11 +57,11 @@ Future showMessageMennu(
             fontWeight: FontWeight.w400,
           ),
         ),
-      if (url == null || path == null)
+      if (mediaDetails == null)
         CupertinoActionSheetAction(
           onPressed: () {
             Get.back();
-            Clipboard.setData(ClipboardData(text: text)).then((_) {
+            Clipboard.setData(ClipboardData(text: message.content)).then((_) {
               GlobalSnackBar.show(message: 'Message copied to clipboard');
             });
           },
@@ -121,12 +100,12 @@ Future showMessageMennu(
       ),
       CupertinoActionSheetAction(
         onPressed: () {
-          if (url == null || path == null) {
+          if (mediaDetails == null) {
             Get.back();
-            Share.share('$text');
+            Share.share(message.content);
           } else {
             Get.back();
-            Share.shareUri(Uri.parse(url));
+            Share.shareUri(Uri.parse(mediaDetails.first.link));
           }
         },
         child: TextWidget(
@@ -136,7 +115,7 @@ Future showMessageMennu(
           fontWeight: FontWeight.w400,
         ),
       ),
-      if ((url == null || path == null) && isMe)
+      if ((mediaDetails == null) && isMe)
         CupertinoActionSheetAction(
           onPressed: () async {
             Get.back();
@@ -211,18 +190,18 @@ class MessageTiles extends StatelessWidget {
     switch (message.type) {
       case "InChatPic":
         final pic = message.content != 'upload'
-            ? MediaDetails.fromMap(message.content[0])
+            ? List.generate(message.content.length,
+                (index) => MediaDetails.fromMap(message.content[index]))
             : null;
         return InkWell(
           onLongPress: () {
             showMessageMennu(
-              mediaType: pic == null ? "" : pic.type,
               context: context,
               message: message,
-              url: pic == null ? "" : pic.link,
-              path: message.type,
+              isMe: isMe,
               friendId: isMe ? message.sentToId : message.sentById,
               docId: message.id,
+              mediaDetails: pic,
             );
           },
           onTap: message.content == 'upload'
@@ -249,9 +228,7 @@ class MessageTiles extends StatelessWidget {
           onLongPress: () {
             showMessageMennu(
               context: context,
-              mediaType: message.content['mediaData'][0]['type'],
-              url: message.content['mediaData'][0]['link'],
-              path: message.type,
+              mediaDetails: postModel.mediaData,
               message: message,
               friendId: isMe ? message.sentToId : message.sentById,
               docId: message.id,
@@ -278,8 +255,7 @@ class MessageTiles extends StatelessWidget {
             showMessageMennu(
               context: context,
               message: message,
-              url: postModel.mediaData.first.link,
-              path: message.type,
+              mediaDetails: postModel.mediaData,
               friendId: isMe ? message.sentToId : message.sentById,
               docId: message.id,
             );
@@ -297,9 +273,9 @@ class MessageTiles extends StatelessWidget {
           ),
         );
       case 'InChatVideo':
-        final videos = message.content != 'upload'
-            ? MediaDetails.fromMap(message.content[0])
-            : null;
+        // final videos = message.content != 'upload'
+        //     ? MediaDetails.fromMap(message.content[0])
+        //     : null;
         var media = message.content == "upload"
             ? null
             : List.generate(message.content.length,
@@ -310,11 +286,9 @@ class MessageTiles extends StatelessWidget {
             ? InkWell(
                 onLongPress: () {
                   showMessageMennu(
-                    mediaType: videos == null ? "" : videos.type,
                     context: context,
                     message: message,
-                    url: videos == null ? "" : videos.link,
-                    path: message.type,
+                    mediaDetails: media,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
                   );
@@ -352,9 +326,9 @@ class MessageTiles extends StatelessWidget {
                         ),
                       )
                     : ChatVideoTile(
-                        key: videos == null ? null : ValueKey(videos.link),
+                        key: ValueKey(media.first.link),
                         mediaLength: media.length > 1 ? media.length : null,
-                        media: videos,
+                        media: media.first,
                         appUserId: message.sentToId,
                         isSeen: message.isSeen,
                         caption: message.caption,
@@ -371,9 +345,7 @@ class MessageTiles extends StatelessWidget {
             showMessageMennu(
               context: context,
               message: message,
-              mediaType: postModel.mediaData.first.type,
-              url: postModel.mediaData.first.link,
-              path: message.type,
+              mediaDetails: postModel.mediaData,
               friendId: isMe ? message.sentToId : message.sentById,
               docId: message.id,
             );
@@ -393,7 +365,8 @@ class MessageTiles extends StatelessWidget {
         );
       case 'InChatMusic':
         final music = message.content != 'upload'
-            ? MediaDetails.fromMap(message.content[0])
+            ? List.generate(message.content.length,
+                (index) => MediaDetails.fromMap(message.content[index]))
             : null;
         final isUploading = music == null && !isMe;
 
@@ -403,20 +376,19 @@ class MessageTiles extends StatelessWidget {
                   showMessageMennu(
                     context: context,
                     message: message,
-                    url: music == null ? "" : music.link,
-                    path: message.type,
+                    mediaDetails: music,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
                   );
                 },
                 child: ChatMusicTile(
-                  key: music == null ? null : ValueKey(music.link),
+                  key: music == null ? null : ValueKey(music.first.link),
                   appUserId: message.sentToId,
                   isSeen: message.isSeen,
                   isMe: isMe,
                   caption: message.caption,
                   date: message.createdAt,
-                  media: music,
+                  media: music!.first,
                 ),
               )
             : widthBox(0);
@@ -427,8 +399,7 @@ class MessageTiles extends StatelessWidget {
           onLongPress: () {
             showMessageMennu(
               context: context,
-              url: postModel.mediaData.first.link,
-              path: message.type,
+              mediaDetails: postModel.mediaData,
               message: message,
               friendId: isMe ? message.sentToId : message.sentById,
               docId: message.id,
@@ -451,7 +422,8 @@ class MessageTiles extends StatelessWidget {
       case 'Doc':
         final doc = message.content == 'upload'
             ? null
-            : MediaDetails.fromMap(message.content[0]);
+            : List.generate(message.content.length,
+                (index) => MediaDetails.fromMap(message.content[index]));
         final isUploading = doc == null && !isMe;
 
         return isUploading
@@ -460,28 +432,28 @@ class MessageTiles extends StatelessWidget {
                 onLongPress: () {
                   showMessageMennu(
                     context: context,
-                    url: doc == null ? '' : doc.link,
-                    path: message.type,
+                    mediaDetails: doc,
                     message: message,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
                   );
                 },
                 child: ChatDocumentTile(
-                  key: doc == null ? null : ValueKey(doc.link),
+                  key: doc == null ? null : ValueKey(doc.first.link),
                   appUserId: message.sentToId,
                   isSeen: message.isSeen,
                   caption: message.caption,
                   isMe: isMe,
                   date: message.createdAt,
-                  media: doc,
+                  media: doc!.first,
                 ),
               );
 
       case 'Voice':
         final voice = message.content == 'upload'
             ? null
-            : MediaDetails.fromMap(message.content[0]);
+            : List.generate(message.content.length,
+                (index) => MediaDetails.fromMap(message.content[index]));
         final isUploading = voice == null && !isMe;
 
         return isUploading
@@ -490,20 +462,19 @@ class MessageTiles extends StatelessWidget {
                 onLongPress: () {
                   showMessageMennu(
                     context: context,
-                    url: voice == null ? '' : voice.link,
-                    path: message.type,
+                    mediaDetails: voice,
                     message: message,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
                   );
                 },
                 child: ChatVoiceTile(
-                  key: voice != null ? ValueKey(voice.link) : null,
+                  key: voice != null ? ValueKey(voice.first.link) : null,
                   appUserId: message.sentToId,
                   isSeen: message.isSeen,
                   isMe: isMe,
                   date: message.createdAt,
-                  media: voice,
+                  media: voice!.first,
                 ),
               );
       case 'story-Video':
@@ -513,8 +484,7 @@ class MessageTiles extends StatelessWidget {
                 onLongPress: () {
                   showMessageMennu(
                     context: context,
-                    url: story.link,
-                    path: message.type,
+                    mediaDetails: [story],
                     message: message,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
@@ -535,13 +505,13 @@ class MessageTiles extends StatelessWidget {
               )
             : Container();
       case 'story-Photo':
+        final story = MediaDetails.fromMap(message.content);
         return isDateAfter24Hour(DateTime.parse(message.createdAt))
             ? InkWell(
                 onLongPress: () {
                   showMessageMennu(
                     context: context,
-                    url: message.content['link'],
-                    path: message.type,
+                    mediaDetails: [story],
                     message: message,
                     friendId: isMe ? message.sentToId : message.sentById,
                     docId: message.id,
@@ -564,12 +534,10 @@ class MessageTiles extends StatelessWidget {
           onLongPress: () {
             showMessageMennu(
               context: context,
-              url: null,
-              path: null,
+              mediaDetails: null,
               friendId: isMe ? message.sentToId : message.sentById,
               isMe: isMe,
               docId: message.id,
-              text: message.content,
               message: message,
             );
           },

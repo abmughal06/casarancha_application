@@ -379,8 +379,12 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   //SIGN OUT METHOD
-  Future<void> signOut() async {
-    await firebaseAuth.signOut();
+  Future<void> signOut(id) async {
+    await firebaseAuth.signOut().then((value) {
+      FirebaseFirestore.instance.collection('users').doc(id).update({
+        'fcmToken': null,
+      });
+    });
   }
 
   Future<void> linkPhoneWithEmailAccount(

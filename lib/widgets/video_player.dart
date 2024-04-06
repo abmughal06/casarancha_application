@@ -141,7 +141,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
           } else {
             videoPlayerController.setVolume(1.0);
           }
-          widget.onVisible;
+          widget.onVisible();
           videoPlayerController.play();
         } else {
           videoPlayerController.pause();

@@ -47,7 +47,7 @@ class EditProfileProvider extends ChangeNotifier {
     imageFilePicked = null;
   }
 
-  getFromGallery(context) async {
+  getFromGallery() async {
     XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 50,
@@ -58,7 +58,7 @@ class EditProfileProvider extends ChangeNotifier {
       imageFilePicked = File(pickedFile.path);
       notifyListeners();
     } else {
-      GlobalSnackBar.show(message: appText(context).strProcessCancelled);
+      // GlobalSnackBar.show(message: appText(context).strProcessCancelled);
     }
     notifyListeners();
   }
@@ -84,7 +84,7 @@ class EditProfileProvider extends ChangeNotifier {
     return true;
   }
 
-  void updateData(context, {UserModel? currentUser}) async {
+  Future<void> updateData(context, {UserModel? currentUser}) async {
     try {
       if (checkValidData(context)) {
         isLoading = true;
@@ -114,6 +114,8 @@ class EditProfileProvider extends ChangeNotifier {
           'education': educationController.text,
           'imageStr': imageUrl,
         });
+
+        GlobalSnackBar.show(message: 'Profile updated sucessfully');
       }
     } on FirebaseException catch (e) {
       GlobalSnackBar.show(message: e.message.toString());

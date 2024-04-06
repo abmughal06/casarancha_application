@@ -133,8 +133,8 @@ class ChatMediaFullScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // printLog(media.toString());
-    var link = media.map((e) => e.link).join(", ");
-    var name = media.map((e) => e.name).join(", ");
+    // var link = media.map((e) => e.link).join(", ");
+    // var name = media.map((e) => e.name).join(", ");
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -147,16 +147,7 @@ class ChatMediaFullScreenView extends StatelessWidget {
           showDialog(
             context: context,
             builder: (c) => CustomDownloadDialog(
-              isImage:
-                  media.first.type == 'Photo' || media.first.type == 'InChatPic'
-                      ? true
-                      : false,
-              isVideo: media.first.type == 'Video' ||
-                      media.first.type == 'InChatVideo'
-                  ? true
-                  : false,
-              path: name,
-              url: link,
+              mediaDetails: media,
             ),
           );
         },

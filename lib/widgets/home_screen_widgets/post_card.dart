@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:casarancha/screens/groups/provider/new_group_prov.dart';
 import 'package:casarancha/screens/home/providers/post_provider.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
@@ -18,7 +16,6 @@ import 'package:provider/provider.dart';
 import '../../models/post_model.dart';
 import '../../models/user_model.dart';
 import '../../screens/dashboard/provider/dashboard_provider.dart';
-import '../../screens/dashboard/provider/download_provider.dart';
 import '../common_widgets.dart';
 import '../text_widget.dart';
 
@@ -121,15 +118,7 @@ class PostCard extends StatelessWidget {
                       showDialog(
                           context: context,
                           builder: (c) => CustomDownloadDialog(
-                                isImage: post.mediaData.first.type == 'Photo'
-                                    ? true
-                                    : false,
-                                isVideo: post.mediaData.first.type == 'Video'
-                                    ? true
-                                    : false,
-                                path:
-                                    '${post.mediaData.first.type}${Random().nextInt(2)}${checkMediaTypeAndSetExtention(post.mediaData.first.type)}',
-                                url: post.mediaData.first.link,
+                                mediaDetails: post.mediaData,
                               ));
                     },
                   ),
