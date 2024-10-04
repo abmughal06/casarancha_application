@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "casa-rancha",
+  "private_key_id": "28f4a37a8725be0533ec54f32941398072ca4dc0",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDClq/KA3eYsUIj\nL2VIN/UsFRSXLr1yeopyUSJ0bGudaH2A3IpW2WFN0r+inYnEO5x1Sqh9wFVzJyz3\nqo+SmfAUB/C6OUzgPfE282RpHDKmDq2CbycY1jR7kprNJ9Q1NSE/g4/60OaLvKw4\nGcV8XQvCOTQFqyl+oVGXQ9LDFkXKpelfkBqYW5UhQqONrAe1JaKVxNLU0QGV52fp\nlGtEy61Td+IuQUhtmj3GAU72kybeHSXG/sFj7ZWRAxS+dUhRTfpsDsGiQQ0pxP2Q\nX0/TntElxHNGvOBQGNzVd416cs0JC1hfCGqCkt4uoDHiByWqXYHwFR5n5dfobJOt\n29F5XpAZAgMBAAECggEAKBZ+KaqUMXdXLkN95KZukoHXR5wf+F0pd4qihASwGPIl\nZO5Ka8EF7E/+HeTBtJUpUvqqApokoIASIgXX5TZkgOPv4pWaclogfxceeQ8PmilM\n8qGuls3OayTVUm2hqMKE0n5qo5v02xXoDvi0OD49BWrefkp4VneqhPS6j2lfwHMY\niO4vr3GmqsNbEcsNxfzfcl1GeZwKfCvOncC83t8npRRgPrTUwZYPFVDGbEsAln8u\nXBAlI0Ksa+bBGFNmhCgw0X664HiQCN3r/dM6IwoCSXJ71mY1Wm54WEa2anbWz2Y3\nGC7AZal48vjz7sFDy30h7CVdYZvqLZqQ+33BHx5YhwKBgQDw+mZMaLKTjroOZrsh\noUbNfqrdWHrQRP14C0rpXAUMo39phbmOm7mBJgjlJvqUd/VsJyvgTm0NT0rdRoTt\n9H/b/j9ajhDu6j0bXKoO86ar+KzBxLSHVmm5yS+5eNbFQnAnn6sigwBEVPsmPSvt\nM+xmMzAjSv8hV367MCqQA+yL0wKBgQDOt/1XCwzEPsEqPQ53iPhMTVgdm+pq1tt0\ndd9aTrV/CXJMU4b316U+cVkqgkGNo8+PUWk5vL2LeohP6FRWKV6yI9VeRvdeQuga\naCFx3VwD7dpb7ipeNyFQXoWvLlLnEsMTH4SOoRCTJgfGxjH8B5Q+l5Vh+d2Ms0DJ\nzgGP8K6c4wKBgQCBPuvLI4RT3AMyYisP2H4vDTb7TM9iEP6ZegUNsEsNAkv9/rkN\nIbyW5h1zOjq/kq9Q+Jlxzt5yewq+L2pwbeh9x5mXKgcu/PcVS9fx+QB10ARoUOY6\niEBgYuVz5rnaRs38koipE/X6sFGbqsd6i5TJI783zquT6GeSYj0RzOj7/QKBgQC1\nfCDmB2R48mNiMuJ9nXnoe0ruC9GdZO6ca1PhFBMR6fg3/GkVNHT1wku3H05wDK4Q\nNDg+oW6Dgtsj1GQelQl3OjB8Ka/JSNI/RMaAEghTxsGbThhSSPJtfd6+MtxD1FwB\ncP1OvycvGQdgwuZlTz4eSbSzpMuWWFV8FumWNocGYwKBgH/gecTfDSa6c0FwUaqL\nL1M//ayqVVP11iHH/L8160A+JTxNEsLP5NIuP8fOinomcX+1flcBEH7v3dlzjyqL\nJlt0fVKCNU6KxKX10qojc3DlqsnGBTXocFBLa99mrEzLYNX0QdJ668NONikq2CsY\nl22dnAZbHTvuJRpZMV6jGDxv\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-xfavd@casa-rancha.iam.gserviceaccount.com",
+  "client_id": "102889579444763921277",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xfavd%40casa-rancha.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

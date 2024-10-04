@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:casarancha/models/notification_model.dart';
 import 'package:casarancha/models/post_creator_details.dart';
 import 'package:casarancha/models/post_model.dart';
 import 'package:casarancha/models/user_model.dart';
+import 'package:casarancha/resources/o_auth_fcm_token.dart';
 import 'package:casarancha/screens/chat/Chat%20one-to-one/chat_screen.dart';
 import 'package:casarancha/screens/home/post_detail_screen.dart';
 import 'package:casarancha/screens/profile/AppUser/app_user_screen.dart';
@@ -78,43 +80,46 @@ class FirebaseMessagingService {
       required String notificationType,
       required String appUserId,
       bool ghostmode = false}) async {
+    final accesstoken = await FirebaseCloudAuthService().getAccessToken();
     Map<String, String> header = {
       "Content-Type": "application/json",
-      "Authorization": serverKey,
+      "Authorization": "Bearer $accesstoken",
     };
 
     var model = await getCurrentUserDetails();
 
     Map officialBodyFormat = {
-      "notification": {
-        "title": ghostmode ? model.ghostName : model.name,
-        "body": msg,
-        "sound": "default"
+      "message": {
+        "token": devRegToken,
+        "notification": {
+          "title": ghostmode ? model.ghostName : model.name,
+          "body": "$msg",
+        },
+        "data": {
+          "click_action": "FLUTTER_NOTIFICATION_CLICK",
+          "id": "1",
+          "status": "done",
+          "userRequestId": model.id,
+          "notification_type": notificationType,
+          "content": content,
+        },
+        "apns": {
+          "headers": {"aps-priority": "10"},
+          "payload": {
+            "aps": {"sound": "default"}
+          }
+        },
       },
-      "apns": {
-        "headers": {"aps-priority": "10"},
-        "payload": {
-          "apns": {"sound": "default"}
-        }
-      },
-      "priority": "high",
-      "data": {
-        "click_action": "FLUTTER_NOTIFICATION_CLICK",
-        "id": "1",
-        "status": "done",
-        "userRequestId": model.id,
-        "notification_type": notificationType,
-        "content": content,
-      },
-      "to": devRegToken
     };
 
     if (devRegToken != null) {
-      http.post(
-        Uri.parse("https://fcm.googleapis.com/fcm/send"),
+      final result = await http.post(
+        Uri.parse(
+            "https://fcm.googleapis.com/v1/projects/casa-rancha/messages:send"),
         headers: header,
         body: jsonEncode(officialBodyFormat),
       );
+      log("response =========>>>>>>>>>> ${result.body}");
     }
 
     if (isMessage == false) {
@@ -154,70 +159,75 @@ class FirebaseMessagingService {
 
     // Iterate through each user and send a notification
     for (var user in users) {
-      var model = await getCurrentUserDetails();
-      var ghostmode = await ghostModeOn();
+      // var model = await getCurrentUserDetails();
+      // var ghostmode = await ghostModeOn();
 
-      Map<String, String> header = {
-        "Content-Type": "application/json",
-        "Authorization": serverKey,
-      };
-
-      Map<String, dynamic> officialBodyFormat = {
-        "notification": {
-          "title": ghostmode ? "Ghost----" : model.name,
-          "body": msg,
-          "sound": "default",
-        },
-        "apns": {
-          "headers": {"aps-priority": "10"},
-          "payload": {
-            "apns": {"sound": "default"},
-          },
-        },
-        "priority": "high",
-        "data": {
-          "click_action": "FLUTTER_NOTIFICATION_CLICK",
-          "id": "1",
-          "status": "done",
-          "userRequestId": model.id,
-          "notification_type": notificationType,
-          "content": content,
-        },
-        "to": user.fcmToken,
-      };
-
-      if (user.fcmToken != null) {
-        await http.post(
-          Uri.parse("https://fcm.googleapis.com/fcm/send"),
-          headers: header,
-          body: jsonEncode(officialBodyFormat),
-        );
-      }
-
-      if (!isMessage) {
-        final NotificationModel notification = NotificationModel(
-          sentToId: user.id,
-          sentById: model.id,
-          msg: msg,
-          content: content,
-          groupId: groupId,
+      sendNotificationToUser(
+          isMessage: isMessage,
           notificationType: notificationType,
-          isRead: false,
-          createdDetails: CreatorDetails(
-            name: ghostmode ? "Ghost----" : model.name,
-            imageUrl: ghostmode ? "" : model.imageStr,
-            isVerified: model.isVerified,
-          ),
-          createdAt: DateTime.now().toUtc().toString(),
-        );
+          appUserId: user.id);
 
-        FirebaseFirestore.instance
-            .collection("users")
-            .doc(user.id)
-            .collection("notificationList")
-            .doc()
-            .set(notification.toMap());
-      }
+      // Map<String, String> header = {
+      //   "Content-Type": "application/json",
+      //   "Authorization": serverKey,
+      // };
+
+      // Map<String, dynamic> officialBodyFormat = {
+      //   "notification": {
+      //     "title": ghostmode ? "Ghost----" : model.name,
+      //     "body": msg,
+      //     "sound": "default",
+      //   },
+      //   "apns": {
+      //     "headers": {"aps-priority": "10"},
+      //     "payload": {
+      //       "apns": {"sound": "default"},
+      //     },
+      //   },
+      //   "priority": "high",
+      //   "data": {
+      //     "click_action": "FLUTTER_NOTIFICATION_CLICK",
+      //     "id": "1",
+      //     "status": "done",
+      //     "userRequestId": model.id,
+      //     "notification_type": notificationType,
+      //     "content": content,
+      //   },
+      //   "to": user.fcmToken,
+      // };
+
+      // if (user.fcmToken != null) {
+      //   await http.post(
+      //     Uri.parse("https://fcm.googleapis.com/fcm/send"),
+      //     headers: header,
+      //     body: jsonEncode(officialBodyFormat),
+      //   );
+      // }
+
+      // if (!isMessage) {
+      //   final NotificationModel notification = NotificationModel(
+      //     sentToId: user.id,
+      //     sentById: model.id,
+      //     msg: msg,
+      //     content: content,
+      //     groupId: groupId,
+      //     notificationType: notificationType,
+      //     isRead: false,
+      //     createdDetails: CreatorDetails(
+      //       name: ghostmode ? "Ghost----" : model.name,
+      //       imageUrl: ghostmode ? "" : model.imageStr,
+      //       isVerified: model.isVerified,
+      //     ),
+      //     createdAt: DateTime.now().toUtc().toString(),
+      //   );
+
+      //   FirebaseFirestore.instance
+      //       .collection("users")
+      //       .doc(user.id)
+      //       .collection("notificationList")
+      //       .doc()
+      //       .set(notification.toMap());
+      // }
     }
   }
 

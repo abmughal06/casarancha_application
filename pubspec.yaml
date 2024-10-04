@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.0.9+35
+version: 2.0.11+37
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -41,7 +41,7 @@ dependencies:
   flutter_linkify: ^6.0.0
   restart_app: ^1.2.1
   swipe_to: ^1.0.6
-  gallery_saver: ^2.3.2
+  gallery_saver_updated: ^3.0.0
   # recaptcha_enterprise_flutter: ^18.4.0 //only for android
 
   pinch_zoom: ^1.0.0
@@ -51,10 +51,11 @@ dependencies:
   file_picker: ^6.1.1
   firebase_auth: ^4.2.5
   firebase_storage: ^11.0.10
-  http: ^0.13.3
+  http: ^1.2.2
+  pointycastle: ^3.9.1
 
   firebase_core: ^2.24.2
-  firebase_messaging: ^14.5.0
+  firebase_messaging: ^14.6.0
   flutter_local_notifications: ^16.2.0
 
   flutter_cache_manager: ^3.3.1
@@ -83,7 +84,7 @@ dependencies:
   badges: ^3.0.2
   get: ^4.6.5
   image_picker: ^0.8.6
-  intl: ^0.18.1
+  intl: ^0.19.0
   shimmer: ^3.0.0
   # story_view: ^0.16.0
   url_launcher: ^6.1.6
@@ -110,6 +111,7 @@ dependencies:
   # chewie: ^1.4.0
   flutter_polls: ^0.1.5
   crypto: ^3.0.2
+  googleapis_auth: ^1.2.0
   jwt_decoder: ^2.0.1
   # encrypted_shared_preferences: ^3.0.1
   shared_preferences: ^2.0.15
@@ -148,6 +150,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/json/
     - assets/images/
     - assets/images/img_home_page/
     - assets/images/img_search_page/

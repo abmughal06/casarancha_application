@@ -5,7 +5,7 @@ import 'package:casarancha/utils/snackbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:gallery_saver_updated/gallery_saver.dart';
 // import 'package:gallery_saver/gallery_saver.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
